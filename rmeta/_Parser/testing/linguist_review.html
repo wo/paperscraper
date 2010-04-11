@@ -1,391 +1,0 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<!--
-
-MAKE SURE YOU KEEP TRACK OF EVERYTHING YOU DO!
-
-Author: Gayathri Sriram
-Date: 01/02/02
-Purpose: This template is the third of search review series. This template searches book reviews by SL, LF, author, title and keyword(in description). Forms for search review: search-review1.cfm, search-review2.cfm, get-review.cfm
-+++++++++++++
-Modifications
-+++++++++++++
-Editor: Michael Appleby			
-DD-MMM-YY: 26 Jan 2002	
-Watcha did:	validation with the templates (adding metadata, the stylesheet link and adding bgcolor and onload attributes to the body tag.  
-This was done with the extended find and replace; please check for errors	
-~~~~~~~~~~~~~
-Editor:	Neil Salmond
-DD-MMM-YY: 21-SEP-04
-Watcha did:	Changed issue link from linguistlist.org/yy/yy.xxx to test.linguistlist.org; find on page "21SEP04".
-~~~~~~~~~~~~~
-Editor:			
-DD-MMM-YY:		
-Watcha did:		
-~~~~~~~~~~~~~
-
--->
-
-         
-<html>
-
-<head>
-<title>Linguist List - Reviews Available for the Book</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="SHORTCUT ICON" href="../../images/favicon.ico">
-<link rel="stylesheet" href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/Templates/LL.css" type="text/css">
-	
-		
-	
-
-</head>
-
-<body topmargin="0" leftmargin="0" marginheight="0" marginwidth="0" bgcolor="#ffffff">
- 	
- 
-<table width="700" border="0" cellspacing="0" cellpadding="0">
-				
-<form action="indextemp.cfm" method="post" name="level" id="level" style="p-match">
-	<input type="hidden" name="level" value="../../">
-</form>
-
-		<tr>
-			<td>
-			
-
-<!-- ULTIMATE DROPDOWN MENU v3.8 by Brothercake -->
-<!-- http://www.brothercake.com/dropdown/ -->
-
-
-<script language="javascript" src="../../Templates/sniffer.js"></script>
-<script language="javascript" src="../../Templates/custom_demo1.js"></script>
-<script language="javascript" src="../../Templates/style.js"></script>
-
-
-<script language="javascript">
-
-//button image names
-var buttons = new Array("index_r2_c2","index_r2_c4","index_r2_c6","index_r2_c10","index_r2_c13","index_r2_c15","index_r2_c18","index_r2_c20","index_r2_c22" );
-
-//menu co-ordinates
-var cords = new Array;
-cords[0] = new Array(0,134);
-cords[1] = new Array(69,134);
-cords[2] = new Array(108,134);
-cords[3] = new Array(210,134);
-cords[4] = new Array(285,134);
-cords[5] = new Array(394,134);
-cords[6] = new Array(498,134);
-cords[7] = new Array(570,134);
-cords[8] = new Array(614,134);
-
-var imgs = new Array;
-for(i=0;i<9;i++){
-	//preload images
-	imgs[i] = new Array;
-	imgs[i][0] = new Image;
-	imgs[i][0].src = '../../images/'+buttons[i]+'.gif';
-	imgs[i][1] = new Image;
-	imgs[i][1].src = '../../images/'+buttons[i]+'_f2.gif';
-
-	}
-
-var imgObj = new Array;
-//var imgObj;
-function over(imgNum) {
-
-	//reset all images
-	menuClosingFunction();
-
-	//image object
-	if(ns4) { imgObj = document.layers["navlayer"].document.images["b"+imgNum]; }
-	else { imgObj = document.images["b"+imgNum]; }
-
-	//change image
-	imgObj.src = imgs[imgNum][1].src;
-
-	var menuReadyState = 1;
-	//activate menu
-	if(menuReadyState) { activateMenu(imgNum,cords[imgNum][0],cords[imgNum][1]); }
-	}
-
-function menuClosingFunction() {
-	//reset all images
-	for(i=0;i<9;i++){
-		if(ns4) { imgObj = document.layers["navlayer"].document.images["b"+i]; }
-		else { imgObj = document.images["b"+i]; }
-		imgObj.src = imgs[i][0].src;
-		}
-	}
-
-</script>
-
- <ilayer id="navlayer">
- 
-<table border="0" cellpadding="0" cellspacing="0" width="718"><tr>
-   <td><img src="../../images/spacer.gif" width="9" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="66" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="22" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="24" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="28" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="8" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="12" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="42" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="32" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="23" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="36" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="30" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="52" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="26" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="83" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="23" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="7" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="54" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="31" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="34" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="35" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="35" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="6" height="1" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="1" height="1" border="0" alt="*"></td>
-  </tr>
-   <tr>
-   <td colspan="10"><img name="index_r1_c1" src="../../images/index_r1_c1.gif" width="266" height="99" border="0" usemap="#m_index_r1_c1" alt="LINGUIST List logo"></td>
-   <td colspan="6"><img name="index_r1_c11" src="../../images/index_r1_c11.gif" width="250" height="99" border="0" usemap="#m_index_r1_c11" alt="Eastern Michigan University"></td>
-   <td colspan="7"><img name="index_r1_c17" src="../../images/index_r1_c17.gif" width="202" height="99" border="0" usemap="#m_index_r1_c17" alt="Wayne State University"></td>
-   <td><img src="../../images/spacer.gif" width="1" height="99" border="0" alt="*"></td>
-  </tr>   
-  <tr>
-   <td><img name="index_r2_c1" src="../../images/index_r2_c1.gif" width="9" height="27" border="0" alt="*"></td>
-   <td><a href="../../people/index.html" onmouseover="over(0)" onmouseout="deactivateMenus(false)"><img name="b0" src="../../images/index_r2_c2.gif" width="66" height="27" border="0" alt="People & Organizations"></a></td>
-   <td><img name="index_r2_c3" src="../../images/index_r2_c3.gif" width="22" height="27" border="0" alt="*"></td>
-   <td><a href="../../jobs/index.html" onmouseover="over(1)" onmouseout="deactivateMenus(false)"><img src="../../images/index_r2_c4.gif" name="b1" width="24" height="27" border="0" alt="Jobs"></a></td>
-   <td><img name="index_r2_c5" src="../../images/index_r2_c5.gif" width="28" height="27" border="0" alt="*"></td>
-   <td colspan="3"><a href="../../callconf/index.html" onmouseover="over(2)"  onmouseout="deactivateMenus(false)"><img src="../../images/index_r2_c6.gif" name="b2" width="62" height="27" border="0" alt="Calls & Conferences"></a></td>
-   <td><img name="index_r2_c9" src="../../images/index_r2_c9.gif" width="32" height="27" border="0" alt="*"></td>
-    <td colspan="2"><a href="../../pubs/index.html" onmouseover="over(3)" onmouseout="deactivateMenus(false)"><img src="../../images/index_r2_c10.gif" name="b3" width="59" height="27" border="0" alt="Publications"></a></td>
-   <td><img name="index_r2_c12" src="../../images/index_r2_c12.gif" width="30" height="27" border="0" alt="*"></td>
-   <td><a href="../../langres/index.html" onmouseover="over(4)"  onmouseout="deactivateMenus(false)"><img src="../../images/index_r2_c13.gif" name="b4" width="52" height="27" border="0" alt="Language Resources"></a></td>
-   <td><img name="index_r2_c14" src="../../images/index_r2_c14.gif" width="26" height="27" border="0" alt="*"></td>
-   <td><a href="../../tools/index.html" onmouseover="over(5)" onmouseout="deactivateMenus(false)" ><img src="../../images/index_r2_c15.gif" name="b5" width="83" height="27" border="0" alt="Text & Computer Tools"></a></td>
-   <td colspan="2"><img name="index_r2_c16" src="../../images/index_r2_c16.gif" width="30" height="27" border="0" alt="*"></td>
-   <td><a href="../../teach/index.html" onmouseover="over(6)" onmouseout="deactivateMenus(false)"><img src="../../images/index_r2_c18.gif" name="b6" width="54" height="27" border="0" alt="Teaching & Learning"></a></td>
-   <td><img name="index_r2_c19" src="../../images/index_r2_c19.gif" width="31" height="27" border="0" alt="*"></td>
-   <td><a href="../../lists/index.html" onmouseover="over(7)"  onmouseout="deactivateMenus(false)"><img src="../../images/index_r2_c20.gif" name="b7" width="34" height="27" border="0" alt="Mailing Lists"></a></td>
-   <td><img name="index_r2_c21" src="../../images/index_r2_c21.gif" width="35" height="27" border="0" alt="*"></td>
-   <td><a href="../../search/index.html" onmouseover="over(8)"  onmouseout="deactivateMenus(false)"><img src="../../images/index_r2_c22.gif" name="b8" width="35" height="27" border="0" alt="Search"></a></td>
-   <td><img src="../../images/spacer.gif" width="3" width="6" height="27" border="0" alt="*"></td>
-  </tr><tr>
-   <td colspan="23" align="bottom"><img name="4index_r3_c1_toponly" src="../../images/index_r3_c1_toponly.gif" width="718" height="9" border="0" alt="*"></td>
-   <td><img src="../../images/spacer.gif" width="1" height="9" border="0" alt="*"></td>
-  </tr></table></ilayer>
-  
-<map name="m_index_r1_c1">
-<area shape="rect" coords="3,8,187,83" href="http://linguistlist.org" >
-</map>
-<map name="m_index_r1_c11">
-<area shape="rect" coords="80,55,248,68" href="http://www.emich.edu/" >
-</map>
-<map name="m_index_r1_c17">
-<area shape="rect" coords="19,56,161,68" href="http://www.wayne.edu/" >
-</map>
-
-			</td>
-		</tr>
-	</table>
-
-<table width="700" border="0" cellspacing="0" cellpadding="0">
-	<tr>
-		<td valign="top">
-			<table border="0" cellspacing="0" cellpadding="5" width="690">
-				<tr>
-					<td valign="top" align="center">
-						 
-<b></b>
- 
-					</td>
-				</tr>
-				<tr>
-					<td width="690">
-					
-					
-											
-							
-							<table width="690">
-								<tr>
-									<td>
-										<table width="575" align="left" cellspacing="2" cellpadding="4" align="center"> 
-										
-										
-											<tr>
-												<td width="175" valign="top" align="right">
-												</td>
-												<td width="400" valign="top" align="left">
-												
-												 		
-														<span class="red"><strong>Review of &nbsp;Perspectives on Negation and Polarity Items</strong></span>
-														
-												</td>
-											</tr>
-							
-								
-											<tr>
-												<td width="175" valign="top" align="right">
-													<span class="p-match"><strong>Reviewer:</strong></span>
-												</td>
-												<td width="400" valign="top" align="left">
-													
-															<a href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/people/personal/get-personal-page2.cfm?PersonID=10875" target="_blank">
-															Cecile  Meier</a>
-													
-											</td>
-										</tr>
-						
-											<tr>
-												<td width="175" valign="top" align="right">
-												<span class="p-match"><strong>Book Title:</strong></span>
-												</td>
-												<td width="400" valign="top" align="left">
-													
-														<a href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/pubs/books/get-book.cfm?BookID=1990" target="_blank">
-														Perspectives on Negation and Polarity Items</a>
-														
-												</td>
-											</tr>
-											<tr>
-												<td width="175" valign="top" align="right">
-													<span class="p-match"><strong>Book Author:</strong></span>
-												</td>
-												<td width="400" valign="top" align="left">
-													
-															<a href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/people/personal/get-personal-page2.cfm?PersonID=511" target="_blank">
-															Jack  Hoeksema</a>
-																			
-																/&nbsp; 
-													    	
-															<a href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/people/personal/get-personal-page2.cfm?PersonID=7115" target="_blank">
-															Hotze  Rullmann</a>
-																			
-																/&nbsp; 
-													    	
-															<a href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/people/personal/get-personal-page2.cfm?PersonID=7116" target="_blank">
-															Victor  Sanchez-Valencia</a>
-																			
-																/&nbsp; 
-													    	
-															<a href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/people/personal/get-personal-page2.cfm?PersonID=7117" target="_blank">
-															Ton  van der Wouden</a>
-														
-											</td>
-										</tr>
-										<tr>
-											<td width="175" valign="top" align="right">
-												<span class="p-match"><strong>Publisher:</strong></span>
-											</td>
-											<td width="400" valign="top" align="left">		
-												<a href="http://www.benjamins.com/"  target="_blank">John Benjamins</a> 
-											</td>	
-										</tr> 
-									
-							
-							
-					
-										
-											<tr>	
-												<td width="175" valign="top" align="right" nowrap>	
-											<span class="p-match"><strong>Linguistic Field(s):</strong></span>
-												</td>	
-												<td width="400" colspan="1" align="left" valign="top">	
-											<span class="p-match">Syntax</span><br> 	
-												</td>
-											</tr>
-										
-										<tr>
-											<td width="175" valign="top" align="right">
-										<span class="p-match"><strong>LL Issue:</strong></span>
-												
-											</td>
-											<td width="400" colspan="1" align="left" valign="top">
-								<!-- 21SEP04 NS -->
-								<a href="http://test.linguistlist.org/issues/13/13-2207.html" target="_blank">
-								13.2207</a>
-											</td>
-										</tr>
-									</table>
-								</td>
-								<td valign="top">
-									
-								</td>
-							</tr>
-						</table>
-						<table width="700" align="left" cellspacing="2" cellpadding="4" align="center">
-										<tr>
-											<td valign="top" align="right">
-										<span class="p-match"><strong>Review:</strong></span>		
-											</td>
-										</tr>					
-								
-											
-										
-									
-										
-										<tr>
-											<td width="75" valign="top" align="right">
-											</td>
-											<td width="600" align="left" valign="top">
-											
-										<span class="p-match"><br><br>	Date: Wed, 28 Aug 2002 11:05:31 +0200<br>From: Cecile Meier <cecile@lingua.uni-frankfurt.de><br>Subject: Hoeksema et al. (2001) Perspectives on Negation and Polarity Items<br><br>Hoeksema, Jack, Hotze Rullmann, Victor Sanchez-Valeria, and Ton van der Wouden, eds. (2001) Perspectives on Negation and Polarity Items. John Benjamins Publishing Company, xi+366pp, hardback ISBN 1-55619-793-4, $105.00, Linguistics Today 40.<br><br>Announcement at http://linguistlist.org/issues/12/12-1788.html#1<br><br>Cecile Meier, Universitaet Frankfurt<br><br>OVERVIEW<br>The volume contains a collection of papers by renowned linguists and logicians working on negation. According to the first paragraph of the introduction (vii­xi) the reader might expect "contributions on various aspects of the syntax and semantics of negation, including the old and notorious problem of scope, the vexing issues surrounding polarity items, the interaction of negation with presuppositions and implicatures and the acquisition of polarity items". The range of topics in the volume is, however, far less wide than the quote is suggesting. Ten of thirteen papers investigate the inventory of polarity items in different languages or (syntactic, semantic or pragmatic) properties of contexts licensing polarity items. (But, there is no paper on the acquisition of polarity items.) In addition, Tovena discusses strategies from non-monotonic reasoning in order to capture negation in so-called neg-raising contexts and discusses NPIs ('until') as a diagnostic for the movement of negation. Van der Auwera presents a typology of modals in relation with negation: a lot of his data is traditionally categorized as negative polarity items. Only Drozd does not mention NPIs. He deals with the acquisition of 'no'. Therefore, the volume probably mostly addresses linguists that are interested in the results of some recent research on polarity items.<br><br>The introduction gives a detailed overview over the contents of the volume. There, the contributions concerning NPIs are grouped into papers that investigate NPI-licensers from a semantic point of view (Atlas, Giannakidou), papers that explain the licensing conditions with the help of pragmatic inferences (Hoeksema & Rullmann, Horn, Lahiri), papers that deal with the antonymy of adjectives with respect to negative polarity (Kennedy and Klein), papers that are more data oriented (van der Auwera, Falkenberg), one paper that focusses on negative polarity with respect to scope relations (Mittwoch) and one paper that investigates taboo words (minimizers) with an NPI reading and a syntactic construction with NPI characteristics (Postma). The contributions are arranged in alphabetical order.<br><br>THE CONTRIBUTIONS<br>Jay D. Atlas ("Negative Quantifier Noun Phrases", pp. 1-22) investigates sentential negation and negative quantifiers from an intuitionistic point of view. The paper is a critical reflection on Zwarts' hierarchy of negative expressions. Zwarts classifies these expressions according to the satisfaction of two (e.g. 'few women'), three (e.g. 'no one', 'not everybody'), or all four (sentential negation 'not') of the DeMorgan relations from classical logic and ties the ordering to the notion of negative strength [the more DeMorgan relations are satisfied the stronger is a negative expression (and the more types of NPIs may be licensed)]. Atlas, however, focusses on the intuitive content of the notion "negative strength" and argues (a) that it is not justified to rank sentential negation above all other negative expressions, and (b) that negative expressions that satisfy an equal number of Zwartsian DeMorgan relations (though different ones) are not equally strong with respect to negativity. In consequence, he proposes a novel hierarchy of negative quantifiers based on the intuitionistic account of negation.<br><br>COMMENT: Atlas gives a detailed account of the intuitive notion of negative strength. It remains however open in what respect his new hierarchy may be useful in order to explain the occurrence of NPIs. So it seems that his contribution opens a new field for linguists interested in the licensing conditions of NPIs.<br><br>Johan van der Auwera ("On the typology of negative modals", pp. 23-48) examines negative modals, i.e., collocations of a negative and a modal auxiliary like 'must not', contractions like 'needn't' and opaque univerbations like 'nei' "shouldn't" in Bengali, for example.  The main focus of the investigation is on the various expressions of (negated) necessity and possibility in Indo-European languages, Uralic languages and Dravidian languages and the mechanisms of semantic change. He explains semantic change from necessity to possibility and vice versa and lexical ambiguity of modals in terms of a conventionalization of an implicature, based on Horn scales. Furthermore, he discusses in more detail modals that are restricted to negative environments (modal NPIs) and argues that there are not only modals that are restricted to occur in the scope of a negation (e.g. 'need') but also modals that require a negative proposition in their scope (German 'duerfen' in an earlier stage).<br><br>COMMENT: It didn't become clear to me why the author subscribes to the explanation of neg-raising by Horn on the one hand but not to his hypothesis of a single meaning of "possible". The mechanisms of the explanation are in both cases analogous. In order to explain the semantic change of possibility-denoting modals to necessity denoting modals, he refers to a kind of process that one could dub "anti-neg-raising" (a lower negation is interpreted with widest scope over the modal). Why should this weakening of meaning take place?<br><br>Kenneth F. Drozd ("Metalinguistic sentence negation in child English", pp. 49-78) argues that presentential 'no' negation in multiword utterances of child English is in fact a predecessor of adults' colloquial exclamative sentence negation and not an early stage variant of the ordinary negation 'not'. A child's 'No Mummy doing' is therefore better glossed by "No way, Mummy is doing it". In particular, it is shown that utterances with 'no' negations meet a criterion for adult exclamative sentence negation: they are echoic "up to deixis" of a previous utterance while utterances with 'not' negations are not. Moreover, the childrens' 'no' negation is shown to be metalinguistic in that it is typically used to convey objection to a previous utterance by cancellation of (mostly) relevance-based implicatures.<br><br>Gabriel Falkenberg ("Lexical sensitivity in negative polar verbs". pp. 79-97) presents generalizations on negative polar verbs. He sets apart four classes of NPI predicates in German: (a) abstentive predicates governing an infinitival complement, (b) predicates of attraction governing infinitival complements, (c) predicates of privation and (d) predicates of care. All these predicates have a tendency to cluster with modals denoting possibility. There are even predicates that get their NPI-status only in combination with such a modal. Abstentive predicates, in particular, do not allow another negative polarity item in the infinitival complement, the proposition expressed by the complement is factive and they need a clause-mate licensing negation (contra 'need' e.g.). And, predicates of attraction DO allow negative polarity items in the complement and they are counterfactive (in contrast to the abstentive predicates).<br><br>COMMENT: NPI-verbs trigger a Gricean generalized implicature according to Falkenberg that might be rephrased as "in the view of what my fate is it is necessary that I do P" and "in the view of what my fate is it is necessary that I don't do P". The appearance of the modals denoting possibility is explained in terms of the logical dependence of necessity and possibility and negation. It would be nice to find a formal analysis of these intuitions.<br><br>Anastasia Giannakidou ("Varieties of polarity items and the (non-)veridicality hypothesis", pp. 99-127) proceeds on the assumption that contexts in which negative polarity items and free choice items (and the subjunctive in Greek relative clauses) occur have a common semantic denominator, i.e., non-veridicality (or anti-veridicality). On the basis of the classification of polarity items with respect to sensitivity to non-veridicality, anti-veridicality or veridicality and licensing and so-called anti-licensing conditions, Giannakidou distinguishes four main classes of expressions: (i) genuine negative polarity items (e.g. minimizers and emphatic indefinites in Greek) are only licit in anti-veridical contexts (English 'any' is exceptional in that it is anti-licensed in veridical contexts); (ii) non-emphatic indefinites in Greek (e.g. 'kanenan') require a non-veridical context; (iii) free choice items (e.g. FC-'any' and 'opjondhipote') require a non-episodic, non-negative context and (iv) positive polarity items are licensed in veridical contexts. Lexical features on the polarity items control the licensing conditions.<br><br>Jack Hoeksema & Hotze Rullmann ("Scalarity and polarity", pp. 129-171) investigate adverbial polarity items more closely, in particular the Dutch (and German) equivalents of 'even': 'ook maar', 'zelfs maar' ('auch nur'). Based on corpus data, they observe that 'zelfs maar' has a wider distribution than 'ook maar'. 'Zelfs maar' nowadays preferably occurs with verbal phrases that refer to a lower endpoint on a scale based on world knowledge. 'Ook maar' on the other hand tends to occur with indefinite noun phrases that conventionally denote small entities or negligible quantities. Furthermore, they show (a) that the anti-additivity requirement of Zwarts (1981) is not absolutely obeyed by either expression in the corpus: in addition, they may occur in non-veridical contexts triggered by opaque verbs. And, they argue (b) that the c-command restriction for polarity items is not correct.<br><br>Laurence R. Horn ("Flaubert triggers, squatative negation and other quirks of grammar", p. 173 ­ 200) discusses a wide range of superficially non-negative, non-monotonic or upward-entailing but NPI-friendly contexts (called Flaubert triggers) and he suggests that in all cases a covert negative implicature or a paraphrase with 'only' seem to license the NPI in question. In particular, he argues that there is no need to assume that some NPIs indeed have a lexical variant that is a positive polaritv item. "Squatitives" are expressions that may or may not occur with a negative element. 'Diddly-squat', for instance, means "nothing" in a positive environment and "anything" in a negative environment. In Horn's opinion, these expressions illustrate Jespersen's cycle. Meaning "anything", they emphasize the meaning of the (often phonologically weakened) negative expression. Meaning "nothing" they are interpreted as a simple negative expression.<br><br>Chris Kennedy ("On the monotonicity of polar adjectives", p. 201 ­ 221) proposes a semantics based on extents for the polarity of gradable adjectives. Extents are sets of degrees on a scale. Whereas positive adjectives denote a relation between an individual and a positive extent (a set of degrees that starts at the minimal element of the scale and ends somewhere in the middle), negative adjectives denote relations between an individual and a negative extent (that start somewhere in the middle and end in infinity). Comparatives are captured as comparisons between two extents. The author argues that this formalism is suitable to explain the monotonicity properties of contexts with negative polar adjectives. Negative polar adjectives may license NPIs in their subject clause (and are assumed to create a downward-entailing context), whereas positive polar adjectives don't. <br><br>COMMENT: It is traditionally assumed that 'It is dangerous' is a monotone decreasing function since "driving fast in Rome" (=p)  entails "driving in Rome" (=q) and  "It is dangerous to drive in Rome" (=f(q)) entails "it is dangerous to drive fast in Rome" (=f(p)). But is this argumentation correct? Traveling to Mozambique is dangerous because of a potential bite by a mosquito that is infected with the Malaria virus. But traveling to Mozambique protected by an effective vaccine need not be dangerous. What we observe here is a phenomenon that is familiar from non-monotonic conditional reasoning. <br><br>Henny Klein ("Polarity sensitivity and collocational restrictions of adverbs of degree", p. 223 ­ 236) studies the distribution of adverbs of degree to negative and positive polar adjectives (mainly on Dutch examples). She postulates that adverbs of degree have two lexical features (a) the informative value and (b) the emotional value. An adverb that is unspecified for both features may freely combine with every adjective (e.g. 'very'), an adverb that is specified for the informative value is a positive or a negative polarity item and obeys the usual restrictions for such expressions (e.g. '(not) much' in English is a negative polarity item), an adverb that is specified negatively for the emotional value may avoid a positive polar adjective (e.g. 'fantastically') and vice versa. An interesting group of adverbs of degrees is only specified (negatively) for the emotional value but not for the informative value. Elements of this class are NPIs in combination with a positive polar adjective and PPIs in combination with a negative polar adjective (e.g. Dutch 'bar' "barren, raw").<br><br>Utpal Lahiri ("'Even'-incorporated NPIs in Hindi definites and correlatives", p. 237 ­ 264) presents in a first step a unified account of Hindi NPIs and free choice items (all compounds of an indefinite plus 'bhii' meaning "even"). Existential readings in downward-entailing contexts (= NPI interpretation) and universal readings in generic habitual, modal and future contexts (= free choice readings) are essentially an effect of the interpretation of the indefinite part of the item in question. NPI-effects are derived by means of an 'even'-related (conventional?) implicature that is triggered by the NPI itself. If the implicature contradicts the ordinary meaning of the sentence (or common knowledge), the NPI is not licensed. In a second step, the author integrates Dayal's theory of correlatives and the NPI-like expression 'jo-bhii' "whoever" into his own proposal for NPI interpretation.<br><br>Anita Mittwoch ("Perfective sentences under negation and durative adverbials", p. 265 ­ 280) discusses scope relationships between negation and durative adverbials. In particular, she presents a whole range of linguistic data based on (a) ambiguities (b) focused negative durative adverbials (c) pragmatic inferences (d) coordination and more. These data show that durative adverbials with 'for' and 'until' may have a wide scope interpretation and a narrow scope interpretation with respect to negation. On the wide scope reading negation is assumed to induce a durative reading on perfective predicates.<br><br>COMMENT: In the narrow-scope reading, durative adverbials get an NPI reading. It is not entirely clear to me how Mittwoch is going to exclude wide scope of 'until'/'for' in the NPI-reading. This must be excluded syntactically.<br><br>Gertjan Postma ("Negative polarity and the syntax of taboo", p. 283-330) investigates Dutch expressions that are ambiguous having an NPI-meaning and a regular meaning. He finds that the NPI-reading is dependent on phonological features and the morpho-syntactic environment of the expression. Taboo words used as NPIs typically loose their ordinary denotation and get a minimal amount reading. Certain NP-comparatives also exhibit NPI-properties, according to the author. Omitting the negative time adverbial in 'I have never seen a man more angry', for example, renders the NP-comparative unacceptable. Postma argues for a parallel syntactic treatment of taboo nouns and NPI-comparatives in terms of (nominal or adjectival) small clauses and locates the NPI-properties in the syntax of this construction.<br><br>Lucia M. Tovena ("Neg-Raising: Negation as failure", p. 331-356) draws an analogy between the phenomenon of Neg-raising on the one hand and negation as failure in the framework of logic programming on the other hand. The (optional) strengthening of "Daniel does not think that Luise will come" to "Daniel thinks that Luise will not come" is explained as follows: saying the first sentence the speaker expresses that Daniel has no information to decide whether Luise will come or not. A general inference rule (=closed world assumption) allows the (provisional) conclusion that Daniel thinks that Luise will not come. This inference rule is motivated by considerations of efficiency in methods of reasoning.<br><br>COMMENT: This analysis cannot explain why certain verbs from different languages with identical semantics may be neg-raisers in one language and no neg-raisers in another (compare 'hope' and German 'hoffen'). Why is neg-raising (almost) obligatory with deontic modals in Italian "imperatives" but (almost) not possible in Italian declaratives ('Non devi ascoltare' "It is necessary that you don't listen" vs. 'Ganni non deve ascoltare' "It is not necessary that Ganni is listening")?<br><br>EVALUATION<br>The volume contains a selection of papers presented at the conference "Perspectives on Negation"  held at the University of Groningen in August 1996. But it is not a true record of the papers presented at the conference. Gabriel Falkenberg's and Hoeksema & Rullmann's papers were not presented at the conference. And, Larry Horn and Jack Hoecksema presented different papers that are, by and large, published in Horn & Kato (2000): see the review at http://linguistlist.org/issues/12/12-2571.html/. Moreover, Paul Portner & Raffaella Zanuttini's paper ("The force of Negation in Wh-Exclamatives and Interrogatives") that was presented in Groningen also appeared in Horn & Kato (2000). That this is so does not really matter but the editors should have mentioned it in the introduction, I suppose. And they shouldn't have called the volume "proceedings". Nevertheless the volume has characteristics of proceedings: first, the volume is not as carefully edited as it could be. There are typos in many contributions (in the introduction there is a reference to a footnote on p.vii but no footnote). References are missing in the bibliography (Tovena's paper, e.g.). And second, some authors presumably expected some kind of prepublication when they submitted their papers. The papers by Lahiri, Giannakidou and Kennedy, for example, overlap in content with Lahiri (1998), Giannakidou (2001) and Kennedy (2001), respectively.<br><br>The solutions to the problems are rather diverse. It would therefore have been interesting to read arguments for or against one solution with respect to the other. As a case in point, Lahiri and Giannakidou, each propose a unified explanation for the occurrence of NPIs and free choice items, but they do not refer to each other. Similarly, some examples by Falkenberg seem to contradict Tovena's theory. Falkenberg's NPI-verbs are strict NPIs in that they require a clausemate licenserwithout being licensed in neg-raising contexts, although a second NPI in the subordinate clause may improve the results. This is a mysterious phenomenon that is not explained to-day.<br><br>The volume, however, does complete our view on polarity items. Whereas the recent volumes by Forget et al. (1997: see http://linguistlist.org/issues/9/9-1836.html/ for a review) and Horn & Kato (2000) contain papers on the syntax of negation, this volume focuses on pragmatic aspects of NPI licensing and the semantics of polarity and it contains interesting studies that provide more field oriented results (Falkenberg, van der Auwera and Hoeksema & Rullmann's corpus evaluation). It is astonishing in this light, that the volume was announced under the heading of generative syntax.<br><br>REFERENCES <br>Forget, Danielle, Paul Hirschbuehler, France Martineau and Maria-Luisa Rivero. (eds) Negation and Polarity.  Amsterdam: John Benjamin, 1997.<br><br>Giannakidou, Anastasia. "The meaning of free choice". In: Linguistics and Philosophy 24(6): 659-735. 2001<br><br>Horn, Lawrence R. and Yasuhiko Kato. /eds.) Negation and Polarity. Syntactic and Semantic Perspectives. New York: Oxford University Press.<br><br>Kennedy, Christopher. "Polar Opposition and the Ontology of Degrees". Linguistics and Philosophy 24(1): 33-70. 2001<br><br>Lahiri, Uptal. "Focus and Negative Polarity in Hindi". Natural Language Semantics 6(1): 57-123.1998<br> <br><br>	<br></span>
-											</td>
-										</tr>
-										
-											<tr>			
-											<td></td>						
-											
-												<td width="600" align="left" valign="top" colspan="2">
-												
-											<span class="p-match">ABOUT THE REVIEWER  Cecile Meier is currently a postdoctoral research fellow at the University of Frankfurt, Germany. Her research interests include the syntax and semantics of comparative constructions, modal expressions, negation and negative polarity items. She presented a paper on NPIs in negated 'because' clauses at the Groningen conference. </span>
-												</td>
-											</tr>
-										
-										
-									</table>
-								</td>
-								
-							</tr>
-						</table>
-					</td>
-				</tr>
-					  
-	
-				
-		<tr valign="bottom" align="center">
-			<td>
-			<span class="small">Page Updated: 19-Dec-2005</span>
-					<div align="center" color="#FF0000#"><a href="Javascript:window.print();">Print This Page</a></div>	
-<hr align="center" color="#FF0000#" width="450" class="margin_headings" noshade>
-
-<!--    Temporary Contents for the antispam code -->   
-   <A HREF="http://linguistlist.org/antispam/"><img src="https://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/images/transp.gif" border="0"></a><br>
-   <a href="mailto:cranston@linguistlist.org"><img src="https://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/images/transp.gif" border="0"></a>
-
-      <span class="p-match">Please <a title="Click to report misclassified data or a bad link" href="http://cf.linguistlist.org/cfdocs/new-website/LL-WorkingDirs/forms/broke.cfm" target="_blank"><strong>report</strong></a> any bad links or misclassified data</span>
-
-<hr align="center" color="#FF0000#" width="350" class="margin_headings" noshade>
-  
-	  
-	<p align="center"><a href="http://linguistlist.org/">LINGUIST Homepage</a> | <a href="http://linguistlist.org/issues/">Read 
-        LINGUIST</a> | <a href="/contact.html">Contact us</a></p>
-		
-		<p align="center"><a href="http://www.nsf.gov"><img src="https://cf.linguistlist.org/cfdocs/emeld/images/nsf2.gif" border="0" alt="NSF Logo" align="middle"></a></p>
-		
-		<span class="blue-small">While the LINGUIST List makes every effort to ensure the linguistic relevance of sites listed<br> on its pages, it cannot vouch for their contents.</span>
-			</td>
-		</tr>
-	</table>
-		
-</td>
-		
-</tr>
-</table>
-<script type="text/javascript" language="javascript" src="../../Templates/menu.js"></script>
-</body>
-
-</html>
