@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="2"
+   name=""
+   committed-date="2008-05-30T04:04:08.536279Z"
+   url="file:///home/wo/svn/repository/trunk/html2xml/chrome"
+   last-author="wo"
+   kind="dir"
+   repos="file:///home/wo/svn/repository"
+   revision="2"/>
+<entry
+   name="locale"
+   kind="dir"/>
+<entry
+   committed-rev="2"
+   name="chrome.manifest"
+   text-time="2008-05-30T03:20:41.000000Z"
+   committed-date="2008-05-30T04:04:08.536279Z"
+   checksum="c513a1d45d08c4f1252bd6b293f99661"
+   last-author="wo"
+   kind="file"
+   prop-time="2008-05-30T04:01:47.000000Z"/>
+<entry
+   name="content"
+   kind="dir"/>
+</wc-entries>

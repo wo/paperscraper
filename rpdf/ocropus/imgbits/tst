@@ -1,0 +1,2 @@
+#!/bin/sh
+grep 'convert.*BitImage' imgrle.cc || exit 1

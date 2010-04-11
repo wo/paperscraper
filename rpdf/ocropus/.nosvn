@@ -1,0 +1,11 @@
+ocrocmd/version.cc
+ocroscript/lepton.cc
+ocroscript/debuggraphics.cc
+ocroscript/nustring.cc
+ocroscript/ocr.cc
+ocroscript/segeval.cc
+ocroscript/dgraphics.cc
+ocroscript/tess.cc
+ocroscript/narray.cc
+ocroscript/fst.cc
+ocroscript/image.cc

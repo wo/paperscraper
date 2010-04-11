@@ -1,0 +1,32 @@
+
+rpdf extracts text and layout from PDF documents, using pdftohtml and
+OCRopus.
+
+version 0.2 (2010-04-04)
+
+---------------------------------------------------------------------
+INSTALLATION
+---------------------------------------------------------------------
+
+rpdf requires slightly modified versions of specifc OCRopus and
+pdftohtml releases, which are included, as well as ghostscript. To
+install OCRopus and pdftohtml, follow the instructions in the
+respective sub-directories.
+
+[Simpler or more detailed installation instructions may follow at some
+point.]
+
+---------------------------------------------------------------------
+USAGE
+---------------------------------------------------------------------
+
+rpdf [-d int] [-p int] file.pdf
+
+ -d int : debug level
+ -p int : max. number of pages to parse
+
+If -p is not specified, what happens depends on whether rpdf can use
+pdftohtml or has to fall back on OCR. With pdftohtml, it will parse
+all; with OCRopus it will parse 1-3 pages depending on the length of
+the pdf document. (OCRopus is slow: expect 10-20 seconds per page.)
+

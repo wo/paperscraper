@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="2"
+   name=""
+   committed-date="2008-05-30T04:04:08.536279Z"
+   url="file:///home/wo/svn/repository/trunk/html2xml/chrome/content"
+   last-author="wo"
+   kind="dir"
+   repos="file:///home/wo/svn/repository"
+   revision="2"/>
+<entry
+   name="html2xml"
+   kind="dir"/>
+</wc-entries>

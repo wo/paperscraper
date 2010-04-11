@@ -1,0 +1,10 @@
+====== 21.11.2006 ======
+Reporter: faisal
+Responsible: tmb
+Related File: imgmisc.cc
+BUG: The functions "peaks" and "valleys" do not return the peak/valley if two consecutive bins at the peak/valley have the same value. 
+Instead of not returning any value, I think it would be better to return the first/middle/last bin having the peak value.
+
+FIXED --- faisal -- 22.11.2006
+In case of consecutive bins having same values, last bin is returned. Wrote test cases in test-imgmisc.cc and added an example image where it crashed previously but now works fine.
+========================

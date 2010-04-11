@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="2"
+   name=""
+   committed-date="2008-05-30T04:04:08.536279Z"
+   url="file:///home/wo/svn/repository/trunk/html2xml/defaults/preferences"
+   last-author="wo"
+   kind="dir"
+   repos="file:///home/wo/svn/repository"
+   revision="2"/>
+<entry
+   committed-rev="2"
+   name="html2xml-prefs.js"
+   text-time="2008-05-30T03:20:41.000000Z"
+   committed-date="2008-05-30T04:04:08.536279Z"
+   checksum="830ca61f5aa4386047d795bb73c51aaf"
+   last-author="wo"
+   kind="file"
+   prop-time="2008-05-30T04:01:47.000000Z"/>
+</wc-entries>

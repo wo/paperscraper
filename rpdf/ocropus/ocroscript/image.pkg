@@ -1,0 +1,239 @@
+/* -*- C++ -*- */
+
+/*
+   Copyright 2007 Deutsches Forschungszentrum fuer Kuenstliche Intelligenz 
+   or its licensors, as applicable.
+   
+   You may not use this file except under the terms of the accompanying license.
+   
+   Licensed under the Apache License, Version 2.0 (the "License"); you
+   may not use this file except in compliance with the License. You may
+   obtain a copy of the License at http:  www.apache.org/licenses/LICENSE-2.0
+   
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   
+   Project: 
+   File: 
+   Purpose: 
+   Responsible: kapry
+   Reviewer: 
+   Primary Repository: 
+   Web Sites: www.iupr.org, www.dfki.de
+*/
+
+$#include "colib.h"
+$#include "imgio.h"
+$#include "imglib.h"
+
+$using namespace colib;
+$using namespace imgio;
+$using namespace imglib;
+$typedef narray<rectangle> rectanglearray;
+
+// Image I/O
+
+void read_image_gray(bytearray &, const char *path, const char *format = NULL);
+void read_image_binary(bytearray &, const char *path, const char *format = NULL);
+
+$ namespace imgio {
+$    void read_png(bytearray &image,const char *file) { read_png(image,(FILE*)stdio(file,"r"),true); }
+$    void write_png(const char *file,bytearray &image) { write_png((FILE*)stdio(file,"w"),image); }
+$    void read_png_rgb(intarray &image,const char *file) { read_png_rgb(image,(FILE*)stdio(file,"r")); }
+$    void write_png_rgb(const char *file,intarray &image) { write_png_rgb((FILE*)stdio(file,"w"),image); }
+$ } 
+
+void read_png(bytearray &image,const char *file);
+void write_png(const char *file,bytearray &image);
+void read_png_rgb(intarray &image,const char *file);
+void write_png_rgb(const char *file,intarray &image);
+
+void read_pnm_gray(FILE *,bytearray &image);
+void read_ppm(FILE *,bytearray &r,bytearray &g,bytearray &b);
+void read_ppm_packed(FILE *,intarray &image);
+void read_ppm_rgb(FILE *,bytearray &image);
+void write_pbm(FILE *,bytearray &image);
+void write_pgm(FILE *,bytearray &image);
+void write_ppm(FILE *,bytearray &r,bytearray &g,bytearray &b);
+void write_ppm_rgb(FILE *,bytearray &image);
+void write_ppm_packed(FILE *,intarray &image);
+
+void read_pnm_gray(const char *file,bytearray &image);
+void read_ppm(const char *file,bytearray &r,bytearray &g,bytearray &b);
+void read_ppm_packed(const char *file,intarray &image);
+void read_ppm_rgb(const char *file,bytearray &image);
+void write_pbm(const char *file,bytearray &image);
+void write_pgm(const char *file,bytearray &image);
+void write_ppm(const char *file,bytearray &r,bytearray &g,bytearray &b);
+void write_ppm_rgb(const char *file,bytearray &image);
+void write_ppm_packed(const char *file,intarray &image);
+
+void read_jpeg_gray(bytearray &a, FILE *f);
+
+void display(bytearray &image);
+void display(intarray &image);
+void make_page_black(bytearray &image);
+void make_page_normalized_and_black(bytearray &image);
+void make_page_binary_and_black(bytearray &image);
+void make_page_binary_and_black(intarray &image);
+
+// Image Processing Library
+
+// imgops
+
+void addscaled(floatarray &,floatarray &,float,int,int);
+void tighten(floatarray &image);
+void circ_by(floatarray &image,int dx,int dy,float value=0);
+void shift_by(floatarray &image,int dx,int dy,float value=0);
+void pad_by(floatarray &image,int px,int py,float value=0);
+void erase_boundary(floatarray &image,int px,int py,float value=0);
+void extract_subimage(floatarray &subimage,floatarray &image,int x0,int y0,int x1,int y1);
+void resize_to(floatarray &image,int w,int h,float value=0);
+void compose_at(bytearray &image,bytearray &source,int x,int y,int value,int conflict);
+
+void addscaled(bytearray &,bytearray &,float,int,int);
+void tighten(bytearray &image);
+void circ_by(bytearray &image,int dx,int dy,unsigned char value=0);
+void shift_by(bytearray &image,int dx,int dy,unsigned char value=0);
+void pad_by(bytearray &image,int px,int py,unsigned char value=0);
+void erase_boundary(bytearray &image,int px,int py,unsigned char value=0);
+void extract_subimage(bytearray &subimage,bytearray &image,int x0,int y0,int x1,int y1);
+void resize_to(bytearray &image,int w,int h,unsigned char value=0);
+void compose_at(bytearray &image,bytearray &source,int x,int y,int value,int conflict);
+
+void extract_subimage(intarray &subimage,intarray &image,int x0,int y0,int x1,int y1);
+
+void linearly_transform_intensity(bytearray &,float,float,float,float);
+void linearly_transform_intensity(intarray &,float,float,float,float);
+void linearly_transform_intensity(floatarray &,float,float,float,float);
+void gamma_transform(bytearray &,float,float,float,float);
+void gamma_transform(intarray &,float,float,float,float);
+void gamma_transform(floatarray &,float,float,float,float);
+void expand_range(bytearray &,float,float);
+void expand_range(intarray &,float,float);
+void expand_range(floatarray &,float,float);
+
+// imggauss
+
+void gauss1d(floatarray &out,floatarray &in,float sigma);
+void gauss1d(floatarray &v,float sigma);
+void gauss2d(floatarray &a,float sx,float sy);
+void gauss1d(bytearray &out,bytearray &in,float sigma);
+void gauss1d(bytearray &v,float sigma);
+void gauss2d(bytearray &a,float sx,float sy);
+
+// imgedges
+
+void rawedges(floatarray &edges,floatarray &smoothed);
+float nonzero_fractile(floatarray &edges,float frac,int nbins=1000);
+void hysteresis_thresholding(floatarray &image,float lo,float hi);
+
+// imgthin
+
+void thin(bytearray &);
+
+// imgtrace
+
+struct IChainTracer {
+    virtual void set_image(bytearray &image) = 0;
+    virtual void clear() = 0;
+    virtual bool get_chain(floatarray &points,bool close=false,int sample=1) = 0;
+    virtual bool get_poly(floatarray &points,float maxdist=1.0,bool close=false) = 0;
+    virtual ~IChainTracer();
+};
+IChainTracer *chaintracer(bytearray &image);
+
+// imgbrushfire
+
+void brushfire_2(floatarray &distance,float maxdist=1e30);
+void brushfire_1(floatarray &distance,float maxdist=1e30);
+void brushfire_inf(floatarray &distance,float maxdist=1e30);
+void brushfire_2(floatarray &distance,narray<point> &source,float maxdist=1e30);
+void brushfire_1(floatarray &distance,narray<point> &source,float maxdist=1e30);
+void brushfire_inf(floatarray &distance,narray<point> &source,float maxdist=1e30);
+void brushfire_2(floatarray &distance,intarray &source,float maxdist=1e30);
+void brushfire_1(floatarray &distance,intarray &source,float maxdist=1e30);
+void brushfire_inf(floatarray &distance,intarray &source,float maxdist=1e30);
+void dilate_1(floatarray &image,float r);
+void dilate_2(floatarray &image,float r);
+void dilate_inf(floatarray &image,float r);
+void erode_1(floatarray &image,float r);
+void erode_2(floatarray &image,float r);
+void erode_inf(floatarray &image,float r);
+void brushfire_inf_scaled(floatarray &distance,float sx,float sy,float maxdist=1e38);
+void brushfire_2_scaled(floatarray &distance,float a,float b,float c,float d,float maxdist=1e38);
+
+// imglabels
+
+void propagate_labels(intarray &image);
+void propagate_labels_to(intarray &target,intarray &seed);
+void remove_dontcares(intarray &image);
+int renumber_labels(intarray &image,int start);
+int label_components(intarray &image,bool four_connected=false);
+void simple_recolor(intarray &image);
+void bounding_boxes(rectanglearray &result,intarray &image);
+
+// imgmap
+
+void rotate_direct_sample(floatarray &out,floatarray &in,float angle,float cx,float cy);
+void rotate_direct_interpolate(floatarray &out,floatarray &in,float angle,float cx,float cy);
+void scale_sample(floatarray &out,floatarray &in,float sx,float sy);
+void scale_sample(floatarray &out,floatarray &in,int nx, int ny);
+void scale_interpolate(floatarray &out,floatarray &in,float sx,float sy);
+void scale_interpolate(floatarray &out,floatarray &in,int nx, int ny);
+
+void rotate_direct_sample(bytearray &out,bytearray &in,float angle,float cx,float cy);
+void rotate_direct_interpolate(bytearray &out,bytearray &in,float angle,float cx,float cy);
+void scale_sample(bytearray &out,bytearray &in,float sx,float sy);
+void scale_sample(bytearray &out,bytearray &in,int nx, int ny);
+void scale_interpolate(bytearray &out,bytearray &in,float sx,float sy);
+void scale_interpolate(bytearray &out,bytearray &in,int nx, int ny);
+
+// imgfilters
+
+void horn_riley_ridges(floatarray &im,floatarray &zero,floatarray &strength,floatarray &angle);
+void laplacian(floatarray &result,floatarray &image);
+void zero_crossings(bytearray &result,floatarray &image);
+void local_minima(bytearray &result,floatarray &image);
+void local_maxima(bytearray &result,floatarray &image);
+void gradient_based_corners(floatarray &image);
+void kitchen_rosenfeld_corners(floatarray &corners,floatarray &image);
+void kitchen_rosenfeld_corners2(floatarray &corners,floatarray &image);
+void median_filter(bytearray &image, int rx, int ry);
+
+// imgmorph
+
+void make_boolean(bytearray &image);
+void complement(bytearray &image);
+void difference(bytearray &image,bytearray &image2,int dx,int dy);
+int maxdifference(bytearray &image,bytearray &image2,int cx=0,int cy=0);
+void minshift(bytearray &image,bytearray &image2,int dx,int dy);
+void maxshift(bytearray &image,bytearray &image2,int dx,int dy);
+void erode(bytearray &image,bytearray &mask,int cx,int cy);
+void dilate(bytearray &image,bytearray &mask,int cx,int cy);
+void open(bytearray &image,bytearray &mask,int cx,int cy);
+void close(bytearray &image,bytearray &mask,int cx,int cy);
+void erode_circle(bytearray &image,int r);
+void dilate_circle(bytearray &image,int r);
+void open_circle(bytearray &image,int r);
+void close_circle(bytearray &image,int r);
+void erode_rect(bytearray &image,int rw,int rh);
+void dilate_rect(bytearray &image,int rw,int rh);
+void open_rect(bytearray &image,int rw,int rh);
+void close_rect(bytearray &image,int rw,int rh);
+
+// imgmisc
+
+void valleys(intarray &locations,floatarray &v,int minsize=0,int maxsize=1<<30,float sigma=0.0);
+void peaks(intarray &locations,floatarray &v,int minsize=0,int maxsize=1<<30,float sigma=0.0);
+void math2raster(floatarray &,floatarray &);
+void math2raster(intarray &,intarray &);
+void math2raster(bytearray &,bytearray &);
+void raster2math(floatarray &,floatarray &);
+void raster2math(intarray &,intarray &);
+void raster2math(bytearray &,bytearray &);
+
+// void hist(floatarray &hist,bytearray &image);

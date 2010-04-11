@@ -1,0 +1,3078 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns:st1="urn:schemas-microsoft-com:office:smarttags"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 11">
+<meta name=Originator content="Microsoft Word 11">
+<link rel=File-List href="Midwest_Studies_paper_Tuomela_files/filelist.xml">
+<title>JOINT INTENTION, THE WE-MODE, AND THE I-MODE</title>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="State"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="place" downloadurl="http://www.5iantlavalamp.com/"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceType"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="PlaceName"/>
+<o:SmartTagType namespaceuri="urn:schemas-microsoft-com:office:smarttags"
+ name="City" downloadurl="http://www.5iamas-microsoft-com:office:smarttags"/>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Tuomela</o:Author>
+  <o:LastAuthor>HAKLI</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>1</o:TotalTime>
+  <o:LastPrinted>2005-09-16T11:53:00Z</o:LastPrinted>
+  <o:Created>2005-10-19T07:34:00Z</o:Created>
+  <o:LastSaved>2005-10-19T07:34:00Z</o:LastSaved>
+  <o:Pages>1</o:Pages>
+  <o:Words>7093</o:Words>
+  <o:Characters>57457</o:Characters>
+  <o:Company> Helsingin yliopisto</o:Company>
+  <o:Lines>478</o:Lines>
+  <o:Paragraphs>128</o:Paragraphs>
+  <o:CharactersWithSpaces>64422</o:CharactersWithSpaces>
+  <o:Version>11.6360</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
+  <w:DisplayVerticalDrawingGridEvery>0</w:DisplayVerticalDrawingGridEvery>
+  <w:UseMarginsForDrawingGridOrigin/>
+  <w:ValidateAgainstSchemas/>
+  <w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid>
+  <w:IgnoreMixedContent>false</w:IgnoreMixedContent>
+  <w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText>
+  <w:Compatibility>
+   <w:FootnoteLayoutLikeWW8/>
+   <w:ShapeLayoutLikeWW8/>
+   <w:AlignTablesRowByRow/>
+   <w:ForgetLastTabAlignment/>
+   <w:LayoutRawTableWidth/>
+   <w:LayoutTableRowsApart/>
+   <w:UseWord97LineBreakingRules/>
+   <w:SelectEntireFieldWithStartOrEnd/>
+   <w:ApplyBreakingRules/>
+   <w:UseWord2002TableStyleRules/>
+  </w:Compatibility>
+  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+ </w:WordDocument>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:LatentStyles DefLockedState="false" LatentStyleCount="156">
+ </w:LatentStyles>
+</xml><![endif]--><!--[if !mso]><object
+ classid="clsid:38481807-CA0E-42D2-BF39-B33AF135CC4D" id=ieooui></object>
+<style>
+st1\:*{behavior:url(#ieooui) }
+</style>
+<![endif]-->
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0mm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+h1
+	{mso-style-name:"Heading 1\,Normaali-otsikko 1";
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:12.0pt;
+	margin-right:0mm;
+	margin-bottom:3.0pt;
+	margin-left:0mm;
+	text-indent:0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	mso-outline-level:1;
+	mso-list:l0 level1 lfo10;
+	font-size:14.0pt;
+	font-family:"Times New Roman";
+	mso-font-kerning:14.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+h2
+	{mso-style-name:"Heading 2\,Normaali-otsikko 2";
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:12.0pt;
+	margin-right:0mm;
+	margin-bottom:3.0pt;
+	margin-left:0mm;
+	text-indent:0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	mso-outline-level:2;
+	mso-list:l0 level2 lfo10;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+h3
+	{mso-style-name:"Heading 3\,Normaali-otsikko 3";
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:12.0pt;
+	margin-right:0mm;
+	margin-bottom:3.0pt;
+	margin-left:0mm;
+	text-indent:0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	mso-outline-level:3;
+	mso-list:l0 level3 lfo10;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+h4
+	{mso-style-name:"Heading 4\,Normaali-otsikko 4";
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:12.0pt;
+	margin-right:0mm;
+	margin-bottom:3.0pt;
+	margin-left:0mm;
+	text-indent:0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	mso-outline-level:4;
+	mso-list:l0 level4 lfo10;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+h5
+	{mso-style-name:"Heading 5\,Normaali-otsikko 5";
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:12.0pt;
+	margin-right:0mm;
+	margin-bottom:3.0pt;
+	margin-left:0mm;
+	text-indent:0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	mso-outline-level:5;
+	mso-list:l0 level5 lfo10;
+	font-size:11.0pt;
+	font-family:"Times New Roman";
+	mso-font-kerning:11.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.MsoToc1, li.MsoToc1, div.MsoToc1
+	{mso-style-name:"TOC 1\,Normaali-sislu 1";
+	mso-style-update:auto;
+	mso-style-noshow:yes;
+	mso-style-parent:"Normaali Char1";
+	mso-style-next:Normal;
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:6.0pt;
+	margin-left:0mm;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;
+	font-weight:bold;}
+p.MsoToc2, li.MsoToc2, div.MsoToc2
+	{mso-style-name:"TOC 2\,Normaali-sislu 2";
+	mso-style-update:auto;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:0mm;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:9.9pt;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:EN-GB;
+	mso-fareast-language:EN-US;}
+p.MsoToc3, li.MsoToc3, div.MsoToc3
+	{mso-style-name:"TOC 3\,Normaali-sislu 3";
+	mso-style-update:auto;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:0mm;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:42.55pt;
+	margin-bottom:.0001pt;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	tab-stops:right dotted 140.0mm;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.MsoToc4, li.MsoToc4, div.MsoToc4
+	{mso-style-name:"TOC 4\,Normaali-sislu 4";
+	mso-style-update:auto;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:0mm;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:20.0mm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	tab-stops:right dotted 140.0mm;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.MsoFootnoteText, li.MsoFootnoteText, div.MsoFootnoteText
+	{mso-style-noshow:yes;
+	mso-style-parent:"";
+	margin:0mm;
+	margin-bottom:.0001pt;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:8.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:8.0pt;
+	mso-fareast-language:EN-US;}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{margin:0mm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	tab-stops:center 207.65pt right 415.3pt;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+span.MsoCommentReference
+	{mso-style-noshow:yes;
+	mso-ansi-font-size:8.0pt;
+	mso-bidi-font-size:8.0pt;}
+span.MsoEndnoteReference
+	{mso-style-noshow:yes;
+	vertical-align:super;}
+p.MsoEndnoteText, li.MsoEndnoteText, div.MsoEndnoteText
+	{mso-style-noshow:yes;
+	margin:0mm;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.NormaaliChar1, li.NormaaliChar1, div.NormaaliChar1
+	{mso-style-name:"Normaali Char1";
+	mso-style-parent:"";
+	mso-style-link:"Normaali Char1 Char";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-indent:10.0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.Normaali-jatko, li.Normaali-jatko, div.Normaali-jatko
+	{mso-style-name:Normaali-jatko;
+	mso-style-parent:"Normaali Char1";
+	mso-style-next:"Normaali Char1";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.Normaali-luettelo, li.Normaali-luettelo, div.Normaali-luettelo
+	{mso-style-name:Normaali-luettelo;
+	mso-style-parent:"";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:14.2pt;
+	margin-bottom:.0001pt;
+	text-indent:-14.2pt;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.Otsikko, li.Otsikko, div.Otsikko
+	{mso-style-name:Otsikko;
+	mso-style-parent:"";
+	mso-style-next:"Normaali Char1";
+	margin-top:18.0pt;
+	margin-right:0mm;
+	margin-bottom:6.0pt;
+	margin-left:0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:14.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:14.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.Sitaatti, li.Sitaatti, div.Sitaatti
+	{mso-style-name:Sitaatti;
+	mso-style-parent:"";
+	mso-style-next:Normaali-jatko;
+	margin-top:12.0pt;
+	margin-right:20.0mm;
+	margin-bottom:12.0pt;
+	margin-left:20.0mm;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:10.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.NormaaliChar, li.NormaaliChar, div.NormaaliChar
+	{mso-style-name:"Normaali Char";
+	mso-style-parent:"";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-indent:10.0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:FI;}
+p.NormaaliCharChar, li.NormaaliCharChar, div.NormaaliCharChar
+	{mso-style-name:"Normaali Char Char";
+	mso-style-parent:"";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-indent:10.0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;}
+p.NormaaliCharChar1CharCharChar, li.NormaaliCharChar1CharCharChar, div.NormaaliCharChar1CharCharChar
+	{mso-style-name:"Normaali Char Char1 Char Char Char";
+	mso-style-parent:"";
+	mso-style-link:"Normaali Char Char1 Char Char Char Char";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-indent:10.0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:FI;}
+span.NormaaliCharChar1CharCharCharChar
+	{mso-style-name:"Normaali Char Char1 Char Char Char Char";
+	mso-style-locked:yes;
+	mso-style-link:"Normaali Char Char1 Char Char Char";
+	mso-ansi-font-size:12.0pt;
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:FI;
+	mso-bidi-language:AR-SA;}
+p.NormaaliCharChar1, li.NormaaliCharChar1, div.NormaaliCharChar1
+	{mso-style-name:"Normaali Char Char1";
+	mso-style-parent:"";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-indent:10.0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:FI;}
+p.NormaaliCharChar1Char, li.NormaaliCharChar1Char, div.NormaaliCharChar1Char
+	{mso-style-name:"Normaali Char Char1 Char";
+	mso-style-parent:"";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-indent:10.0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:FI;}
+span.NormaaliChar1Char
+	{mso-style-name:"Normaali Char1 Char";
+	mso-style-locked:yes;
+	mso-style-link:"Normaali Char1";
+	mso-ansi-font-size:12.0pt;
+	mso-bidi-font-size:12.0pt;
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:EN-US;
+	mso-bidi-language:AR-SA;}
+p.Normaali, li.Normaali, div.Normaali
+	{mso-style-name:Normaali;
+	mso-style-parent:"";
+	margin-top:6.0pt;
+	margin-right:0mm;
+	margin-bottom:0mm;
+	margin-left:0mm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-indent:10.0mm;
+	line-height:150%;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	mso-bidi-font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";
+	mso-font-kerning:12.0pt;
+	mso-ansi-language:EN-US;
+	mso-fareast-language:FI;}
+ /* Page Definitions */
+ @page
+	{mso-footnote-separator:url("Midwest_Studies_paper_Tuomela_files/header.htm") fs;
+	mso-footnote-continuation-separator:url("Midwest_Studies_paper_Tuomela_files/header.htm") fcs;
+	mso-endnote-separator:url("Midwest_Studies_paper_Tuomela_files/header.htm") es;
+	mso-endnote-continuation-separator:url("Midwest_Studies_paper_Tuomela_files/header.htm") ecs;
+	mso-endnote-numbering-style:arabic;}
+@page Section1
+	{size:210.0mm 842.0pt;
+	margin:20.0mm 20.0mm 20.0mm 20.0mm;
+	mso-header-margin:42.55pt;
+	mso-footer-margin:42.55pt;
+	mso-even-footer:url("Midwest_Studies_paper_Tuomela_files/header.htm") ef1;
+	mso-footer:url("Midwest_Studies_paper_Tuomela_files/header.htm") f1;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;
+	mso-endnote-numbering-style:arabic;}
+ /* List Definitions */
+ @list l0
+	{mso-list-id:1041174856;
+	mso-list-template-ids:-478511722;}
+@list l0:level1
+	{mso-level-style-link:"Heading 1";
+	mso-level-suffix:space;
+	mso-level-text:%1;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level2
+	{mso-level-style-link:"Heading 2";
+	mso-level-suffix:space;
+	mso-level-text:"%1\.%2";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level3
+	{mso-level-style-link:"Heading 3";
+	mso-level-suffix:space;
+	mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level4
+	{mso-level-style-link:"Heading 4";
+	mso-level-suffix:space;
+	mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level5
+	{mso-level-style-link:"Heading 5";
+	mso-level-suffix:space;
+	mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level6
+	{mso-level-number-format:none;
+	mso-level-suffix:none;
+	mso-level-text:"";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level7
+	{mso-level-number-format:none;
+	mso-level-suffix:none;
+	mso-level-text:"";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level8
+	{mso-level-number-format:none;
+	mso-level-suffix:none;
+	mso-level-text:"";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+@list l0:level9
+	{mso-level-number-format:none;
+	mso-level-suffix:none;
+	mso-level-text:"";
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0mm;
+	text-indent:0mm;}
+ol
+	{margin-bottom:0mm;}
+ul
+	{margin-bottom:0mm;}
+-->
+</style>
+<!--[if gte mso 10]>
+<style>
+ /* Style Definitions */
+ table.MsoNormalTable
+	{mso-style-name:"Table Normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-padding-alt:0mm 5.4pt 0mm 5.4pt;
+	mso-para-margin:0mm;
+	mso-para-margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	mso-ansi-language:#0400;
+	mso-fareast-language:#0400;
+	mso-bidi-language:#0400;}
+</style>
+<![endif]-->
+</head>
+
+<body lang=FI style='tab-interval:36.0pt'>
+
+<div class=Section1>
+
+<p class=NormaaliChar1 align=center style='text-align:center'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=center style='text-align:center'><span lang=EN-US>JOINT
+INTENTION, WE-MODE AND I-MODE</span></p>
+
+<p class=NormaaliChar1 align=center style='text-align:center'><span lang=EN-US>by</span></p>
+
+<p class=NormaaliChar1 align=center style='text-align:center'><span lang=EN-US>Raimo
+Tuomela</span></p>
+
+<p class=NormaaliChar1 align=center style='text-align:center'><st1:place w:st="on"><st1:PlaceType
+ w:st="on"><span lang=EN-US>University</span></st1:PlaceType><span lang=EN-US>
+ of <st1:PlaceName w:st="on">Helsinki</st1:PlaceName></span></st1:place></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>I
+INTRODUCTION</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+central topic of this paper is to study joint intention to perform a joint
+action or to bring about a certain state. Here are some examples of such joint
+action: You<span style='mso-spacerun:yes'>  </span>and<span
+style='mso-spacerun:yes'>  </span>I<span style='mso-spacerun:yes'> 
+</span>share the plan to carry<span style='mso-spacerun:yes'>  </span>a<span
+style='mso-spacerun:yes'>  </span>heavy<span style='mso-spacerun:yes'> 
+</span>table jointly <span style='mso-spacerun:yes'> </span>upstairs and
+realize this plan, we sing a duet together, we clean up our backyard together,
+and I cash a check by acting jointly with you, a bank teller, and finally we
+together elect a new president for our country. In these cases<span
+style='mso-spacerun:yes'>  </span>the participants can<span
+style='mso-spacerun:yes'>  </span>be<span style='mso-spacerun:yes'> 
+</span>said to have a <i style='mso-bidi-font-style:normal'>joint intention</i>
+jointly or as a group to<span style='mso-spacerun:yes'>  </span>carry<span
+style='mso-spacerun:yes'>  </span>the table<span style='mso-spacerun:yes'> 
+</span>upstairs: the content of the intention involves<span
+style='mso-spacerun:yes'>  </span>our performing<span
+style='mso-spacerun:yes'>  </span>something<span style='mso-spacerun:yes'> 
+</span>together and the pronoun<span style='mso-spacerun:yes'>  </span>“we”
+refers<span style='mso-spacerun:yes'>  </span>to<span
+style='mso-spacerun:yes'>  </span>us, viz. you and me and the possible other
+participants considered together. When we jointly intend to carry the table,
+each of us can be said to <i style='mso-bidi-font-style:normal'>we-intend</i>
+to do it. The purpose of the present paper is to discuss joint intention and
+we-intention primarily in a strong sense, the “we-mode” sense. In this sense
+the participants intend as group members because of a group reason (as will be
+clarified later). This contrasts with “I-mode” joint or shared intention. When
+the participants intend in the I-mode they intend solely as private persons –
+in contrast to the we-mode case where they must functioning as group members
+and where intending for a group reason must be at play.<a style='mso-endnote-id:
+edn1' href="#_edn1" name="_ednref1" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[1]</span></span><![endif]></span></span></a> The I-mode case divides
+into two subcases. The participants may, first, have their intentions to do
+something, e.g. lift one end of a log or wear a certain kind of<span
+style='mso-spacerun:yes'>  </span>jacket, in part because some other agent
+performs a relevant other action, e.g. lifts the other end of the log or wears
+a similar kind of jacket. This is the essentially social I-mode case.<span
+style='mso-spacerun:yes'>  </span>The other I-mode case is one in which the
+fact that there are other agents involved as participants is not essential
+(e.g. I conserve energy and so do you). This is the “non-social”, merely
+interpersonal I-mode case.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>In
+my earlier work I have often taken (we-mode) joint intentions to be expressible
+by<span style='mso-spacerun:yes'>  </span>means of<span
+style='mso-spacerun:yes'>  </span>locutions like “We will do X”, where the word
+“will” is<span style='mso-spacerun:yes'>  </span>used conatively (rather than
+predictively, in the future tense) and<span style='mso-spacerun:yes'>  </span>X
+is<span style='mso-spacerun:yes'>  </span>a joint action type (see Section V
+below for the content of a joint intention).<a style='mso-endnote-id:edn2'
+href="#_edn2" name="_ednref2" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[2]</span></span><![endif]></span></span></a> However, joint intentions
+can also have other contents, and we may also speak of the jointly intending
+agents’ <span style='mso-bidi-font-style:italic'>jointly seeing to it or (what
+is different) bringing it about </span><span
+style='mso-spacerun:yes'> </span>that a state or event obtains. They may thus
+jointly see to it that they jointly build a house, that one of them builds it,
+or that some outsiders are hired to do the job, etc.<a style='mso-endnote-id:
+edn3' href="#_edn3" name="_ednref3" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[3]</span></span><![endif]></span></span></a> In this paper I will,
+however, focus on the we-mode case of the performance of an action where the
+agents jointly intend to perform the action together.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+content of a (we-mode) joint intention has, as it were, two parts. In the case
+of single-agent intention I take the intention to have the form “A intends, by
+his actions, to perform X”. Analogously with this, we have in the case of joint
+agency (here the dyadic case) “A<span style='mso-spacerun:yes'>  </span>and B
+jointly intend, by their actions, to perform joint action X ”<span
+style='mso-spacerun:yes'>  </span>or “A and B jointly intend jointly to see to
+it that X” (or, from their perspective, “We will perform X together”). There is
+joint action and there is content of the joint action (e.g. jointly bringing
+about something is the joint action and what is being brought about is the
+content of the action). Joint action involves that each participant of a joint
+intention is in principle “actionally” involved: he has a share or part in the
+participants’ performance of the joint action in question. Jointly intentional
+joint action is joint action performed on the basis of a joint intention, where
+each participant (or at least most of them) performs his part intentionally on
+the basis of his we-intention to perform that joint action (or a closely
+related action). Accordingly, his intention to perform his part of the joint
+action can be derived from, and be justified by, the participants’ joint
+intention.<a style='mso-endnote-id:edn4' href="#_edn4" name="_ednref4" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[4]</span></span><![endif]></span></span></a> </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>All
+intentions are necessarily related to one’s own actions. In the single-agent
+case, an agent may intend to see to it that his car is fixed. This intention
+has as its satisfaction condition that the agent by his own actions sees to it
+that his car becomes fixed – e.g. he can get a mechanic to fix the car or fix
+it himself. If the intention concerns the direct performance of an action (e.g.
+when an agent intends to open the window) the agent must himself bring about
+the satisfaction solely by his own action. This kind of intention I will call
+(direct) “action intention”. A minimal rationality condition for an action
+intention, at least a prior intention, is that the agent must at least believe
+that it is not impossible for him to perform the action. Assuming that at least
+a prior intention involves commitment to the content of the intention, we can
+ground the previous claim by saying that if he would not so believe it would be
+pointless for him to commit himself to his task.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>An
+action intention contrasts with an “aim-intention”. In the latter case it is
+not conceptually required that the agent believes that he with some likelihood
+can alone bring about or see to it that the action or its “result” event comes
+about, rather the agent is assumed <i style='mso-bidi-font-style:normal'>by his
+action</i> to contribute to the aimed result.<a style='mso-endnote-id:edn5'
+href="#_edn5" name="_ednref5" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[5]</span></span><![endif]></span></span></a> The kind of aim-intention
+that will concern us in the present paper is we-intention. A we-intention is a
+participant’s “slice” of their joint intention, so to speak. Or the other way around,
+it can technically be said that a joint intention consists of the participants’
+we-intentions about the existence of which the participants have mutual belief.
+As is the case of ordinary action intention, also in the case of joint
+intention the participants have to bring it about, by their actions, that the
+intended state or event comes about. We-intentions are different from ordinary
+action intentions not only in being aim-intentions but also in that they
+conceptually depend on the joint intention in question. The central condition
+of satisfaction of the we-intention is that the we-intending agent <i
+style='mso-bidi-font-style:normal'>intends to participate</i> and accordingly
+intentionally participates in the joint action. That is, he intends by his own
+action, his part or share, to contribute to the joint action. Thus, the agent’s
+having the we-intention to perform a joint action together with the others (or
+that the participants perform that joint action) entails his participation
+intention, which is an action intention.<span style='mso-spacerun:yes'> 
+</span></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>There
+is the rationality constraint on we-intention that<span
+style='mso-spacerun:yes'>  </span>an<span style='mso-spacerun:yes'> 
+</span>agent cannot rationally we-intend unless he believes not only that he
+can<span style='mso-spacerun:yes'>  </span>perform his part of their joint
+action, X, with some probability, but also that he together with his fellow
+participants<span style='mso-spacerun:yes'>  </span>can perform X jointly at
+least with some nonzero probability.<span style='mso-spacerun:yes'> 
+</span>The<span style='mso-spacerun:yes'>  </span>jointly<span
+style='mso-spacerun:yes'>  </span>intending agents must believe that the “joint
+action opportunities” for<span style='mso-spacerun:yes'>  </span>an intentional
+joint performance of X are (or will be) there at least with some
+probability.<span style='mso-spacerun:yes'>  </span>Yet another property of a
+we-intention is that, in each rational participant’s view, it must be mutually
+believed by the participants<span style='mso-spacerun:yes'>  </span>that<span
+style='mso-spacerun:yes'>  </span>the presuppositions for the jointly
+intentional performance of X hold or will hold with some probability. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+formation of a joint intention (and hence<span style='mso-spacerun:yes'> 
+</span>a we-intention, a personal “slice” of<span style='mso-spacerun:yes'> 
+</span>the joint intention)<span style='mso-spacerun:yes'> 
+</span>requires<span style='mso-spacerun:yes'>  </span>that the participants
+jointly<span style='mso-spacerun:yes'>  </span>and typically intentionally make<span
+style='mso-spacerun:yes'>  </span>up their<span style='mso-spacerun:yes'> 
+</span>minds<span style='mso-spacerun:yes'>  </span>to<span
+style='mso-spacerun:yes'>  </span>bring about something,<span
+style='mso-spacerun:yes'>  </span>thus<span style='mso-spacerun:yes'> 
+</span>exercising<span style='mso-spacerun:yes'>  </span>joint control over the
+possible courses of action and<span style='mso-spacerun:yes'>  </span>settling
+for a particular content. The formation of a joint intention<span
+style='mso-spacerun:yes'>  </span>(or<span style='mso-spacerun:yes'> 
+</span>plan)<span style='mso-spacerun:yes'>  </span>is based on their<span
+style='mso-spacerun:yes'>  </span>various<span style='mso-spacerun:yes'> 
+</span>personal<span style='mso-spacerun:yes'>  </span>and, especially,<span
+style='mso-spacerun:yes'>  </span>shared desires and mutual and other beliefs.
+In<span style='mso-spacerun:yes'>  </span>this sense a joint intention can be
+said to “summarize” or reflect the motivation underlying joint action. Of
+course, this final motivation underlying the joint intention need not be
+anything like an aggregation of private motivations but may instead be a
+compromise based on discussion, negotiation, or bargaining. In contrast, joint<span
+style='mso-spacerun:yes'>  </span>desires and wants do not similarly involve
+making up<span style='mso-spacerun:yes'>  </span>one’s<span
+style='mso-spacerun:yes'>  </span>mind and do not necessarily lead to
+intentional joint action,<span style='mso-spacerun:yes'>  </span>to<span
+style='mso-spacerun:yes'>  </span>attempts to function rationally in a
+coordinated way, and to fulfill the already formed plan. Furthermore, rational desires
+and wants do not require success beliefs as their normal (or “normal-rational”)
+accompaniments.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Concentrating
+on the case of the direct performance of a joint action, in joint-intention
+formation each agent accepts to participate in the participants’ joint
+performance <i>as a group </i>(or as one agent) of an action X. We can think of
+the situation in analogy with the case of a single agent: An agent intends X
+and performs X on the basis of the intention. Now assume that the agent is
+collective, and then the same can be said of it. A collective agent’s (group’s)
+intending and acting amounts to the group members’ jointly intending X and
+jointly acting on the basis of their joint intention. They must act on their
+joint intention for their satisfying action to be jointly intentional and not
+only intentional in the weak sense that all the participants act intentionally.
+If that satisfying action were not jointly intentional the analogy with the
+group agent acting intentionally would not hold true, and they would not act as
+a unit.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>In the
+present case the agents jointly intend as a group and thus in the we-mode to
+realize the content of the joint intention that they – by their forming of the
+joint intention – have jointly accepted as the group’s intended goal (broadly
+understood). The joint intention entails a collective (viz. joint) commitment
+in analogy with a single-agent’s intention entailing a commitment to the
+content of the intention. A group is analogously committed to satisfying its
+intention, and the group members are collectively committed to satisfying their
+joint intention and are also socially committed to each other to performing
+their parts of the satisfying joint action. The collective commitment serves to
+keep the group members together as a unit. They function as group members
+towards achieving the content of the joint intention. Collective commitment
+need not be stronger than what joint intention conceptually entails: When our
+agents jointly intend X (e.g. a joint action) they must collectively bind
+themselves to X and what its satisfaction requires. This I call the
+instrumental group sense of collective commitment. This minimal group sense is
+intention-relative and, strictly speaking, non-normative or, if your prefer, only
+“technically” normative. In this sense my non-normative account sides with Michael
+Bratman and Seumas Miller against Margaret Gilbert.<a style='mso-endnote-id:
+edn6' href="#_edn6" name="_ednref6" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[6]</span></span><![endif]></span></span></a> </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>In
+the joint intention to perform a joint action X, it is precisely the content of
+the intention that is shared, <i style='mso-bidi-font-style:normal'>viz.</i>, performing
+X jointly is shared. Because of the very idea of participation, each
+participant must intend to perform his part of the joint action, and,
+furthermore, that is typically required for the joint intention to become
+satisfied. The part performance must be intentional, of course, and thus based
+on the agent’s intention (and indeed, ultimately, on the joint intention in
+question, as will be seen later).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>II
+I-MODE VERSUS WE-MODE REASONS FOR INTENDING</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Consider
+the case where you and I jointly intend to go to a museum. We have jointly accepted
+that going to the museum is our, viz., our dyad’s, goal, and we are
+collectively committed to satisfying this joint goal with a social commitment
+(bond) to each other to this. Accordingly, we-mode joint intention concerning a
+joint action X entails that the participants must have collectively accepted
+“We together will perform X” (or one of its variants) for their group and hence
+for themselves, and consequently they must have collectively committed
+themselves to performing X jointly. Here “We together will perform X” applies
+to each participant, and in the case of a single participant it expresses his
+we-intention. An agent’s we-intention then is his part of the agents’ joint
+intention, and conversely a joint intention can, upon analysis, be said to
+consist of the participants’ mutually known we-intentions.<a style='mso-endnote-id:
+edn7' href="#_edn7" name="_ednref7" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[7]</span></span><![endif]></span></span></a> To recall, a we-intention
+is not by itself an action intention but an aim-intention involving that the
+agent intentionally aims at X (viz., at that the group performs X)and is
+“aim-committed” to X, while his “action commitment” is to performing his part
+of X. The agent’s intention to perform his <i style='mso-bidi-font-style:normal'>part</i>
+of the joint action accordingly is a proper action intention (that presupposes,
+of course, that the others perform their parts).<a style='mso-endnote-id:edn8'
+href="#_edn8" name="_ednref8" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[8]</span></span><![endif]></span></span></a> We have seen that when the
+agents jointly intend to perform a joint action together, this involves performing
+one’s part of the joint action, and the concept of joint action in the general
+case cannot be composed out of individual action concepts independent of the
+joint action concept. Indeed, in many cases the joint action cannot
+antecedently be decomposed into parts in a more informative way than saying
+that you and I will both have to participate without a fully clear idea of what
+these parts will amount to (cf. the pattern of reasoning (<i style='mso-bidi-font-style:
+normal'>W2</i>) assumed in Section III to apply to we-intenders).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Focusing
+on full-blown joint intentions, a central subclass of them is formed by joint
+intentions based on the participants’ (explicit or implicit) agreement to act
+jointly. The making of an agreement in the full sense (<i style='mso-bidi-font-style:
+normal'>viz.,</i> accepting a jointly obligating plan) is a joint action which
+is necessarily intentional. What does a plan-based joint intention presuppose?
+It must obviously be required that the participants understand – at least in
+some rudimentary sense – that a joint action in some sense, however weak, is
+involved. The joint action must be taken to include a “slot” for each
+participant’s intention. In general, all the relevant generic action concepts
+need to be possessed to a relevant extent by the participants – a kind of
+“hermeneutic circle” is at play. Thus the notion of joint action opportunity
+needs to be available to the participants together with the background
+knowledge, most of it culture-dependent, that it in turn presupposes. Next, certain
+situation-specific information must be presupposed. If the performance of a
+joint action X in a situation S is at stake, the concept of X must be possessed
+at least in a functional sense (not necessarily in a cognitive and reflective
+sense) by the potential participants, and they must also understand what S
+involves concerning the performance of X. It is also required that, at least
+ideally, each participant believes that the participants mutually believe that
+the joint action opportunities for X hold in S.<a style='mso-endnote-id:edn9'
+href="#_edn9" name="_ednref9" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[9]</span></span><![endif]></span></span></a> Some direct or indirect
+communication (or signaling) between the participants is needed for the reason
+that the participants are autonomous agents who, nevertheless, must make up
+their minds depending on what the others are thinking and doing. More
+concretely, communication is required for them rationally to arrive at
+unconditional intentions (we-intentions as well as the entailed intentions to
+perform one’s part of the joint action) in the presupposition-dependent sense
+to be discussed. The indirect communication may be previously “codified” and
+may relate to certain kinds of situations (e.g. “in situation S we always have
+a joint plan of a certain kind and act together appropriately”). </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Jointly
+intending as a group thus amounts to jointly intending to realize a joint plan (e.g.
+simply to achieve a goal or to perform an action together) when functioning as
+a member of the jointly intending group of persons. Intuitively, the
+participants<span style='mso-spacerun:yes'>  </span>must be suitably bound
+together for proper collective action purporting to realize the shared plan to
+come about (and accordingly for their acting <i style='mso-bidi-font-style:
+normal'>as a group</i>).<a style='mso-endnote-id:edn10' href="#_edn10"
+name="_ednref10" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[10]</span></span><![endif]></span></span></a> In the general case we
+must allow that special authorized members act as operative members for the
+group and form intentions for it, but below I will mostly ignore this feature. When
+some persons jointly intend and act as a group I speak of “we-mode” intending
+and acting. It contrasts with I-mode intending and acting which is based on intending
+and acting as a private person. Let me now try to state a more precisely what
+an I-mode reason and a we-mode reason amount to. I will give the following
+characterization for a simple case relating to the context of a specific group,
+assuming that a reason is a fact or a fact-like entity expressible by a
+that-clause:</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(<i
+style='mso-bidi-font-style:normal'>IMR</i>) Reason R is a group member’s
+motivating<i> I-mode reason</i> for performing an action X if<span
+style='mso-spacerun:yes'>  </span>and only if R is the agent’s main <i>private</i>
+(“non-group”) reason for his performing X. Typically, R is a state that the
+agent wants or intends to be the case or a state that, according to his belief,
+obtains; and X is an action that is a means to R or an action that R requires
+for its obtaining such that the agent is privately committed to performing X on
+the basis of R.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(<i
+style='mso-bidi-font-style:normal'>WMR</i>) Reason R is a group member’s <span
+style='mso-bidi-font-style:italic'>motivating<i><span
+style='mso-spacerun:yes'>  </span>we-mode reason</i></span> for performing an action
+X if<span style='mso-spacerun:yes'>  </span>and only if R is the agent’s main motivating
+group reason for his performing X. Typically, R is a state that the group in
+question wants or intends to be the case or a state that, according to the group’s
+belief, obtains; and X is an action that is the individual’s part of<span
+style='mso-spacerun:yes'>  </span>a collective action that is a means to R or a
+collective action that R requires for its obtaining, where the group members
+are collectively committed to performing the collective action for reason R and
+mutually believing so.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>In (<i
+style='mso-bidi-font-style:normal'>WMR</i>) X can be e.g. a collective (or
+group) action with multiple tokens (e.g. going to church on Sundays) or a joint
+action like cleaning up a park as a many-person action. Functioning as group
+members, the participants have collectively accepted a the performance of a
+joint action as an aim for the group and are collectively committed to
+performing it for group reason R (a state expressible by a that-clause), and they
+are also socially committed to the group members to performing their parts of
+the collective action for reason R. Having a private commitment means in (<i
+style='mso-bidi-font-style:normal'>IMR</i>) that the person privately (rather
+than as a group member) has psychologically bound himself to a “content”, e.g.
+to performing an action for a reason. In general, private commitment is
+dependent on an intention, here the intention to reach a goal. Notice that functioning
+in the we-mode is necessarily connected to a group reason while functioning in
+the I-mode is at most only contingently connected to the group reason when one
+is involved. ((<i>WMR) </i>and (<i>IMR)</i> can be generalized to cover any
+voluntary attitude and action.)</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>One
+can now say that an attitude is in the I-mode or in the we-mode if,
+respectively, it is held for an I-mode reason or for a we-mode reason, and the
+analogous applies to actions.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>III
+WE-INTENTIONS AND JOINT INTENTIONS ANALYTICALLY<span style='mso-spacerun:yes'> 
+</span>ELUCIDATED</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>In
+accordance with the grounds presented in the previous section, I will next
+discuss social we-intentions and joint intentions in a more analytical and precise
+fashion. Although the conceptual distinction between a we-mode and I-mode
+intention is clear in view of what was said above, both kinds of social
+intentions can in a sense be viewed in terms of the notion of a shared
+we-attitude.<a style='mso-endnote-id:edn11' href="#_edn11" name="_ednref11"
+title=""><span class=MsoEndnoteReference><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:12.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[11]</span></span><![endif]></span></span></a>
+Concisely put, a we-attitude is an attitude a person has relative to some
+collective if and only if he has that attitude in part because, according to his
+belief, the others in the collective have it, there being mutual belief among
+the participants about their having it. We can apply this to intentions and say
+somewhat loosely that a person has the we-intention to do X (or that action or
+outcome X will come about) if and only if he has the intention to do X (or that
+action or outcome X will come about) and has it in part because, according to his
+belief, the others in the collective have that intention, there being mutual
+belief among the participants about this. When there is shared we-intention in
+this sense we can speak of at least a weak joint intention, one in the I-mode. In
+the we-mode case we can say that the participant intends to participate in X at
+least in part because the group intends to perform X – recall that the group’s
+intending can be based on the operative agents’ intending rather than all the
+members so intending. I intend to participate in our joint performance of X in
+part because we intend to perform X and only derivatively because the others
+intend to participate. The group reason here is a conceptual condition for a
+participant’s we-intention while the other participants’ intention to
+participate (his we-intention) is a presupposed rationality condition (“it
+would not be rational for me to participate unless the others participate”). We
+may also say that in the we-mode case the participants are functioning as group
+members but not in the I-mode case, where they are functioning merely as
+private persons.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>A
+we-mode joint intention is expressible by “We as a group will perform X
+jointly”. Here “we” is assumed to refer to a group or to some persons collectively
+considered and indeed the participants are assumed to take themselves to form a
+“we”, that is, “we-together” or “we-as-a-group” which is not a mere aggregative
+“we” that signifies “the two of us” (the basic I-mode sense of “we”). The
+“we-as-a-group” notion indicates the we-mode sense of “we”. We can say that the
+<i style='mso-bidi-font-style:normal'>intentional </i>subject of a we-intention
+is “we” while the <i style='mso-bidi-font-style:normal'>ontological </i>subject
+of a we-intention is a single agent.<a style='mso-endnote-id:edn12'
+href="#_edn12" name="_ednref12" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[12]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Deferring
+the group ascription case to the next section, I will here be concerned with
+the case in which the joint intention to perform X together is attributed to m
+agents, say A<sub>1</sub>,...,A<sub>i</sub>,...,A<sub>m</sub> and in which case
+the participants assume that those participants really exist and understand
+what the joint action X at least in general terms involves. In this case, every
+participant A<sub>i</sub> has the we-intention to perform X together with the
+others, and indeed the conatively used expression <span
+style='mso-spacerun:yes'> </span>“We as a group will perform X jointly” can be
+taken to express the we-intention and also the group reason that each A<sub>i</sub>
+here has for participating in the performance of the joint action X. The
+participants form a group here in the rather trivial sense that their having a
+joint intention means that they take themselves to be capable of acting as a
+group, and this will make them a social group on almost any view.<a
+style='mso-endnote-id:edn13' href="#_edn13" name="_ednref13" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[13]</span></span><![endif]></span></span></a> </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>I
+will next present the account of (we-mode) we-intention I have advocated for a
+long time.<a style='mso-endnote-id:edn14' href="#_edn14" name="_ednref14"
+title=""><span class=MsoEndnoteReference><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:12.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[14]</span></span><![endif]></span></span></a> <span
+style='mso-spacerun:yes'> </span>This analysis will now be summarily formulated
+for the case of X being a joint action and on the presupposition that a
+we-intention expression “We will do X together” (or one of its variants or
+related phrases such as “member A<sub>i</sub> we-intends <i style='mso-bidi-font-style:
+normal'>that</i> his group performs X together”) has been accepted by the
+participants<span style='mso-spacerun:yes'>  </span>A<sub>1</sub>,...,A<sub>i</sub>,...,A<sub>m</sub>
+– entailing, under normal conditions, that a joint intention exists:</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(<i
+style='mso-bidi-font-style:normal'>WI</i>) A member A<sub>i</sub> of a
+collective g <i style='mso-bidi-font-style:normal'>we-intends</i> to do X if
+and only if</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(i) A<sub>i</sub>
+intends to do his part of X (as his part of X); </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(ii)
+A<sub>i</sub> has a belief to the effect that the joint action opportunities
+for an intentional performance of X will obtain (or at least probably will
+obtain), especially that a right number of the full-fledged and adequately
+informed members of g, as required for the performance of X, will (or at least
+probably will) perform their parts of X, which under normal conditions will
+result in an intentional joint performance of X by the participants; </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(iii)
+A<sub>i</sub> believes that there is (or will be) a mutual belief among the
+participating members of g (or at least among those participants who perform
+their parts of X intentionally as their parts of X there is or will be a mutual
+belief) to the effect that the joint action opportunities for an intentional
+performance of X will obtain (or at least probably will obtain);</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(iv)
+(i) in part because of (ii) and (iii).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>I
+have assumed that the participants actually exist, but I allow that a
+participant might under some outlandish conditions be mistaken in his beliefs
+(ii) and (iii). (On pain of not we-intending at all, he cannot be mistaken
+about the general situation at stake, viz. that there are some agents about to
+perform a joint action X.) Thus, in such abnormal circumstances a single agent
+can in principle have a we-intention. In such a case a we-intention is not a
+“slice” of a joint intention. Below I will, however, assume that the acceptance
+of “We will do X together” must be veridical<span style='mso-spacerun:yes'> 
+</span>and entail the existence of a joint intention. Thus it will be assumed
+below that all the agents in question really have the we-intention.<a
+style='mso-endnote-id:edn15' href="#_edn15" name="_ednref15" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[15]</span></span><![endif]></span></span></a> </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>I
+would like to emphasize three things here. Firstly, the general structure of
+the above account shows that we are dealing with a social we-intention. The
+agent intends to perform X together with the others, and his having this
+intention is based in part, according to his belief, on the others’ also
+intending to participate (or at least sufficiently many of them so intending
+that an intentional performance of X will result), there being mutual belief
+about this. That also the others have the intention is a conceptual
+presupposition of a joint intention, but that they actually have formed the
+intention to participate in X is a contingent fact that can be an agent’s proximate
+factual reason for taking part. His so undertaking to participate is a matter
+of rationality rather than merely a conceptual feature. However, it must be
+emphasized that the principal proximate reasons for a participant’s intention
+to perform his part of X in the we-mode case – on conceptually grounds – is the
+group’s intention, although this group reason might not in fact exist before
+the participants’ forming <span style='mso-spacerun:yes'> </span>their
+intentions to perform their parts. Conceptually, the group’s proattitude
+towards X precedes an agent’s intention to perform his part and is accordingly
+conceptually involved in this intention. In contrast, the fact that the others
+also intend to participate and have the relevant we-intention is a derivative
+rationality reason. Secondly, they are collectively committed to at least
+trying to see to it that their intention to perform X together will be
+satisfied, this collective commitment being a conceptual feature involved in
+their intention. Thirdly, the part division of X can be taken to indicate that
+a we-mode we-intention is at stake on the ground that the part action is a
+participant’s part of the agents’ intentionally performed action X based on
+their joint intention and thus proattitude to perform X for the group.<a
+style='mso-endnote-id:edn16' href="#_edn16" name="_ednref16" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[16]</span></span><![endif]></span></span></a> </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>I will
+comment on clause (i) later, but let me here say that this is not an
+“I-intention” in the sense that e.g. Searle uses the notion, because this is a
+we-mode personal intention essentially of the kind “I, as a group member,
+intend to participate”. The presupposed beliefs (ii) and (iii), expressing the
+minimal rationality of the we-intender concerning what a we-intention
+conceptually involves, and condition (iv) will not be commented on in detail
+here.<a style='mso-endnote-id:edn17' href="#_edn17" name="_ednref17" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[17]</span></span><![endif]></span></span></a><span
+style='mso-spacerun:yes'>  </span>Let me only say that the joint action
+opportunity conditions include, besides the relevant mental and physical
+abilities of the participants, also that the others (or at least sufficiently
+many of the “right” kinds of them, as required for an intentional performance
+of X) will indeed participate. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>It<span
+style='mso-spacerun:yes'>  </span>is presupposed by my analysis that a
+minimally rational we-intender<span style='mso-spacerun:yes'>  </span>should in
+the standard case of direct joint action be disposed to reason in accordance
+with the following two<span style='mso-spacerun:yes'>  </span>schemas (<i
+style='mso-bidi-font-style:normal'>W1</i>) and (<i style='mso-bidi-font-style:
+normal'>W2</i>) of practical inference (or in terms of their variants):</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>(<i style='mso-bidi-font-style:normal'>W1</i>)<span
+style='mso-spacerun:yes'>       </span>(i) We will do X.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>Therefore:<span style='mso-tab-count:1'>           </span><span
+style='mso-spacerun:yes'>        </span></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>(ii) I will do my part of X.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>(<i style='mso-bidi-font-style:normal'>W2</i>)<span
+style='mso-tab-count:1'>       </span>(i) We will do X.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>(ii) X cannot be performed by us unless we perform action<span
+style='mso-spacerun:yes'>  </span>Z (for<span style='mso-spacerun:yes'> 
+</span>instance, teach<span style='mso-spacerun:yes'>  </span>agent<span
+style='mso-spacerun:yes'>  </span>A, who<span style='mso-spacerun:yes'> 
+</span>is one of us, to do something required of him for X).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>Therefore,</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>(iii) We will do Z.:</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>(iv) Unless I perform Y we cannot perform Z. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>Therefore (because of (iii) and (iv)),</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left;line-height:normal'><span
+lang=EN-US>(v) I will do Y (as my contribution to Z).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+first of these schemas in an obvious way connects we-intending to the
+we-intender’s own action - to his performance of his part or share of joint
+action X. The second of the schemas applies to all “normally rational”
+we-intenders, too, but of course only when the contingent clauses (ii) and (iv)
+apply, and it is to be exhibited by the we-intenders’ dispositions to reason
+in<span style='mso-spacerun:yes'>  </span>appropriate<span
+style='mso-spacerun:yes'>  </span>circumstances. This schema expresses part of
+what<span style='mso-spacerun:yes'>  </span>is involved in saying that a
+we-intention involves a<span style='mso-spacerun:yes'>  </span>joint commitment
+to contribute to the realization of the content of the we-intention. This joint
+commitment also involves social commitment, viz. that the participants are
+committed to one another to participating in the joint performance of X.
+Accordingly, (<i style='mso-bidi-font-style:normal'>W2</i>) clearly makes
+we-intentions cooperative to a considerable extent by requiring relevant interaction
+– or at least disposition to interact – of the participants. (<i>W2</i>) also
+indicates that the notion of one’s part of joint action X<span
+style='mso-spacerun:yes'>  </span>cannot be fully fixed in advance and
+constructed of antecedently available individual actions.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><span
+style='mso-spacerun:yes'> </span>Supposing that joint intentions can be
+expressed by “We as a group will do X” or its variants,<span
+style='mso-spacerun:yes'>  </span>in order to cover “standing” intentions in
+addition to directly action-generating intentions we must also take into
+account dispositions to we-intend.<a style='mso-endnote-id:edn18' href="#_edn18"
+name="_ednref18" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[18]</span></span><![endif]></span></span></a> The following can accordingly
+be regarded as a true claim:</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(<i
+style='mso-bidi-font-style:normal'>JI</i>) Agents A<sub>1</sub>,...,A<sub>i</sub>,...,A<sub>m</sub>
+have the <i style='mso-bidi-font-style:normal'>joint intention to perform a
+joint action X</i> if and only if </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(a)
+these agents have the we-intention (or are disposed to form the we-intention)
+to perform X; and </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(b)
+there is a mutual belief among them to the effect that (a).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>In
+the case of joint intention the conatively used “We will do X” is true of<span
+style='mso-spacerun:yes'>  </span>each participant A<sub>i</sub>.<a
+style='mso-endnote-id:edn19' href="#_edn19" name="_ednref19" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[19]</span></span><![endif]></span></span></a> </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+above account of we-mode joint intention and we-intention is conceptually
+non-reductive, although it is ontically individualistic or, rather, interrelational.<a
+style='mso-endnote-id:edn20' href="#_edn20" name="_ednref20" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[20]</span></span><![endif]></span></span></a> In my account (<i>WI</i>)
+the participants are assumed to believe that they will perform joint action X
+intentionally – as arguably an intention cannot be satisfied by means of
+non-intentional action. Assuming the standard case that the beliefs are true
+and assuming also that intentional action X requires a relevant intention (here
+typically X), we can in the present case take this (joint) intention to be one
+with the content to perform X , and<span style='mso-spacerun:yes'>  </span>we
+arrive at the view that (i) of (<i>WI</i>) entails for the first person case:</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(*)
+I intend to perform my part of our joint action X as my part of X that we
+perform jointly intentionally as a group <i style='mso-bidi-font-style:normal'>on
+the basis of our joint intention to perform X</i>. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(*)
+is perhaps more circular than one may want to tolerate.<a style='mso-endnote-id:
+edn21' href="#_edn21" name="_ednref21" title=""><sup><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><sup><span lang=EN-US style='font-size:12.0pt;
+font-family:"Times New Roman";mso-fareast-font-family:"Times New Roman";
+mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;
+mso-bidi-language:AR-SA'>[21]</span></sup><![endif]></span></sup></a> The
+notion of joint intention can here be understood in a somewhat vague,
+preanalytic sense, viz. in terms of what the agents actually “have in mind”
+when they jointly intend in everyday life, and this is what analytical theories
+of collective intentionality analyze and elucidate in terms of (partly)
+technical notions such as we-intentions. There is circularity but not vicious
+circularity here, because the elements in my analysis are not independently
+existing “building blocks” of joint intentions but only analytically isolated
+parts that presuppose the whole of which they are parts.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>To
+approach circularity from a slightly different perspective, I claim that the
+italicized part that creates the circularity can be omitted without change of
+truth value (as indeed clause (i) of (<i>WI</i>) does). Let us thus go back to
+the following claim (in view of the second clause of (<i>WI</i>)): </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(**)
+I intend to perform my part of our joint action X (that we will perform as a
+group) as my part of our performing X intentionally.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+central thing here is that the participants are assumed to be able to perform X
+intentionally as a group with an adequate functional understanding of joint
+action X. Performing X as a group is understood to involve acting fully as a
+group member, thus for a group reason (“forgroupness”) and being collectively
+committed to the performance of X and also to the joint intention to perform X.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Here
+intentional performance of X as a joint action should be understood at least in
+the practice sense, but not necessarily conceptually. The participants are
+taken to be able to perform X intentionally (in the most rudimentary sense as a
+kind of “collective pattern-governed action”), even if they need not have the
+full concept of intentionally performed joint action and may lack the ability
+to use it in their practical reasoning. Neither need the participants have the
+concept of joint intention in a reflective sense.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>We
+can analyze intentional performance of joint action X further, and it could be
+done on the basis of the participants’ intentions to perform their parts of X
+as intended (or intentionally). We do get regress, if we try to analyze
+intentional joint action directly in terms of joint intention. But we can stop –
+in a functional sense – with just the requirement of intentional performance of
+joint action X. The participants must simply be able to act – to perform X – or
+at least try to act or to initiate action before forming the intention to act
+and similarly to act together or try to act together before being able to form
+the joint intention to perform X. So practice is central – the intention
+requires the practice. It can accordingly be suggested that
+we-intention-in-action is prior to future-directed intention.<a
+style='mso-endnote-id:edn22' href="#_edn22" name="_ednref22" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[22]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>IV
+INTENTIONS ASCRIBED TO GROUPS</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Another
+point that still needs to be made here concerns broader cases in which a group
+can be said to intend to perform an action. My account makes a distinction
+between group members who are somehow <i style='mso-bidi-font-style:normal'>authorized</i>
+(typically by the group members) to form intentions for the group and possibly
+to act on these intentions. These authorized members are called operative
+members.<a style='mso-endnote-id:edn23' href="#_edn23" name="_ednref23" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[23]</span></span><![endif]></span></span></a> One can accordingly speak
+of the ”authority system” for a group. It consists of a set of operative
+members that have<span style='mso-spacerun:yes'>  </span>the authority to bring
+about a group will or, more generally, the group’s acceptance of<span
+style='mso-spacerun:yes'>  </span>proposition e.g. of the kind<span
+style='mso-spacerun:yes'>  </span>“This group (“we”) will do X”, or “We ought
+to do X” or “We believe that p”. The notion of an authority system as such does
+not take a stand on from where such social group authority comes, but basically
+it can be due to internal authorization by the group members, external
+authorization from outside, or coercion by a powerful set of operatives (e.g. a
+junta or dictator).<a style='mso-endnote-id:edn24' href="#_edn24"
+name="_ednref24" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[24]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Consider
+now this account:<a style='mso-endnote-id:edn25' href="#_edn25" name="_ednref25"
+title=""><span class=MsoEndnoteReference><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:12.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[25]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(<i
+style='mso-bidi-font-style:normal'>GINT</i>)<span style='mso-spacerun:yes'> 
+</span>Group g <i style='mso-bidi-font-style:normal'>intends to perform action
+X</i> (or intends that a state X obtain) if and only if there are specific
+operative members of g such that </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(1)
+these agents acting as group members intentionally collectively accept the
+conative expression “We will do X” (or one of its cognates) for g and accordingly
+jointly intend to achieve p with collective commitment;</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(2)
+there is mutual belief among the operative members to the effect that (1);</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(3)
+because of (1), the (full-fledged and adequately informed) non-operative
+members qua members of g tend to tacitly accept with collective commitment – or
+at least ought so to accept – that their group g has accepted “We will do X”
+for the group (as specified in clause (1));</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(4)
+there is mutual belief in g to the effect that (3).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Clauses
+(1) and (3) express the most central ideas here. (2) and (4) express
+rationality conditions that might not be properly fulfilled while there still is
+a group intention on the basis of the fulfillment of (1) and (3).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>We
+can see from this account that the nonoperative members can in a central way
+take part in the group’s intention simply by functioning as group members and
+tacitly accepting the operatives’ joint intention – or at least being
+normatively obligated to such acceptance. This tacit acceptance can amount to the
+nonoperatives’ endorsing the operatives’ joint intention qua members of g but
+they can well be “in reserve” e.g. concerning the execution of the intention.
+For instance, the sales personnel of a department store (an organization) can
+take part in the organization’s intentions and actions just by doing their work
+and without perhaps knowing very much about what the operatives for decision
+making are doing. Notice that the analysans of (<i>GINT</i>) can be satisfied
+even when some non-operatives fail to tacitly accept “We will do X” for g and
+the participation intentions that this intention expression entails for them
+(together with other relevant information). In such a case it does not seem
+appropriate to say that they really participate in the group’s intention.<span
+style='mso-spacerun:yes'>  </span></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Christopher
+Kutz has recently argued that in a “minimal” joint action the participants need
+not share a collective end but need only have a “participatory intention”, viz.,
+an intention to do one’s part in joint action (accompanied by the belief that
+the part action indeed will contribute to the collective end or goal).<a
+style='mso-endnote-id:edn26' href="#_edn26" name="_ednref26" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[26]</span></span><![endif]></span></span></a> As just seen, I accept
+this for the case of actions performed by structured groups (which actions Kutz
+includes among joint actions), for in the case of group action in my account
+there need not be even such a participatory intention in the case of all participants.
+However I claim, seemingly contrary to Kutz, that in the case of many-person
+joint action a relevant joint intention is required for jointly intentional
+performance (except perhaps in the case of some kinds of defective joint
+actions). I generally require collective commitment for joint intentionality,
+but Kutz’s account does not require it or even shared private commitment. This
+feature makes his minimal joint actions to some extent functionally deficient.<a
+style='mso-endnote-id:edn27' href="#_edn27" name="_ednref27" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[27]</span></span><![endif]></span></span></a></span><span lang=EN-US
+style='font-size:10.0pt;mso-bidi-font-size:12.0pt;line-height:150%'><o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>V
+I-MODE AND WE-MODE JOINT INTENTIONS CONTRASTED </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>In
+this section I-mode and we-mode joint intentions will be revisited and their
+relationship considered. I will present an argument for the irreducibility of
+the we-mode to the I-mode in the case of joint intention. As above, I will mean
+by a full-blown, we-mode joint intention an intention expressible by “We
+together will do X”, where X may be a joint action or just any state that can
+be (jointly) intended to be brought about. When a joint intention is about
+performing a joint action, X will be a joint action the performance of which is
+expressible by means of “We are doing X” (or “We did X”, etc.). My point here
+is that the we-perspective must apply as indicated. Indeed, I assume that a
+joint intention and a joint action expressible in this way with a “thick we”
+expressing togetherness is necessarily in the we-mode, viz. the participants
+are jointly intending and joint acting <i style='mso-bidi-font-style:normal'>as
+a group</i>.<a style='mso-endnote-id:edn28' href="#_edn28" name="_ednref28"
+title=""><span class=MsoEndnoteReference><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:12.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[28]</span></span><![endif]></span></span></a><span
+style='mso-spacerun:yes'>  </span>We-mode joint action is to be distinguished
+from interpersonal, dependent action directed towards the same goal. For
+instance, Seumas Miller’s theory is concerned with such interpersonal action
+directed towards an individualistically conceived “collective end”, and
+similarly Michael Bratman’s account belongs to the I-mode realm.<a
+style='mso-endnote-id:edn29' href="#_edn29" name="_ednref29" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[29]</span></span><![endif]></span></span></a> No matter how workable in
+a functional sense these accounts are or may be, they deal with interpersonal,
+“I-thou” action that falls short of being based on a group reason. The most
+central distinction in the case of discussing in some sense joint or shared or
+same attitudes and actions is whether the participants function as a group (as
+one agent, as it were) or whether there is only interpersonal action. The
+former does not entail the latter even if also (actual or potential)
+interaction is included, because the we-mode involves functioning as a group
+member and not as a private person while the I-mode is concerned only with
+functioning as a private person. Nor does the latter entail the former. The
+kind of “oneness” involved in acting as a group member in the case of the
+former is not as such involved in the kind of interaction pattern that the latter
+contains.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>My
+starting point here is to consider preanalytic, common-sense examples like the
+multi-agent action of lifting a table or the multi-agent action of going to <st1:City
+w:st="on"><st1:place w:st="on">Rome</st1:place></st1:City> or watching a
+football game. Such cases can be either in the we-mode or in the I-mode. These
+modes are argued to be irreducible to each other. Actually, once it has been
+said what the we-mode and the I-mode are, this is a trivial claim – e.g. because
+the former but not the latter involves a group reason. However, here I make my
+irreducibility theses concerning joint intention, etc. concern preanalytic or
+colloquial notions, the kind of possibly vague ideas involved when we say that
+we will go to the movies tonight or lift this table or will have coffee in a
+nearby cafeteria. In such examples there is only one content, however vaguely
+stated, in each case, and our philosophical analysis is supposed to clear up
+the situation and to show that in one case we are dealing with an I-mode joint
+action of lifting a table whereas in another case there was we-mode joint
+lifting of a table. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>To
+briefly comment on other approaches, Seumas Miller<span
+style='mso-spacerun:yes'>  </span>would say about the table lifting case that
+the participants shared the collective end of having the table lifted and they
+acted dependently to achieve that.<span style='mso-spacerun:yes'>  </span>His
+theory gives an I-mode answer. There is no joint intention, there is no
+we-action, no “we-together”, and there is no joint commitment (unless perhaps
+such a requirement is added as a separate requirement). Michael Bratman’s
+theory says for the case with you and me as participants that I intend that we
+lift the table (not necessarily as a joint action) and similarly for you, our
+intentions being suitably dependent;<span style='mso-spacerun:yes'>  </span>and
+then we carry out our intentions (I-mode intentions, in my classification).<a
+style='mso-endnote-id:edn30' href="#_edn30" name="_ednref30" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[30]</span></span><![endif]></span></span></a> Margaret Gilbert would
+say that the participants are jointly committed to lifting the table and
+therefore form a plural subject, and somehow act in light of their joint
+commitment to lift the table.<a style='mso-endnote-id:edn31' href="#_edn31"
+name="_ednref31" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[31]</span></span><![endif]></span></span></a> Her “plural subject” account
+can be viewed as a we-mode account, and so can John Searle’s view in principle
+(although the latter it is rather individualistic at bottom).<a
+style='mso-endnote-id:edn32' href="#_edn32" name="_ednref32" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[32]</span></span><![endif]></span></span></a> </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>As
+to my own account, it is clear that forgroupness (thus group reason) and
+collective (or joint) commitment need not be explicit in the content of the
+intention, nor do they appear in the surface of common sense parlance and
+thinking. They can be regarded as underlying conceptual presuppositions that
+philosophical analysis has revealed. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Given
+the above, the following simple argument for the irreducibility of the we-mode
+can be proposed:</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(a)
+The concepts of joint intention as a group and joint action <span
+style='mso-bidi-font-style:italic'>as a group</span> (in technical terms, “in
+the we-mode”) are not reducible to concepts expressing private intentions and
+actions (viz. intentions and actions based on a private or purely personal
+reason) and what can in general be conceptually constructed out of I-mode
+resources. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(b) If
+there actually are joint intentions and joint actions that can be<span
+style='mso-spacerun:yes'>  </span>correctly described as joint intentions and
+actions as a group, then they differ ontologically from private intentions and
+actions with the same content (or with a “counterpart” content).</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>I
+will here assume that the antecedent of (b) is true and that we-mode concepts
+are not idle:</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(c) Some
+joint intentions and joint actions as a group in fact exist (and indeed are
+needed in many cases, e.g. for suitable tasks or many-person activities such as
+tennis, dialogue). </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Therefore,
+</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(d) Some
+ontologically irreducible joint intentions and actions as a group that
+exemplify the corresponding conceptually irreducible concepts in fact exist
+(and are, in addition, needed in many cases). (From (a), (b), and (c).)</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>What
+is at stake in premise (a) is basically the <i style='mso-bidi-font-style:normal'>concepts</i>
+of joint intention and joint action as a group. (My explication of the rather
+colloquial phrase ‘as a group’ is precisely the we-mode.) If concepts are
+irreducible then it is reasonable to think in the present case that the states
+and events to which they correctly apply are ontologically irreducible as well.
+The conceptual side so to speak induces naturalistically different ways of
+thinking and acting in the cases under comparison, and this means ontological
+difference (that very likely exists in the brain as well). Premise (b) refers
+to really existing activities. As such, (a) does not entail (b). There are (in
+principle) ontologically idle concepts.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>To
+defend (a), one central argument for the claim that joint intention and action
+in the we-mode are irreducible to I-mode interpersonal intention and action is
+simply that the former are based on a group reason while the latter are based
+on private reasons. A group reason (e.g. “Our group intends to lift this heavy
+table”) for a participant’s intention and action to participate is different
+from private, I-mode reason (e.g. “I intend that you and I lift this table merely
+on my private grounds”, and similarly for you). Supposing that the relevant
+epistemic requirements for the participants are in place, in the we-mode case
+the participant’s reason (at least when reconstructed by a theoretician) refers
+to a group in a sense in which the I-mode reason does not. The I-mode reason
+here is based on the idea that I participate because of my private reason,
+given that you also participate. There need be no collective commitment here,
+only your and my private commitments, and you and I do not act for the use or
+benefit of a group, e.g. the dyad formed by you and me, but for our own personal
+use or benefit. E.g. if you also benefit from the I-mode joint action, that is
+only a contingent consequence from my point of<span style='mso-spacerun:yes'> 
+</span>view, not something that I have aimed at.<a style='mso-endnote-id:edn33'
+href="#_edn33" name="_ednref33" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[33]</span></span><![endif]></span></span></a> To be sure, in real life
+one often acts both for group reasons and private reasons when performing an
+action. In such cases the central problem is whether the group reason is effective
+enough to make the agent satisfy the conditions for acting as a group member.<a
+style='mso-endnote-id:edn34' href="#_edn34" name="_ednref34" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[34]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Assumption
+(b) can be argued on the basis of plain common sense. When two agents jointly
+lift the table that must be based on their joint intention, and each agent
+performs his part of the joint lifting, where one’s part of table lifting is
+ontologically and functionally dependent on the notion of joint table lifting
+and its ontic content might be fully determinable only after the performance of
+the joint action. However, a table can be lifted also in the I-mode in terms of
+interpersonal action directed towards the shared end of the table being lifted
+(cf. aforementioned Miller’s and Bratman’s accounts). My central point here,
+though, is that there are full-blown we-mode cases. For instance we make an
+agreement or shared plan to lift this table and perform our parts because of
+our joint plan for the simple reason that we have the joint intention to lift
+the table or for the reason that we are cleaning our house and take that to
+require that we suitably lift the table. This clearly can be regarded as a full-blown
+we-mode case. (In cases like pushing a broken bus up the hill, there might be
+I-mode actors involved, but if it is true that we together are seeing to it
+that the bus moves in the right way there must be some we-mode joint acting
+involved.) </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>To
+deepen the discussion, we consider Bratman’s analysis of <i style='mso-bidi-font-style:
+normal'>shared intentions</i> in terms of the locutions &quot;We intend to
+J,&quot; where J is a joint action. I claim that this account is an I-mode
+account of joint intention. Indeed it is rather close to a weak we-intention in
+our present sense. His final analysis is this:<a style='mso-endnote-id:edn35'
+href="#_edn35" name="_ednref35" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[35]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>We
+intend to J if and only if</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(1)
+(a) I intend that we J and b) you intend that we J;</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(2)
+(a) I intend that we J in accordance with and because of meshing subplans of
+(1)(a) and (1)(b); you intend that we J in accordance with and because of meshing
+subplans of (1)(a) and (1)(b);</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>(3)
+(1) and (2) are common knowledge between us.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Why
+is this an I-mode account? The most basic reason is that the analysans does not
+entail a group reason, viz. that the agents have their intentions of the form
+“I intend that we J” (for each participant) in part because of a group-reason
+such as a full-blown joint intention (and conceptually entailed proattitude)
+expressible by “We together intend that we J”. Hence the we-mode is not
+entailed, and thus there need not be collective acceptance of the joint action
+J as the group’s jointly intended content meant for the group to which the
+group members are assumed to be collectively committed. What may thus also be missing
+is social commitment that I take to be involved in collective commitment. (More
+precisely, the requirement that the participants be socially committed to each
+other in a quasi-normative way to participate is missing.) There need be no
+group-based intention and proattitude that “reasons” the agents’ personal
+intentions in Bratman’s account. The agents may have their personal intentions
+on the basis of their private reasons.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>According
+to my we-mode account, the participants (“we”) are jointly lifting the table in
+accordance with and partly because of our joint intention to lift the table (or
+to do something closely related). Because of our joint intention we are jointly
+committed to the task. All this is in the we-mode – we have thus collectively
+accepted the joint intention (plan) for us considered as a group or as a unit.
+We are jointly intentionally performing the joint action of lifting the table
+and each of us is intentionally lifting his side of the table. However, we can
+also lift the table in the I-mode as can be seen from considering the
+satisfaction conditions of the shared intention in Bratman’s above account.<a
+style='mso-endnote-id:edn36' href="#_edn36" name="_ednref36" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[36]</span></span><![endif]></span></span></a> <span
+style='mso-spacerun:yes'> </span></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+following thesis connecting joint intention and joint action seems defensible:
+It is necessarily the case that if there is joint intention (involving some
+agents jointly intending as a group) it can only be satisfied by joint action
+as a group (at least they must jointly see to it or bring it about that X, even
+if X is a neutral event or someone’s performance of an action). The converse
+also seems to hold in the sense that – and this my quasi-Davidsonian conjecture
+applied to joint action – if there is joint action (viz. if a piece of
+collective behavior is joint action) then it must be (jointly) intentional
+”under some description” (there must be something relevant that the agents did
+jointly intentionally), and this in turn entails that there must be a relevant
+joint intention on the basis of which the agents performed the action jointly.
+In typical cases this joint intention has the content X, if X is the action
+jointly intentionally performed. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>To
+start arguing for this thesis, consider a successful case of satisfaction of
+joint intention. You and I (”we”) have the joint intention to lift the table in
+ten seconds, …, in one second, …, <i style='mso-bidi-font-style:normal'>now</i>,
+and as result we are jointly lifting the table with the joint
+intention-in-action (or joint ”we-willing”) to lift the table. Thus we are
+jointly intentionally lifting the table, each of us intentionally lifting his
+side of the table. This is basically because we, the participants are jointly
+lifting the table in accordance with and partly because of our joint intention
+to lift the table (or to do something closely related). Because of our joint
+intention we are jointly committed to the task. All this is in the we-mode – we
+have thus collectively accepted the joint intention (plan) for us as a group or
+as a unit. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>The
+joint action satisfying a joint intention cannot be (using the example just
+under discussion) just the aggregate action consisting of your and my private
+actions of my lifting my end and your lifting your end of the table. Rather, it
+is <i style='mso-bidi-font-style:normal'>our joint action</i> of lifting the
+table. That it is our joint action means that we take it to be an action that
+we have chosen to perform jointly, as our joint action. There is a group reason
+for the action and not (only) private reasons. We are jointly committed to this
+joint action, the joint commitment being based on the joint intention. All this
+entails that we are grounding our action (minimally) on our joint intention (a
+group reason, a we-mode reason) and that <span style='mso-bidi-font-style:italic'>our
+action here is and must be in the we-mode and involve our acting together as
+group members</span>.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>As
+to Bratman’s account, the action J need not even be a joint action based on a
+shared intention.<a style='mso-endnote-id:edn37' href="#_edn37" name="_ednref37"
+title=""><span class=MsoEndnoteReference><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:12.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[37]</span></span><![endif]></span></span></a> We
+have here a second line of argument for showing that Bratman’s account is an
+I-mode one, if we assume that a joint intention can only be satisfied by a
+joint action based on that intention. The point is of course that in his
+account such a joint action is not required and that therefore there need be no
+joint intention of the full-blown, we-mode kind present.<a style='mso-endnote-id:
+edn38' href="#_edn38" name="_ednref38" title=""><span
+class=MsoEndnoteReference><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[38]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>There
+are other we-mode features that seem at least generally to hold true. Thus, the
+participants in joint intention and action also satisfy a version of the three
+musketeers’ condition according to which necessarily “All for one and one for
+all”. This is a kind of <i style='mso-bidi-font-style:normal'>collectivity
+principle</i> that applies not only to semantic satisfaction of attitudes but
+to actions (e.g. part actions of joint actions, in contrast to the I-mode
+case), group reasons, and to full group responsibility. Accordingly, when the
+an attitude (or action) is satisfied for a member it is necessarily satisfied
+for all members. Furthermore, there is <i style='mso-bidi-font-style:normal'>shared
+authority </i>(and responsibility) in the we-mode case over the joint action X
+and its parts. This contrasts with the I-mode case where every participant rather
+has full (private) authority over his action in the aggregate action (but of
+course not over the aggregate action).<a style='mso-endnote-id:edn39'
+href="#_edn39" name="_ednref39" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA'>[39]</span></span><![endif]></span></span></a></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>My
+overall judgment concerning the above irreducibility argument is that (d) not
+only follows from the premises argued for but that the argument is about as
+“sound” as it can be in this kind of field of research. Furthermore, I would
+like to point out that my basic we-mode argument (the need of irreducible
+we-mode mental states) seems to be applicable, <i style='mso-bidi-font-style:
+normal'>mutatis mutandis,</i> to any other attitude or action involving
+jointness.</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>Space
+does not allow a proper discussion of what we-mode joint intentions and joint
+actions are functionally good for, but let me still make one point here related
+to collective action dilemmas. The argument goes as follows for a Prisoner´s
+Dilemma: Regarding a group as a collective agent, it is assumed that the group
+(“our group”, “we”), assumed to accept the dominance principle (“higher payoff
+dominates lower payoff”), intends to choose C (over D). Thus, here the group
+intends and acts only if the members correspondingly jointly intend, as a
+group, to cooperate and accordingly jointly cooperate, the participants form
+the joint intention to realize the joint cooperation outcome and perform their
+parts of the group’s achieving it, viz. they choose C. As the group members are
+assumed to act as group members, and thus as one agent, the joint outcomes CD
+and DC simply drop out. The Prisoner’s Dilemma simply disappears in principle.
+The agents act collectively rationally when they act for a we-reason as here,
+indeed there is no room for private individual action and private rationality
+at all. The upshot then is this: Strategically acting agents acting on the
+basis of the relevant I-mode reason involving maximization of private value
+(utility) can rationally choose only D (viz., mutual defection is a Nash
+equilibrium in a single-shot Prisoner’s Dilemma), but agents acting for the
+relevant we-mode reasons (e.g. “our group will maximize the value for the group
+by acting appropriately”) will rationally choose C. Of course, it must be added
+to all this that in actual practice groups may not act fully as units in the
+above committed way. There will be free-riders and there must be some
+sanctioning involved. Thus, from the backdoor, as it were, we may get the
+Prisoner´s Dilemma alternatives back. (I will not here discuss the control and
+other problems involved here.)<span style='mso-spacerun:yes'>  </span></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>V CONCLUDING
+SUMMARY</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>I will now summarize my own account of joint intention
+and we-intention. We may recall that an I-mode account of joint intention is
+concerned with putting together individuals’ private intentions when they for
+some reason want to act together or achieve something together. The basic model
+here, in the two-person case, is: I regard you as a part of my environment
+rather than as a fellow group member and we face a task to be solved together
+by our actions. In contrast, in my we-mode account you and I form a “we”, a
+group, which acts possibly in order to solve a jointly accepted task, or we
+just act together for purely social reasons (“we enjoy each other’s company,
+basically no matter what we are doing together”). <o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>In my account the intention-dependencies go this way
+in an unstructured group g with m members that has formed an intention for
+itself:<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(1) Group g, consisting of the agents A<sub>1</sub>,…,A<sub>m</sub>,
+intends to bring about X (or see to it that X), where X may in principle be any
+state or event (as long as no rationality constraints on g are imposed).<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>As groups are not literally agents, we must speak of
+the group members’ relevant states and actions:<a style='mso-endnote-id:edn40'
+href="#_edn40" name="_ednref40" title=""><span class=MsoEndnoteReference><span
+style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:12.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-font-kerning:
+12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;mso-bidi-language:
+AR-SA;mso-no-proof:yes'>[40]</span></span><![endif]></span></span></a><o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(2) The members A<sub>1</sub>,…,A<sub>m</sub> of g
+jointly as a group intend to bring about X; put in more linguistic terms, these
+agents jointly accept that the intention expression “We will bring about X” is
+true of them (collectively and also individually, as group members). <o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>The next step is the following “distribution”
+assumption:<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(3) Each one of the members A<sub>1</sub>,…,A<sub>m</sub>
+of g accepts, qua a member of g, in this situation that “We will bring about X”
+is true of himself.<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(4) Each member must reason or be disposed to reason
+as follows:<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(i) We will bring about X<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>Therefore, <o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(ii) I will participate in our (viz. A<sub>1</sub>,…,A<sub>m</sub>’s)
+jointly bringing about X or jointly seeing to it that X.<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>As a paraphrase of (ii) we have<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(5) I will perform my part of our jointly seeing to it
+that X.<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>It is inessential here what exactly a part of X means
+– it will have to come functionally from participation in X, whatever that
+takes. Similarly, we can here ignore how exactly each participant’s part is
+determined. Note that if there is at least minimal rationality involved the
+participants must at least rationally hope that X will come about due to their
+joint effort. This serves to give a partial indirect characterization of what
+“a part” and “participation” involve.<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>Next, given that A<sub>1</sub>,…,A<sub>m</sub> have
+the right presupposed mutual beliefs about the action opportunities for jointly
+seeing to it that X and given that the analogy between single agents and group
+agents (as “jointified” basically by (2) above) holds true, we can make (5)
+more specific. This will still require that the analogy assumption is based on
+the two ideas that (a) an intention to act can only be satisfied by means of
+intentional action and that (b) intentional action must be analyzed as action
+performed on the basis of a relevant intention – e.g. precisely the intention to
+bring about X, and this is what I will assume here. So we get<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(6) I intend to perform my part of our jointly seeing
+to it that X as my part of X when acting as a member of g.<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(6) presupposes that our jointly seeing to it that X
+is our intentional action performed as jointly intended (that is, as based on
+our joint intention, however preanalytic, to jointly see to it that X).<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(6) gives the main individual-level content of what my
+notion of we-intention involves. Its group-level content is given by (1) and
+its jointness-level content is basically given by (2) while (3) – (6) concern
+the individual personal level of acting as a group member. Note that any
+collection of agents that satisfy (1)-(6) form a group in my sense and so does
+a collection capable of forming a joint intention (and having mutual belief
+about this), and indeed the latter, weaker requirement is necessary for their
+forming a social group capable of action as a group. <o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>Notice still that the concept of joint intention can
+be taken to entail:<o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>(7) If the members A<sub>1</sub>,…,A<sub>m</sub> of g
+jointly intend to bring about X, then they are jointly committed (bound) to
+intending and bringing about X.</span><span class=MsoEndnoteReference><span
+lang=EN-US> </span></span><span lang=EN-US style='mso-no-proof:yes'><o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'>We may leave it as a task of psychologists to find out
+how people in ordinary life, as it were, simplify (6) when intending and acting
+jointly so that the instrumentally and functionally right things comes about.
+There is some circularity here: joint intention does come to depend on joint
+intention, although perhaps only an unarticulated, preanalytic notion of joint
+intention. But so what, we may say, as long as people are able to jointly
+intend in terms of the above account and produce X in the right way. (Recall
+Section IV.) <o:p></o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>It
+is basically an empirical matter, a matter of upbringing, teaching, and
+education as well as, more generally, the surrounding culture whether people
+tend to function prevalently in the we-mode or in the I-mode or in which
+contexts they prevalently do which, or, more generally, how the people tend to
+weigh their we-mode and I-mode reasons relative to each other.*</span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US>* I
+wish to thank Raul Hakli, Frank Hindriks, Kaarlo Miller, Antti Saaristo, and
+Maj Tuomela for comments. </span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US
+style='mso-no-proof:yes'><o:p>&nbsp;</o:p></span></p>
+
+<p class=Normaali-jatko><i style='mso-bidi-font-style:normal'><span lang=EN-US>References<o:p></o:p></span></i></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Balzer, W. and Tuomela, R. (1997), ‘A
+Fixed Point Approach to Collective Attitudes’, in Holmström-Hintikka, G. and
+Tuomela, R. (eds.), <i style='mso-bidi-font-style:normal'>Contemporary Action
+Theory II: Social Action</i>, Kluwer Academic Publishers, Dordrecht and Boston,
+pp. 115-142</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Belnap, N., Perloff, M, and Xu, M. (2001),
+<i style='mso-bidi-font-style:normal'>Facing the Future: Agents and Choices in
+Our Indeterministic World</i>, <st1:place w:st="on"><st1:PlaceName w:st="on">Oxford</st1:PlaceName>
+ <st1:PlaceType w:st="on">University</st1:PlaceType></st1:place> Press, <st1:City
+w:st="on"><st1:place w:st="on">Oxford</st1:place></st1:City> and <st1:State
+w:st="on"><st1:place w:st="on">New York</st1:place></st1:State></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Bratman, M. (1999), <i
+style='mso-bidi-font-style:normal'>Faces of Intention</i>, <st1:place w:st="on"><st1:PlaceName
+ w:st="on">Cambridge</st1:PlaceName> <st1:PlaceType w:st="on">University</st1:PlaceType></st1:place>
+Press, <st1:City w:st="on"><st1:place w:st="on">Cambridge</st1:place></st1:City></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Gilbert, M. (1989), <i
+style='mso-bidi-font-style:normal'>On Social Facts</i>, Routledge, <st1:City
+w:st="on"><st1:place w:st="on">London</st1:place></st1:City></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Gilbert, M. (1990), ‘Walking Together:
+A Paradigmatic Social Phenomenon’, <st1:place w:st="on"><i style='mso-bidi-font-style:
+ normal'>Midwest</i></st1:place><i style='mso-bidi-font-style:normal'> Studies
+in Philosophy 15</i>, 1-14</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Kutz, C. (2000), <i style='mso-bidi-font-style:
+normal'>Complicity: Ethics and Law for a Collective Age</i>, <st1:place w:st="on"><st1:PlaceName
+ w:st="on">Cambridge</st1:PlaceName> <st1:PlaceType w:st="on">University</st1:PlaceType></st1:place>
+Press, <st1:City w:st="on"><st1:place w:st="on">Cambridge</st1:place></st1:City>
+and <st1:State w:st="on"><st1:place w:st="on">New York</st1:place></st1:State><u><o:p></o:p></u></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Mathiesen, K. (2002), ‘Searle,
+Collective Intentions, and Individualism’, in Meggle, G.. (ed.), <i
+style='mso-bidi-font-style:normal'>Social Facts &amp; Collective Intentionality</i>,
+in German Library of Sciences, <i style='mso-bidi-font-style:normal'>Philosophical
+Research, vol. 1</i>, Dr. Hänsel-Hohenhausen AG, Frankfurt, pp. 187-204</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Meijers, A. (2003), ‘Can Collective
+Intentionality Be Individualized?’, in Koepsell, D. and Moss, L. (eds.), <i
+style='mso-bidi-font-style:normal'>John Searle’s Ideas About Social Reality</i>,
+Blackwell Publishing, Malden, MA, pp. 167-183</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Miller, S. (1995), ‘Intentions, Ends
+and Joint Action’, <i style='mso-bidi-font-style:normal'>Philosophical Papers
+24</i>, 51-67</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Miller, S. (2001), <i
+style='mso-bidi-font-style:normal'>Social Action: A Teleological Account</i>, <st1:place
+w:st="on"><st1:PlaceName w:st="on">Cambridge</st1:PlaceName> <st1:PlaceType
+ w:st="on">University</st1:PlaceType></st1:place> Press, <st1:City w:st="on"><st1:place
+ w:st="on">Cambridge</st1:place></st1:City> and <st1:State w:st="on"><st1:place
+ w:st="on">New York</st1:place></st1:State></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Sandu, G. and Tuomela, R. (1996),
+“Joint Action and Group Action Made Precise,” <i style='mso-bidi-font-style:
+normal'>Synthese 105</i>, 319-345</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Searle, J. (1990), ‘Collective
+Intentions and Actions’, in Cohen, P., Morgan, J., and Pollack, M. (eds.), <i
+style='mso-bidi-font-style:normal'>Intentions in Communication</i>, The MIT
+Press, <st1:place w:st="on"><st1:City w:st="on">Cambridge</st1:City>, <st1:State
+ w:st="on">Mass.</st1:State></st1:place>, pp. 401-415</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (1984), <i
+style='mso-bidi-font-style:normal'>A Theory of Social Action</i>, Reidel, <st1:City
+w:st="on"><st1:place w:st="on">Dordrecht</st1:place></st1:City> and <st1:City
+w:st="on"><st1:place w:st="on">Boston</st1:place></st1:City> </span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (1989), ‘Actions by
+Collectives’, <i style='mso-bidi-font-style:normal'>Philosophical Perspectives
+3</i>, 471-496</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (1991), ‘We Will Do It: An
+Analysis of Group-Intentions’, <i style='mso-bidi-font-style:normal'>Philosophy
+and Phenomenological Research LI</i>, 249-277 </span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (1995), <i
+style='mso-bidi-font-style:normal'>The Importance of Us: A Philosophical Study
+of Basic Social Notions</i>, Stanford Series in Philosophy, <st1:place w:st="on"><st1:PlaceName
+ w:st="on">Stanford</st1:PlaceName> <st1:PlaceType w:st="on">University</st1:PlaceType></st1:place>
+Press, Stanford</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (2000), <i
+style='mso-bidi-font-style:normal'>Cooperation: A Philosophical Study</i>, <i
+style='mso-bidi-font-style:normal'>Philosophical Studies Series 82</i>, Kluwer
+Academic Publishers, <st1:City w:st="on"><st1:place w:st="on">Dordrecht</st1:place></st1:City></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (2002), <i
+style='mso-bidi-font-style:normal'>The Philosophy of Social Practices: A
+Collective Acceptance View</i>, <st1:place w:st="on"><st1:PlaceName w:st="on">Cambridge</st1:PlaceName>
+ <st1:PlaceType w:st="on">University</st1:PlaceType></st1:place> Press, <st1:City
+w:st="on"><st1:place w:st="on">Cambridge</st1:place></st1:City> </span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (2003), ‘The We-mode and
+the I-mode’, in F. Schmitt (ed.), <i style='mso-bidi-font-style:normal'>Socializing
+Metaphysics: The Nature of Social Reality</i>, Rowman and Littlefield, Lanham,
+Md, pp. 93-127</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (2005a), ‘We-Intentions
+Revisited’, <i>Philosophical Studies 125, </i><span style='mso-bidi-font-style:
+italic'>327-369</span></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. (2005b), <i
+style='mso-bidi-font-style:normal'>Philosophy of Sociality: A We-Perspective
+Analysis</i>, book ms</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. and Miller, K. (1988),
+‘We-Intentions’, <i style='mso-bidi-font-style:normal'>Philosophical Studies 53</i>,
+115-137</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. and Bonnevier-Tuomela, M.
+(1997), ‘From Social Imitation to Teamwork’, in Holmström-Hintikka, G. and
+Tuomela, R. (eds.), <i style='mso-bidi-font-style:normal'>Contemporary Action
+Theory, Vol. II: Social Action</i>, Kluwer Academic Publishers, <st1:City
+w:st="on"><st1:place w:st="on">Dordrecht</st1:place></st1:City> and <st1:City
+w:st="on"><st1:place w:st="on">Boston</st1:place></st1:City>, pp. 1-47</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Tuomela, R. and Tuomela, M. (2003),
+‘Acting As a Group Member and Collective Commitment’, <i style='mso-bidi-font-style:
+normal'>Protosociology 18</i>, 7-65</span></p>
+
+<p class=Normaali-jatko><span lang=EN-US>Velleman, J. (1997), ‘How to Share an
+Intention?’, <i style='mso-bidi-font-style:normal'>Philosophy and
+Phenomenological Research LXII</i>, pp. 29-50</span></p>
+
+<p class=NormaaliCharChar1CharCharChar style='text-indent:0mm'><span
+lang=EN-US>Zaibert, L. (2003), ‘Collective Intentions and Collective
+Intentionality’, in Koepsell, D. and Moss, L. (eds.), <i style='mso-bidi-font-style:
+normal'>John Searle’s Ideas About Social Reality,</i> Blackwell Publishing
+Company, Malden, MA , and Oxford, pp. 209-232</span></p>
+
+<p class=NormaaliChar1 style='text-indent:0mm'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 align=left style='text-align:left'><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote-list'><![if !supportEndnotes]><br clear=all>
+
+<hr align=left size=1 width="33%">
+
+<![endif]>
+
+<div style='mso-element:endnote' id=edn1>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn1' href="#_ednref1"
+name="_edn1" title=""></a><i style='mso-bidi-font-style:normal'><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'>Notes<o:p></o:p></span></i></p>
+
+<p class=MsoEndnoteText><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=MsoEndnoteText><span lang=EN-US><o:p>&nbsp;</o:p></span></p>
+
+<p class=NormaaliChar1 style='text-indent:0mm'><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[1]</span></span><![endif]></span></span></span><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> In the I-mode case there
+may<span style='mso-spacerun:yes'>  </span>be a group reason<span
+style='mso-spacerun:yes'>  </span>involved but it is had privately. A we-mode
+group reason, say R, can only be had when functioning as a group member. In contrast,
+R can be a person’s I-mode reason when he is functioning merely as a private
+person. Functioning in the we-mode is necessarily connected to a group reason
+while functioning in the I-mode is only contingently connected to the group
+reason (when there happens to be one involved). When R is a we-mode group
+reason There are the following three possibilities for intending in the I-mode:
+1) the person functions solely as a private person, 2) the person is a member
+of an I-mode group, viz a collective in a broad sense in which the participants
+are only privately committed to the group (see Chapter 1 of Tuomela, 2005b, for
+I-mode and we-mode groups), or 3) the person is a member of a we-mode group but
+only functions as a group member in a weak, I-mode sense of acting as rather
+than in the we-mode sense. (Cf. the comments related to non-operative members
+in Section IV as illustrating this possibility.)<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn2>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn2' href="#_ednref2"
+name="_edn2" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[2]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> Cf. Tuomela (1984),
+(1995), (2000) and Tuomela and Miller (1988).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn3>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn3' href="#_ednref3"
+name="_edn3" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[3]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>Jointly seeing to it that something is the
+case can be used as umbrella notion to cover many kinds of activities – e.g.
+jointly performing actions in a direct or in an indirect sense, jointly
+bringing about states, jointly maintaining states, and so on (cf. Sandu and
+Tuomela, 1996, and Belnap et al., 2001). Notice however, that in the context of
+joint intention the actions in question can be of various kinds, as just
+mentioned, and they can be non-equivalent (e.g. joint seeing to it that
+something is the case does not entail direct performance, nor is the converse
+true). <o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn4>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn4' href="#_ednref4"
+name="_edn4" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[4]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> In other words, there is
+the activity in which the participants see to it that the (second part of the)
+content comes about and there is the very activity that makes the content
+obtain. Thus the participants might hire some other agents to build a house.
+Here the first kind of activity is hiring the agents and monitoring their work;
+and building the house (performed by the hired agents) is the second kind of
+activity. In this paper I will, as said, mainly speak of the case of the
+(direct) performance and acting together. (See Tuomela, 2000, Chapter 2, for
+discussion.)<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn5>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn5' href="#_ednref5"
+name="_edn5" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[5]</span></span><![endif]></span></span></span></a><span
+lang=EN-GB style='font-size:10.0pt;line-height:150%;mso-ansi-language:EN-GB'> A
+linguistic formulation that typically seems apt for aim-intentions is
+”intending that something be the case”, however, taken with the understanding
+that an aim-intending agent is still required actively to contribute to the
+coming about of the state in question (and this conceptual condition is in
+general independent of whether realizing it is rational for him or not).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn6>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn6' href="#_ednref6"
+name="_edn6" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[6]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> See Bratman (1999), p.
+125ff.<span style='mso-spacerun:yes'>  </span>and Miller (1995), p. 64, Gilbert
+(1990), pp. 6-9.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn7>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn7' href="#_ednref7"
+name="_edn7" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[7]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> The collective acceptance
+of an intention as the group’s intention entails the satisfaction of the
+so-called Collectivity Condition. Applied to satisfaction, the Collectivity
+Condition says, roughly, that necessarily, if the joint intention (goal) is
+(semantically) satisfied for one of the participants, then it is satisfied for
+all participants. (Note that here we are speaking of the participants personal
+intentions in the we-mode, not in the I-mode.) <o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn8>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn8' href="#_ednref8"
+name="_edn8" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[8]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> Here is a comment on
+Velleman’s (1997) account. He considers joint intention (or “shared intention”,
+in his terminology) in the two-person case as follows.<span
+style='mso-spacerun:yes'>  </span>Suppose that joint intention between two
+persons is formed by the following exchange. The first person says “I will if
+you will”, where “I will” is taken to express an intention to participate in a
+joint action. The other person might say “Well, I will if you will” (cf.
+Velleman, 1997, p. 38). What we have here is a regress of the kind “I will if
+you will, but you will if I will, but …”, as long as no further assumptions are
+made (see e.g. Tuomela, 2005, for the regress problem). But according to
+Velleman, “[y]our responding with ‘Well, I will if you will’ perversely calls
+into question whether I have in fact willed” (p. 45). According to him, the
+proper response to “I will if you will” is “Then I will”. <o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>The above response “Well, I will if you will” may in a coordination
+situation express a conditional intention to participate in a joint action or
+it may express only a (causal) condition for one’s forming the intention to
+participate. As the latter interpretation poses no particular philosophical
+problem, I assume Velleman takes the above saying to refer to properly
+conditional intentions (see Velleman, 1997, p. 46). Then it is not right to say
+that the response “Well, I will if you will” perversely questions my willing,
+because it does acknowledge that I intend – albeit that I intend only
+conditionally, the condition being your intention. The verbal response “Then I
+will” does not perform the task of deconditionalization except under further
+assumptions left implicit in the pragmatics of the situation. Thus Velleman’s
+solution does not theoretically work as such in our hard problem cases
+(although it of course does normally work in the context of our shared social
+practice of verbally making agreements). The approach is basically wrong
+because it does not start from a we-perspective (like the Bulletin Board View
+of Tuomela, 2005b), where we-ness and the idea that a joint project is under
+way is already presupposed (be the presupposition right or wrong). <o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn9>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn9' href="#_ednref9"
+name="_edn9" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[9]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>Cf. the third clause in my analysis (<i
+style='mso-bidi-font-style:normal'>WI</i>) of we-intentions below in Section
+III.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn10>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn10' href="#_ednref10"
+name="_edn10" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[10]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> This activity in general
+requires public exchange of information between them if it is to lead to
+mutually known (and not only mutually believed) unconditional participation
+intentions. Another reason for publicity in a group context is that such
+central social notions as the speech acts of agreement making, promising,
+commanding, and informing – all relevant to joint-intention formation – are in
+their core sense not only language-dependent but public.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn11>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn11' href="#_ednref11"
+name="_edn11" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[11]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>I have discussed we-intentions as shared
+we-attitudes in the 1980’s and later more generally as applicable to all kinds
+of attitudes (see e.g. Tuomela and Miller, 1988, Tuomela, 1995, Tuomela and
+Bonnevier-Tuomela, 1997, Balzer and Tuomela, 1997, Tuomela, 2002, Tuomela, 2005b).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn12>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn12' href="#_ednref12"
+name="_edn12" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[12]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> This is the terminology
+that Mathiesen (2002) uses in this connection. <o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn13>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn13' href="#_ednref13"
+name="_edn13" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[13]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> See Tuomela (1995),
+Chapter 4, for an analysis of social groups along these lines.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn14>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn14' href="#_ednref14"
+name="_edn14" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[14]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> <span
+style='mso-spacerun:yes'> </span>Cf. the treatments in Tuomela (1984, 1995,
+2000, 2002, 2003, 2005a,b) and in Tuomela and Miller 1988).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn15>
+
+<p class=Normaali-jatko align=left style='text-align:left'><a style='mso-endnote-id:
+edn15' href="#_ednref15" name="_edn15" title=""><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:10.0pt;mso-bidi-font-size:
+12.0pt;line-height:150%'><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:10.0pt;mso-bidi-font-size:
+12.0pt;font-family:"Times New Roman";mso-fareast-font-family:"Times New Roman";
+mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:EN-US;
+mso-bidi-language:AR-SA'>[15]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;mso-bidi-font-size:12.0pt;line-height:150%'>
+From the point of view of the logical form of joint intentions, we-intentions,
+and group intentions the following rather trivial point is central to keep in
+mind. A joint intention can<span style='mso-spacerun:yes'>  </span>be<span
+style='mso-spacerun:yes'>  </span>expressed by an (m+1)-place predicate JI(A<sub>1</sub>,...,A<sub>m</sub>,X)
+standing<span style='mso-spacerun:yes'>  </span>for “the<span
+style='mso-spacerun:yes'>  </span>agents<span style='mso-spacerun:yes'> 
+</span>A<sub>1</sub>,...,A<sub>m</sub> jointly, as a group, intend to
+perform<span style='mso-spacerun:yes'>  </span>the<span
+style='mso-spacerun:yes'>  </span>action<span style='mso-spacerun:yes'> 
+</span>X jointly”. Here “as a group” can be symbolized by assuming that the
+agents function as proper group members thus as members of a “we”, and we have
+WE(A<sub>1</sub>,...,A<sub>m</sub>,X). The agents thus form a thick “we” at
+least concerning X. This “togetherness-we” can be cashed out by saying that the
+agents have collectively accepted joint action X as the agents’ “goal” or as
+what they are to perform together for the group they form, being collectively
+committed to performing X jointly. In this context, each member A<sub>i </sub><span
+style='mso-spacerun:yes'> </span>has the we-intention to perform X (viz. each A<sub>i
+</sub><span style='mso-spacerun:yes'> </span>intends to<span
+style='mso-spacerun:yes'>  </span>perform X together with the others as
+expressed by “We will do X”). This is symbolized by WI(A<sub>i</sub> , X). The
+account (<i style='mso-bidi-font-style:normal'>WI</i>) in the text gives an
+analysis of what this involves. Finally, we can speak of a group’s intention to
+perform an action, such as X, here. This is symbolized by I(g,X). In our simple
+case g consists precisely of A<sub>1</sub>,...,A<sub>m</sub>.<span
+style='mso-spacerun:yes'>  </span>In this case JI(A<sub>1</sub>,...,A<sub>m</sub>,X)
+and I(g,X) are truth equivalent, the two sides of one and the same coin, so to
+speak. In more interesting cases, where the group involves the distinction
+between authorized operative and non-operative members, the account (<i
+style='mso-bidi-font-style:normal'>GINT</i>) to be stated below, gives the
+connection.<o:p></o:p></span></p>
+
+<p class=MsoEndnoteText style='line-height:150%'><span
+class=MsoEndnoteReference><span lang=EN-US><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[15]</span></span><![endif]></span></span></span><span
+lang=EN-US><span style='mso-spacerun:yes'>  </span>Recall that I have
+characterized the we-mode in terms of three features: (1) the attitude or
+action must be collectively accepted as the group’s attitude or action, (2) it
+must be for the use and, typically, benefit of the group, and (3) the
+participants must be collectively committed to the attitude or action.</span><span
+style='mso-ansi-language:FI'><o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn16>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn16' href="#_ednref16"
+name="_edn16" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[16]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>In other contexts (e.g. Tuomela, 2002,
+Tuomela and Tuomela, 2003) I have characterized the we-mode in terms of three
+features: (1) the attitude or action must be collectively accepted as the
+group’s attitude or action, (2) it must be for the use and, typically, benefit
+of the group, and (3) the participants must be collectively committed to the
+attitude or action. <o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn17>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn17' href="#_ednref17"
+name="_edn17" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[17]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> See the mentioned
+references, especially Tuomela and Miller, 1988, for justification.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn18>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn18' href="#_ednref18"
+name="_edn18" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[18]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> See Tuomela (1991).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn19>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn19' href="#_ednref19"
+name="_edn19" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[19]</span></span><![endif]></span></span></span></a><span
+lang=EN-GB style='font-size:10.0pt;line-height:150%;mso-ansi-language:EN-GB'>
+For two different logical formalizations of we-intentions in the sense of (<i
+style='mso-bidi-font-style:normal'>WI</i>)<span style='mso-spacerun:yes'> 
+</span>and joint intentions in the sense of (<i style='mso-bidi-font-style:
+normal'>JI</i>), see Sandu and Tuomela (1996) and Balzer and Tuomela (1997).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn20>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn20' href="#_ednref20"
+name="_edn20" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[20]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>Cf. Tuomela, 1995, Chapter 9, on the
+interrelationistic version of individualism, which has the feature that groups
+as agents are viewed merely in an instrumental sense.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn21>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn21' href="#_ednref21"
+name="_edn21" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[21]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> This is what Searle,
+1990, p. 405, says: “We are tempted to construe ‘doing his part’ to mean doing
+his part toward achieving the collective goal. But if we adopt that move, then
+we have included the notion of a collective intention in the notion of ‘doing
+his part.’ We are thus faced with a dilemma: if we include the notion of
+collective intention in the notion of ‘doing his part,’ the analysis fails
+because of circularity; we would now be defining we-intentions in terms of
+we-intentions. If we don’t so construe ‘doing his part’, then the analysis
+fails because of inadequacy.” (Cf. also S. Miller, 2001, pp. 71-73.)<span
+style='mso-spacerun:yes'>  </span>In Tuomela (2005a) I respond to this charge
+and claim that while there is some circularity, it is not vicious. On the
+whole, Searle’s discussion of the Tuomela-Miller (1988) paper is based on a
+massive misunderstanding probably based on his not having properly read the
+paper, as I have shown elsewhere (e.g. in Tuomela, 1995).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn22>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn22' href="#_ednref22"
+name="_edn22" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[22]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> The discussion in Tuomela
+(2002), Chapters 3 and 4, of collective pattern-governed behavior, generalizing
+Sellars’ relevant notion to the collective case, may be consulted as giving
+justification to the claims in the previous and this paragraph. Let me point
+out that the present way of answering the charge of circularity is somewhat
+different from the long answer I give in Tuomela (2003).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn23>
+
+<p class=MsoEndnoteText style='line-height:150%'><a style='mso-endnote-id:edn23'
+href="#_ednref23" name="_edn23" title=""><span class=MsoEndnoteReference><span
+lang=EN-US><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:10.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-ansi-language:
+EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'>[23]</span></span><![endif]></span></span></span></a><span
+lang=EN-US> Note that, at least typically, in unorganized groups <i
+style='mso-bidi-font-style:normal'>all</i> full-fledged members are operative
+ones.</span><span lang=EN-GB style='mso-ansi-language:EN-GB'><o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn24>
+
+<p class=MsoEndnoteText style='line-height:150%'><a style='mso-endnote-id:edn24'
+href="#_ednref24" name="_edn24" title=""><span class=MsoEndnoteReference><span
+lang=EN-US><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:10.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-ansi-language:
+EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'>[24]</span></span><![endif]></span></span></span></a><span
+lang=EN-US> </span><span lang=EN-GB style='mso-ansi-language:EN-GB'><span
+style='mso-spacerun:yes'> </span>See Tuomela (1995), Chapter 4.<span
+style='mso-spacerun:yes'>  </span><o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn25>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn25' href="#_ednref25"
+name="_edn25" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[25]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>Similar formulations for intentions and other
+attitudes including actions appear in Tuomela (1984), (1989), (1995), and (2005b).
+The account given below is justified in these other works and cannot be
+defended here. Note, however, that the present formulation concerns the case
+where the groups are internally and externally free to form intentions. This
+assumption denies the possibility of external and internal coercion (hence the
+existence of a dictator is not a possibility covered here).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn26>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn26' href="#_ednref26"
+name="_edn26" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[26]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>See Kutz (2000).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn27>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn27' href="#_ednref27"
+name="_edn27" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[27]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> To go into some detail of
+Kutz’s (2000) account, let me indicate where I think his analysis faces a
+problem. His argument for the need of only participatory intentions goes in
+terms of the following two conditionals where G is the end or “result” involved
+in the joint action in question and P is the agent’s (“my”) part (p. 101):<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(1) If I did not believe that P was a way of contributing to G in such
+circumstances, I wouldn’t do P but would do P’.<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(2) If I did not believe that P was a way of contributing to G’s occurrence
+in such circumstances and I did not believe G could be realized in these
+circumstances, I wouldn’t do P (but would do P’ or might call the whole thing
+off).<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>According to Kutz, both conditionals have to be true in the case of
+full-blown joint action, but in the case of minimal joint action (2) may be
+false. <o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>I claim that that these conditions are rationality conditions rather than
+mere conceptual conditions for joint action. (1) might not be satisfied in the
+case of an irrational agent. (1) appears to be compatible with all the agents
+believing or even mutually believing that g is not achievable. This seems
+problematic in most cases. Counterfactual (2) is too strong. Even a minimally
+rational agent might just hope that P together with the other participants’
+contributions might lead to G but did not really believe it. But on conceptual
+grounds he could still intend the end G. This is at least what I have been
+claiming in my account, and this matter seems to me rather trivial. So (2) is
+not needed for intended ends. On the other hand, the participant in this kind
+of case, expressing minimal joint action, does not satisfy the requirement that
+he be (collectively or even privately) committed to G. This is basically
+because he may even believe that G might not be attainable. </span></p>
+
+<p class=Normaali-jatko style='text-indent:36.0pt'><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'>However, there are also weaker,
+I-mode kinds of collective actions in which not even a participatory intention
+in the above sense is needed. These collective actions<span
+style='mso-spacerun:yes'>  </span>are actions based on shared we-attitudes,
+where the shared we-attitude, e.g. a shared I-mode we-goal or we-belief or
+we-fear, serves as the participants’ reason for action (in the typical case of
+conformative we-attitudes for harmony-inducing action). See Tuomela and
+Bonnevier-Tuomela (1997) and Tuomela (2002), Chapter 4.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn28>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn28' href="#_ednref28"
+name="_edn28" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[28]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> This notion in its full
+sense is assumed to express the we-mode, which I have somewhat technically
+explicated as a conjunction of collective acceptance (CA) and “forgroupness”
+(FG) and collective commitment (Cocom) in the sense of involving<span
+style='mso-spacerun:yes'>  </span>collective acceptance of the “content” in
+question as the group’s “content” to which the participants have bound
+themselves.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn29>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn29' href="#_ednref29"
+name="_edn29" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[29]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'><span
+style='mso-spacerun:yes'>  </span>See Miller (2001) and Bratman (1999).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn30>
+
+<p class=MsoEndnoteText style='line-height:150%'><a style='mso-endnote-id:edn30'
+href="#_ednref30" name="_edn30" title=""><span class=MsoEndnoteReference><span
+lang=EN-US><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:10.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-ansi-language:
+EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'>[30]</span></span><![endif]></span></span></span></a><span
+lang=EN-US> See Bratman (1999), p. 114, Schmitt (2003) and Tuomela (2005b),
+Chapter 3, for the fact that joint action is not required in Bratman’s account.</span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn31>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn31' href="#_ednref31"
+name="_edn31" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[31]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> Cf. Gilbert (1989) and
+her later works. Gilbert is not specific about the jointly intending
+participants’ attitudes. What happens in their personal minds when they
+participate in a joint intention? As seen, my elaborate answer goes in terms of
+we-intention and intention to perform one’s part.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn32>
+
+<p class=MsoEndnoteText style='line-height:150%'><a style='mso-endnote-id:edn32'
+href="#_ednref32" name="_edn32" title=""><span class=MsoEndnoteReference><span
+lang=EN-US><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:10.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-ansi-language:
+EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'>[32]</span></span><![endif]></span></span></span></a><span
+lang=EN-US> Searle claims that collective intentions are irreducible to
+individual intentions and mutual beliefs. However, when he actually tries to
+spell this out, he does not succeed in showing that collective intentions are
+different kinds of intentions, and indeed ends up with individual ”by-means-of
+” intentions. This is argued by Zaibert (2003). Futhermore, as argued by
+Meijers (2003), Searle’s account is atomistic and does not account for
+interpersonal relations and in particular not for the social commitments that
+the participants are taken to have in relation to each other.</span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn33>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn33' href="#_ednref33"
+name="_edn33" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[33]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> The I-mode/ we-mode
+distinction is different from the selfishness/altruism distinction. In the
+present example I might as well have aimed to benefit you but contingently
+ended up benefiting (also) myself.</span><span lang=EN-GB style='font-size:
+10.0pt;line-height:150%;mso-ansi-language:EN-GB'><o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn34>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn34' href="#_ednref34"
+name="_edn34" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[34]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> One can also list other
+features of the we-mode which are different from the features of the I-mode.
+One feature still worth emphasizing is<span style='mso-spacerun:yes'> 
+</span>that the notion of a part of a joint action X is not conceptually
+reducible to individual actions, as e.g. Seumas Miller’s theory assumes. One’s
+part depends crucially on X and may not be antecedently fixable. Think of. the
+practical inference schema (W2) which may generate new elements into one’s part
+during the course of the performance of the joint action. This shows that there
+are in principle indefinitely many factors that may enter the situation during
+action. The part cannot be fully specified beforehand. However, the present
+point seems not to apply to Bratman’s theory, as he only speaks about “our
+J-ing” in his account.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn35>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn35' href="#_ednref35"
+name="_edn35" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[35]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> Cf. </span><span
+lang=EN-GB style='font-size:10.0pt;line-height:150%;mso-ansi-language:EN-GB'>Bratman
+(1999).<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn36>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn36' href="#_ednref36"
+name="_edn36" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[36]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> A shared we-attitude
+analysis of I-mode joint intention also yields something very similar. Here is
+the account of I-mode joint action that I have recently proposed in Tuomela
+(2005b):<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>You and I intentionally performed X together if and only if<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(1) X is a collective action type, viz., an “achievement-whole” divisible
+– either ex ante actu or ex post actu -- into A’s and B’s parts;<sup><o:p></o:p></sup></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(2) We shared the (reason-based, see below) I-mode intention to perform X
+together;<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(3) We performed X together in accordance with and partly because of our
+shared I-mode intention to perform X (or some “closely related” action) together.
+<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(4) You and I mutually believed – or at least shared the belief – that
+(1), (2), and (3).<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(5) (2) in part because of (4).<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>In (2) we use the following analysis of I-mode shared we-attitude
+analysis of intention: <o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>You and I share (in the I-mode sense) the intention to jointly perform X
+if and only if<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>1) I intend that we X in the reason-based we-attitude sense (viz. I
+intend that we X in part because I believe that you intend in the reason-based
+sense that we X and that we mutually believe that each of us so intends), and <o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>2) you similarly intend that we X in the reason-based we-attitude sense.<o:p></o:p></span></p>
+
+<p class=Normaali-jatko><span lang=EN-US style='font-size:10.0pt;line-height:
+150%'>(Space does not allow a discussion of the above I-mode account.)<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn37>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn37' href="#_ednref37"
+name="_edn37" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[37]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> </span><span
+style='font-size:10.0pt;line-height:150%;mso-ansi-language:FI'>See Bratman
+(1999), p. 114.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn38>
+
+<p class=MsoEndnoteText style='line-height:150%'><a style='mso-endnote-id:edn38'
+href="#_ednref38" name="_edn38" title=""><span class=MsoEndnoteReference><span
+lang=EN-US><span style='mso-special-character:footnote'><![if !supportFootnotes]><span
+class=MsoEndnoteReference><span lang=EN-US style='font-size:10.0pt;font-family:
+"Times New Roman";mso-fareast-font-family:"Times New Roman";mso-ansi-language:
+EN-US;mso-fareast-language:EN-US;mso-bidi-language:AR-SA'>[38]</span></span><![endif]></span></span></span></a><span
+lang=EN-US> Also Bratman’s case of ”unhelpful singers” indicates that his
+account is an I-mode account (see Bratman, 1999, p. 103): The singers are
+assumed to jointly intend to sing a duet without helping the other one if he,
+contrary to expectations, does something wrong. In contrast, a we-mode joint
+intention is necessarily (minimally) cooperative, as also the inference schema
+(<i style='mso-bidi-font-style:normal'>W2</i>) of the previous section shows.
+However, no actual inference is needed because we-intenders typically have internalized<span
+style='mso-spacerun:yes'>  </span>forgroupness and the substantive content of (<i
+style='mso-bidi-font-style:normal'>W2</i>) so that it has become a kind of
+skill.</span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn39>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn39' href="#_ednref39"
+name="_edn39" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[39]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> See Tuomela (2005b),
+especially Chapter 1, for the points presented in this paragraph.<o:p></o:p></span></p>
+
+</div>
+
+<div style='mso-element:endnote' id=edn40>
+
+<p class=Normaali-jatko><a style='mso-endnote-id:edn40' href="#_ednref40"
+name="_edn40" title=""><span class=MsoEndnoteReference><span lang=EN-US
+style='font-size:10.0pt;line-height:150%'><span style='mso-special-character:
+footnote'><![if !supportFootnotes]><span class=MsoEndnoteReference><span
+lang=EN-US style='font-size:10.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-font-kerning:12.0pt;mso-ansi-language:EN-US;mso-fareast-language:
+EN-US;mso-bidi-language:AR-SA'>[40]</span></span><![endif]></span></span></span></a><span
+lang=EN-US style='font-size:10.0pt;line-height:150%'> See Tuomela (2005b) for
+my reasons for not taking groups to be agents in an ontic sense.<o:p></o:p></span></p>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+
+opp-tools is a collection of tools to track academic papers uploaded
+to (or linked from) certain web pages.
+
+version 0.4 (2010-04-10)
+
+---------------------------------------------------------------------
+INSTALLATION AND SETUP
+---------------------------------------------------------------------
+
+If you want to track papers in PDF and HTML format, you have to
+install rpdf and rhtml. See the README file in the respective
+subdirectory.
+
+Next, set up a MySQL database to store the tracked pages and
+papers. To create the tables, call
+
+mysql -u dbuser -p dbpass dbname < setup.sql 
+
+Finally, open config.pl and adjust the values for the database
+connection and the install path.
+
+Now you can call process_pages.pl to look for (new) links on the
+tracked pages, and process_links.pl to extract information from (new)
+papers found behind these links.
+
+Of course, there aren't any pages in the database yet. To test the
+setup, you might try
+
+mysql -u dbuser -p dbpass dbname <<EOF
+  INSERT INTO PAGES (url, registered)
+  VALUES ('http://consc.net/papers.html', NOW());
+EOF
+perl -v process_pages.pl
+perl -v process_links.pl
+
+
+---------------------------------------------------------------------
+INTERNALS
+---------------------------------------------------------------------
+
+Here is a flowchart of the steps in process_links.pl. Boxed terms
+stand for applications that are part of opp-tools, underlined ones
+denote other applications that may also be installed. Capitalised
+steps without boxes are performed directly in process_link.pl.
+
+
+                              url
+
+                               |
+                               V
+                                      server error?   
+                             FETCH    unsupported filetype?
+                               &      intermediate page?
+                            CONFIRM  --------------------->  STORE
+                                     
+                               |
+                               |
+         if plain text         V
+             available      
+     +---------+  <-------   SPAM      spam?
+     | RFILTER |  ------->   CHECK   -------->  STORE
+     +---------+          
+                               |
+                _______________|________________
+               |         |           |          |
+               | ps?     | pdf?      | doc?     | html?
+               |         |           | rtf?     | txt?
+               V         V           V          V
+                      +------+              +-------+
+            ps2pdf -> | RPDF | <- antiword  | RHTML | 
+            ------    +------+    --------  +-------+
+                         |                      |
+                         |_____ ________________|
+                               |
+                               V
+                          +---------+   
+                          |  TIDY   |  
+                          +---------+   
+                               |
+                               V
+
+                            ENRICH    
+
+                               |
+                               V
+                          +---------+   
+                          |  META   |  
+                          +---------+   
+                               |
+                               V
+                          
+     +---------+  <-------   SPAM      spam?
+     | RFILTER |  ------->   CHECK   -------->  STORE
+     +---------+          
+                               |
+                               V
+ 
+                             STORE
+
+
+

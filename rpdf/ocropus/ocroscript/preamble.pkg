@@ -1,0 +1,37 @@
+$#include "colib.h"
+$#include "segmentation.h"
+$#include "grouping.h"
+$#include "grouper.h"
+$#include "langmod-shortest-path.h"
+$#include "ocrcomponents.h"
+
+$using namespace colib;
+$using namespace ocropus;
+
+struct point {
+    int x;
+    int y;
+    point();
+    point(int x,int y);
+};
+
+struct rectangle {
+    int x0;
+    int y0;
+    int x1;
+    int y1;
+    rectangle();
+    rectangle(int x0,int y0,int x1,int y1);
+    bool empty();
+    int width();
+    int height();
+    void include(int x,int y);
+    bool contains(int x,int y);
+    void intersect(rectangle other);
+    void include(rectangle other);
+    rectangle intersection(rectangle other);
+    rectangle inclusion(rectangle other);
+    rectangle grow(int offset);
+};
+
+$typedef narray<rectangle> rectanglearray;

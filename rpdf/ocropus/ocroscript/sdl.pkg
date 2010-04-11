@@ -1,0 +1,883 @@
+// -*- C++ -*-
+
+// Copyright 2007 Deutsches Forschungszentrum fuer Kuenstliche Intelligenz 
+// or its licensors, as applicable.
+// 
+// You may not use this file except under the terms of the accompanying license.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); you
+// may not use this file except in compliance with the License. You may
+// obtain a copy of the License at http:  www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// 
+// Project: 
+// File: 
+// Purpose: 
+// Responsible: tmb
+// Reviewer: 
+// Primary Repository: 
+// Web Sites: www.iupr.org, www.dfki.de
+
+/*
+    SDL - Simple DirectMedia Layer
+    Copyright(C) 1997-2004 Sam Lantinga
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or(at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+    Sam Lantinga
+    slouken@libsdl.org
+*/
+
+$#include <SDL/SDL.h>
+$#include <SDL/SDL_gfxPrimitives.h>
+$#include <SDL/SDL_image.h>
+$#include <SDL/SDL_imageFilter.h>
+
+module sdl {
+
+#define SDL_INIT_TIMER          0x00000001
+#define SDL_INIT_AUDIO          0x00000010
+#define SDL_INIT_VIDEO          0x00000020
+#define SDL_INIT_CDROM          0x00000100
+#define SDL_INIT_JOYSTICK       0x00000200
+#define SDL_INIT_NOPARACHUTE    0x00100000      /*Don't catch fatal signals */
+#define SDL_INIT_EVENTTHREAD    0x01000000      /*Not supported on all OS's */
+#define SDL_INIT_EVERYTHING     0x0000FFFF
+
+int SDL_Init(Uint32 flags);
+int SDL_InitSubSystem(Uint32 flags);
+void SDL_QuitSubSystem(Uint32 flags);
+Uint32 SDL_WasInit(Uint32 flags);
+void SDL_Quit(void);
+
+typedef enum {
+        SDL_FALSE = 0,
+        SDL_TRUE  = 1
+} SDL_bool;
+
+typedef unsigned char   Uint8;
+typedef signed char     Sint8;
+typedef unsigned short  Uint16;
+typedef signed short    Sint16;
+typedef unsigned int    Uint32;
+typedef signed int      Sint32;
+
+#define SDL_ALPHA_OPAQUE 255
+#define SDL_ALPHA_TRANSPARENT 0
+
+typedef struct {
+        Sint16 x, y;
+        Uint16 w, h;
+} SDL_Rect;
+
+typedef struct {
+        Uint8 r;
+        Uint8 g;
+        Uint8 b;
+        Uint8 unused;
+} SDL_Color;
+
+typedef struct SDL_Palette {
+        int       ncolors;
+        SDL_Color *colors;
+} SDL_Palette;
+
+typedef struct SDL_PixelFormat {
+        SDL_Palette *palette;
+        Uint8  BitsPerPixel;
+        Uint8  BytesPerPixel;
+        Uint8  Rloss;
+        Uint8  Gloss;
+        Uint8  Bloss;
+        Uint8  Aloss;
+        Uint8  Rshift;
+        Uint8  Gshift;
+        Uint8  Bshift;
+        Uint8  Ashift;
+        Uint32 Rmask;
+        Uint32 Gmask;
+        Uint32 Bmask;
+        Uint32 Amask;
+        Uint32 colorkey;
+        Uint8  alpha;
+} SDL_PixelFormat;
+
+typedef struct SDL_Surface {
+        Uint32 flags;                           /*Read-only */
+        SDL_PixelFormat *format;                /*Read-only */
+        int w, h;                               /*Read-only */
+        Uint16 pitch;                           /*Read-only */
+        void *pixels;                           /*Read-write */
+        int offset;                             /*Private */
+        struct private_hwdata *hwdata;
+        SDL_Rect clip_rect;                     /*Read-only */
+        Uint32 unused1;                         /*for binary compatibility */
+        Uint32 locked;                          /*Private */
+        struct SDL_BlitMap *map;                /*Private */
+        unsigned int format_version;            /*Private */
+        int refcount;                           /*Read-mostly */
+} SDL_Surface;
+
+
+#define SDL_SWSURFACE   0x00000000      /*Surface is in system memory */
+#define SDL_HWSURFACE   0x00000001      /*Surface is in video memory */
+#define SDL_ASYNCBLIT   0x00000004      /*Use asynchronous blits if possible */
+#define SDL_ANYFORMAT   0x10000000      /*Allow any video depth/pixel-format */
+#define SDL_HWPALETTE   0x20000000      /*Surface has exclusive palette */
+#define SDL_DOUBLEBUF   0x40000000      /*Set up double-buffered video mode */
+#define SDL_FULLSCREEN  0x80000000      /*Surface is a full screen display */
+#define SDL_OPENGL      0x00000002      /*Create an OpenGL rendering context */
+#define SDL_OPENGLBLIT  0x0000000A      /*Create an OpenGL rendering context and use it for blitting */
+#define SDL_RESIZABLE   0x00000010      /*This video mode may be resized */
+#define SDL_NOFRAME     0x00000020      /*No window caption or edge frame */
+#define SDL_HWACCEL     0x00000100      /*Blit uses hardware acceleration */
+#define SDL_SRCCOLORKEY 0x00001000      /*Blit uses a source color key */
+#define SDL_RLEACCELOK  0x00002000      /*Private flag */
+#define SDL_RLEACCEL    0x00004000      /*Surface is RLE encoded */
+#define SDL_SRCALPHA    0x00010000      /*Blit uses source alpha blending */
+#define SDL_PREALLOC    0x01000000      /*Surface uses preallocated memory */
+
+$ int SDL_MustLock(SDL_Surface *surface) {
+$    return SDL_MUSTLOCK(surface);
+$ }
+
+typedef struct SDL_VideoInfo {
+        int hw_available;       /*Flag Can you create hardware surfaces? */
+        int wm_available;       /*Flag Can you talk to a window manager? */
+        int UnusedBits1;
+        int UnusedBits2;
+        int blit_hw;    /*Flag Accelerated blits HW --> HW */
+        int blit_hw_CC; /*Flag Accelerated blits with Colorkey */
+        int blit_hw_A;  /*Flag Accelerated blits with Alpha */
+        int blit_sw;    /*Flag Accelerated blits SW --> HW */
+        int blit_sw_CC; /*Flag Accelerated blits with Colorkey */
+        int blit_sw_A;  /*Flag Accelerated blits with Alpha */
+        int blit_fill;  /*Flag Accelerated color fill */
+        int video_mem;  /*The total amount of video memory(in K) */
+} SDL_VideoInfo;
+
+
+typedef enum {
+    SDL_GL_RED_SIZE,
+    SDL_GL_GREEN_SIZE,
+    SDL_GL_BLUE_SIZE,
+    SDL_GL_ALPHA_SIZE,
+    SDL_GL_BUFFER_SIZE,
+    SDL_GL_DOUBLEBUFFER,
+    SDL_GL_DEPTH_SIZE,
+    SDL_GL_STENCIL_SIZE,
+    SDL_GL_ACCUM_RED_SIZE,
+    SDL_GL_ACCUM_GREEN_SIZE,
+    SDL_GL_ACCUM_BLUE_SIZE,
+    SDL_GL_ACCUM_ALPHA_SIZE,
+    SDL_GL_STEREO,
+    SDL_GL_MULTISAMPLEBUFFERS,
+    SDL_GL_MULTISAMPLESAMPLES
+} SDL_GLattr;
+
+#define SDL_LOGPAL 0x01
+#define SDL_PHYSPAL 0x02
+
+int SDL_VideoInit(const char *driver_name, Uint32 flags);
+void SDL_VideoQuit(void);
+char *SDL_VideoDriverName(char *namebuf, int maxlen);
+SDL_Surface *SDL_GetVideoSurface(void);
+const SDL_VideoInfo *SDL_GetVideoInfo(void);
+int SDL_VideoModeOK(int width, int height, int bpp, Uint32 flags);
+SDL_Surface *SDL_SetVideoMode(int width, int height, int bpp=32, Uint32 flags=SDL_SWSURFACE);
+void SDL_UpdateRects(SDL_Surface *screen, int numrects, SDL_Rect *rects);
+void SDL_UpdateRect(SDL_Surface *screen, Sint32 x, Sint32 y, Uint32 w, Uint32 h);
+int SDL_Flip(SDL_Surface *screen);
+int SDL_SetGamma(float red, float green, float blue);
+int SDL_SetGammaRamp(const Uint16 *red, const Uint16 *green, const Uint16 *blue);
+int SDL_GetGammaRamp(Uint16 *red, Uint16 *green, Uint16 *blue);
+int SDL_SetColors(SDL_Surface *surface, SDL_Color *colors, int firstcolor, int ncolors);
+int SDL_SetPalette(SDL_Surface *surface, int flags, SDL_Color *colors, int firstcolor, int ncolors);
+Uint32 SDL_MapRGB(SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b);
+Uint32 SDL_MapRGBA(SDL_PixelFormat *format, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+void SDL_GetRGB(Uint32 pixel, SDL_PixelFormat *fmt, Uint8 *r, Uint8 *g, Uint8 *b);
+void SDL_GetRGBA(Uint32 pixel, SDL_PixelFormat *fmt, Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a);
+SDL_Surface *SDL_CreateRGBSurface(Uint32 flags, int width, int height, int depth,
+        Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask);
+SDL_Surface *SDL_CreateRGBSurfaceFrom(void *pixels, int width, int height, int depth,
+        int pitch, Uint32 Rmask, Uint32 Gmask, Uint32 Bmask, Uint32 Amask);
+void SDL_FreeSurface(SDL_Surface *surface);
+int SDL_LockSurface(SDL_Surface *surface);
+void SDL_UnlockSurface(SDL_Surface *surface);
+int SDL_SetColorKey(SDL_Surface *surface, Uint32 flag, Uint32 key);
+int SDL_SetAlpha(SDL_Surface *surface, Uint32 flag, Uint8 alpha);
+SDL_bool SDL_SetClipRect(SDL_Surface *surface, const SDL_Rect *rect);
+void SDL_GetClipRect(SDL_Surface *surface, SDL_Rect *rect);
+SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, Uint32 flags);
+int SDL_UpperBlit @ SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect);
+int SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, Uint32 color);
+SDL_Surface *SDL_DisplayFormat(SDL_Surface *surface);
+SDL_Surface *SDL_DisplayFormatAlpha(SDL_Surface *surface);
+
+int SDL_GL_LoadLibrary(const char *path);
+void *SDL_GL_GetProcAddress(const char*proc);
+int SDL_GL_SetAttribute(SDL_GLattr attr, int value);
+int SDL_GL_GetAttribute(SDL_GLattr attr, int*value);
+void SDL_GL_SwapBuffers(void);
+void SDL_GL_UpdateRects(int numrects, SDL_Rect*rects);
+void SDL_GL_Lock(void);
+void SDL_GL_Unlock(void);
+
+void SDL_WM_SetCaption(const char *title, const char *icon);
+void SDL_WM_SetIcon(SDL_Surface *icon, Uint8 *mask);
+int SDL_WM_IconifyWindow(void);
+int SDL_WM_ToggleFullScreen(SDL_Surface *surface);
+
+typedef enum {
+        SDL_GRAB_QUERY = -1,
+        SDL_GRAB_OFF = 0,
+        SDL_GRAB_ON = 1,
+        SDL_GRAB_FULLSCREEN     /*Used internally */
+} SDL_GrabMode;
+SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode);
+
+int pixelColor(SDL_Surface *dst, Sint16 x, Sint16 y, Uint32 color);
+int pixelRGBA(SDL_Surface *dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int hlineColor(SDL_Surface *dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color);
+int hlineRGBA(SDL_Surface *dst, Sint16 x1, Sint16 x2, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int vlineColor(SDL_Surface *dst, Sint16 x, Sint16 y1, Sint16 y2, Uint32 color);
+int vlineRGBA(SDL_Surface *dst, Sint16 x, Sint16 y1, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int rectangleColor(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
+int rectangleRGBA(SDL_Surface *dst, Sint16 x1, Sint16 y1,
+                               Sint16 x2, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int boxColor(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
+int boxRGBA(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2,
+                         Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int lineColor(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
+int lineRGBA(SDL_Surface *dst, Sint16 x1, Sint16 y1,
+                          Sint16 x2, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int aalineColor(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color);
+int aalineRGBA(SDL_Surface *dst, Sint16 x1, Sint16 y1,
+                            Sint16 x2, Sint16 y2, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int circleColor(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 r, Uint32 color);
+int circleRGBA(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 rad, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int aacircleColor(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 r, Uint32 color);
+int aacircleRGBA(SDL_Surface *dst, Sint16 x, Sint16 y,
+                              Sint16 rad, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int filledCircleColor(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 r, Uint32 color);
+int filledCircleRGBA(SDL_Surface *dst, Sint16 x, Sint16 y,
+                                  Sint16 rad, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int ellipseColor(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 rx, Sint16 ry, Uint32 color);
+int ellipseRGBA(SDL_Surface *dst, Sint16 x, Sint16 y,
+                             Sint16 rx, Sint16 ry, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int aaellipseColor(SDL_Surface *dst, Sint16 xc, Sint16 yc, Sint16 rx, Sint16 ry, Uint32 color);
+int aaellipseRGBA(SDL_Surface *dst, Sint16 x, Sint16 y,
+                               Sint16 rx, Sint16 ry, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int filledEllipseColor(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 rx, Sint16 ry, Uint32 color);
+int filledEllipseRGBA(SDL_Surface *dst, Sint16 x, Sint16 y,
+                                   Sint16 rx, Sint16 ry, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int pieColor(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 rad,
+                          Sint16 start, Sint16 end, Uint32 color);
+int pieRGBA(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 rad,
+                         Sint16 start, Sint16 end, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int filledPieColor(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 rad,
+                                Sint16 start, Sint16 end, Uint32 color);
+int filledPieRGBA(SDL_Surface *dst, Sint16 x, Sint16 y, Sint16 rad,
+                               Sint16 start, Sint16 end, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int trigonColor(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, Uint32 color);
+int trigonRGBA(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
+                             Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int aatrigonColor(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, Uint32 color);
+int aatrigonRGBA(SDL_Surface *dst,  Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
+                               Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int filledTrigonColor(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3, Uint32 color);
+int filledTrigonRGBA(SDL_Surface *dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Sint16 x3, Sint16 y3,
+                                   Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int polygonColor(SDL_Surface *dst, const Sint16 * vx, const Sint16 * vy, int n, Uint32 color);
+int polygonRGBA(SDL_Surface *dst, const Sint16 * vx, const Sint16 * vy,
+                             int n, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int aapolygonColor(SDL_Surface *dst, const Sint16 * vx, const Sint16 * vy, int n, Uint32 color);
+int aapolygonRGBA(SDL_Surface *dst, const Sint16 * vx, const Sint16 * vy,
+                               int n, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int filledPolygonColor(SDL_Surface *dst, const Sint16 * vx, const Sint16 * vy, int n, Uint32 color);
+int filledPolygonRGBA(SDL_Surface *dst, const Sint16 * vx,
+                                   const Sint16 *vy, int n, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int bezierColor(SDL_Surface *dst, const Sint16 * vx, const Sint16 * vy, int n, int s, Uint32 color);
+int bezierRGBA(SDL_Surface *dst, const Sint16 * vx, const Sint16 * vy,
+                             int n, int s, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int characterColor(SDL_Surface *dst, Sint16 x, Sint16 y, char c, Uint32 color);
+int characterRGBA(SDL_Surface *dst, Sint16 x, Sint16 y, char c, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+int stringColor(SDL_Surface *dst, Sint16 x, Sint16 y, const char *c, Uint32 color);
+int stringRGBA(SDL_Surface *dst, Sint16 x, Sint16 y, const char *c, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+void gfxPrimitivesSetFont(const void *fontdata, int cw, int ch);
+
+SDL_Surface *IMG_LoadTyped_RW(SDL_RWops *src, int freesrc, char *type);
+SDL_Surface *IMG_Load(const char *file);
+SDL_Surface *IMG_Load_RW(SDL_RWops *src, int freesrc);
+int IMG_InvertAlpha(int on);
+int IMG_isBMP(SDL_RWops *src);
+int IMG_isPNM(SDL_RWops *src);
+int IMG_isXPM(SDL_RWops *src);
+int IMG_isXCF(SDL_RWops *src);
+int IMG_isPCX(SDL_RWops *src);
+int IMG_isGIF(SDL_RWops *src);
+int IMG_isJPG(SDL_RWops *src);
+int IMG_isTIF(SDL_RWops *src);
+int IMG_isPNG(SDL_RWops *src);
+int IMG_isLBM(SDL_RWops *src);
+SDL_Surface *IMG_LoadBMP_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadPNM_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadXPM_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadXCF_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadPCX_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadGIF_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadJPG_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadTIF_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadPNG_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadTGA_RW(SDL_RWops *src);
+SDL_Surface *IMG_LoadLBM_RW(SDL_RWops *src);
+SDL_Surface *IMG_ReadXPMFromArray(char **xpm);
+
+int SDL_imageFilterAdd(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterMean(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterSub(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterAbsDiff(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterMult(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterMultNor(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterMultDivby2(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterMultDivby4(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterBitAnd(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterBitOr(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterDiv(unsigned char *Src1, unsigned char *Src2, unsigned char *Dest, int length);
+int SDL_imageFilterBitNegation(unsigned char *Src1, unsigned char *Dest, int length);
+int SDL_imageFilterAddByte(unsigned char *Src1, unsigned char *Dest, int length, unsigned char C);
+int SDL_imageFilterAddUint(unsigned char *Src1, unsigned char *Dest, int length, unsigned int C);
+int SDL_imageFilterAddByteToHalf(unsigned char *Src1, unsigned char *Dest, int length,
+                                                  unsigned char C);
+int SDL_imageFilterSubByte(unsigned char *Src1, unsigned char *Dest, int length, unsigned char C);
+int SDL_imageFilterSubUint(unsigned char *Src1, unsigned char *Dest, int length, unsigned int C);
+int SDL_imageFilterShiftRight(unsigned char *Src1, unsigned char *Dest, int length, unsigned char N);
+int SDL_imageFilterShiftRightUint(unsigned char *Src1, unsigned char *Dest, int length, unsigned char N);
+int SDL_imageFilterMultByByte(unsigned char *Src1, unsigned char *Dest, int length, unsigned char C);
+int SDL_imageFilterShiftRightAndMultByByte(unsigned char *Src1, unsigned char *Dest, int length,
+                                                            unsigned char N, unsigned char C);
+int SDL_imageFilterShiftLeftByte(unsigned char *Src1, unsigned char *Dest, int length,
+                                                  unsigned char N);
+int SDL_imageFilterShiftLeftUint(unsigned char *Src1, unsigned char *Dest, int length,
+                                                  unsigned char N);
+int SDL_imageFilterShiftLeft(unsigned char *Src1, unsigned char *Dest, int length, unsigned char N);
+int SDL_imageFilterBinarizeUsingThreshold(unsigned char *Src1, unsigned char *Dest, int length,
+                                                           unsigned char T);
+int SDL_imageFilterClipToRange(unsigned char *Src1, unsigned char *Dest, int length,
+                                                unsigned char Tmin, unsigned char Tmax);
+int SDL_imageFilterNormalizeLinear(unsigned char *Src1, unsigned char *Dest, int length, int Cmin,
+                                                    int Cmax, int Nmin, int Nmax);
+int SDL_imageFilterConvolveKernel3x3Divide(unsigned char *Src, unsigned char *Dest, int rows,
+                                                            int columns, signed short *Kernel, unsigned char Divisor);
+int SDL_imageFilterConvolveKernel5x5Divide(unsigned char *Src, unsigned char *Dest, int rows,
+                                                            int columns, signed short *Kernel, unsigned char Divisor);
+int SDL_imageFilterConvolveKernel7x7Divide(unsigned char *Src, unsigned char *Dest, int rows,
+                                                            int columns, signed short *Kernel, unsigned char Divisor);
+int SDL_imageFilterConvolveKernel9x9Divide(unsigned char *Src, unsigned char *Dest, int rows,
+                                                            int columns, signed short *Kernel, unsigned char Divisor);
+int SDL_imageFilterConvolveKernel3x3ShiftRight(unsigned char *Src, unsigned char *Dest, int rows,
+                                                                int columns, signed short *Kernel,
+                                                                unsigned char NRightShift);
+int SDL_imageFilterConvolveKernel5x5ShiftRight(unsigned char *Src, unsigned char *Dest, int rows,
+                                                                int columns, signed short *Kernel,
+                                                                unsigned char NRightShift);
+int SDL_imageFilterConvolveKernel7x7ShiftRight(unsigned char *Src, unsigned char *Dest, int rows,
+                                                                int columns, signed short *Kernel,
+                                                                unsigned char NRightShift);
+int SDL_imageFilterConvolveKernel9x9ShiftRight(unsigned char *Src, unsigned char *Dest, int rows,
+                                                                int columns, signed short *Kernel,
+                                                                unsigned char NRightShift);
+int SDL_imageFilterSobelX(unsigned char *Src, unsigned char *Dest, int rows, int columns);
+int SDL_imageFilterSobelXShiftRight(unsigned char *Src, unsigned char *Dest, int rows, int columns,
+                                                     unsigned char NRightShift);
+void SDL_imageFilterAlignStack(void);
+void SDL_imageFilterRestoreStack(void);
+
+$#include <SDL/SDL_rotozoom.h>
+
+#define SMOOTHING_OFF           0
+#define SMOOTHING_ON            1
+
+SDL_Surface *rotozoomSurface(SDL_Surface * src, double angle, double zoom, int smooth);
+SDL_Surface *rotozoomSurfaceXY(SDL_Surface * src, double angle, double zoomx, double zoomy, int smooth);
+void rotozoomSurfaceSize(int width, int height, double angle, double zoom, int *dstwidth, int *dstheight);
+void rotozoomSurfaceSizeXY(int width, int height, double angle, double zoomx, double zoomy, 
+                           int *dstwidth, int *dstheight);
+SDL_Surface *zoomSurface(SDL_Surface * src, double zoomx, double zoomy, int smooth);
+void zoomSurfaceSize(int width, int height, double zoomx, double zoomy, int *dstwidth, int *dstheight);
+
+
+Uint8 SDL_GetMouseState(int *x, int *y);
+Uint8 SDL_GetRelativeMouseState(int *x, int *y);
+void SDL_WarpMouse(Uint16 x, Uint16 y);
+int SDL_ShowCursor(int toggle);
+#define SDL_BUTTON_LEFT         1
+#define SDL_BUTTON_MIDDLE       2
+#define SDL_BUTTON_RIGHT        3
+#define SDL_BUTTON_WHEELUP      4
+#define SDL_BUTTON_WHEELDOWN    5
+#define SDL_BUTTON_LMASK        SDL_BUTTON(SDL_BUTTON_LEFT)
+#define SDL_BUTTON_MMASK        SDL_BUTTON(SDL_BUTTON_MIDDLE)
+#define SDL_BUTTON_RMASK        SDL_BUTTON(SDL_BUTTON_RIGHT)
+
+
+typedef enum {
+        /* The keyboard syms have been cleverly chosen to map to ASCII */
+        SDLK_UNKNOWN            = 0,
+        SDLK_FIRST              = 0,
+        SDLK_BACKSPACE          = 8,
+        SDLK_TAB                = 9,
+        SDLK_CLEAR              = 12,
+        SDLK_RETURN             = 13,
+        SDLK_PAUSE              = 19,
+        SDLK_ESCAPE             = 27,
+        SDLK_SPACE              = 32,
+        SDLK_EXCLAIM            = 33,
+        SDLK_QUOTEDBL           = 34,
+        SDLK_HASH               = 35,
+        SDLK_DOLLAR             = 36,
+        SDLK_AMPERSAND          = 38,
+        SDLK_QUOTE              = 39,
+        SDLK_LEFTPAREN          = 40,
+        SDLK_RIGHTPAREN         = 41,
+        SDLK_ASTERISK           = 42,
+        SDLK_PLUS               = 43,
+        SDLK_COMMA              = 44,
+        SDLK_MINUS              = 45,
+        SDLK_PERIOD             = 46,
+        SDLK_SLASH              = 47,
+        SDLK_0                  = 48,
+        SDLK_1                  = 49,
+        SDLK_2                  = 50,
+        SDLK_3                  = 51,
+        SDLK_4                  = 52,
+        SDLK_5                  = 53,
+        SDLK_6                  = 54,
+        SDLK_7                  = 55,
+        SDLK_8                  = 56,
+        SDLK_9                  = 57,
+        SDLK_COLON              = 58,
+        SDLK_SEMICOLON          = 59,
+        SDLK_LESS               = 60,
+        SDLK_EQUALS             = 61,
+        SDLK_GREATER            = 62,
+        SDLK_QUESTION           = 63,
+        SDLK_AT                 = 64,
+        /* 
+           Skip uppercase letters
+         */
+        SDLK_LEFTBRACKET        = 91,
+        SDLK_BACKSLASH          = 92,
+        SDLK_RIGHTBRACKET       = 93,
+        SDLK_CARET              = 94,
+        SDLK_UNDERSCORE         = 95,
+        SDLK_BACKQUOTE          = 96,
+        SDLK_a                  = 97,
+        SDLK_b                  = 98,
+        SDLK_c                  = 99,
+        SDLK_d                  = 100,
+        SDLK_e                  = 101,
+        SDLK_f                  = 102,
+        SDLK_g                  = 103,
+        SDLK_h                  = 104,
+        SDLK_i                  = 105,
+        SDLK_j                  = 106,
+        SDLK_k                  = 107,
+        SDLK_l                  = 108,
+        SDLK_m                  = 109,
+        SDLK_n                  = 110,
+        SDLK_o                  = 111,
+        SDLK_p                  = 112,
+        SDLK_q                  = 113,
+        SDLK_r                  = 114,
+        SDLK_s                  = 115,
+        SDLK_t                  = 116,
+        SDLK_u                  = 117,
+        SDLK_v                  = 118,
+        SDLK_w                  = 119,
+        SDLK_x                  = 120,
+        SDLK_y                  = 121,
+        SDLK_z                  = 122,
+        SDLK_DELETE             = 127,
+        /* End of ASCII mapped keysyms */
+
+        /* International keyboard syms */
+        SDLK_WORLD_0            = 160,          /* 0xA0 */
+        SDLK_WORLD_1            = 161,
+        SDLK_WORLD_2            = 162,
+        SDLK_WORLD_3            = 163,
+        SDLK_WORLD_4            = 164,
+        SDLK_WORLD_5            = 165,
+        SDLK_WORLD_6            = 166,
+        SDLK_WORLD_7            = 167,
+        SDLK_WORLD_8            = 168,
+        SDLK_WORLD_9            = 169,
+        SDLK_WORLD_10           = 170,
+        SDLK_WORLD_11           = 171,
+        SDLK_WORLD_12           = 172,
+        SDLK_WORLD_13           = 173,
+        SDLK_WORLD_14           = 174,
+        SDLK_WORLD_15           = 175,
+        SDLK_WORLD_16           = 176,
+        SDLK_WORLD_17           = 177,
+        SDLK_WORLD_18           = 178,
+        SDLK_WORLD_19           = 179,
+        SDLK_WORLD_20           = 180,
+        SDLK_WORLD_21           = 181,
+        SDLK_WORLD_22           = 182,
+        SDLK_WORLD_23           = 183,
+        SDLK_WORLD_24           = 184,
+        SDLK_WORLD_25           = 185,
+        SDLK_WORLD_26           = 186,
+        SDLK_WORLD_27           = 187,
+        SDLK_WORLD_28           = 188,
+        SDLK_WORLD_29           = 189,
+        SDLK_WORLD_30           = 190,
+        SDLK_WORLD_31           = 191,
+        SDLK_WORLD_32           = 192,
+        SDLK_WORLD_33           = 193,
+        SDLK_WORLD_34           = 194,
+        SDLK_WORLD_35           = 195,
+        SDLK_WORLD_36           = 196,
+        SDLK_WORLD_37           = 197,
+        SDLK_WORLD_38           = 198,
+        SDLK_WORLD_39           = 199,
+        SDLK_WORLD_40           = 200,
+        SDLK_WORLD_41           = 201,
+        SDLK_WORLD_42           = 202,
+        SDLK_WORLD_43           = 203,
+        SDLK_WORLD_44           = 204,
+        SDLK_WORLD_45           = 205,
+        SDLK_WORLD_46           = 206,
+        SDLK_WORLD_47           = 207,
+        SDLK_WORLD_48           = 208,
+        SDLK_WORLD_49           = 209,
+        SDLK_WORLD_50           = 210,
+        SDLK_WORLD_51           = 211,
+        SDLK_WORLD_52           = 212,
+        SDLK_WORLD_53           = 213,
+        SDLK_WORLD_54           = 214,
+        SDLK_WORLD_55           = 215,
+        SDLK_WORLD_56           = 216,
+        SDLK_WORLD_57           = 217,
+        SDLK_WORLD_58           = 218,
+        SDLK_WORLD_59           = 219,
+        SDLK_WORLD_60           = 220,
+        SDLK_WORLD_61           = 221,
+        SDLK_WORLD_62           = 222,
+        SDLK_WORLD_63           = 223,
+        SDLK_WORLD_64           = 224,
+        SDLK_WORLD_65           = 225,
+        SDLK_WORLD_66           = 226,
+        SDLK_WORLD_67           = 227,
+        SDLK_WORLD_68           = 228,
+        SDLK_WORLD_69           = 229,
+        SDLK_WORLD_70           = 230,
+        SDLK_WORLD_71           = 231,
+        SDLK_WORLD_72           = 232,
+        SDLK_WORLD_73           = 233,
+        SDLK_WORLD_74           = 234,
+        SDLK_WORLD_75           = 235,
+        SDLK_WORLD_76           = 236,
+        SDLK_WORLD_77           = 237,
+        SDLK_WORLD_78           = 238,
+        SDLK_WORLD_79           = 239,
+        SDLK_WORLD_80           = 240,
+        SDLK_WORLD_81           = 241,
+        SDLK_WORLD_82           = 242,
+        SDLK_WORLD_83           = 243,
+        SDLK_WORLD_84           = 244,
+        SDLK_WORLD_85           = 245,
+        SDLK_WORLD_86           = 246,
+        SDLK_WORLD_87           = 247,
+        SDLK_WORLD_88           = 248,
+        SDLK_WORLD_89           = 249,
+        SDLK_WORLD_90           = 250,
+        SDLK_WORLD_91           = 251,
+        SDLK_WORLD_92           = 252,
+        SDLK_WORLD_93           = 253,
+        SDLK_WORLD_94           = 254,
+        SDLK_WORLD_95           = 255,          /* 0xFF */
+
+        /* Numeric keypad */
+        SDLK_KP0                = 256,
+        SDLK_KP1                = 257,
+        SDLK_KP2                = 258,
+        SDLK_KP3                = 259,
+        SDLK_KP4                = 260,
+        SDLK_KP5                = 261,
+        SDLK_KP6                = 262,
+        SDLK_KP7                = 263,
+        SDLK_KP8                = 264,
+        SDLK_KP9                = 265,
+        SDLK_KP_PERIOD          = 266,
+        SDLK_KP_DIVIDE          = 267,
+        SDLK_KP_MULTIPLY        = 268,
+        SDLK_KP_MINUS           = 269,
+        SDLK_KP_PLUS            = 270,
+        SDLK_KP_ENTER           = 271,
+        SDLK_KP_EQUALS          = 272,
+
+        /* Arrows + Home/End pad */
+        SDLK_UP                 = 273,
+        SDLK_DOWN               = 274,
+        SDLK_RIGHT              = 275,
+        SDLK_LEFT               = 276,
+        SDLK_INSERT             = 277,
+        SDLK_HOME               = 278,
+        SDLK_END                = 279,
+        SDLK_PAGEUP             = 280,
+        SDLK_PAGEDOWN           = 281,
+
+        /* Function keys */
+        SDLK_F1                 = 282,
+        SDLK_F2                 = 283,
+        SDLK_F3                 = 284,
+        SDLK_F4                 = 285,
+        SDLK_F5                 = 286,
+        SDLK_F6                 = 287,
+        SDLK_F7                 = 288,
+        SDLK_F8                 = 289,
+        SDLK_F9                 = 290,
+        SDLK_F10                = 291,
+        SDLK_F11                = 292,
+        SDLK_F12                = 293,
+        SDLK_F13                = 294,
+        SDLK_F14                = 295,
+        SDLK_F15                = 296,
+
+        /* Key state modifier keys */
+        SDLK_NUMLOCK            = 300,
+        SDLK_CAPSLOCK           = 301,
+        SDLK_SCROLLOCK          = 302,
+        SDLK_RSHIFT             = 303,
+        SDLK_LSHIFT             = 304,
+        SDLK_RCTRL              = 305,
+        SDLK_LCTRL              = 306,
+        SDLK_RALT               = 307,
+        SDLK_LALT               = 308,
+        SDLK_RMETA              = 309,
+        SDLK_LMETA              = 310,
+        SDLK_LSUPER             = 311,          /* Left "Windows" key */
+        SDLK_RSUPER             = 312,          /* Right "Windows" key */
+        SDLK_MODE               = 313,          /* "Alt Gr" key */
+        SDLK_COMPOSE            = 314,          /* Multi-key compose key */
+
+        /* Miscellaneous function keys */
+        SDLK_HELP               = 315,
+        SDLK_PRINT              = 316,
+        SDLK_SYSREQ             = 317,
+        SDLK_BREAK              = 318,
+        SDLK_MENU               = 319,
+        SDLK_POWER              = 320,          /* Power Macintosh power key */
+        SDLK_EURO               = 321,          /* Some european keyboards */
+        SDLK_UNDO               = 322,          /* Atari keyboard has Undo */
+
+        /* Add any other keys here */
+
+        SDLK_LAST
+} SDLKey;
+
+/* Enumeration of valid key mods (possibly OR'd together) */
+typedef enum {
+        KMOD_NONE  = 0x0000,
+        KMOD_LSHIFT= 0x0001,
+        KMOD_RSHIFT= 0x0002,
+        KMOD_LCTRL = 0x0040,
+        KMOD_RCTRL = 0x0080,
+        KMOD_LALT  = 0x0100,
+        KMOD_RALT  = 0x0200,
+        KMOD_LMETA = 0x0400,
+        KMOD_RMETA = 0x0800,
+        KMOD_NUM   = 0x1000,
+        KMOD_CAPS  = 0x2000,
+        KMOD_MODE  = 0x4000,
+        KMOD_RESERVED = 0x8000
+} SDLMod;
+
+#define KMOD_CTRL       (KMOD_LCTRL|KMOD_RCTRL)
+#define KMOD_SHIFT      (KMOD_LSHIFT|KMOD_RSHIFT)
+#define KMOD_ALT        (KMOD_LALT|KMOD_RALT)
+#define KMOD_META       (KMOD_LMETA|KMOD_RMETA)
+
+typedef struct SDL_keysym {
+        Uint8 scancode;                 /* hardware specific scancode */
+        SDLKey sym;                     /* SDL virtual keysym */
+        SDLMod mod;                     /* current key modifiers */
+        Uint16 unicode;                 /* translated character */
+} SDL_keysym;
+
+#define SDL_ALL_HOTKEYS         0xFFFFFFFF
+int SDL_EnableUNICODE(int enable);
+#define SDL_DEFAULT_REPEAT_DELAY        500
+#define SDL_DEFAULT_REPEAT_INTERVAL     30
+int SDL_EnableKeyRepeat(int delay, int interval);
+Uint8 * SDL_GetKeyState(int *numkeys);
+SDLMod SDL_GetModState(void);
+void SDL_SetModState(SDLMod modstate);
+char * SDL_GetKeyName(SDLKey key);
+
+$#include <stdlib.h>
+
+void system(const char *);
+void pause();
+
+$#include "colib.h"
+$ using namespace ocropus;
+$ SDL_Surface *UNSAFE_ArraySurface(bytearray &data) {
+$     return SDL_CreateRGBSurfaceFrom(&data.at1d(0),data.dim(1),data.dim(0),
+$        8,data.dim(1),0xff,0xff,0xff,0x00);
+$ }
+$ SDL_Surface *UNSAFE_ArraySurface(intarray &data) {
+$     return SDL_CreateRGBSurfaceFrom(&data.at1d(0),data.dim(1),data.dim(0),
+$        32,data.dim(1)*4,0xff0000,0xff00,0xff,0x00);
+$ }
+$ SDL_Surface *ArraySurface(bytearray &data,double angle,double zoom,int smooth) {
+$     SDL_Surface *input = SDL_CreateRGBSurfaceFrom(&data.at1d(0),data.dim(1),data.dim(0),
+$        8,data.dim(1),0xff,0xff,0xff,0x00);
+$     SDL_SetAlpha(input,SDL_SRCALPHA,SDL_ALPHA_OPAQUE);
+$     SDL_Surface *output = rotozoomSurface(input,angle,zoom,smooth);
+$     SDL_FreeSurface(input);
+$     return output;
+$ }
+$ SDL_Surface *ArraySurface(intarray &data,double angle,double zoom,int smooth) {
+$     SDL_Surface *input = SDL_CreateRGBSurfaceFrom(&data.at1d(0),data.dim(1),data.dim(0),
+$        32,data.dim(1)*4,0xff0000,0xff00,0xff,0x00);
+$     SDL_SetAlpha(input,SDL_SRCALPHA,SDL_ALPHA_OPAQUE);
+$     SDL_Surface *output = rotozoomSurface(input,angle,zoom,smooth);
+$     SDL_FreeSurface(input);
+$     return output;
+$ }
+SDL_Surface *UNSAFE_ArraySurface(bytearray &data);
+SDL_Surface *UNSAFE_ArraySurface(intarray &data);
+SDL_Surface *ArraySurface(bytearray &data,double angle=0,double zoom=1,int smooth=1);
+SDL_Surface *ArraySurface(intarray &data,double angle=0,double zoom=1,int smooth=1);
+
+$SDL_Rect rect(int x,int y,int w,int h) { SDL_Rect r; r.x = x; r.y = y; r.w = w; r.h = h; return r; }
+SDL_Rect rect(int x,int y,int w,int h);
+$SDL_Rect rect(SDL_Surface *s) { SDL_Rect r; r.x = 0; r.y = 0; r.w = s->w; r.h = s->h; return r; }
+SDL_Rect rect(SDL_Surface *s);
+$SDL_Color color(int r,int g,int b) { SDL_Color c; c.r = r; c.g = g; c.b = b; return c; }
+SDL_Color color(int r,int g,int b);
+$void SDL_UpdateRect(SDL_Surface *screen, SDL_Rect r) { SDL_UpdateRect(screen,r.x,r.y,r.w,r.h); }
+void SDL_UpdateRect(SDL_Surface *screen, SDL_Rect r);
+$void Update(SDL_Surface *screen) { SDL_UpdateRect(screen,0,0,screen->w,screen->h); }
+void Update(SDL_Surface *screen);
+
+$ void ArrayBlit(SDL_Surface *dst,SDL_Rect *r,bytearray &data,double angle,double zoom,int smooth) {
+$     SDL_Surface *input = SDL_CreateRGBSurfaceFrom(&data.at1d(0),data.dim(1),data.dim(0),
+$        8,data.dim(1),0xff,0xff,0xff,0x00);
+$     SDL_SetAlpha(input,SDL_SRCALPHA,SDL_ALPHA_OPAQUE);
+$     SDL_Surface *output = rotozoomSurface(input,angle,zoom,smooth);
+$     SDL_SetAlpha(output,SDL_SRCALPHA,SDL_ALPHA_OPAQUE);
+$     SDL_FreeSurface(input);
+$     SDL_Rect sr; sr.x = 0; sr.y = 0; sr.w = output->w; sr.h = output->h;
+$     SDL_BlitSurface(output,&sr,dst,r);
+$     SDL_FreeSurface(output);
+$ }
+$ void ArrayBlit(SDL_Surface *dst,SDL_Rect *r,intarray &data,double angle,double zoom,int smooth) {
+$     SDL_Surface *input = SDL_CreateRGBSurfaceFrom(&data.at1d(0),data.dim(1),data.dim(0),
+$        32,data.dim(1)*4,0xff0000,0xff00,0xff,0x00);
+$     SDL_SetAlpha(input,SDL_SRCALPHA,SDL_ALPHA_OPAQUE);
+$     SDL_Surface *output = rotozoomSurface(input,angle,zoom,smooth);
+$     SDL_SetAlpha(output,SDL_SRCALPHA,SDL_ALPHA_OPAQUE);
+$     SDL_FreeSurface(input);
+$     SDL_Rect sr; sr.x = 0; sr.y = 0; sr.w = output->w; sr.h = output->h;
+$     SDL_BlitSurface(output,&sr,dst,r);
+$     SDL_FreeSurface(output);
+$ }
+void ArrayBlit(SDL_Surface *dst,SDL_Rect *r,bytearray &data,double angle=0,double zoom=1.0,int smooth=1);
+void ArrayBlit(SDL_Surface *dst,SDL_Rect *r,intarray &data,double angle=0,double zoom=1.0,int smooth=1);
+
+$ void ParseSpec(double &x0,double &y0,double &x1,double &y1,const char *spec) {
+$     while(*spec) {
+$         switch(*spec) {
+$             case 'a': 
+$                 x1 = (x0+x1)/2;
+$                 y1 = (y0+y1)/2;
+$                 break;
+$             case 'b': 
+$                 x0 = (x0+x1)/2;
+$                 y1 = (y0+y1)/2;
+$                 break;
+$             case 'c': 
+$                 x1 = (x0+x1)/2;
+$                 y0 = (y0+y1)/2;
+$                 break;
+$             case 'd': 
+$                 x0 = (x0+x1)/2;
+$                 y0 = (y0+y1)/2;
+$                 break;
+$             case 'x': 
+$                 x1 = (x0+x1)/2;
+$                 break;
+$             case 'X': 
+$                 x0 = (x0+x1)/2;
+$                 break;
+$             case 'y': 
+$                 y1 = (y0+y1)/2;
+$                 break;
+$             case 'Y': 
+$                 y0 = (y0+y1)/2;
+$                 break;
+$         }
+$         spec++;
+$     }
+$ }
+$ template <class T>
+$ void Show(SDL_Surface *dst,const char *spec,narray<T> &data,double angle,int smooth,int rgb) {
+$     if(!dst) return;
+$     double x0=0,y0=0,x1=1,y1=1;
+$     ParseSpec(x0,y0,x1,y1,spec);
+$     SDL_Rect out = rect(dst);
+$     out.x = int(out.w * x0);
+$     out.y = int(out.h * y0);
+$     out.w = int(out.w * (x1-x0));
+$     out.h = int(out.h * (y1-y0));
+$     double xscale = out.w * 1.0 / data.dim(0);
+$     double yscale = out.h * 1.0 / data.dim(1);
+$     double scale = xscale<yscale?xscale:yscale;
+$     rgb = SDL_MapRGB(dst->format,((rgb&0xff0000)>>16),((rgb&0xff00)>>8),(rgb&0xff));
+$     SDL_FillRect(dst,&out,rgb);
+$     SDL_UpdateRect(dst,out.x,out.y,out.w,out.h);
+$     ArrayBlit(dst,&out,data,angle,scale,smooth);
+$     SDL_UpdateRect(dst,out.x,out.y,out.w,out.h);
+$ }
+$#include "colib.h"
+$#include "imglib.h"
+$ void ShowRecolored(SDL_Surface *dst,const char *spec,intarray &data,double angle,int smooth,int rgb) {
+$     if(!dst) return;
+$     intarray temp; copy(temp,data); simple_recolor(temp); Show(dst,spec,temp,angle,smooth,rgb);
+$ }
+void Show(SDL_Surface *dst,const char *spec,bytearray &data,double angle=90,int smooth=1,int rgb=32);
+void Show(SDL_Surface *dst,const char *spec,intarray &data,double angle=90,int smooth=1,int rgb=32);
+void ShowRecolored(SDL_Surface *dst,const char *spec,intarray &data,double angle=90,int smooth=1,int rgb=32);
+
+}
+
+$[
+-- FIXME this doesn't seem to get all the SDL_ symbols for some reason
+for key,value in pairs(sdl) do
+    if string.sub(key,1,4)=="SDL_" then
+        short = string.sub(key,5)
+        sdl[short] = value
+    end
+end
+$]

@@ -1,0 +1,192 @@
+// -*- C++ -*-
+
+/*
+   Copyright 2007 Deutsches Forschungszentrum fuer Kuenstliche Intelligenz 
+   or its licensors, as applicable.
+   
+   You may not use this file except under the terms of the accompanying license.
+   
+   Licensed under the Apache License, Version 2.0 (the "License"); you
+   may not use this file except in compliance with the License. You may
+   obtain a copy of the License at http:  www.apache.org/licenses/LICENSE-2.0
+   
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   
+   Project: 
+   File: 
+   Purpose: 
+   Responsible: tmb
+   Reviewer: 
+   Primary Repository: 
+   Web Sites: www.iupr.org, www.dfki.de
+*/
+
+$#include "colib.h"
+$#include "nustring.h"
+$#include "fst/lib/fst.h"
+$#include "fst/lib/fstlib.h"
+$#include "fst-util.h"
+$#include "fstutil.h"
+$#include "fstbuilder.h"
+$#include "fstmodels.h"
+
+$using namespace colib;
+$using namespace ocropus;
+
+struct FstBuilder : IGenericFst {
+    fst::StdVectorFst *take();
+};
+FstBuilder *make_FstBuilder(fst::StdVectorFst *fst = 0);
+
+
+module openfst {
+
+namespace fst {
+
+class StdArc {
+    StdArc(int ilabel,int olabel,float cost,int to);
+    int ilabel;
+    int olabel;
+    int nextstate;
+};
+
+class StdVectorFst {
+    StdVectorFst();
+    int AddState();
+    void SetStart(int);
+    void AddArc(int,const StdArc &);
+    void SetFinal(int,float);
+    void Write(const char *);
+    StdVectorFst *Copy();
+    int Start();
+    int NumStates();
+    int NumArcs(int id);
+    int NumInputEpsilons(int i);
+    int NumOutputEpsilons(int i);
+    tolua_outside void FstAddArc @ AddArc1(int from,int ilabel,int oabel,float weight,int to);
+    tolua_outside void FstAddInputSymbol @ AddInputSymbol(const char *sym,int i);
+    tolua_outside void FstAddOutputSymbol @ AddOutputSymbol(const char *sym,int i);
+}; 
+
+};
+
+fst::StdVectorFst *FstRead @ Read(const char *file);
+
+
+void ArcSortInput(fst::StdVectorFst *fst);
+void ArcSortOutput(fst::StdVectorFst *fst);
+void Compose(fst::StdVectorFst &a,fst::StdVectorFst &b,fst::StdVectorFst *result);
+void ClosureStar(fst::StdVectorFst *fst); 
+void ClosurePlus(fst::StdVectorFst *fst);
+void Concat(fst::StdVectorFst *fst1,fst::StdVectorFst &fst2);
+void Connect(fst::StdVectorFst *fst);
+void Determinize(fst::StdVectorFst &a,fst::StdVectorFst *b);
+void Difference(fst::StdVectorFst &a ,fst::StdVectorFst &b,fst::StdVectorFst *c);
+void EpsNormalizeInput(fst::StdVectorFst &a,fst::StdVectorFst *b); 
+void EpsNormalizeOutput(fst::StdVectorFst &a,fst::StdVectorFst *b);
+bool Equivalent(fst::StdVectorFst &a,fst::StdVectorFst &b);
+void Intersect(fst::StdVectorFst &a,fst::StdVectorFst &b,fst::StdVectorFst *c);
+void Invert(fst::StdVectorFst *a);
+void Minimize(fst::StdVectorFst *a); 
+void Minimize(fst::StdVectorFst *a,fst::StdVectorFst *b); 
+void ProjectInput(fst::StdVectorFst *fst);
+void ProjectOutput(fst::StdVectorFst *fst);
+void Prune(fst::StdVectorFst *a,float threshold);
+void PushToInitial(fst::StdVectorFst &a,fst::StdVectorFst *b,bool weights,bool labels);
+void PushToFinal(fst::StdVectorFst &a,fst::StdVectorFst *b,bool weights,bool labels);
+/* Relabel */
+/* Replace */
+void Reverse(fst::StdVectorFst &a,fst::StdVectorFst *b);
+void RmEpsilon(fst::StdVectorFst *a);
+/* double *ShortestDistance(fst::StdVectorFst &a,bool reverse); */
+void ShortestPath(fst::StdVectorFst &a,fst::StdVectorFst *b,int n);
+void Synchronize(fst::StdVectorFst &a,fst::StdVectorFst *b);
+void TopSort(fst::StdVectorFst *a); 
+void Union(fst::StdVectorFst *a,fst::StdVectorFst &b);
+void Verify(fst::StdVectorFst &a);
+
+fst::StdVectorFst *as_fst(const char *s,float cost=0.0,float skip_cost=9999,float junk_cost=9999);
+fst::StdVectorFst *as_fst(intarray &a,float cost=0.0,float skip_cost=9999,float junk_cost=9999);
+fst::StdVectorFst *as_fst(nustring &a,float cost=0.0,float skip_cost=9999,float junk_cost=9999);
+
+double bestpath(nustring &result, floatarray &costs, intarray &ids,fst::StdVectorFst &fst,bool copy_eps=false);
+double bestpath(nustring &result,fst::StdVectorFst &fst,bool copy_eps=false);
+double bestpath2(nustring &result, floatarray &costs, intarray &ids,fst::StdVectorFst &fst,fst::StdVectorFst &fst2,bool copy_eps=false);
+double bestpath2(nustring &result,fst::StdVectorFst &fst,fst::StdVectorFst &fst2,bool copy_eps=false);
+const char *bestpath(fst::StdVectorFst &fst);
+ 
+double translate(intarray &out,fst::StdVectorFst &fst,intarray &in);
+const char *translate(fst::StdVectorFst &fst,const char *in);
+double reverse_translate(intarray &out,fst::StdVectorFst &fst,intarray &in);
+const char *reverse_translate(fst::StdVectorFst &fst,const char *in);
+double score(fst::StdVectorFst &fst,intarray &in);
+double score(intarray &out,fst::StdVectorFst &fst,intarray &in);
+double score(fst::StdVectorFst &fst,const char *s);
+double score(const char *out,fst::StdVectorFst &fst,const char *in);
+double sample(intarray &out,fst::StdVectorFst &fst);
+
+struct UnigramModel {
+    void clear();
+    void addSymbol(int input,int output,float cost=0.0);
+    fst::StdVectorFst *take();
+};
+UnigramModel *make_UnigramModel();
+
+struct DictionaryModel {
+    void clear();
+    void addWord(intarray &w,float cost=0.0);
+    void addWordSymbol(intarray &w,int output,float cost=0.0);
+    void addWordTranscription(intarray &input,intarray &output,float cost=0.0);
+    void addWord(const char *s,float cost=0.0);
+    void addWordSymbol(const char *s,int output,float cost=0.0);
+    void addWordTranscription(const char *input,const char *output,float cost=0.0);
+    void minimize();
+    fst::StdVectorFst *take();
+};
+DictionaryModel *make_DictionaryModel();
+
+struct NgramModel {
+    // ngrams are in reading order, with the last element conditioned on the previous ones
+    virtual void addNgram(intarray &ngram,float cost) = 0;
+    virtual void addNgram(const char *ngram,float cost) = 0;
+    virtual fst::StdVectorFst *take() = 0;
+    virtual ~NgramModel() {}
+};
+NgramModel *make_NgramModel();
+
+fst::StdVectorFst *fst_ignoring(intarray &a,int maxsymbol=128,int minsymbol=1);
+fst::StdVectorFst *fst_keeping(intarray &a,int maxsymbol=128,int minsymbol=1);
+fst::StdVectorFst *fst_edit_distance(float subst,float ins,float del,int maxsymbol=128,int minsymbol=1);
+fst::StdVectorFst *fst_limited_edit_distance(int maxins,float ins,int maxdel,float del,int maxsymbol=128,int minsymbol=1);
+fst::StdVectorFst *fst_insdel(float ins,float del,int maxsymbol=128,int minsymbol=1);
+fst::StdVectorFst *fst_size_range(int minsize,int maxsize,int maxsymbol=128,int minsymbol=1);
+
+fst::StdVectorFst *compose(fst::StdVectorFst &a,fst::StdVectorFst &b);
+fst::StdVectorFst *compose(fst::StdVectorFst &a,fst::StdVectorFst &b,bool rmeps,bool det,bool min);
+fst::StdVectorFst *determinize(fst::StdVectorFst &a);
+fst::StdVectorFst *difference(fst::StdVectorFst &a,fst::StdVectorFst &b);
+fst::StdVectorFst *intersect(fst::StdVectorFst &a,fst::StdVectorFst &b);
+fst::StdVectorFst *reverse(fst::StdVectorFst &a);
+
+void fst_prune_arcs(fst::StdVectorFst &result,fst::StdVectorFst &fst,int maxarcs,float minratio,bool keep_eps);
+void fst_add_ascii_symbols(fst::StdVectorFst &a,bool input,bool output);
+void fst_add_to_each_transition(fst::StdVectorFst &fst,int ilabel,int olabel,float cost,bool eps_too);
+
+}
+
+$[
+function openfst.print(fst)
+    fst:Write("_debug_.fst")
+    system("fstprint _debug_.fst")
+end
+
+function openfst.draw(fst)
+    fst:Write("_debug_.fst")
+    system("fstdraw _debug_.fst | dotty - & sleep 2")
+end
+$]
+

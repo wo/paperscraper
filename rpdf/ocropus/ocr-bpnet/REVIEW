@@ -1,0 +1,82 @@
+====== mezhirov 2006-12-19 ======
+
+(reviewing revision 97)
+
+bpnet.cc
+36,37: true/false for bool constants?
+55: there's no need to dealloc arrays right before their destruction
+80: maybe just fabsf()?
+82: `abs_result' is misleading (because it's really fabs(result-0.5)+0.5)
+89: the mystical constant `20.0' might be replaced with SIGMOID_RANGE
+    (and then we don't need the check at line 93)
+96,103,193: cuddle the braces (just like in line 91) - that's our coding conventions
+116: can we use `activations_input.length()' instead of separate argument `ninput'?
+117: same about noutput, of course, and in lots of places further
+119: maybe just init this table at construction and don't carry this flag around?
+134: by the coding conventions, result argument should go first;
+     that also applies to the next function
+136: people will think the code is ported from C :)
+141: looks like a kluge; unfortunately, I'm not a big NN fan, so I don't know what
+     is this. If it's some kind of anti-saturation measure, then I'd turn it off
+     when it works towards saturation. But I don't know.
+267: this destructor is not needed
+348: the return after throw is inaccessible
+359: I suggest a function like write(FILE *, floatarray &)
+that's all for today... oh, but
+493: sigma is a joke, right?
+
+====== kapry 2006-12-20 ======
+
+(first changes in revision 97)
+
+bpnet.cc
+36,37: true/false for bool constants? 
+- changed it according to the suggestions
+
+55: there's no need to dealloc arrays right before their destruction. 
+- removed the deallocation of the array
+
+80: maybe just fabsf()?
+82: `abs_result' is misleading (because it's really fabs(result-0.5)+0.5)
+89: the mystical constant `20.0' might be replaced with SIGMOID_RANGE
+    (and then we don't need the check at line 93)
+- the code is based on the implementation of tmb. I am not sure if I should
+  change this (see line 56 in hacks/tmb/1999-handwriting-tmb/hwrec/bpnet.cc)
+
+96,103,193: cuddle the braces (just like in line 91) - that's our coding
+	    conventions
+- I cuddled the braces
+
+116: can we use `activations_input.length()' instead of separate argument
+     `ninput'?
+117: same about noutput, of course, and in lots of places further
+- FIXME - I'll have a look at it how I can probably change this
+119: maybe just init this table at construction and don't carry this flag
+     around?
+- FIXME - I'll have a look at it how I can probably change this
+
+134: by the coding conventions, result argument should go first;
+     that also applies to the next function
+- I changed the order
+
+136: people will think the code is ported from C :)
+- ok, I put it into the for loop
+
+141: looks like a kluge; unfortunately, I'm not a big NN fan, so I don't know what
+     is this. If it's some kind of anti-saturation measure, then I'd turn it off
+     when it works towards saturation. But I don't know.
+- the code is based on the implementation of tmb. I am not sure if I should
+  change this (see line 125 in hacks/tmb/1999-handwriting-tmb/hwrec/bpnet.cc)
+
+267: this destructor is not needed
+- I removed the destructor
+
+348: the return after throw is inaccessible
+- I removed it
+
+359: I suggest a function like write(FILE *, floatarray &)
+that's all for today... oh, but
+- added write(...) and read(...)
+
+493: sigma is a joke, right?
+- fixed it

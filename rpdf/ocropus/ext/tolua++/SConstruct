@@ -1,0 +1,20 @@
+import glob,os,sys,string,re
+
+opt = "-O2"
+
+env = Environment()
+env.Replace(CCFLAGS="-g "+opt+" -DLUA_USE_POSIX")
+
+env.Prepend(CPPPATH=["../lua"])
+
+env.StaticLibrary('libtolua++.a',"""
+    tolua_event.c tolua_is.c tolua_map.c tolua_push.c tolua_to.c
+""".split())
+
+env.Prepend(LIBS=["m"])
+env.Prepend(LIBS=[File("../lua/liblua.a")])
+env.Prepend(LIBS=[File("libtolua++.a")])
+
+env.Program("tolua++","""
+    tolua.c toluabind.c
+""".split())

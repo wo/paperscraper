@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#
+# makes sure that ocropus compiles !
+#
+# Responsible: kofler
+#
+
+# include common functions (look there for documentation!)
+. `dirname $0`/common.sh
+
+# make sure we are in the right directory
+verifyDir
+
+section TEST-RUN
+# actually run ocropus
+verifyCommand "./ocrocmd/ocrocmd data/pages/alice_1.png" 0
+exit $?

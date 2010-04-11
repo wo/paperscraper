@@ -1,0 +1,73 @@
+#!/bin/sh
+
+echo
+echo ================================================================
+echo testing toplevel scripts
+echo ================================================================
+echo
+
+runocroscript() {
+    if [ -x ocroscript ]; then
+        eval ./ocroscript "$@" > _out 2> _err
+    elif [ x`which ocroscript` != x ]; then
+        eval ocroscript "$@" > _out 2> _err
+    else
+        echo "ERROR: can't find ocroscript"
+        exit 1
+    fi
+}
+
+runlua() {
+    echo === "$*"
+    (
+    unset DISPLAY
+    runocroscript "$@"
+    if egrep '.lua:[0-9][0-9]*:|usage:' _err > /dev/null ||
+       egrep 'usage:' _out > /dev/null; then
+        echo SCRIPT FAILED
+    else
+	echo SCRIPT OK
+    fi
+    )
+}
+
+result() {
+    if diff -b $1 $2; then
+	echo RESULT OK
+    else
+	echo RESULT FAILED
+    fi
+}
+
+bpnet=../data/models/neural-net-file.nn
+limage=tests/images/line.png
+ltext=tests/images/line.txt
+out=_out.png
+simage=tests/images/simple.png
+stext=tests/images/simple.txt
+shocr=tests/images/simple.hocr
+out=_out.png
+
+runlua scripts/line-clean.lua $limage $out
+runlua scripts/sauvola.lua $simage $out
+runlua scripts/rec-tess.lua $simage
+result _out $shocr
+runlua scripts/rec-tess.lua $simage
+result _out $shocr
+
+# fix the following scripts
+echo
+runlua scripts/rec-line.lua
+runlua scripts/align-bpnet.lua $limage $ltext $out
+runlua scripts/align-line.lua $limage $ltext $out
+runlua scripts/align-tesseract.lua $limage $ltext $out
+runlua scripts/rec-bpnet.lua $simage
+runlua scripts/rec-ltess.lua $simage
+runlua scripts/rec-lines-bpnetmixtures.lua $simage
+
+# figure out what to do with these
+# runlua scripts/align-transcription.lua
+# run ocroscript scripts/rec-tess-old.lua
+# run ocroscript scripts/segment-line.lua
+# run ocroscript scripts/train-english-bpnetmixtures.lua
+# run ocroscript scripts/train-english.lua

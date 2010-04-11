@@ -1,0 +1,16 @@
+#!/bin/sh
+
+cd tests
+for i in test-*.lua; do 
+	echo
+	echo '***' $i '***'
+	echo
+        valgrind --leak-check=full ../ocroscript -e '
+            collectgarbage()
+            print(gcinfo())
+            ok,result = pcall(function() dofile("'$i'") end)
+            if not ok then print(result.." TEST FAILED UNEXPECTEDLY ('$i')") end
+            collectgarbage()
+            print(gcinfo())
+        ' /dev/null
+done

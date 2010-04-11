@@ -1,0 +1,62 @@
+$#include "narray.h"
+$#include "coords.h"
+$#include "imglib.h"
+$#include "imgbits.h"
+$#include "imgrle.h"
+$ using namespace colib;
+$ using namespace imglib;
+$ using namespace imgbits;
+$ using namespace imgrle;
+$ typedef narray<rectangle> rectanglearray;
+
+module rle {
+    struct RLEImage {
+        RLEImage();
+        ~RLEImage();
+        int dim(int d);
+        void resize(int d0,int d1);
+        void fill(bool);
+        void equals(RLEImage &other);
+        void take(RLEImage &other);
+        void copy(RLEImage &other);
+        int number_of_runs();
+        double megabytes();
+    };
+
+    void rle_transpose @ transpose(RLEImage &out,RLEImage &in);
+    void rle_transpose @ transpose(RLEImage &image);
+    void rle_rotate_rect @ rotate_rect(RLEImage &image,int angle);
+    void rle_convert @ convert(RLEImage &out,bytearray &in);
+    void rle_convert @ convert(bytearray &out,RLEImage &in);
+    int rle_count_bits @ count_bits(RLEImage &image,int x0=~0,int x1=~0,int y0=~0,int y1=~0);
+    void rle_invert @ invert(RLEImage &image);
+    void rle_and @ And(RLEImage &image,RLEImage &mask,int d0,int d1);
+    void rle_or @ Or(RLEImage &image,RLEImage &mask,int d0,int d1);
+    void rle_dilate_rect @ dilate_rect(RLEImage &image,int r0,int r1);
+    void rle_erode_rect @ erode_rect(RLEImage &image,int r0,int r1);
+    void rle_erode_mask @ erode_mask(RLEImage &image,RLEImage &mask,int r0,int r1);
+    void rle_open_rect @ open_rect(RLEImage &image,int r0,int r1);
+    void rle_close_rect @ close_rect(RLEImage &image,int r0,int r1);
+    void rle_skew @ skew(RLEImage &image,float skew,float center);
+    void rle_rotate @ rotate(RLEImage &image,float angle);
+    void rle_flip_v @ flip_v(RLEImage &image);
+    int rle_bounding_boxes @ bounding_boxes(rectanglearray &boxes,RLEImage &image);
+    void rle_runlength_statistics @ runlength_statistics(floatarray &on,floatarray &off,RLEImage &image);
+    void rle_peak_estimation @ runlength_peaks(intarray &h0,intarray &h1,intarray &v0,intarray &v1,RLEImage &image,float sh=3.0,float sv=3.0);
+
+    void rle_write @ write(const char *file,RLEImage &image);
+    void rle_read @ read(RLEImage &image,const char *file);
+    void rle_dshow @ dshow(RLEImage &image,const char *spec="");
+    void rle_circular_mask @ circular_mask(RLEImage &image,int r);
+
+    void rle_dilate_runs @ dilate_runs(RLEImage &image,int r);
+    void rle_erode_runs @ erode_runs(RLEImage &image,int r);
+    void rle_debug @ debug(RLEImage &image);
+
+    void rle_dilate_rect_runlength @ dilate_rect_runlength(RLEImage &image,int r0,int r1);
+    void rle_erode_rect_runlength @ erode_rect_runlength(RLEImage &image,int r0,int r1);
+}
+
+$[
+RLEImage = rle.RLEImage
+$]

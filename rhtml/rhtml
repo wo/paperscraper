@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+sub usage() {
+    print <<EOD;
+
+Extracts text and layout information from HTML documents, using
+xulrunner and Xvfb.
+
+usage: $0 [-d int] file.html
+
+ -d int : debug level
+
+EOD
+   exit;
+}
+
+use constant XVFB 	        => '/usr/bin/xvfb-run';
+use constant XULRUNNER 	        => '/opt/xulrunner/xulrunner';
+use constant RHTML         	=> 'xulrunner/application.ini';
+
+use strict;
+use warnings;
+use Encode;
+use utf8;
+binmode STDOUT, ":utf8";
+use util::Sysexec;
+
+# change to right directory for relative paths:
+use File::Basename qw/dirname/;
+chdir(dirname($0));
+
+my %opt = ( "d" => 0 );
+my $file;
+sub init() {
+    use Getopt::Std;
+    getopts( "hd:", \%opt ) or usage();
+    usage() if $opt{h};
+    @ARGV >= 1 || usage();
+    $file = $ARGV[0] ;
+}
+
+sub html2xml {
+    my $file = shift;
+    if (!(-e $file)) {
+	die "$file does not exist";
+    }
+    my $command = XVFB
+        .' -n 99'
+        .' '.XULRUNNER 
+        .' '.RHTML
+        ." file://$file"
+        .' 2>&1';
+    my $result = sysexec($command, 30, $opt{'d'});
+    my $xml = Encode::decode_utf8($result || '');
+    print $xml if $opt{'d'} > 4;
+    if ($xml !~ /DOCTYPE/) {
+        # brutal hack; but we often have leftover Xvfb sessions:
+        `killall Xvfb`;
+        die "rhtml failed. $xml $!";
+    }
+    return $xml;
+}
+
+init();
+my $out = html2xml($file);
+print $out;

@@ -1,0 +1,388 @@
+# -*- Python -*-
+
+### Simple, non-recursive SConstruct file
+###
+### scons -- build
+### scons check -- check for coding conventions etc.
+### scons tests -- run quick tests
+### scons bigtests -- run big tests
+###
+### TODO:
+### -- add conditionalization
+### -- somehow integrate with autoconf, or use scons built-in
+
+opt = "-O2"
+
+# external dependencies
+
+TESSHEADERS = "/usr/local/include/tesseract"
+TESSLIB = "/usr/local/lib"
+
+EDITLINE = "editline"
+
+# installation directories
+
+prefix = "/usr/local"
+datadir = prefix+"/share/ocropus"
+bindir = prefix+"/bin"
+
+################################################################
+# nothing configurable below this line
+################################################################
+
+import glob,os,sys,string,re
+
+top = "."
+
+###
+### try to find or build lua and tolua++ that are
+### included in this distribution
+###
+
+TOLUADIR = "ext/tolua++"
+TOLUALIB = TOLUADIR+"/libtolua++.a"
+TOLUA = TOLUADIR+"/tolua++"
+LUADIR = "ext/lua"
+LUALIB = LUADIR+"/liblua.a"
+
+if not os.path.exists(LUALIB):
+    print "\n###\n### building liblua.a recursively\n###\n"
+    os.system("cd "+LUADIR+" && scons")
+
+if not os.path.exists(TOLUA) or not os.path.exists(TOLUALIB):
+    print "\n###\n### building tolua++ recursively\n###\n"
+    os.system("cd "+TOLUADIR+" && scons")
+
+###
+### set up a build environment
+###
+
+env = Environment()
+env.Replace(CXXFLAGS="-g "+opt)
+
+tolua_builder = \
+    Builder(action = TOLUA+" -L ocroscript/hook_exceptions.lua -o $TARGET $SOURCE",
+            suffix=".cc",src_suffix=".pkg")
+env.Append(BUILDERS = {'Tolua' : tolua_builder })
+
+###
+### external library dependencies
+###
+
+env.Prepend(LIBPATH=["/usr/local/lib"])
+env.Prepend(CPPPATH=["/usr/local/include"])
+env.Prepend(CPPPATH=["/usr/local/include/tesseract"])
+env.Prepend(LIBS=[])
+env.Prepend(LIBS=[EDITLINE])
+env.Prepend(LIBS=["tiff","png","jpeg"])
+env.Prepend(LIBS=["pthread"])
+env.Prepend(LIBS=["fst"])
+env.Prepend(LIBS=["SDL"])
+env.Prepend(LIBS=["SDL_gfx"])
+env.Prepend(LIBS=File(TOLUALIB))
+env.Prepend(LIBS=File(LUALIB))
+env.Prepend(LIBS=File(TESSLIB+"/libtesseract_full.a"))
+
+env.Prepend(CPPPATH=["ext/tolua++"])
+env.Prepend(CPPPATH=["ext/lua"])
+
+###
+### colib
+###
+
+env.Prepend(CPPPATH=["colib"])
+
+###
+### imglib
+###
+
+env.StaticLibrary('imglib/libimg.a',glob.glob("imglib/img*.cc"))
+env.Prepend(CPPPATH=["imglib"])
+env.Prepend(LIBS=File("imglib/libimg.a"))
+
+###
+### imgio
+###
+
+env.StaticLibrary('imgio/libimgio.a',"""
+    imgio/autoinvert.cc
+    imgio/imgio.cc
+    imgio/io_jpeg.cc
+    imgio/io_pbm.cc
+    imgio/io_png.cc
+""".split())
+env.Prepend(CPPPATH=["imgio"])
+env.Prepend(LIBS=File("imgio/libimgio.a"))
+
+###
+### imgbits
+###
+
+env.StaticLibrary('imgbits/libimgmorph.a',glob.glob("imgbits/img*.cc"))
+env.Prepend(CPPPATH=["imgbits"])
+env.Prepend(LIBS=File("imgbits/libimgmorph.a"))
+
+###
+### ocr-utils
+###
+
+env.StaticLibrary('ocr-utils/libocrutils.a',"""
+    ocr-utils/dgraphics.cc
+    ocr-utils/didegrade.cc
+    ocr-utils/eigens.cc
+    ocr-utils/grouper.cc
+    ocr-utils/narray-io.cc
+    ocr-utils/ocr-binarize-sauvola.cc
+    ocr-utils/ocr-segmentations.cc
+    ocr-utils/ocr-utils.cc
+    ocr-utils/resource-path.cc
+    ocr-utils/seg-ccs.cc
+    ocr-utils/seg-cuts.cc
+    ocr-utils/seg-skel.cc
+    ocr-utils/sysutil.cc
+    ocr-utils/logger.cc
+""".split())
+env.Prepend(CPPPATH=["ocr-utils"])
+env.Prepend(LIBS=File("ocr-utils/libocrutils.a"))
+
+###
+### langmods
+###
+
+env.StaticLibrary('langmods/liblangmods.a',"""
+    langmods/fstbuilder.cc
+    langmods/fstmodels.cc
+    langmods/fstutil.cc
+    langmods/langmod-aspell-stub.cc
+    langmods/langmod-dict.cc
+    langmods/langmod-openfst.cc
+    langmods/langmod-shortest-path.cc
+""".split())
+env.Prepend(CPPPATH=["langmods"])
+env.Prepend(LIBS=File("langmods/liblangmods.a"))
+
+###
+### ocr-layout-rast
+###
+
+env.StaticLibrary('ocr-layout-rast/liblayoutrast.a',"""
+    ocr-layout-rast/ocr-layout-rast.cc 
+    ocr-layout-rast/ocr-whitespace-cover.cc 
+    ocr-layout-rast/ocr-char-stats.cc 
+    ocr-layout-rast/ocr-extract-gutters.cc 
+    ocr-layout-rast/ocr-ctextline-rast.cc 
+    ocr-layout-rast/line-info.cc 
+""".split())
+env.Prepend(CPPPATH=["ocr-layout-rast"])
+env.Prepend(LIBS=File("ocr-layout-rast/liblayoutrast.a"))
+
+###
+### tesseract
+###
+
+# define a separate tesseract compilation environment because
+# of a name conflict involving the imgio.h file
+tess_env = env.Clone()
+tess_env.Append(CXXFLAGS=" -I"+TESSHEADERS)
+tess_env.StaticLibrary('ocr-tesseract/libtesseract.a',"""
+    ocr-tesseract/tesseract.cc
+""".split())
+env.Prepend(CPPPATH=["ocr-tesseract"])
+env.Prepend(LIBS=File("ocr-tesseract/libtesseract.a"))
+
+###
+### bpnet
+###
+
+env.StaticLibrary('ocr-bpnet/libbpnet.a',"""
+    ocr-bpnet/bpnetline.cc
+    ocr-bpnet/grouping.cc
+    ocr-bpnet/bpnet.cc
+    ocr-bpnet/feature-extractor.cc
+    ocr-bpnet/charlib.cc
+    ocr-bpnet/charlib-uw3.cc
+    ocr-bpnet/charlib-grid.cc
+    ocr-bpnet/charlib-screen-ocr.cc
+    ocr-bpnet/classify-chars.cc
+    ocr-bpnet/charlib-pnglist.cc
+    ocr-bpnet/charlib-ocropus.cc
+    ocr-bpnet/charlib-segmentation.cc
+    ocr-bpnet/feature-stream.cc
+    ocr-bpnet/mnist.cc
+    ocr-bpnet/make-garbage.cc
+""".split())
+env.Prepend(CPPPATH=["ocr-bpnet"])
+env.Prepend(LIBS=File("ocr-bpnet/libbpnet.a"))
+
+###
+### ocr-engine
+###
+
+if 0:
+    env.StaticLibrary('ocr-engine/libocrengine.a',"""
+        ocr-engine/lines.cc
+        ocr-engine/ocr-recognize-page.cc
+        ocr-engine/ocr-recognize-line.cc
+        ocr-engine/triv-hocr.cc
+        ocr-engine/layout-rules.cc 
+    """.split())
+    env.Prepend(CPPPATH=["ocr-engine"])
+    env.Prepend(LIBS=File("ocr-engine/libocrengine.a"))
+
+###
+### ocr-clean
+###
+
+env.StaticLibrary('ocr-doc-clean/libdocclean.a',"""
+    ocr-doc-clean/ocr-noisefilter.cc
+    ocr-doc-clean/ocr-doc-clean.cc
+""".split())
+env.Prepend(CPPPATH=["ocr-doc-clean"])
+env.Prepend(LIBS=File("ocr-doc-clean/libdocclean.a"))
+
+###
+### ocr-deskew-rast
+###
+
+env.StaticLibrary('ocr-deskew-rast/libdeskewrast.a',"""
+    ocr-deskew-rast/ocr-deskew-rast.cc
+""".split())
+env.Prepend(CPPPATH=["ocr-deskew-rast"])
+env.Prepend(LIBS=File("ocr-deskew-rast/libdeskewrast.a"))
+
+###
+### textimageseg
+###
+
+env.StaticLibrary('ocr-pageseg/libtextimageseg.a',"""
+    ocr-pageseg/ocr-classify-zones.cc
+    ocr-pageseg/ocr-pageseg-wcuts.cc
+    ocr-pageseg/ocr-text-image-seg.cc
+    ocr-pageseg/ocr-pageseg-xycut.cc
+    ocr-pageseg/log-reg-data.cc
+""".split())
+env.Prepend(CPPPATH=["ocr-pageseg"])
+env.Prepend(LIBS=File("ocr-pageseg/libtextimageseg.a"))
+
+###
+### simple (roughocr)
+###
+
+env.StaticLibrary('simple/libroughocr.a',"""
+    simple/nearestneighbor.cc
+    simple/kmeans.cc
+    simple/ocr-layout-smear.cc
+    simple/ocr-layout-1cp.cc
+    simple/ocr-cseg-projection.cc
+    simple/ocr-cseg-ccs.cc
+    simple/ocr-binarize-range.cc
+""".split())
+env.Prepend(CPPPATH=["simple"])
+env.Prepend(LIBS=File("simple/libroughocr.a"))
+
+###
+### glinerec
+###
+
+env.StaticLibrary('glinerec/libglinerec.a',"""
+    glinerec/glinerec.cc
+""".split())
+env.Prepend(CPPPATH=["glinerec"])
+env.Prepend(LIBS=File("glinerec/libglinerec.a"))
+
+###
+### ocroscript library
+###
+
+packages = """
+    fst graphics image imgbitscmds imgrlecmds narray nustring ocr
+    sysutil tess
+""".split()
+
+for package in packages: env.Tolua("ocroscript/"+package+".pkg")
+
+env.StaticLibrary('ocroscript/libocroscript.a',
+    ["ocroscript/"+package+".cc" for package in packages] +
+    "ocroscript/ocrotoplevel.cc ocroscript/version.cc".split())
+env.Prepend(CPPPATH=["ocroscript"])
+env.Prepend(LIBS=File("ocroscript/libocroscript.a"))
+
+###
+### ocroscript executable
+###
+
+os.system("./generate_version_cc.sh ocroscript/version.cc")
+env.Program("ocroscript/ocroscript","""
+    ocroscript/version.cc
+    ocroscript/ocroscript.cc
+""".split())
+
+###
+### installation
+###
+
+env.Alias('install',bindir)
+env.Install(bindir,source=["ocroscript/ocroscript"])
+env.Alias('install',datadir+"/models")
+env.Install(datadir+"/models",source=glob.glob("data/models/*"))
+env.Alias('install',datadir+"/words")
+env.Install(datadir+"/words",source=glob.glob("data/words/*"))
+env.Alias('install',datadir+"/scripts")
+env.Install(datadir+"/scripts",source=glob.glob("ocroscript/scripts/*.lua"))
+
+###
+### pseudo targets
+###
+
+def sh(s):
+    print "#",s
+    if os.system(s)!=0:
+        print "ERROR"
+        sys.exit(255)
+
+### checking
+
+if "check" in COMMAND_LINE_TARGETS or "checks" in COMMAND_LINE_TARGETS:
+    print "\n### duplicate sourcenames\n"
+    sh("check-duplicate-sourcenames")
+    print "\n### duplicate symbols\n"
+    sh("check-duplicate-symbols")
+    print "\n### style\n"
+    sh("check-style -f")
+    sys.exit(0)
+
+if "fixme" in COMMAND_LINE_TARGETS:
+    sh("check-style")
+    sys.exit(0)
+
+if "complexity" in COMMAND_LINE_TARGETS:
+    print "\n### code complexity\n"
+    sh("check-mccabe")
+    sys.exit(0)
+
+### testing
+
+if "tests" in COMMAND_LINE_TARGETS or "test" in COMMAND_LINE_TARGETS:
+    sh("cd ocroscript && ./run-tests")
+    sys.exit(0)
+
+if "bigtests" in COMMAND_LINE_TARGETS or "bigtest" in COMMAND_LINE_TARGETS:
+    sh("cd ocroscript && ./run-bigtests")
+    sys.exit(0)
+
+if "leaks" in COMMAND_LINE_TARGETS or "leak" in COMMAND_LINE_TARGETS:
+    sh("cd ocroscript && ./run-leaks")
+    sys.exit(0)
+
+### cleaning
+
+if "clean" in COMMAND_LINE_TARGETS:
+    sh("rm -f */*.a */.o */*/*.o")
+    sys.exit(0)
+
+### tags
+    
+if "tags" in COMMAND_LINE_TARGETS:
+    sh("rm -f TAGS")
+    sh("find . | egrep '(^|/)[a-zA-Z][^/]*\\.(o|c|cc)$' | xargs etags -a")
+    sys.exit(0)

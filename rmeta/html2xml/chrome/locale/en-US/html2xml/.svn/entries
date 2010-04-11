@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="2"
+   name=""
+   committed-date="2008-05-30T04:04:08.536279Z"
+   url="file:///home/wo/svn/repository/trunk/html2xml/chrome/locale/en-US/html2xml"
+   last-author="wo"
+   kind="dir"
+   repos="file:///home/wo/svn/repository"
+   revision="2"/>
+<entry
+   committed-rev="2"
+   name="html2xml.dtd"
+   text-time="2008-05-30T03:20:41.000000Z"
+   committed-date="2008-05-30T04:04:08.536279Z"
+   checksum="2a44930dca4389b1c7f00b7e6a72b79c"
+   last-author="wo"
+   kind="file"
+   prop-time="2008-05-30T04:01:47.000000Z"/>
+</wc-entries>

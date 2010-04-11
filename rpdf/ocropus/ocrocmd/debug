@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+
+proc write {file s} {
+    set stream [open $file "w"]
+    puts $stream $s
+    close $stream
+}
+
+write ._gdb {
+break main
+commands
+catch throw
+break abort
+cont
+end
+}
+
+spawn gdb [lindex $argv 0]
+expect (gdb)
+send "source ._gdb\r"
+expect (gdb)
+send "run [lrange $argv 1 end]\r"
+interact {
+    "\030\003" {exit 1}
+    "\033u" { send "up\r"; send "list\r" }
+    "\033d" { send "down\r"; send "list\r" }
+}

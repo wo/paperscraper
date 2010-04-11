@@ -1,0 +1,73 @@
+// -*- C++ -*-
+
+// Copyright 2006 Deutsches Forschungszentrum fuer Kuenstliche Intelligenz 
+// or its licensors, as applicable.
+// 
+// You may not use this file except under the terms of the accompanying license.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License"); you
+// may not use this file except in compliance with the License. You may
+// obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// 
+// Project: 
+// File: 
+// Purpose: 
+// Responsible: tmb
+// Reviewer: 
+// Primary Repository: 
+// Web Sites: www.iupr.org, www.dfki.de, www.ocropus.org
+
+$#include "colib.h"
+$using namespace colib;
+
+// unicode arrays
+
+struct nuchar {
+    nuchar();
+    nuchar(const nuchar &c);
+    explicit nuchar(int x);
+    int ord();
+};
+
+class nustring {
+    nustring();
+    nustring(int d0);
+    nustring(const char *);
+    ~nustring();
+    void dealloc();
+    void resize(int d0);
+    void renew(int d0);
+    void reshape(int d0);
+    int length();
+    int rank() const;
+    int dim(int i) const;
+    nuchar &at(int i0);
+    nuchar &at1d(int i) const;
+    void reserve(int n);
+    void grow_to(int n);
+    void push(const nuchar &value);
+    void push(nuchar &value);
+    nuchar &push();
+    nuchar &pop();
+    nuchar &last();
+    void clear();
+    int utf8Length();
+    void utf8Decode @ decode(const char *s,int size=-1);
+    char *mallocUtf8Encode @ utf8();
+    //int length1d() const;
+    //void utf8Encode(char *result,int size);
+    //void utf8Encode(narray<char> &data);
+    //void utf8Decode(narray<char> &data);
+    //char *newUtf8Encode();
+};
+
+void move@nustring_move(nustring &dest,nustring &src);
+void copy@nustring_copy(nustring &dest,nustring &src);
+bool equal@nustring_equal(nustring &a,nustring &b);
+

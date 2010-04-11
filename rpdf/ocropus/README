@@ -1,0 +1,64 @@
+OCRopus - open source document analysis and OCR system (www.ocropus.org)
+
+Version 0.2 (2008-05-30)
+
+
+--------------------------------------------------------------------------------
+Building OCRopus
+--------------------------------------------------------------------------------
+Please refer to the file INSTALL for help on building OCRopus from source.
+
+
+--------------------------------------------------------------------------------
+Executing OCRopus
+--------------------------------------------------------------------------------
+After successfully building and installing OCRopus you can use "ocroscript"
+to interpret the Lua scripts.
+Try e.g.
+    ocroscript rec-tess data/pages/alice_1.png
+
+--------------------------------------------------------------------------------
+Documentation
+--------------------------------------------------------------------------------
+
+Please refer to http://sites.google.com/site/ocropus
+for the most recent documentation of OCRopus.
+
+
+--------------------------------------------------------------------------------
+Background
+--------------------------------------------------------------------------------
+OCRopus is a state-of-the-art document analysis and OCR system, featuring
+    * pluggable layout analysis,
+    * pluggable character recognition,
+    * statistical natural language modeling and
+    * multi-lingual capabilities.
+OCRopus development is sponsored by Google and is initially intended for
+high-throughput, high-volume document conversion efforts. We expect that
+it will also be an excellent OCR system for many other applications.
+
+OCRopus is mainly based on research projects of Thomas Breuel and the Image
+Understanding and Pattern Recognition (IUPR) group of the German Research
+Center for Artificial Intelligence (DFKI) located in Kaiserslautern, Germany.
+
+
+--------------------------------------------------------------------------------
+Online Resources
+--------------------------------------------------------------------------------
+Homepage:
+    http://www.ocropus.org
+
+Forum / Mailinglist:
+    http://groups.google.com/group/ocropus
+
+Public Issue Tracker:
+    http://www.ocropus.org/issues
+
+OCRopus is made by IUPR:
+    http://www.iupr.org
+
+IUPR is a part of DFKI:
+    http://www.dfki.de
+
+hOCR Output Format:
+    http://docs.google.com/View?docid=dfxcv4vc_67g844kf

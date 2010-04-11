@@ -1,0 +1,16 @@
+This is the Python binding for OCRopus through Lua, in an early stage.
+The main feature is the conversion between narrays and numpy arrays.
+
+So far the following methods are available in the `ocropus' module:
+
+    eval(expression)            - evaluate the expression in the Lua interpreter
+    get(name)                   - get a Lua global
+    set                         - set a Lua global
+    call(function, param_tuple) - invoke a Lua global function
+
+Building:
+    - Compile OCRopus (look in <ocropus release directory>/INSTALL and note the -fPIC options)
+    - Run python setup.py build
+
+You'll get an ocropus.so built somewhere in build/ hierarchy. This is the whole
+OCRopus as a Python extension. Place it in a Python path and try importing it.

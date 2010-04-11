@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="2"
+   name=""
+   committed-date="2008-05-30T04:04:08.536279Z"
+   url="file:///home/wo/svn/repository/trunk/_Parser"
+   last-author="wo"
+   kind="dir"
+   repos="file:///home/wo/svn/repository"
+   revision="2"/>
+<entry
+   committed-rev="2"
+   name="HTML.pm"
+   text-time="2008-05-30T03:20:40.000000Z"
+   committed-date="2008-05-30T04:04:08.536279Z"
+   checksum="a21fbae3084bcbd4512d76cebdf13b35"
+   last-author="wo"
+   kind="file"/>
+<entry
+   committed-rev="2"
+   name="PDF.pm"
+   text-time="2008-05-30T03:20:40.000000Z"
+   committed-date="2008-05-30T04:04:08.536279Z"
+   checksum="6298f93f40903615cf5604eebbd261c7"
+   last-author="wo"
+   kind="file"
+   prop-time="2008-05-30T04:01:47.000000Z"/>
+<entry
+   committed-rev="2"
+   name="test.pl"
+   text-time="2008-05-30T03:20:41.000000Z"
+   committed-date="2008-05-30T04:04:08.536279Z"
+   checksum="5ad4a07c4a6b46c38fdde580006f2788"
+   last-author="wo"
+   kind="file"
+   prop-time="2008-05-30T04:01:47.000000Z"/>
+<entry
+   name="testing"
+   kind="dir"/>
+</wc-entries>
