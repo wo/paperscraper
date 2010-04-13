@@ -1,17 +1,19 @@
 
 rhtml extracts text and layout from HTML documents, using xulrunner.
 
-version 0.4 (2010-04-05)
+version 0.4 (2010-04-13)
 
 ---------------------------------------------------------------------
 INSTALLATION
 ---------------------------------------------------------------------
 
 rhtml requires Mozilla xulrunner and Xvfb, which should be part of
-your Linux distro.
+your Linux distro. If these are not at /usr/bin/xulrunner and
+/usr/bin/xvfb-run, adjust the paths at the top of the rhtml file.
 
-[Simpler or more detailed installation instructions may follow at some
-point.]
+Not try calling
+
+rhtml test/simple.html
 
 ---------------------------------------------------------------------
 USAGE

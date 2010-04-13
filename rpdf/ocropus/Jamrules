@@ -7,7 +7,7 @@ include $(TOP)/Jamimport ;
 
 noaspell = 1 ;
 noeditline = 1 ;
-notesseract =  ;
+notesseract = 1 ;
 nosdl = 1 ;
 nolept = 1 ;
 nolua =  ;
@@ -33,7 +33,7 @@ OPTIM = $(opt) ;
 # do NOT enable -DUNSAFE globally, except to detect high overhead error checking
 OPTIM = -g -O2 ;
 }
-ldflags =  -lpthread -ltesseract_full -lpthread -ltiff -ljpeg -lpng -lz  ;
+ldflags =  -lpthread -lpthread -ltiff -ljpeg -lpng -lz  ;
 LINK = g++ $(ldflags) ;
 
 TESSHEADERS = /usr/local/include/tesseract ;

@@ -18,20 +18,20 @@ EOD
    exit;
 }
 
-use constant GS         	=> '/usr/bin/gs';
-use constant PDFTOHTML          => 'pdftohtml/src/pdftohtml'
-use constant OCROSCRIPT 	=> 'ocropus/ocroscript/ocroscript';
-use constant TEMPDIR 	        => '../temp/';
-use constant DPI 		=> 300;
-
 use strict;
 use warnings;
-binmode STDOUT, ":utf8";
+use Encode;
+use FindBin qw($Bin);
+use lib $Bin;
 use util::Sysexec;
+binmode STDOUT, ":utf8";
 
-# change to right directory for relative paths:
-use File::Basename qw/dirname/;
-chdir(dirname($0));
+use constant GS         	=> '/usr/bin/gs';
+use constant PDFTOHTML          => $Bin.'/pdftohtml/pdftohtml';
+use constant OCROSCRIPT 	=> $Bin.'/ocropus/ocroscript/ocroscript';
+use constant TEMPDIR 	        => $Bin.'/temp/';
+use constant DPI 		=> 300;
+
 
 my %opt = ( "d" => 0 );
 my $pdf;
@@ -47,13 +47,13 @@ sub pdf2xml {
     my $source = shift;
     die "$source does not exist" unless (-e $source);
     my $command = PDFTOHTML
-        .' -i'        	# ignore images
-        .' -xml'      	# xml output
+        .' -i'            # ignore images
+        .' -xml'          # xml output
         .' -enc \'UTF-8\''
-        .' -stdout'   	# output to stdout
-        .' '.$filename 	# source file
-        .' 2>&1';     	# stderr to stdout
-    my $xml = sysexec($command, 10, verbosity) || '';
+        .' -stdout'       # output to stdout
+        .' '.$source      # source file
+        .' 2>&1';         # stderr to stdout
+    my $xml = sysexec($command, 10, $opt{'d'}) || '';
     # strip anchors (inserted by pdftohtml for footnotes):
     $xml =~ s/<a[^>]+>(.+?)<\/a>/$1/gi;
     if ($xml && $xml =~ /<text.+?>.*\w{5}.*</) {
@@ -62,8 +62,8 @@ sub pdf2xml {
         return $xml;
     }
     # if pdftohtml failed, we use OCR:
-    print "pdftohtml failed on parsing. Using OCR.\n" if verbosity;
-    $xml = ocr($filename) || '';
+    print "pdftohtml failed on parsing. Using OCR.\n" if $opt{'d'};
+    $xml = ocr($source) || '';
     if (!$xml || $xml !~ /<text.+?>.*\w{5}.*</) {
         die "OCR failed. $xml $!";
     }
@@ -71,6 +71,7 @@ sub pdf2xml {
 }
 
 sub ocr {
+    my $source = shift;
     # convert pdf to pngs:
     my $tempfile = $source;
     $tempfile =~ s/\W/o/g;
@@ -79,10 +80,10 @@ sub ocr {
               ." -sOutputFile=$tempfile%03d.png"
               .' -sDEVICE=pnggray'
               .' -dTextAlphaBits=4'
-	      .' -r'.DPI
+          .' -r'.DPI
               .' -dNOPAUSE -dSAFER -dBATCH -q'
-	      ." $source"
-	      .' 2>&1';     # stderr to stdout
+          ." $source"
+          .' 2>&1';     # stderr to stdout
     print "$command\n" if $opt{'d'} >= 3;
     my $out = sysexec($command, 20, $opt{'d'}) || '';
     print "$out\n" if $opt{'d'} >= 3;
@@ -99,14 +100,14 @@ sub ocr {
     }
     else {
         push @pngs, $tempfile."001.png";
-        push @pngs, $tempfile."002.png" if ($pages > 5 || $opt{'p'} > 1);
-        push @pngs, $tempfile."003.png" if ($pages > 30 || $opt{'p'} > 2);
+        push @pngs, $tempfile."002.png" if ($pages > 5);
+        push @pngs, $tempfile."003.png" if ($pages > 30);
         # push @pngs, $tempfile.sprintf("%03d.png", $pages) if ($pages > 1);
     }
     $command = OCROSCRIPT
               .' rec-tess'
               .' '.join(' ', @pngs)
-	      .' 2>&1';     # stderr to stdout
+              .' 2>&1';     # stderr to stdout
     print "$command\n" if $opt{'d'} >= 3;
     my $xml = sysexec($command, 60, $opt{'d'}) || '';
     print "$xml\n" if $opt{'d'} >= 3;
@@ -129,8 +130,8 @@ sub ocr {
       .'<fontspec id="1" size="18" family="Times" color="#000000"/>'."\n";
     my $page_re = qr/<div.+page.+bbox (\d+) (\d+) (\d+) (\d+).+?>/;
     for (my $p=1; $xml =~ /$page_re/; $p++) {
-	my $newtag = '<page number="'.$p.'" position="absolute" top="0" left="0" height="'.int($4*$scale).'" width="'.int($3*$scale).'">';
-	$xml =~ s/$page_re/$newtag\n$fontspecs/;
+    my $newtag = '<page number="'.$p.'" position="absolute" top="0" left="0" height="'.int($4*$scale).'" width="'.int($3*$scale).'">';
+    $xml =~ s/$page_re/$newtag\n$fontspecs/;
     }
     $xml =~ s|</div|</page|g;
     # replace <span> by <text>:
@@ -140,8 +141,8 @@ sub ocr {
     my @xml = split /<\/?h3.*?>/, $xml;
     my $in_h3 = 0;
     for my $i (0 .. $#xml) {
-	$xml[$i] =~ s/font="0">/font="1">/g if ($in_h3);
-	$in_h3 = !$in_h3;
+    $xml[$i] =~ s/font="0">/font="1">/g if ($in_h3);
+    $in_h3 = !$in_h3;
     }
     $xml = join "\n", @xml;
     return $xml;
