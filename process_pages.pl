@@ -52,7 +52,7 @@ my $session_id_re = qr{
 }xi;
 
 # get urls from db:
-my $dbh = DBI->connect('DBI:mysql:'.$cgf{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
+my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
     $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
     or die "Couldn't connect to database: " . DBI->errstr;
 my $query = "SELECT id, url, UNIX_TIMESTAMP(last_checked) AS last_checked "
