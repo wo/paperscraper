@@ -146,14 +146,5 @@ sub convert2xml {
   }
 }
 
-sub readfile {
-    my $filename = shift or die "readfile requires filename parameter";
-    my $content = '';
-    open INPUT, $filename or die $!;
-    while (<INPUT>) { $content .= $_; }
-    close INPUT;
-    return $content;
-}
-
 1;
 
