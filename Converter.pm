@@ -24,9 +24,6 @@ sub cfg {
 }
 
 my @converters_used;
-sub converters {
-   return join ' ',@converters_used;
-}
 
 sub convert2pdf {
     my $source = shift or die "convert2pdf requires source filename parameter";

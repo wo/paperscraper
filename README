@@ -24,6 +24,8 @@ Finally, make sure you have the following CPAN modules:
 HTML::LinkExtractor
 HTML::Encoding
 HTML::Strip
+Text::Capitalize
+String::Approx
 
 Now you can call process_pages.pl to look for (new) links on the
 tracked pages, and process_links.pl to extract information from (new)

@@ -3,18 +3,17 @@ use strict;
 use warnings;
 use Data::Dumper;
 #use HTML::StripScripts::Parser;
-#use Text::Capitalize;
+use Text::Capitalize;
 use String::Approx 'amatch';
 use Encode;
 use util::Io;
 use util::String;
-use util::Converter;
 
 # known author names, firstnames, and strings that are not names:
 use constant DATA             => 'data/';
-use constant AUTHORS_FILE     => PATH.'names.txt';
-use constant FIRSTNAMES_FILE  => PATH.'firstnames.txt';
-use constant NOTNAMES_FILE    => PATH.'notnames.txt';
+use constant AUTHORS_FILE     => DATA.'names.txt';
+use constant FIRSTNAMES_FILE  => DATA.'firstnames.txt';
+use constant NOTNAMES_FILE    => DATA.'notnames.txt';
 
 # these are defined at the end:
 my ($re_name, $re_pre_name, $re_post_name, $re_authors_separator,
@@ -69,10 +68,10 @@ sub prior {
 sub parse {
     my $self = shift;
     die "local file ".$self->{filename}." not found" unless -e $self->{filename};
-    util::Converter::verbosity($self->verbosity);
-    my $xml = convert2xml($self->{filename});
+    my $xml = readfile($self->{filename});
     print $xml if $self->verbosity > 4;
-    $self->{converters} = converters();
+    my @converters = $xml =~ /<converter>(.+?)<\/converter>/og;
+    $self->{converters} .= join ', ', @converters;
     $self->confidence(-0.08, 'OCR') if $self->{converters} =~ /OCR/;
     $self->confidence(-0.05, 'HTML') if $self->{converters} =~ /mozilla/;
     $self->confidence(-0.05, 'Word') if $self->{converters} =~ /rtf|word/;
@@ -1219,8 +1218,8 @@ sub strip_scripts {
 sub fix_chars {
     # Certain characters and character combinations may be extracted
     # incorrectly, depending on the program that generated the PDF
-    # file. For example, "ligatures" such as "fi", "fl", "ff" and
-    # "ffl" are often rendered using a special glyph rather than as
+    # file. For example, ligatures such as "fi", "fl", "ff" and "ffl"
+    # are often rendered using a special glyph rather than as
     # individual characters, and this information may be lost in the
     # textual representation. Also, some PDF generating programs may
     # not correctly encode accented characters. For example, to draw a
