@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 #use HTML::StripScripts::Parser;
-use Text::Capitalize;
+#use Text::Capitalize;
 use String::Approx 'amatch';
 use Encode;
 use util::Io;

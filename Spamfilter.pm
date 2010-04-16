@@ -7,7 +7,6 @@ use Data::Dumper;
 use File::Basename qw/dirname/;
 use Exporter;
 use util::Io;
-use util::Converter;
 binmode STDOUT, ":utf8";
 our @ISA = ('Exporter');
 our @EXPORT = qw(&classify);
