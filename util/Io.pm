@@ -58,12 +58,12 @@ sub fetch_url {
 }
 
 sub _ua_get {
-    # oh man. Otherwise we get a warning due to perl's y2038 bug when handling cookies
+    # Otherwise we get a warning due to perl's y2038 bug when handling cookies
     my ($ua, $url, $headers) = @_;
     my %headers = %{$headers};
     open OLDERR,     ">&", \*STDERR or die "Can't dup STDERR: $!";
     select OLDERR;
-    open STDERR, ">/dev/null"     or die "Can't change STDERR: $!";
+    open STDERR, ">/dev/null"       or die "Can't change STDERR: $!";
     select STDERR; $| = 1;
     open my $oldout, ">&STDOUT"     or die "Can't dup STDOUT: $!";
     select STDOUT; $| = 1;
