@@ -1,4 +1,4 @@
-package util::Spamfilter;
+package Spamfilter;
 use strict;
 use warnings;
 use utf8;
@@ -6,7 +6,6 @@ use Digest::MD5;
 use Data::Dumper;
 use File::Basename qw/dirname/;
 use Exporter;
-use lib '../';
 use util::Io;
 use util::Converter;
 binmode STDOUT, ":utf8";
@@ -21,6 +20,12 @@ my $verbosity = 0;
 sub verbosity {
    $verbosity = shift if @_;
    return $verbosity;
+}
+
+my %cfg;
+sub cfg {
+   %cfg = shift if @_;
+   return %cfg;
 }
 
 my $bad_anchortext_re 	= qr/^site\s*map$|^home|page\b/xi;
@@ -38,25 +43,6 @@ sub classify {
     print "classifying document\n" if $verbosity;
     my $is_spam = 0.5;
 
-    if (defined($link->{text})) {
-	my $file = TEMPDIR.Digest::MD5::md5_hex($link->{url}).'.txt';
-	save($file, $link->{text}, 1) or die "cannot save local file $file";
-        # use spambayes hack to guess spamminess:
-        chdir($cfg{'PATH'}.'rfilter');
-        my $cmd = "python guess.py $file";
-        my $guess = `$cmd`;
-        if ($guess =~ /spamprob:\s*([\de\-\.]+)/) {
-            print "guess.py says $guess" if $verbosity;
-            $is_spam = $1 + 0;
-            # overwrite irrational confidence:
-            $is_spam = 0.95 if ($is_spam > 0.95);
-            $is_spam = 0.05 if ($is_spam < 0.05);
-        }
-        else {
-            print "Error: guess.py returned: '$guess'.\n";
-            return -1;
-        }
-    }
     if ($link->{url} && $link->{url} =~ m/$bad_filetype_re/) {
 	$is_spam = _score($is_spam, 0.2, 0.01, 'bad filetype: '.$link->{url});
     }
@@ -65,6 +51,27 @@ sub classify {
     }
     if (defined($link->{anchortext}) && $link->{anchortext} =~ m/$bad_anchortext_re/) {
 	$is_spam = _score($is_spam, 0.3, 0.1, 'bad anchor text: '.$link->{anchortext});
+    }
+    
+    return $is_spam unless defined($link->{text});
+
+    my $text = $link->{text};
+    my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex($link->{url}).'.txt';
+    save($file, $text, 1) or die "cannot save local file $file";
+    # use spambayes hack to guess spamminess:
+    chdir($cfg{'PATH'}.'rfilter');
+    my $cmd = "python guess.py $file";
+    my $guess = `$cmd`;
+    if ($guess =~ /spamprob:\s*([\de\-\.]+)/) {
+        print "guess.py says $guess" if $verbosity;
+        $is_spam = $1 + 0;
+        # overwrite irrational confidence:
+        $is_spam = 0.95 if ($is_spam > 0.95);
+        $is_spam = 0.05 if ($is_spam < 0.05);
+    }
+    else {
+        print "Error: guess.py returned: '$guess'.\n";
+        return -1;
     }
     if (!$link->{filetype} || $link->{filetype} eq 'html') {
 	$is_spam = _score($is_spam, 0.7, 0.3, 'html');

@@ -1,4 +1,4 @@
-package metaparser::Extractor;
+package Extractor;
 use strict;
 use warnings;
 use Data::Dumper;
@@ -6,16 +6,15 @@ use Data::Dumper;
 use Text::Capitalize;
 use String::Approx 'amatch';
 use Encode;
-use lib '../';
 use util::Io;
 use util::String;
 use util::Converter;
 
 # known author names, firstnames, and strings that are not names:
-use constant PATH 		=> '/home/wo/exec/opp-trunk/metaparser/';
-use constant AUTHORS_FILE 	=> PATH.'names.txt';
-use constant FIRSTNAMES_FILE 	=> PATH.'firstnames.txt';
-use constant NOTNAMES_FILE 	=> PATH.'notnames.txt';
+use constant DATA             => 'data/';
+use constant AUTHORS_FILE     => PATH.'names.txt';
+use constant FIRSTNAMES_FILE  => PATH.'firstnames.txt';
+use constant NOTNAMES_FILE    => PATH.'notnames.txt';
 
 # these are defined at the end:
 my ($re_name, $re_pre_name, $re_post_name, $re_authors_separator,

@@ -35,8 +35,8 @@ setup, you might try
 INSERT INTO pages (url, registered) 
 VALUES ('http://consc.net/papers.html', NOW());
 
-perl -v process_pages.pl
-perl -v process_links.pl
+perl process_pages.pl -v2
+perl process_links.pl -v2
 
 
 ---------------------------------------------------------------------

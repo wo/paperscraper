@@ -1,10 +1,9 @@
-package util::Converter;
+package Converter;
 use strict;
 use utf8;
 use Encode;
 use Data::Dumper;
 use Exporter;
-use lib '../';
 use util::Sysexec;
 use util::String;
 use util::Io;
@@ -12,12 +11,16 @@ binmode STDOUT, ":utf8";
 our @ISA = ('Exporter');
 our @EXPORT = qw(&convert2text &convert2pdf &convert2xml &converters);
 
-my %cfg = do '../config.pl';
-
 my $verbosity = 0;
 sub verbosity {
    $verbosity = shift if @_;
    return $verbosity;
+}
+
+my %cfg;
+sub cfg {
+   %cfg = shift if @_;
+   return %cfg;
 }
 
 my @converters_used;
@@ -93,7 +96,7 @@ sub convert2text {
 	      ." $filename"
 	      .' 2>&1';
 	  print "$command\n" if $verbosity >= 3;
-	  $xml = sysexec($command, 60, $verbosity) || '';
+	  my $xml = sysexec($command, 60, $verbosity) || '';
           $text = strip_tags($xml);
 	  last;
       };
@@ -124,7 +127,7 @@ sub convert2xml {
 	      ." $filename"
 	      .' 2>&1';
 	  print "$command\n" if $verbosity >= 3;
-	  $xml = sysexec($command, 60, $verbosity) || '';
+	  my $xml = sysexec($command, 60, $verbosity) || '';
 	  return $xml;
       };
       /html|txt/ && do {
@@ -132,7 +135,7 @@ sub convert2xml {
 	      ." $filename"
 	      .' 2>&1';
 	  print "$command\n" if $verbosity >= 3;
-	  $xml = sysexec($command, 60, $verbosity) || '';
+	  my $xml = sysexec($command, 60, $verbosity) || '';
 	  return $xml;
       };
       # convert other formats to PDF:
