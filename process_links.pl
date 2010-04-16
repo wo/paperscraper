@@ -15,8 +15,9 @@ use Getopt::Std;
 use util::Io;
 use util::Errors;
 use util::String;
-use util::Spamfilter;
-use util::Converter;
+use Spamfilter;
+use Converter;
+use Extractor;
 my %cfg = do 'config.pl';
 
 my %opts;
@@ -57,7 +58,7 @@ if ( -e '.processlock' ) {
 system('touch .processlock');
 
 # find some links to check:
-my $dbh = DBI->connect('DBI:mysql:'.$cgf{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
+my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
     $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
     or die "Couldn't connect to database: " . DBI->errstr;
 $dbh->{'mysql_auto_reconnect'} = 1;
@@ -79,31 +80,31 @@ if ($opts{p}) {
 else {
     # from database.
     # Do we have unprocessed links?
-    my $query = "SELECT id, url FROM docs WHERE status = 0 ORDER BY id LIMIT ".NUM_URLS;
+    my $query = "SELECT id, url FROM docs WHERE status = 0 ORDER BY id LIMIT ".$cfg{'NUM_URLS'};
     my @links = @{$dbh->selectall_arrayref($query, { Slice => {} })};
     if (!@links) {
 	# No. Toss a coin to decide whether to (a) verify old papers
 	# and re-check links with HTTP errors, or (b) give old spam
 	# and parser errors a new chance. Mostly we want to do (a).
 	# But first, check if we reprocess everything.
-	if (REPROCESS_ALL) {
+	if ($cfg{'REPROCESS_ALL'}) {
 	    $query = "SELECT id, url, filesize, status, "
                 ."UNIX_TIMESTAMP(last_checked) AS last_checked FROM docs "
-                ."ORDER BY last_checked LIMIT ".NUM_URLS;
+                ."ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
 	}
 	elsif (rand(10) <= 9) {
 	    # (a) re-process old papers and HTTP errors:
 	    $query = "SELECT id, url, filesize, status, "
                 ."UNIX_TIMESTAMP(last_checked) AS last_checked FROM docs "
                 ."WHERE (status NOT BETWEEN 2 AND 99) AND NOT is_spam > 0.5 "
-                ."ORDER BY last_checked LIMIT ".NUM_URLS;
+                ."ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
 	}
 	else {
 	    # (b) give old spam and parser errors a second chance:
 	    $query = "SELECT id, url, filesize, is_spam, "
                 ."UNIX_TIMESTAMP(last_checked) AS last_checked FROM docs "
                 ."WHERE (status = 1 AND is_spam > 0.5) OR status BETWEEN 2 AND 99 "
-                ."ORDER BY last_checked LIMIT ".NUM_URLS;
+                ."ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
 	}
 	@links = @{$dbh->selectall_arrayref($query, { Slice => {} })};
     }
@@ -112,7 +113,7 @@ else {
 
 print "done.\n" if $verbosity;
 
-system('rm -f '.TEMPDIR.'*') unless $verbosity;
+system('rm -f '.$cfg{'TEMPDIR'}.'*') unless $verbosity;
 system('rm -f .processlock');
 
 $dbh->disconnect() if ($dbh);
@@ -149,7 +150,7 @@ sub process_links {
 	print "checking link $link->{id}: $link->{url}\n" if $verbosity;
 
 	# retrieve document:
-	my $mtime = (defined $link->{last_checked} && !REPROCESS_ALL) ? $link->{last_checked} : 0;
+	my $mtime = (defined $link->{last_checked} && !$cfg{'REPROCESS_ALL'}) ? $link->{last_checked} : 0;
 	my $res = fetch_url($link->{url}, $mtime);
 	if ($res && $res->code == 304 && defined $link->{last_checked}) {
 	    print "not modified.\n" if $verbosity;
@@ -188,7 +189,7 @@ sub process_links {
 	# be trusted on this. So we also check for changes in
 	# filesize:
         my $old_filesize = defined $link->{filesize} ? $link->{filesize} : 0;
-	if ($old_filesize && abs($old_filesize-$filesize)/$filesize < 0.2 && !REPROCESS_ALL) {
+	if ($old_filesize && abs($old_filesize-$filesize)/$filesize < 0.2 && !$cfg{'REPROCESS_ALL'}) {
 	    print "no substantial change in filesize; treating as Not Modified.\n" if $verbosity;
 	    $db_verify->execute($link->{id}) or print DBI->errstr;
 	    next;
@@ -210,7 +211,7 @@ sub process_links {
 	}
 
 	# save local copy:
-	my $file = TEMPDIR.Digest::MD5::md5_hex($link->{url}).'.'.$filetype;
+	my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex($link->{url}).'.'.$filetype;
 	if (!save($file, $content)) {
 	    error("cannot save local file");
 	    $db_err->execute(errorcode(), $link->{id}) or print DBI->errstr;
@@ -303,8 +304,9 @@ sub process_links {
             $link->{text} = strip_tags($content);
         }
 	my $is_spam = 0;
+        Spamfilter::cfg(%cfg);
 	eval {
-	    $is_spam = util::Spamfilter::classify($link);
+	    $is_spam = Spamfilter::classify($link);
 	};
 	if ($@) {
 	    error($@);
@@ -326,18 +328,17 @@ sub process_links {
 	}
 
         # convert file to xml:
+        Converter::cfg(%cfg);
+        Converter::verbosity($verbosity);
         my $xml = convert2xml($file);
-        print $xml if $self->verbosity > 4;
+        print $xml if $verbosity > 4;
         save("$file.xml", $xml, 1);
 
 	# extract author, title, abstract:
 	$cand_title = '' if ($cand_title && ($cand_title !~ /\w\w/ || $cand_title =~ /$filetype|version/i));
 	my $result;
 	eval {
-
-xxx call meta here
-
-	    my $extractor = metaparser::Extractor->new($file);
+	    my $extractor = Extractor->new($file);
 	    $extractor->verbosity($verbosity);
 	    $extractor->prior('author', $cand_author, 0.7) if ($cand_author);
 	    $extractor->prior('title', $cand_title, 0.5) if ($cand_title);
@@ -372,10 +373,10 @@ xxx call meta here
 
 	# guess spamminess again, now that we definitely have the text content:
         $link->{text} = $text;
-	my $is_spam = 0;
-	util::Spamfilter::verbosity($verbosity);
+	$is_spam = 0;
+	Spamfilter::verbosity($verbosity);
         eval {
-	    $is_spam = util::Spamfilter::classify($link);
+	    $is_spam = Spamfilter::classify($link);
 	};
 	if ($@) {
 	    error($@);
