@@ -20,6 +20,14 @@ use Converter;
 use Extractor;
 my %cfg = do 'config.pl';
 
+# A few more config settings:
+$cfg{'TEMPDIR'} = $cfg{'PATH'}.'temp/';
+$cfg{'RPDF'}    = $cfg{'PATH'}.'rpdf/rpdf';
+$cfg{'RHTML'}   = $cfg{'PATH'}.'rhtml/rhtml';
+$cfg{'RTF2PDF'} = $cfg{'PATH'}.'/util/rtf2pdf.sh';
+# Spam score threshold where we don't bother guessing author etc.:
+$cfg{'CERT_SPAM'} = 0.99;
+
 my %opts;
 getopts("v:p:nh", \%opts);
 if ($opts{h}) {
@@ -41,21 +49,26 @@ EOF
 }
 
 my $verbosity = $opts{v} || 0;
+util::Errors::verbosity($verbosity);
+util::Io::verbosity($verbosity);
 
 # don't run multiple processes in parallel:
-if ( -e '.processlock' ) {
-    if ( -M '.processlock' < 0.005) {
+my $lockfile = $cfg{'PATH'}.'.processlock';
+if ( -e "$lockfile" ) {
+    if ( -M "$lockfile" < 0.005) {
         # modified in the last ~10 mins
-        print "process already running\n" if $verbosity;
+        print "process already running (or last call crashed: remove .processlock)\n"
+            if $verbosity;
         exit;
     }
     print "killing previous run!\n";
+    system("rm -f '$lockfile'");
     # we are killing ourserlves here!
-    system("ps -ef | grep 'l process_links' | grep -v grep"
-           ." | awk '{print \$2}' | xargs kill -9"
-           ." && rm -f .processlock");
+    system("ps -ef | grep 'process_links' | grep -v grep"
+           ." | awk '{print \$2}' | xargs kill -9");
 }
-system('touch .processlock');
+print "$lockfile\n";
+system("touch '$lockfile'");
 
 # find some links to check:
 my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
@@ -114,12 +127,9 @@ else {
 print "done.\n" if $verbosity;
 
 system('rm -f '.$cfg{'TEMPDIR'}.'*') unless $verbosity;
-system('rm -f .processlock');
+system("rm -f '$lockfile'");
 
 $dbh->disconnect() if ($dbh);
-
-# Spam score threshold where we don't bother guessing author etc.:
-use constant CERT_SPAM => 0.8;
 
 sub process_links {
     my @links = @_;
@@ -183,6 +193,7 @@ sub process_links {
 	}
 	my $filesize = $res->{filesize};
 	my $filetype = $res->{filetype};
+        print "file retrieved, $filesize bytes\n" if $verbosity;
 
 	# We want to make sure that we only update an old link if it
 	# has really (substantially) changed. HTTP headers are not to
@@ -196,7 +207,7 @@ sub process_links {
 	}
 
 	# check if filetype is supported:
-	if ($filetype !~ /html|pdf|ps|doc|rtf|txt/) {
+        unless (grep {$filetype eq $_} @{$cfg{'FILETYPES'}}) {
 	    error("unsupported filetype ".$filetype."\n"); 
 	    $db_err->execute(errorcode(), $link->{id}) or print DBI->errstr;
 	    next;
@@ -304,7 +315,8 @@ sub process_links {
             $link->{text} = strip_tags($content);
         }
 	my $is_spam = 0;
-        Spamfilter::cfg(%cfg);
+        Spamfilter::cfg(\%cfg);
+        Spamfilter::verbosity($verbosity);
 	eval {
 	    $is_spam = Spamfilter::classify($link);
 	};
@@ -316,19 +328,19 @@ sub process_links {
 	$is_spam = sprintf("%3f", $is_spam);
 	if ($is_spam > 0.5) {
 	    if (defined $link->{is_spam}) {
-		# was previously recognized as spam as well; don't update 'updated' etc.
+                print "was previously recognized as spam, still looks like that\n" if $verbosity;
 		$db_verify->execute($link->{id});
 		next;
 	    }
-	    if ($is_spam >= CERT_SPAM) {
-		# certain spam, don't process any further
+	    if ($is_spam >= $cfg{'CERT_SPAM'}) {
+                print "spam score $is_spam, not checking any further\n" if $verbosity;
 		$db_set->execute(1, $filetype, $filesize, 0, '', '', '', $is_spam, 0.5, $link->{id});
 		next;
 	    }
 	}
 
         # convert file to xml:
-        Converter::cfg(%cfg);
+        Converter::cfg(\%cfg);
         Converter::verbosity($verbosity);
         my $xml = convert2xml($file);
         print $xml if $verbosity > 4;
@@ -338,7 +350,7 @@ sub process_links {
 	$cand_title = '' if ($cand_title && ($cand_title !~ /\w\w/ || $cand_title =~ /$filetype|version/i));
 	my $result;
 	eval {
-	    my $extractor = Extractor->new($file);
+	    my $extractor = Extractor->new("$file.xml");
 	    $extractor->verbosity($verbosity);
 	    $extractor->prior('author', $cand_author, 0.7) if ($cand_author);
 	    $extractor->prior('title', $cand_title, 0.5) if ($cand_title);
@@ -391,11 +403,18 @@ sub process_links {
 	}
 
 	# check for duplicates (uses the MySQL levenshtein UDF from joshdrew.com)
-	my $query = "SELECT id,filetype FROM docs WHERE status = 1 AND id != $link->{id} AND duplicates IS NULL"
-                ." AND levenshtein(author,".$dbh->quote($author).") < 4"
-	        ." AND levenshtein(title,".$dbh->quote($title).") < 4"
-	        ." AND levenshtein(abstract,".$dbh->quote($abstract).") < 15"
-                ." LIMIT 1";
+	my $query = "SELECT id,filetype FROM docs WHERE status = 1 "
+            ." AND id != $link->{id} AND duplicates IS NULL"
+            ." AND levenshtein(author,".$dbh->quote($author).") < 4"
+            ." AND levenshtein(title,".$dbh->quote($title).") < 4"
+            ." AND levenshtein(abstract,".$dbh->quote($abstract).") < 15"
+            ." LIMIT 1";
+        # xxx overwrite the above to simplify setup:
+	$query = "SELECT id,filetype FROM docs WHERE status = 1 "
+            ." AND id != $link->{id} AND duplicates IS NULL"
+            ." AND author = ".$dbh->quote($author)
+            ." AND title = ".$dbh->quote($title)
+            ." LIMIT 1";
 	my ($orig_id, $orig_filetype) = $dbh->selectrow_array($query);
 	if ($orig_id) {
 	    print "duplicate of $orig_id.\n" if $verbosity;

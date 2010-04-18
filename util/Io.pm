@@ -8,7 +8,7 @@ use HTTP::Date;
 use HTML::Encoding 'encoding_from_http_message';
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw(&fetch_url &save);
+our @EXPORT = qw(&fetch_url &save &readfile);
 
 our $verbosity = 0;
 sub verbosity {

@@ -76,11 +76,11 @@ sub parse {
     $self->confidence(-0.05, 'HTML') if $self->{converters} =~ /mozilla/;
     $self->confidence(-0.05, 'Word') if $self->{converters} =~ /rtf|word/;
     $xml = fix_chars($xml) if $self->{converters} =~ /pdftohtml/;
-    $self->{document}->{text} = strip_tags($xml);
     my $blocks = $self->parse_xml(\$xml);
     # my $startblocks = $self->get_startblocks($blocks);
     # $self->get_metadata($startblocks);
     $self->get_metadata($blocks);
+    $self->{document}->{text} = strip_tags($xml);
     return $self->{document};
 }
 

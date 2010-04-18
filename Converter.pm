@@ -19,7 +19,7 @@ sub verbosity {
 
 my %cfg;
 sub cfg {
-   %cfg = shift if @_;
+   %cfg = %{$_[0]} if @_;
    return %cfg;
 }
 
@@ -115,7 +115,7 @@ sub convert2text {
 
 
 sub convert2xml {
-    my $filename = shift or die "convert2text requires filename parameter";
+    my $filename = shift or die "convert2xml requires filename parameter";
     my ($basename, $filetype) = ($filename =~ /^(.*?)\.?([^\.]+)$/);
     print "getting XML from $filename\n" if $verbosity;
   SWITCH: for ($filetype) {

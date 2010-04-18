@@ -23,7 +23,7 @@ sub verbosity {
 
 my %cfg;
 sub cfg {
-   %cfg = shift if @_;
+   %cfg = %{$_[0]} if @_;
    return %cfg;
 }
 
@@ -61,6 +61,7 @@ sub classify {
     chdir($cfg{'PATH'}.'rfilter');
     my $cmd = "python guess.py $file";
     my $guess = `$cmd`;
+    chdir($cfg{'PATH'});
     if ($guess =~ /spamprob:\s*([\de\-\.]+)/) {
         print "guess.py says $guess" if $verbosity;
         $is_spam = $1 + 0;
