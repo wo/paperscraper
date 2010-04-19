@@ -26,7 +26,8 @@ $cfg{'RPDF'}    = $cfg{'PATH'}.'rpdf/rpdf';
 $cfg{'RHTML'}   = $cfg{'PATH'}.'rhtml/rhtml';
 $cfg{'RTF2PDF'} = $cfg{'PATH'}.'/util/rtf2pdf.sh';
 # Spam score threshold where we don't bother guessing author etc.:
-$cfg{'CERT_SPAM'} = 0.99;
+$cfg{'CERT_SPAM'} = 0.8;
+$cfg{'REPROCESS_ALL'} = 0;
 
 my %opts;
 getopts("v:p:nh", \%opts);
