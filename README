@@ -27,8 +27,8 @@ HTML::Strip
 Text::Capitalize
 String::Approx
 
-Now you can call process_pages.pl to look for (new) links on the
-tracked pages, and process_links.pl to extract information from (new)
+Now you can call process_pages to look for (new) links on the
+tracked pages, and process_links to extract information from (new)
 papers found behind these links.
 
 Of course, there aren't any pages in the database yet. To test the
