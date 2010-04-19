@@ -17,8 +17,15 @@ papers. To create the tables, call
 
 mysql -u dbuser -p dbpass dbname < setup.sql 
 
-Finally, open config.pl and adjust the values for the database
-connection and the install path.
+Then open config.pl and adjust the values for the database connection
+and the install path.
+
+Finally, make sure you have the following CPAN modules:
+HTML::LinkExtractor
+HTML::Encoding
+HTML::Strip
+Text::Capitalize
+String::Approx
 
 Now you can call process_pages.pl to look for (new) links on the
 tracked pages, and process_links.pl to extract information from (new)
@@ -27,12 +34,13 @@ papers found behind these links.
 Of course, there aren't any pages in the database yet. To test the
 setup, you might try
 
-mysql -u dbuser -p dbpass dbname <<EOF
-  INSERT INTO PAGES (url, registered)
-  VALUES ('http://consc.net/papers.html', NOW());
-EOF
-perl -v process_pages.pl
-perl -v process_links.pl
+INSERT INTO authors (name) VALUES ('David Chalmers');
+INSERT INTO pages (url, author, registered) VALUES 
+  ('http://consc.net/papers.html', 
+  (SELECT id FROM authors LIMIT 1), NOW());
+
+perl process_pages.pl -v2
+perl process_links.pl -v2
 
 
 ---------------------------------------------------------------------

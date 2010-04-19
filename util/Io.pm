@@ -8,7 +8,7 @@ use HTTP::Date;
 use HTML::Encoding 'encoding_from_http_message';
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw(&fetch_url &save);
+our @EXPORT = qw(&fetch_url &save &readfile);
 
 our $verbosity = 0;
 sub verbosity {
@@ -58,12 +58,20 @@ sub fetch_url {
 }
 
 sub _ua_get {
+<<<<<<< HEAD:util/Io.pm
     # oh man. Otherwise we get a warning due to perl's y2038 bug when handling cookies
+=======
+    # Otherwise we get a warning due to perl's y2038 bug when handling cookies
+>>>>>>> develop:util/Io.pm
     my ($ua, $url, $headers) = @_;
     my %headers = %{$headers};
     open OLDERR,     ">&", \*STDERR or die "Can't dup STDERR: $!";
     select OLDERR;
+<<<<<<< HEAD:util/Io.pm
     open STDERR, ">/dev/null"     or die "Can't change STDERR: $!";
+=======
+    open STDERR, ">/dev/null"       or die "Can't change STDERR: $!";
+>>>>>>> develop:util/Io.pm
     select STDERR; $| = 1;
     open my $oldout, ">&STDOUT"     or die "Can't dup STDOUT: $!";
     select STDOUT; $| = 1;
@@ -130,4 +138,16 @@ sub save {
    return 1;
 }
 
+<<<<<<< HEAD:util/Io.pm
+=======
+sub readfile {
+    my $filename = shift or die "readfile requires filename parameter";
+    my $content = '';
+    open INPUT, $filename or die $!;
+    while (<INPUT>) { $content .= $_; }
+    close INPUT;
+    return $content;
+}
+
+>>>>>>> develop:util/Io.pm
 1;
