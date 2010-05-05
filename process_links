@@ -21,12 +21,12 @@ use Extractor;
 my %cfg = do 'config.pl';
 
 # A few more config settings:
-$cfg{'TEMPDIR'} = $cfg{'PATH'}.'temp/';
-$cfg{'RPDF'}    = $cfg{'PATH'}.'rpdf/rpdf';
-$cfg{'RHTML'}   = $cfg{'PATH'}.'rhtml/rhtml';
-$cfg{'RTF2PDF'} = $cfg{'PATH'}.'/util/rtf2pdf.sh';
+$cfg{'TEMPDIR'}       = $cfg{'PATH'}.'temp/';
+$cfg{'RPDF'}          = $cfg{'PATH'}.'rpdf/rpdf';
+$cfg{'RTF2PDF'}       = $cfg{'PATH'}.'util/rtf2pdf.sh';
+$cfg{'WKHTMLTOPDF'}   = $cfg{'PATH'}.'util/wkhtmltopdf';
 # Spam score threshold where we don't bother guessing author etc.:
-$cfg{'CERT_SPAM'} = 0.8;
+$cfg{'CERT_SPAM'}     = 10.8;
 $cfg{'REPROCESS_ALL'} = 0;
 
 my %opts;
@@ -68,7 +68,6 @@ if ( -e "$lockfile" ) {
     system("ps -ef | grep 'process_links' | grep -v grep"
            ." | awk '{print \$2}' | xargs kill -9");
 }
-print "$lockfile\n";
 system("touch '$lockfile'");
 
 # find some links to check:
@@ -216,12 +215,6 @@ sub process_links {
 
 	my $content = $res->content;
 
-	# tidy up HTML so that xulrunner doesn't throw errors (for missing frames etc.):
-	if ($filetype eq 'html') {
-	    $content =~ s/src\s*=\s*[\"\'][^\"\']+[\"\']/src='about:blank'/ig;
-	    $content =~ s/src\s*=\s*[^\s>]+/src='about:blank'/ig;
-	}
-
 	# save local copy:
 	my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex($link->{url}).'.'.$filetype;
 	if (!save($file, $content)) {
@@ -343,9 +336,7 @@ sub process_links {
         # convert file to xml:
         Converter::cfg(\%cfg);
         Converter::verbosity($verbosity);
-        my $xml = convert2xml($file);
-        print $xml if $verbosity > 4;
-        save("$file.xml", $xml, 1);
+        convert2xml($file);
 
 	# extract author, title, abstract:
 	$cand_title = '' if ($cand_title && ($cand_title !~ /\w\w/ || $cand_title =~ /$filetype|version/i));

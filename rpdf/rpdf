@@ -6,7 +6,7 @@ sub usage() {
 Extracts text and layout information from PDF documents, using
 pdftohtml or OCRopus.
 
-usage: $0 [-d int] [-p int] file.pdf
+usage: $0 [-d int] [-p int] source.pdf target.xml
 
  -d int : debug level
  -p int : max. number of pages to parse
@@ -34,14 +34,23 @@ use constant DPI 		=> 300;
 
 
 my %opt = ( "d" => 0 );
-my $pdf;
+my $source;
+my $target;
 sub init() {
     use Getopt::Std;
     getopts( "hvd:p:", \%opt ) or usage();
     usage() if $opt{h};
-    @ARGV >= 1 || usage();
-    $pdf = $ARGV[0] ;
+    @ARGV >= 2 || usage();
+    $source = $ARGV[0];
+    $target = $ARGV[1];
 }
+
+init();
+my $out = pdf2xml($source);
+open FH, '>'.$target or die "Error: cannot save $target: $!";
+binmode(FH, ":utf8");
+print FH $out;
+close FH;
 
 sub pdf2xml {
     my $source = shift;
@@ -147,9 +156,5 @@ sub ocr {
     $xml = join "\n", @xml;
     return $xml;
 }
-
-init();
-my $out = pdf2xml($pdf);
-print $out;
 
 1;

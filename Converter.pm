@@ -3,6 +3,8 @@ use strict;
 use utf8;
 use Encode;
 use Data::Dumper;
+use File::Spec;
+use FindBin qw($Bin);
 use Exporter;
 use util::Sysexec;
 use util::String;
@@ -31,6 +33,19 @@ sub convert2pdf {
     my ($basename, $filetype) = ($source =~ /^(.*?)\.?([^\.]+)$/);
     print "converting $source to pdf\n" if $verbosity;
   SWITCH: for ($filetype) {
+      /html|txt/ && do {
+	  push @converters_used, 'wkhtmltopdf';
+          $source = File::Spec->rel2abs($source);
+	  my $command = $cfg{'WKHTMLTOPDF'}
+              ." file://$source"
+              ." $target"
+	      .' 2>&1';
+	  print "$command\n" if $verbosity >= 2;
+	  my $out = sysexec($command, 10, $verbosity);
+          print $out if $verbosity > 4;
+	  die "wkhtmltopdf failed: $out" unless -e $target;
+	  return 1;
+      };
       /doc/ && do {
 	  push @converters_used, 'antiword';
 	  my $command = $cfg{'ANTIWORD'}
@@ -121,19 +136,14 @@ sub convert2xml {
   SWITCH: for ($filetype) {
       /pdf/ && do {
 	  my $command = $cfg{'RPDF'}
+              ." -d$verbosity"
 	      ." $filename"
+              ." $filename.xml"
 	      .' 2>&1';
 	  print "$command\n" if $verbosity >= 3;
-	  my $xml = sysexec($command, 60, $verbosity) || '';
-	  return $xml;
-      };
-      /html|txt/ && do {
-	  my $command = $cfg{'RHTML'}
-	      ." $filename"
-	      .' 2>&1';
-	  print "$command\n" if $verbosity >= 3;
-	  my $xml = sysexec($command, 60, $verbosity) || '';
-	  return $xml;
+	  my $out = sysexec($command, 60, $verbosity) || '';
+	  die "pdf conversion failed: $out" unless -e "$filename.xml";
+	  return 1;
       };
       # convert other formats to PDF:
       if (convert2pdf($filename, "$filename.pdf")) {

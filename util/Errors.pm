@@ -64,7 +64,7 @@ sub errorcode {
    63 => 'rtf2pdf failed',
    64 => 'antiword failed',
    65 => 'htmldoc failed',
-   66 => 'mozilla2ps failed',
+   66 => 'wkhtmltopdf failed',
    67 => 'ps2pdf failed',
    68 => 'html2xml failed',
    69 => 'PDF conversion failed',
