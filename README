@@ -8,9 +8,8 @@ version 0.4 (2010-04-10)
 INSTALLATION AND SETUP
 ---------------------------------------------------------------------
 
-If you want to track papers in PDF and HTML format, you have to
-install rpdf and rhtml. See the README file in the respective
-subdirectory.
+In order to track papers in PDF and HTML format, you have to install
+rpdf. See the README file in the rpdf subdirectory.
 
 Next, set up a MySQL database to store the tracked pages and
 papers. To create the tables, call
@@ -27,9 +26,9 @@ HTML::Strip
 Text::Capitalize
 String::Approx
 
-Now you can call process_pages to look for (new) links on the
-tracked pages, and process_links to extract information from (new)
-papers found behind these links.
+Now you can call process_pages to look for (new) links on the tracked
+pages, and process_links to extract information from (new) papers
+found behind these links.
 
 Of course, there aren't any pages in the database yet. To test the
 setup, you might try
