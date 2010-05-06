@@ -67,6 +67,7 @@ sub prior {
 
 sub parse {
     my $self = shift;
+    print "parsing file ".$self->{filename}."\n" if $self->verbosity > 3;
     die "local file ".$self->{filename}." not found" unless -e $self->{filename};
     my $xml = readfile($self->{filename});
     print $xml if $self->verbosity > 4;

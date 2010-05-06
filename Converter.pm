@@ -126,6 +126,8 @@ sub convert2text {
 
 sub convert2xml {
     my $filename = shift or die "convert2xml requires filename parameter";
+    my $target = shift;
+    $target = "$filename.xml" unless $target;
     my ($basename, $filetype) = ($filename =~ /^(.*?)\.?([^\.]+)$/);
     print "getting XML from $filename\n" if $verbosity;
   SWITCH: for ($filetype) {
@@ -133,7 +135,7 @@ sub convert2xml {
 	  my $command = $cfg{'RPDF'}
               ." -d$verbosity"
 	      ." $filename"
-              ." $filename.xml"
+              ." $target"
 	      .' 2>&1';
 	  my $out = sysexec($command, 60, $verbosity) || '';
 	  die "pdf conversion failed: $out" unless -e "$filename.xml";
@@ -141,7 +143,7 @@ sub convert2xml {
       };
       # convert other formats to PDF:
       if (convert2pdf($filename, "$filename.pdf")) {
-	  return convert2xml("$filename.pdf", );
+	  return convert2xml("$filename.pdf", "$filename.xml");
       }
       die "PDF conversion failed";
   }
