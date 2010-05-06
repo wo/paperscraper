@@ -27,7 +27,7 @@ use util::Sysexec;
 binmode STDOUT, ":utf8";
 
 use constant GS         	=> '/usr/bin/gs';
-use constant PDFTOHTML          => $Bin.'/pdftohtml/pdftohtml';
+use constant PDFTOHTML          => '/usr/bin/pdftohtml';
 use constant OCROSCRIPT 	=> $Bin.'/ocropus/ocroscript/ocroscript';
 use constant TEMPDIR 	        => $Bin.'/temp/';
 use constant DPI 		=> 300;

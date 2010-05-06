@@ -8,15 +8,9 @@ version 0.2 (2010-04-04)
 INSTALLATION
 ---------------------------------------------------------------------
 
-rpdf requires slightly modified versions of specifc OCRopus and
-pdftohtml releases, which are included. To install pdftohtml:
-
-cd pdftohtml
-make
-cd ..
-
-To install ocropus, you need a few packages -- jam, libtiff-dev
-libjpeg-dev, libpng-dev. E.g. on Debian-based systems:
+rpdf requires a modified version of OCRopus, which is included. To
+install it, you need a few packages -- jam, libtiff-dev libjpeg-dev,
+libpng-dev. E.g. on Debian-based systems:
 
 sudo apt-get install jam libtiff-dev libjpeg-dev libpng12-dev
 cd ocropus/tesseract-2.03/
@@ -30,13 +24,14 @@ cd ..
 Check the instructions in the relevant sub-directory if you run into
 problems.
 
-rpdf also needs ghostscript, which should be in every package manager:
+rpdf also needs the poppler version of pdftohtml and ghostscript:
 
-sudo apt-get install ghostscript
+sudo apt-get install ghostscript pdftohtml
 whereis gs
+whereis pdftohtml
 
-If gs is not in /usr/bin/gs, adjust the path at the top of the rpdf
-file.
+If these applications are not in /usr/bin, adjust the path at the top
+of the rpdf file.
 
 
 
