@@ -40,7 +40,6 @@ sub convert2pdf {
               ." file://$source"
               ." $target"
 	      .' 2>&1';
-	  print "$command\n" if $verbosity >= 2;
 	  my $out = sysexec($command, 10, $verbosity);
           print $out if $verbosity > 4;
 	  die "wkhtmltopdf failed: $out" unless -e $target;
@@ -54,7 +53,6 @@ sub convert2pdf {
 	      .' -m 8859-1' # character encoding: antiword doesn't support utf8
 	      ." $source"   # source file
 	      .' 2>&1';     # stderr to stdout
-	  print "$command\n" if $verbosity >= 2;
 	  my $content = sysexec($command, 10, $verbosity) || '';
 	  $content = Encode::decode('iso-8859-1', $content) || $content;
 	  die "antiword failed: $content" unless ($content && $content =~ /%PDF/);
@@ -66,7 +64,6 @@ sub convert2pdf {
 	      ." $source"     # source file
 	      ." $target"     # destination file
 	      .' 2>&1';       # stderr to stdout
-	  print "$command\n" if $verbosity >= 2;
 	  my $out = sysexec($command, 10, $verbosity);
 	  print $out if $verbosity >= 4;
 	  die "rtf2pdf failed: $out" unless -e $target;
@@ -78,7 +75,6 @@ sub convert2pdf {
 	      ." $source"     # source file
 	      ." $target"     # destination file
 	      .' 2>&1';       # stderr to stdout
-	  print "$command\n" if $verbosity >= 2;
 	  my $out = sysexec($command, 10, $verbosity) || '';
 	  print $out if $verbosity >= 4;
 	  die "ps2pdf failed: $out" unless -e $target;
@@ -107,7 +103,6 @@ sub convert2text {
 	  my $command = $cfg{'RPDF'}
 	      ." $filename"
 	      .' 2>&1';
-	  print "$command\n" if $verbosity >= 3;
 	  my $xml = sysexec($command, 60, $verbosity) || '';
           $text = strip_tags($xml);
 	  last;
@@ -140,7 +135,6 @@ sub convert2xml {
 	      ." $filename"
               ." $filename.xml"
 	      .' 2>&1';
-	  print "$command\n" if $verbosity >= 3;
 	  my $out = sysexec($command, 60, $verbosity) || '';
 	  die "pdf conversion failed: $out" unless -e "$filename.xml";
 	  return 1;
