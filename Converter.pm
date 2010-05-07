@@ -138,7 +138,7 @@ sub convert2xml {
               ." $target"
 	      .' 2>&1';
 	  my $out = sysexec($command, 60, $verbosity) || '';
-	  die "pdf conversion failed: $out" unless -e "$filename.xml";
+	  die "pdf conversion failed: $out" unless -e "$target";
 	  return 1;
       };
       # convert other formats to PDF:
