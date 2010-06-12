@@ -24,7 +24,6 @@ my %cfg = do 'config.pl';
 $cfg{'TEMPDIR'}       = $cfg{'PATH'}.'temp/';
 $cfg{'RPDF'}          = $cfg{'PATH'}.'rpdf/rpdf';
 $cfg{'RTF2PDF'}       = $cfg{'PATH'}.'util/rtf2pdf.sh';
-$cfg{'WKHTMLTOPDF'}   = $cfg{'PATH'}.'util/wkhtmltopdf';
 # Spam score threshold where we don't bother guessing author etc.:
 $cfg{'CERT_SPAM'}     = 0.8;
 $cfg{'REPROCESS_ALL'} = 0;

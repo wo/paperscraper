@@ -42,9 +42,6 @@ String::Approx
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
-# Support OCR processing of PDFs:
-OCR        => 1,
-
 
 mysql -u dbuser -p dbpass dbname < setup.sql 
 
