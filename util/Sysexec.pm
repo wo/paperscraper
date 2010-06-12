@@ -21,8 +21,8 @@ sub sysexec {
     my $pid;
 
     local $SIG{ALRM} = sub {
-	kill 15, $pid or die "kill: $!";  # Just SIGTERM.
-        print "Timeout!\n" if $verbosity;
+	kill 15, $pid or die "kill: $!";  # 15: SIGTERM
+        print "$pid Timeout!\n" if $verbosity;
 	die "Timeout!"
     };
 
@@ -37,11 +37,14 @@ sub sysexec {
 	    close READER;
 	    waitpid ($pid, 0);
 	}
-	else { 
+	else {
             # child:
 	    close READER;
 	    open(PIPE, "$command |") or die $!;
-	    while (<PIPE>) { $res .= $_; };
+	    while (<PIPE>) {
+                $res .= $_;
+                print $_ if $verbosity > 1;
+            };
 	    close(PIPE);
 	    print WRITER $res;
 	    close WRITER;
@@ -54,4 +57,3 @@ sub sysexec {
 }
 
 1;
-

@@ -1,46 +1,25 @@
 
 rpdf extracts text and layout from PDF documents, using pdftohtml and
-OCRopus.
+cuneiform.
 
-version 0.2 (2010-04-04)
+version 0.3 (2010-06-05)
 
 ---------------------------------------------------------------------
 INSTALLATION
 ---------------------------------------------------------------------
 
-rpdf requires a modified version of OCRopus, which is included. To
-install it, you need a few packages -- jam, libtiff-dev libjpeg-dev,
-libpng-dev. E.g. on Debian-based systems:
+rpdf requires 
 
-sudo apt-get install jam libtiff-dev libjpeg-dev libpng12-dev
-cd ocropus/tesseract-2.03/
-./configure
-make
-cd ..
-./configure
-jam
-cd ..
+- pdftohtml (the Poppler version)
+- cuneiform
+- convert (ImageMagick)
+- pdftk
+- the Perl modules XML::Writer, XML::XPath, HTML::TreeBuilder
 
-Check the instructions in the relevant sub-directory if you run into
-problems.
+No further installation required. To test if it works, run
 
-rpdf also needs the poppler version of pdftohtml and ghostscript:
-
-sudo apt-get install ghostscript pdftohtml
-whereis gs
-whereis pdftohtml
-
-If these applications are not in /usr/bin, adjust the path at the top
-of the rpdf file.
-
-
-
-
-
-
-
-
-
+./rpdf test/simple.pdf
+./rpdf test/ocr.pdf
 
 
 ---------------------------------------------------------------------
@@ -53,7 +32,4 @@ rpdf [-d int] [-p int] file.pdf
  -p int : max. number of pages to parse
 
 If -p is not specified, what happens depends on whether rpdf can use
-pdftohtml or has to fall back on OCR. With pdftohtml, it will parse
-all; with OCRopus it will parse 1-3 pages depending on the length of
-the pdf document. (OCRopus is slow: expect 10-20 seconds per page.)
-
+pdftohtml or has to fall back on OCR.

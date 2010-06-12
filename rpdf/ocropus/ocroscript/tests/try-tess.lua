@@ -1,7 +1,0 @@
-image = bytearray:new()
-read_image_gray(image,"images/simple.png")
-make_page_black(image)
-tesseract.init("eng")
-result = tesseract.recognize_rectangle(image,0,0,image:dim(0),image:dim(1))
-print(result)
-tesseract.finish()

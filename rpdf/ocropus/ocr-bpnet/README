@@ -1,5 +1,0 @@
-Implementation of a neural network classifier.
-
-For testing just type:
-
-$ ./bpnet-line ../data/models/neural-net-file.nn ../data/lines/000001.png

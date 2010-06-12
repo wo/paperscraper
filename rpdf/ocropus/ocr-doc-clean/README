@@ -1,2 +1,0 @@
-This module removes border noise from an input binary using 
-projection profile analysis and connected component filtering.

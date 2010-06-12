@@ -1,4 +1,0 @@
-#! /bin/sh
-# This script is here just to shut up the automated tester.
-DIR=`dirname $0`/../ocroscript
-OCROSCRIPTS=$DIR/scripts $DIR/ocroscript rec-tess $@

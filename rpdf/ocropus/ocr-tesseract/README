@@ -1,4 +1,0 @@
-`ocr-tesseract' contains a Tesseract wrapper that supports linewise recognition
-and retraining on characters through an ISimpleRetrainableOCR interface.
-
-Please install Tesseract headers and libraries to compile this code.
