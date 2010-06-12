@@ -16,13 +16,13 @@ pdftk
 cuneiform 0.9
 convert (ImageMagick)
 ps2pdf
-antiword
+unoconv
 wkhtmltopdf
 
 On Ubuntu 10.04, the following installs everything except cuneiform:
 
 sudo apt-get install poppler-utils pdftk imagemagick ghostscript
-antiword wkhtmltopdf
+unoconv wkhtmltopdf
 
 The cuneiform version in the standard repositories is too old. For
 Debian-based systems, you can get cuneiform 0.9 from

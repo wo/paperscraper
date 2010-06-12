@@ -15,6 +15,5 @@ NUM_URLS   => 1,
 
 # SOFTWARE
 PS2PDF      => '/usr/bin/ps2pdf',
-ANTIWORD    => '/usr/bin/antiword',
+UNICONV     => '/usr/bin/uniconv',
 WKHTMLTOPDF => '/usr/bin/wkhtmltopdf',
-

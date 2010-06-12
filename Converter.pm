@@ -46,16 +46,13 @@ sub convert2pdf {
 	  return 1;
       };
       /doc/ && do {
-	  push @converters_used, 'antiword';
-	  my $command = $cfg{'ANTIWORD'}
-	      .' -aa4'      # output as PDF in a4 format
-	      .' -i1'       # ignore images
-	      .' -m 8859-1' # character encoding: antiword doesn't support utf8
-	      ." $source"   # source file
-	      .' 2>&1';     # stderr to stdout
+	  push @converters_used, 'uniconv';
+	  my $command = $cfg{'UNICONV'}
+	      .' -f pdf'
+              .' --stdout'
+	      ." $source";
 	  my $content = sysexec($command, 10, $verbosity) || '';
-	  $content = Encode::decode('iso-8859-1', $content) || $content;
-	  die "antiword failed: $content" unless ($content && $content =~ /%PDF/);
+	  die "uniconv failed: $content" unless ($content && $content =~ /%PDF/);
 	  return save($target, $content);
       };
       /rtf/ && do {
@@ -94,7 +91,6 @@ sub convert2text {
     }
   SWITCH: for ($filetype) {
       /html/ && do {
-	  # strip tags:
 	  $text = readfile($filename);
           $text = strip_tags($text);
 	  last;
@@ -107,10 +103,18 @@ sub convert2text {
           $text = strip_tags($xml);
 	  last;
       };
-      /doc|rtf|ps/ && do {
-	  # xxx hack: works, but inefficient:
+      /ps/ && do {
 	  convert2pdf($filename, "$filename.pdf") or return undef;
 	  $text = convert2text("$filename.pdf");
+	  last;
+      };
+      /doc|rtf/ && do {
+	  my $command = $cfg{'UNICONV'}
+	      .' -f pdf'
+              .' --stdout'
+	      ." $filename";
+	  my $text = sysexec($command, 10, $verbosity) || '';
+	  die "uniconv failed: $text" unless $text;
 	  last;
       };
       /txt/ && do {

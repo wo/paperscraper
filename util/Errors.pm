@@ -62,7 +62,7 @@ sub errorcode {
    61 => 'pdftohtml failed',
    62 => 'no text found in converted document',
    63 => 'rtf2pdf failed',
-   64 => 'antiword failed',
+   64 => 'uniconv failed',
    65 => 'htmldoc failed',
    66 => 'wkhtmltopdf failed',
    67 => 'ps2pdf failed',
