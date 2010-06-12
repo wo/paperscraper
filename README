@@ -42,6 +42,9 @@ String::Approx
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
+# Support OCR processing of PDFs:
+OCR        => 1,
+
 
 mysql -u dbuser -p dbpass dbname < setup.sql 
 
@@ -58,8 +61,8 @@ INSERT INTO pages (url, author, registered) VALUES
   ('http://consc.net/papers.html', 
   (SELECT id FROM authors LIMIT 1), NOW());
 
-perl process_pages.pl -v2
-perl process_links.pl -v2
+perl process_pages -v2
+perl process_links -v2
 
 
 ---------------------------------------------------------------------
