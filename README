@@ -2,36 +2,56 @@
 opp-tools is a collection of tools to track academic papers uploaded
 to (or linked from) certain web pages.
 
-version 0.4 (2010-04-10)
+version 0.5 (2010-06-12)
 
 ---------------------------------------------------------------------
 INSTALLATION AND SETUP
 ---------------------------------------------------------------------
 
-In order to track papers in PDF and HTML format, you have to install
-rpdf. See the README file in the rpdf subdirectory.
+To process documents in various formats, a few additional software
+packages are required:
 
-Next, set up a MySQL database to store the tracked pages and
-papers. To create the tables, call
+pdftohtml (Poppler version)
+pdftk
+cuneiform 0.9
+convert (ImageMagick)
+ps2pdf
+antiword
+wkhtmltopdf
 
-mysql -u dbuser -p dbpass dbname < setup.sql 
+On Ubuntu 10.04, the following installs everything except cuneiform:
 
-Then open config.pl and adjust the values for the database connection
-and the install path.
+sudo apt-get install poppler-utils pdftk imagemagick ghostscript
+antiword wkhtmltopdf
 
-Finally, make sure you have the following CPAN modules:
+The cuneiform version in the standard repositories is too old. For
+Debian-based systems, you can get cuneiform 0.9 from
+http://notesalexp.org/. Otherwise see
+https://launchpad.net/cuneiform-linux/.
+
+Finally, make sure you have the following CPAN Perl modules:
+
 HTML::LinkExtractor
 HTML::Encoding
 HTML::Strip
+HTML::TreeBuilder
+XML::Writer
+XML::XPath
 Text::Capitalize
 String::Approx
 
+Now set up a MySQL database to store the tracked pages and papers. To
+create the tables, call
+
+mysql -u dbuser -p dbpass dbname < setup.sql 
+
+Then copy config-example.pl to config.pl and adjust the values for the
+database connection and the installation path.
+
 Now you can call process_pages to look for (new) links on the tracked
 pages, and process_links to extract information from (new) papers
-found behind these links.
-
-Of course, there aren't any pages in the database yet. To test the
-setup, you might try
+found behind these links. At this point there aren't any pages in the
+database yet. To test the setup, you might try
 
 INSERT INTO authors (name) VALUES ('David Chalmers');
 INSERT INTO pages (url, author, registered) VALUES 

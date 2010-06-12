@@ -37,6 +37,7 @@ sub init() {
     @ARGV >= 2 || usage();
     $source = $ARGV[0];
     $target = $ARGV[1];
+    mkdir TEMPDIR, 0755 unless -d TEMPDIR;
 }
 
 init();

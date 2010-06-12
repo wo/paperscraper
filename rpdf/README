@@ -11,7 +11,7 @@ INSTALLATION
 rpdf requires 
 
 - pdftohtml (the Poppler version)
-- cuneiform
+- cuneiform 0.9
 - convert (ImageMagick)
 - pdftk
 - the Perl modules XML::Writer, XML::XPath, HTML::TreeBuilder
