@@ -46,13 +46,13 @@ sub convert2pdf {
 	  return 1;
       };
       /doc/ && do {
-	  push @converters_used, 'uniconv';
-	  my $command = $cfg{'UNICONV'}
+	  push @converters_used, 'unoconv';
+	  my $command = $cfg{'UNOCONV'}
 	      .' -f pdf'
               .' --stdout'
 	      ." $source";
 	  my $content = sysexec($command, 10, $verbosity) || '';
-	  die "uniconv failed: $content" unless ($content && $content =~ /%PDF/);
+	  die "unoconv failed: $content" unless ($content && $content =~ /%PDF/);
 	  return save($target, $content);
       };
       /rtf/ && do {
@@ -96,11 +96,9 @@ sub convert2text {
 	  last;
       };
       /pdf/ && do {
-	  my $command = $cfg{'RPDF'}
-	      ." $filename"
-	      .' 2>&1';
-	  my $xml = sysexec($command, 60, $verbosity) || '';
-          $text = strip_tags($xml);
+	  convert2xml($filename, "$filename.xml") or return undef;
+          $text = readfile("$filename.xml");
+          $text = strip_tags($text);
 	  last;
       };
       /ps/ && do {
@@ -109,12 +107,13 @@ sub convert2text {
 	  last;
       };
       /doc|rtf/ && do {
-	  my $command = $cfg{'UNICONV'}
-	      .' -f pdf'
+	  my $command = $cfg{'UNOCONV'}
+	      .' -f html'
               .' --stdout'
 	      ." $filename";
-	  my $text = sysexec($command, 10, $verbosity) || '';
-	  die "uniconv failed: $text" unless $text;
+	  my $html = sysexec($command, 10, $verbosity) || '';
+	  die "unoconv failed" unless $html;
+          $text = strip_tags($html);
 	  last;
       };
       /txt/ && do {

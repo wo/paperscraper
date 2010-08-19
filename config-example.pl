@@ -15,5 +15,5 @@ NUM_URLS   => 1,
 
 # SOFTWARE
 PS2PDF      => '/usr/bin/ps2pdf',
-UNICONV     => '/usr/bin/uniconv',
+UNOCONV     => '/usr/bin/unoconv',
 WKHTMLTOPDF => '/usr/bin/wkhtmltopdf',
