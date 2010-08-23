@@ -60,7 +60,7 @@ if test ! -e $INFILE; then
 fi
 
 mkdir -p "$DIR" || { echo "Cannot create $DIR"; exit 1; }
-rm -f "$DIR"/*
+rm -rf "$DIR"/*
 
 # $OUTFILE with full path:
 OUTFILE="$( readlink -f "$( dirname "$OUTFILE" )" )/$( basename "$OUTFILE" )"

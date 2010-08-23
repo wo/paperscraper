@@ -43,7 +43,7 @@ sub sysexec {
 	    open(PIPE, "$command |") or die $!;
 	    while (<PIPE>) {
                 $res .= $_;
-                print $_ if $verbosity > 1;
+                print $_ if $verbosity > 3;
             };
 	    close(PIPE);
 	    print WRITER $res;

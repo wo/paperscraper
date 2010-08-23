@@ -23,6 +23,7 @@ use lib $Bin;
 use util::Sysexec;
 binmode STDOUT, ":utf8";
 
+my $path = $Bin;
 use constant PDFTOHTML    => '/usr/bin/pdftohtml';
 use constant TEMPDIR 	  => $Bin.'/temp';
 use constant TIMEOUT      => 30;
@@ -69,10 +70,10 @@ sub pdf2xml {
     print "pdftohtml failed on parsing. Using OCR.\n" if $opt{'d'};
     $xml = '';
     my $tmp = TEMPDIR;
-    $command = "./pdfocr $source $tmp/out.hocr";
+    $command = "$path/pdfocr $source $tmp/out.hocr";
     my $res = sysexec($command, TIMEOUT, $opt{'d'});
     print $res if $opt{'d'} > 1;
-    $command = "./hocr2xml $tmp/out.hocr $tmp/out.xml";
+    $command = "$path/hocr2xml $tmp/out.hocr $tmp/out.xml";
     $res = sysexec($command, 5, $opt{'d'});
     print $res if $opt{'d'} > 1;
     open INPUT, "$tmp/out.xml" or die "OCR failed.";
