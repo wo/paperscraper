@@ -3,7 +3,9 @@ use strict;
 use warnings;
 use utf8;
 use Digest::MD5;
-use Data::Dumper;
+use AI::Categorizer::Learner::NaiveBayes;
+use AI::Categorizer::Document;
+use Algorithm::NaiveBayes::Model::Frequency;
 use File::Basename qw/dirname/;
 use Exporter;
 use util::Io;
@@ -12,7 +14,16 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(&classify);
 
 #
-# function to guess whether a link is a philosophy paper or not ('spam').
+# A function to guess whether a link is a philosophy paper or not
+# ('spam').
+#
+# I use a combination of Bayesian text classification and various
+# heurists. The Bayesian part can be adjusted in the spamcorpus
+# directory.
+#
+# TODO: run the Bayesian classifier on all relevant features (in the
+# XML representation), rather than just the plain text content. This
+# would hopefully be able to replace many of the heurists.
 #
 
 my $verbosity = 0;
@@ -42,6 +53,28 @@ sub classify {
     print "classifying document\n" if $verbosity;
     my $is_spam = 0.5;
 
+    if (defined($link->{text})) {
+        print "categorizing text\n" if $verbosity;
+        if (0) {
+        eval {
+            my $nb = AI::Categorizer::Learner::NaiveBayes->restore_state($cfg{'SPAMCORPUS'}.'filterstate');
+            $nb->verbose($verbosity ? 3 : 0);
+            my $ai_doc = AI::Categorizer::Document->new(content => $link->{text});
+            my $ai_res = $nb->categorize($ai_doc);
+            my $ai_ham = $ai_res->{scores}->{ham};
+            my $ai_spam = $ai_res->{scores}->{spam};
+            $is_spam = _score($is_spam, $ai_spam, $ai_ham, "Bayesian score +$ai_ham / -$ai_spam");
+            # overwrite naive confidence:
+            $is_spam = 0.95 if ($is_spam > 0.95);
+            $is_spam = 0.05 if ($is_spam < 0.05);
+        };
+        if ($@) {
+            print "categorization failed! $@\n" if $verbosity;
+        }
+        }
+
+    }
+
     if ($link->{url} && $link->{url} =~ m/$bad_filetype_re/) {
 	$is_spam = _score($is_spam, 0.2, 0.01, 'bad filetype: '.$link->{url});
     }
@@ -53,26 +86,8 @@ sub classify {
     }
     
     return $is_spam unless defined($link->{text});
-
     my $text = $link->{text};
-    my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex($link->{url}).'.txt';
-    save($file, $text, 1) or die "cannot save local file $file";
-    # use spambayes hack to guess spamminess:
-    chdir($cfg{'PATH'}.'rfilter');
-    my $cmd = "python guess.py $file";
-    my $guess = `$cmd`;
-    chdir($cfg{'PATH'});
-    if ($guess =~ /spamprob:\s*([\de\-\.]+)/) {
-        print "guess.py says $guess" if $verbosity;
-        $is_spam = $1 + 0;
-        # overwrite irrational confidence:
-        $is_spam = 0.95 if ($is_spam > 0.95);
-        $is_spam = 0.05 if ($is_spam < 0.05);
-    }
-    else {
-        print "Error: guess.py returned: '$guess'.\n";
-        return -1;
-    }
+
     if (!$link->{filetype} || $link->{filetype} eq 'html') {
 	$is_spam = _score($is_spam, 0.7, 0.3, 'html');
 	$is_spam = _score($is_spam, 0.8, length($text)/$link->{filesize}, 'tags');
@@ -123,7 +138,6 @@ sub classify {
     if (substr($text,0,500) =~ /interview/i) {
 	$is_spam = _score($is_spam, 0.4, 0.1, "interview?");
     }
-
 
 #    print "ratio: ".(($text =~ tr/\n\n|\r\n\r\n//)/(length($text)));
 #    if (($text =~ tr/\n\n|\r\n\r\n//)/(length($text)) > 200) {

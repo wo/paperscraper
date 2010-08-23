@@ -39,6 +39,8 @@ XML::Writer
 XML::XPath
 Text::Capitalize
 String::Approx
+Algorithm::NaiveBayes
+AI::Categorizer
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
@@ -87,11 +89,11 @@ steps without boxes are performed directly in process_link.pl.
                                      
                                |
                                |
-         if plain text         V
-             available      
-     +---------+  <-------   SPAM      spam?
-     | RFILTER |  ------->   CHECK   -------->  STORE
-     +---------+          
+                               V
+                            
+                             SPAM      spam?
+                             CHECK   -------->  STORE
+               
                                |
                 _______________|________________
                |         |           |          |
@@ -121,9 +123,9 @@ steps without boxes are performed directly in process_link.pl.
                                |
                                V
                           
-     +---------+  <-------   SPAM      spam?
-     | RFILTER |  ------->   CHECK   -------->  STORE
-     +---------+          
+                             SPAM      spam?
+                             CHECK   -------->  STORE
+                          
                                |
                                V
  
