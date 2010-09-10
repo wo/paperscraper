@@ -45,7 +45,7 @@ AI::Categorizer
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
 
-mysql -u dbuser -p dbpass dbname < setup.sql 
+mysql -u dbuser -p dbname < setup.sql 
 
 Then copy config-example.pl to config.pl and adjust the values for the
 database connection and the installation path.
@@ -53,10 +53,8 @@ database connection and the installation path.
 At this point there aren't any pages in the database yet. To test the
 setup, you might try
 
-INSERT INTO authors (name) VALUES ('David Chalmers');
-INSERT INTO pages (url, author, registered) VALUES 
-  ('http://consc.net/papers.html', 
-  (SELECT id FROM authors LIMIT 1), NOW());
+INSERT INTO sources (url) VALUES 
+  ('http://github.com/wo/opp-tools/wiki/Test-source-page');
 
 Then run 
 

@@ -22,8 +22,7 @@ sub fetch_url {
    my $ua = _get_ua();
    print "fetching document $url.\n" if $verbosity;
    my %headers = ( 'If-Modified-Since' => HTTP::Date::time2str($if_modified_since) );
-   my $response;
-   $response = _ua_get($ua, $url, \%headers);
+   my $response = _ua_get($ua, $url, \%headers);
    $response->{url} = $url;
    # Follow redirects, but don't loop.
    my @locations = ($url);

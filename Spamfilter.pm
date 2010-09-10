@@ -49,21 +49,21 @@ my $interview_words_re  = qr/do you/i;
 my $bad_words_re        = qr/$course_words_re|$interview_words_re/;
 
 sub classify {
-    my $link = shift or die "classify requires HTTP_RESULT parameter";
+    my $loc = shift or die "classify requires HTTP_RESULT parameter";
     print "classifying document\n" if $verbosity;
     my $is_spam = 0.5;
 
-    if (defined($link->{text})) {
-        print "categorizing text\n" if $verbosity;
-        if (0) {
+    if (defined($loc->{text})) {
+        print "running Bayesian classifier\n" if $verbosity;
         eval {
-            my $nb = AI::Categorizer::Learner::NaiveBayes->restore_state($cfg{'SPAMCORPUS'}.'filterstate');
+            my $nb = AI::Categorizer::Learner::NaiveBayes->restore_state(
+                $cfg{'SPAMCORPUS'}.'filterstate');
             $nb->verbose($verbosity ? 3 : 0);
-            my $ai_doc = AI::Categorizer::Document->new(content => $link->{text});
+            my $ai_doc = AI::Categorizer::Document->new(content => $loc->{text});
             my $ai_res = $nb->categorize($ai_doc);
             my $ai_ham = $ai_res->{scores}->{ham};
             my $ai_spam = $ai_res->{scores}->{spam};
-            $is_spam = _score($is_spam, $ai_spam, $ai_ham, "Bayesian score +$ai_ham / -$ai_spam");
+            $is_spam = _score($is_spam, $ai_spam, $ai_ham, "Bayes score +$ai_ham / -$ai_spam");
             # overwrite naive confidence:
             $is_spam = 0.95 if ($is_spam > 0.95);
             $is_spam = 0.05 if ($is_spam < 0.05);
@@ -71,42 +71,41 @@ sub classify {
         if ($@) {
             print "categorization failed! $@\n" if $verbosity;
         }
-        }
 
     }
 
-    if ($link->{url} && $link->{url} =~ m/$bad_filetype_re/) {
-	$is_spam = _score($is_spam, 0.2, 0.01, 'bad filetype: '.$link->{url});
+    if ($loc->{url} && $loc->{url} =~ m/$bad_filetype_re/) {
+	$is_spam = _score($is_spam, 0.2, 0.01, 'bad filetype: '.$loc->{url});
     }
-    if ($link->{url} && $link->{url} =~ m/$bad_path_re/ && $link->{url} !~ /plato.stanford/) {
-	$is_spam = _score($is_spam, 0.2, 0.03, 'bad url: '.$link->{url});
+    if ($loc->{url} && $loc->{url} =~ m/$bad_path_re/ && $loc->{url} !~ /plato.stanford/) {
+	$is_spam = _score($is_spam, 0.2, 0.03, 'bad url: '.$loc->{url});
     }
-    if (defined($link->{anchortext}) && $link->{anchortext} =~ m/$bad_anchortext_re/) {
-	$is_spam = _score($is_spam, 0.3, 0.1, 'bad anchor text: '.$link->{anchortext});
+    if (defined($loc->{anchortext}) && $loc->{anchortext} =~ m/$bad_anchortext_re/) {
+	$is_spam = _score($is_spam, 0.3, 0.1, 'bad anchor text: '.$loc->{anchortext});
     }
     
-    return $is_spam unless defined($link->{text});
-    my $text = $link->{text};
+    return $is_spam unless defined($loc->{text});
+    my $text = $loc->{text};
 
-    if (!$link->{filetype} || $link->{filetype} eq 'html') {
+    if (!$loc->{filetype} || $loc->{filetype} eq 'html') {
 	$is_spam = _score($is_spam, 0.7, 0.3, 'html');
-	$is_spam = _score($is_spam, 0.8, length($text)/$link->{filesize}, 'tags');
+	$is_spam = _score($is_spam, 0.8, length($text)/$loc->{filesize}, 'tags');
 	# extra punishment for short HTML:
 	if (length($text) < 10000) {
 	    $is_spam = _score($is_spam, 0.8, length($text) < 4000 ? 0.25 : 0.5, 'short');
 	}
-	if (!$link->{content}) {
+	if (!$loc->{content}) {
             $is_spam = _score($is_spam, 0.5, 0.3, 'no content');
 	}
  	else {
-	    if ($link->{content} =~ /<script/i) {
+	    if ($loc->{content} =~ /<script/i) {
 		$is_spam = _score($is_spam, 0.5, 0.2, 'javascript tags');
 	    }
-	    if ($link->{content} =~ /<form/i) {
+	    if ($loc->{content} =~ /<form/i) {
 		$is_spam = _score($is_spam, 0.5, 0.2, 'form tags');
 	    }
-	    my $longest_text = 0; # longest pure text passage withour links
-	    foreach my $txt (split(/<a /i, $link->{content})) {
+	    my $longest_text = 0; # longest pure text passage without links
+	    foreach my $txt (split(/<a /i, $loc->{content})) {
 		$longest_text = length($txt) if (length($txt) > $longest_text);
 	    }
 	    if ($longest_text < 2000) {

@@ -1,98 +1,54 @@
 
---
--- Table structure for table `authors`
---
+SET NAMES 'utf8';
 
-DROP TABLE IF EXISTS `authors`;
-CREATE TABLE `authors` (
-  `id` int(11) NOT NULL auto_increment,
-  `name` varchar(128) default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE documents (
+  document_id INT(11) UNSIGNED NOT NULL auto_increment,
+  found_date DATETIME DEFAULT NULL,
+  last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  authors VARCHAR(255) DEFAULT NULL,
+  title VARCHAR(255) DEFAULT NULL,
+  abstract TEXT,
+  length SMALLINT(6) UNSIGNED DEFAULT NULL,
+  language VARCHAR(8) DEFAULT 'en',
+  meta_confidence FLOAT(4,3) UNSIGNED DEFAULT NULL,
+  PRIMARY KEY (document_id),
+  KEY (found_date)
+) ENGINE=InnoDB CHARACTER SET utf8;
 
---
--- Table structure for table `authors2tags`
---
+CREATE TABLE locations (
+  location_id INT(11) UNSIGNED NOT NULL auto_increment,
+  url VARCHAR(255) DEFAULT NULL,
+  status SMALLINT(6) DEFAULT NULL,
+  document_id INT(11) UNSIGNED DEFAULT NULL,
+  filetype VARCHAR(8) DEFAULT NULL,
+  filesize INT(10) UNSIGNED DEFAULT NULL,
+  spamminess FLOAT(4,3) UNSIGNED DEFAULT NULL,
+  last_checked DATETIME DEFAULT NULL,
+  PRIMARY KEY (location_id),
+  UNIQUE KEY url (url),
+  KEY (document_id),
+  KEY (last_checked)
+) ENGINE=InnoDB CHARACTER SET utf8;
 
-DROP TABLE IF EXISTS `authors2tags`;
-CREATE TABLE `authors2tags` (
-  `author_id` int(11) NOT NULL,
-  `tag_id` int(11) NOT NULL,
-  PRIMARY KEY  (`author_id`,`tag_id`),
-  KEY `tag_id` (`tag_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE sources (
+  source_id INT(11) UNSIGNED NOT NULL auto_increment,
+  url VARCHAR(255) DEFAULT NULL,
+  status SMALLINT(6) DEFAULT NULL,
+  parent_id INT(11) UNSIGNED DEFAULT NULL,
+  found_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_checked DATETIME DEFAULT NULL,
+  default_author VARCHAR(128) DEFAULT NULL,
+  PRIMARY KEY (source_id),
+  UNIQUE KEY (url),
+  KEY (last_checked)
+) ENGINE=InnoDB CHARACTER SET utf8;
 
---
--- Table structure for table `docs`
---
-
-DROP TABLE IF EXISTS `docs`;
-CREATE TABLE `docs` (
-  `id` int(11) NOT NULL auto_increment,
-  `duplicates` int(11) default NULL,
-  `page` int(11) default NULL,
-  `url` varchar(255) default NULL,
-  `found` datetime default NULL,
-  `last_checked` datetime default NULL,
-  `updated` datetime default NULL,
-  `status` smallint(6) default NULL,
-  `anchortext` varchar(255) default NULL,
-  `filetype` varchar(8) default NULL,
-  `filesize` int(10) unsigned default NULL,
-  `pages` smallint(5) unsigned default NULL,
-  `author` varchar(255) default NULL,
-  `title` varchar(255) default NULL,
-  `abstract` text,
-  `confirmed_by` varchar(16) default NULL,
-  `confidence` float default NULL,
-  `is_spam` float default NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `url` (`url`),
-  KEY `found` (`found`),
-  KEY `last_checked` (`last_checked`),
-  KEY `status` (`status`),
-  FULLTEXT KEY `author` (`author`,`title`,`abstract`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `docs2tags`
---
-
-DROP TABLE IF EXISTS `docs2tags`;
-CREATE TABLE `docs2tags` (
-  `doc_id` int(11) NOT NULL,
-  `tag_id` int(11) NOT NULL,
-  PRIMARY KEY  (`doc_id`,`tag_id`),
-  KEY `doc_id` (`doc_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `pages`
---
-
-DROP TABLE IF EXISTS `pages`;
-CREATE TABLE `pages` (
-  `id` int(11) NOT NULL auto_increment,
-  `parent` int(11) default NULL,
-  `author` int(11) default NULL,
-  `url` varchar(255) default NULL,
-  `registered` datetime default NULL,
-  `last_checked` datetime default NULL,
-  `status` int(11) default NULL,
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `url` (`url`),
-  KEY `author` (`author`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `tags`
---
-
-DROP TABLE IF EXISTS `tags`;
-CREATE TABLE `tags` (
-  `tag_id` int(11) NOT NULL auto_increment,
-  `tag_name` varchar(128) NOT NULL,
-  PRIMARY KEY  (`tag_id`),
-  UNIQUE KEY `tag_name` (`tag_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
+CREATE TABLE links (
+  source_id INT(11) UNSIGNED NOT NULL,
+  location_id INT(11) UNSIGNED NOT NULL,
+  anchortext VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (source_id, location_id),
+  KEY (location_id),
+  FOREIGN KEY (source_id) REFERENCES sources (source_id),
+  FOREIGN KEY (location_id) REFERENCES locations (location_id)
+) ENGINE=InnoDB CHARACTER SET utf8;

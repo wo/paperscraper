@@ -1,11 +1,11 @@
 #! /usr/bin/perl -w
 use strict;
-#use warnings;
 use DBI;
 use URI::URL;
 use HTML::LinkExtractor;
 use Data::Dumper;
 use Getopt::Std;
+use Encode;
 binmode STDOUT, ":utf8";
 use lib '../';
 use util::Io;
@@ -18,9 +18,9 @@ getopts("v:p:nh", \%opts);
 if ($opts{h}) {
     print <<EOF;
 
-Fetches pages from the database, stores new links on them in the docs
-database. Run as a cronjob without arguments, or with arguments for
-testing and debugging:
+Fetches source pages from the database, stores new links on them in
+the database. Run as a cronjob without arguments, or with arguments
+for testing and debugging:
 
 Usage: $0 [-h] [-p url] [-v verbosity]
 
@@ -48,120 +48,138 @@ my $ignore_url_re = qr{
 # ignore these session ids in urls:
 my $session_id_re = qr{
     \bs\w*id=\w+    |
-    halsid=\w+       |
+    halsid=\w+      |
 }xi;
 
 # get urls from db:
 my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
     $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
     or die "Couldn't connect to database: " . DBI->errstr;
-my $query = "SELECT id, url, UNIX_TIMESTAMP(last_checked) AS last_checked "
-    ."FROM pages ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
+my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) AS last_checked "
+    ."FROM sources ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
 my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
-$pages = [({ id => 0, orig_id => $opts{o}, url => $opts{p}, 
-             last_checked =>1213937107 })] if $opts{p};
+$pages = [({ source_id => 0, url => $opts{p}, last_checked => 0 })] if $opts{p};
 
 # process pages:
 my $pg_update = $dbh->prepare(
-    "UPDATE pages SET last_checked = NOW(), status = ? WHERE id = ?");
-my $db_insert = $dbh->prepare(
-    "INSERT IGNORE INTO docs (url, page, anchortext, status, found) "
-    ."VALUES (?,?,?,0,NOW())");
-my $db_insert_as_old = $dbh->prepare(
-    "INSERT IGNORE INTO docs (url, page, anchortext, status, found) "
-    ."VALUES (?,?,?,0,'2008-01-01')");
+    "UPDATE sources SET last_checked = NOW(), status = ? WHERE source_id = ?");
+my $db_insert_location = $dbh->prepare(
+    "INSERT IGNORE INTO locations (url, status) VALUES (?,0)");
+my $db_insert_link = $dbh->prepare(
+    "INSERT IGNORE INTO links (source_id, location_id, anchortext) "
+    ."VALUES (?,?,?)");
 foreach my $page (@{$pages}) {
    print "checking page $page->{url}\n" if $verbosity;
+   my $page_id = $page->{source_id};
    my $mtime = (defined $page->{last_checked}) ? $page->{last_checked} : 0;
    my $res = fetch_url($page->{url}, $mtime);
    if ($res && $res->code == 304) {
        print "not modified.\n" if $verbosity;
-       $pg_update->execute(1, $page->{id});
+       $pg_update->execute(1, $page_id);
        next;
    }
    if (!$res || !$res->is_success || !$res->{content}) {
       print "error:\n   ", ($res ? $res->status_line : ''), "\n" if $verbosity;
-      $pg_update->execute($res ? $res->code : 900, $page->{id});
+      $pg_update->execute($res ? $res->code : 900, $page_id);
       next;
    }
    # also check for 404 errors without proper HTTP status:
    if ($res->{content} =~ /Error 404/) {
       print "page contains 404 error message\n" if $verbosity;
-      $pg_update->execute('404', $page->{id});
+      $pg_update->execute('404', $page_id);
       next;
    }
+
    # fetch currently stored links from db:
-   my $old_links = $dbh->selectcol_arrayref(
-       "SELECT url FROM docs WHERE page = $page->{id}");
-   my @old_links = @{$old_links};
-   # parse for links and add them to DB if new:
+   my $old_urls = $dbh->selectcol_arrayref(
+       "SELECT url FROM links "
+       ."INNER JOIN locations ON links.location_id = locations.location_id "
+       ."WHERE source_id = $page_id");
+   my @old_urls = @{$old_urls};
+
+   # extract links from page and add them to DB if new:
    my $link_extractor = new HTML::LinkExtractor(undef, $res->base, 1);
    eval {
      $link_extractor->parse(\$res->{content});
    };
-
-   my @hrefs = map($$_{href} ? "$$_{href}" : "", @{$link_extractor->links});
+   my @urls = map($$_{href} ? "$$_{href}" : "", @{$link_extractor->links});
    LINKS: 
    foreach my $new_link (@{$link_extractor->links}) {
       next unless $$new_link{tag} eq 'a'; 
-      my $href = $$new_link{href};
+      my $url = $$new_link{href};
       my $text = $$new_link{_TEXT};
-      print "checking link: $href ($text)\n" if ($verbosity > 1);
-      # $new_link = url($new_link, $res->base)->abs->as_string;
-      next if ($href eq $page->{url});
-      if ($href =~ /$ignore_url_re/) {
+      binmode STDOUT, ":utf8"; # why do I have to repeat this here?
+      print "checking link: $url ($text)\n" if ($verbosity > 1);
+      next if ($url eq $page->{url});
+      if ($url =~ /$ignore_url_re/) {
 	  print "URL ignored.\n"  if ($verbosity > 1);
 	  next;
       }
-      if (grep /\Q$href\E/, @old_links) {
+      if (grep /\Q$url\E/, @old_urls) {
 	  print "URL already in DB.\n" if ($verbosity > 1);
 	  next;
       }
       # check for session variants:
-      if ($href =~ /$session_id_re/) {
-	  my $href2 = $href;
-	  $href2 =~ s/$session_id_re//;
-	  foreach my $old_link (@old_links) {
-	      next unless ($old_link =~ /$session_id_re/);
-	      $old_link =~ s/$session_id_re//;
-	      if ($href2 eq $old_link) {
-		  print "session variant of $old_link\n" if ($verbosity > 1);
+      if ($url =~ /$session_id_re/) {
+	  my $url2 = $url;
+	  $url2 =~ s/$session_id_re//;
+	  foreach my $old_url (@old_urls) {
+	      next unless ($old_url =~ /$session_id_re/);
+	      $old_url =~ s/$session_id_re//;
+	      if ($url2 eq $old_url) {
+		  print "session variant of $old_url\n" if ($verbosity > 1);
 		  next LINKS;
 	      }
 	  }
       }
-      # check for filetype variants:
-      my ($basename, $filetype) = ($href =~ /^(.*?)\.?([^\.]+)$/);
-      if ($basename && $filetype) {
-	  my @dupes = grep(/\Q$basename\E/, @hrefs);
-	  foreach my $dupe (@dupes) {
-	      my ($dupetype) = ($dupe =~ /^.*?\.?([^\.]+)$/);
-	      if (filetype_rank($dupetype) < filetype_rank($filetype)) {
-		  print "filetype variant of $dupe.\n" if ($verbosity > 1);
-		  next LINKS;
-	      }
-	  }
+      $url =~ s/\s/%20/g; # fix links with whitespace
+      print "new link: $url ($text)\n" if $verbosity;
+      my $res = $db_insert_location->execute($url)
+          or print DBI->errstr;
+      if ($res eq '0E0') {
+          # This happens if the page has several links to the same url.
+          next LINKS;
       }
-      $href =~ s/\s/%20/g; # fix links with whitespace
-      print "new link: $href ($text)\n" if $verbosity;
-      push @old_links, $href;
-      # if this whole page is new, don't list papers as recently found:
-      if ($mtime) {
-	  $db_insert->execute($href, $page->{id}, $text);
-      }
-      else {
-	  $db_insert->execute($href, $page->{id}, $text);
-      }
+      my $loc_id = $db_insert_location->{mysql_insertid};
+      $db_insert_link->execute($page_id, $loc_id, $text);
    }
-   $pg_update->execute(1, $page->{id});
+   # remove disappeared links:
+   foreach my $old_url (@old_urls) {
+       remove_link($old_url, $page_id) unless (grep /\Q$old_url\E/, @urls);
+   }
+   $pg_update->execute(1, $page_id);
 }
 
 $dbh->disconnect();
 
-
-sub filetype_rank {
-    my %ranking = ( 'pdf' => 1, 'ps' => 2, 'html' => 3, 'htm' => 4, 'doc' => 5, 'rtf' => 6);
-    $_ = shift;
-    return 10 unless defined $ranking{$_};
-    return $ranking{$_};
+sub remove_link {
+    my $url = shift;
+    my $page_id = shift;
+    print "removing link to $url from database.\n" if $verbosity > 1;
+    my ($loc_id, $doc_id) = $dbh->selectrow_array(
+        "SELECT location_id, document_id FROM locations WHERE url = ".$dbh->quote($url));
+    return 0 unless $loc_id;
+    $dbh->do(
+        "DELETE FROM links WHERE location_id = $loc_id AND source_id = $page_id");
+    my ($links_left) = $dbh->selectrow_array(
+        "SELECT source_id FROM links WHERE location_id = $loc_id");
+    if (!$links_left || $links_left eq '0') {
+        print "deleting orphaned location $loc_id.\n" if $verbosity > 1;
+        # Occasionally an orphaned location still leads to a valuable
+        # paper. So ideally we might not delete the location or the
+        # document here and instead do that in process_links, when the
+        # location eventually goes dead. But then we'd have to check
+        # in process_links for every spammy or dead location whether
+        # it is orphaned so that it can be removed.
+        $dbh->do(
+            "DELETE FROM locations WHERE location_id = $loc_id AND source_id = $page_id");
+        my ($locs_left) = $dbh->selectrow_array(
+            "SELECT location_id FROM locations WHERE document_id = $doc_id");
+        if (!$locs_left || $locs_left eq '0') {
+            print "deleting orphaned document $doc_id.\n" if $verbosity > 1;
+            $dbh->do(
+                "DELETE FROM documents WHERE document_id = $doc_id");
+        }
+    }
+    return 1;
 }
