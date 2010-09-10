@@ -37,6 +37,7 @@ HTML::Strip
 HTML::TreeBuilder
 XML::Writer
 XML::XPath
+CML::RSS
 Text::Capitalize
 String::Approx
 Algorithm::NaiveBayes
@@ -58,8 +59,8 @@ INSERT INTO sources (url) VALUES
 
 Then run 
 
-process_pages -v2
-process_links -v2
+process_pages -v1
+process_links -v1
 
 The first of these looks for (new) links on the tracked pages, the
 second extracts information from (new) papers found behind these

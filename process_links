@@ -153,7 +153,7 @@ sub process_locations {
 
     foreach my $loc (@locations) {
         my $loc_id = $loc->{location_id};
-	print "checking location $loc_id: $loc->{url}\n" if $verbosity;
+	print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
 
         if ($loc->{url} =~ /^https:/) {
 	    error("HTTPS is currently not supported");
@@ -208,7 +208,7 @@ sub process_locations {
 
 	# save local copy:
 	my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex($loc->{url}).'.'.$loc->{filetype};
-	if (!save($file, $loc->{content})) {
+	if (!save($file, $loc->{content}, $loc->{filetype} eq 'html' ? 1 : 0)) {
 	    error("cannot save local file");
 	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
 	    next;
@@ -216,7 +216,7 @@ sub process_locations {
 
 	# check if this is a subpage with further links to papers:
         if (is_subpage($loc)) {
-            error("looks like a subpage with more links");
+            error("possibly subpage with more links");
             $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
             next;
         }
@@ -395,11 +395,13 @@ sub process_locations {
         }
 
         # add document to database:
+        print "\n --- adding document to database.\n" if $verbosity > 1;
         next if $opts{n};
         $db_adddoc->execute($loc->{authors}, $loc->{title}, $loc->{abstract}, 
                             $loc->{length}, $loc->{confidence})
 	    or print DBI->errstr;
-        my $doc_id = $db_savedoc->{mysql_insertid};
+        my $doc_id = $db_adddoc->{mysql_insertid};
+        print "document added as id $doc_id\n";
         $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
                              $loc->{spamminess}, $doc_id, $loc_id)
             or print DBI->errstr;
@@ -422,7 +424,7 @@ sub is_subpage {
     # fetch potential parent pages:
     my $query = "SELECT sources.* FROM links "
         ."INNER JOIN sources ON links.source_id = sources.source_id "
-        ."WHERE links.location_id = $loc->{id}";
+        ."WHERE links.location_id = $loc->{location_id}";
     my @sources = @{$dbh->selectall_arrayref($query, { Slice => {} })};
     my @parents;
     foreach my $source (@sources) {

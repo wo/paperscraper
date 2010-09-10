@@ -122,7 +122,7 @@ sub save {
        binmode(FH, ":utf8");
    }
    else {
-       binmode(FH);
+       binmode(FH, ":raw");
    }
    print FH $content;
    close FH;

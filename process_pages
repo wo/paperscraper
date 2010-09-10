@@ -45,10 +45,11 @@ my $ignore_url_re = qr{
     \.(?:css|mp3|avi|jpg|gif)$
 }xi;
 
-# ignore these session ids in urls:
+# ignore these session or locale in urls:
 my $session_id_re = qr{
-    \bs\w*id=\w+    |
-    halsid=\w+      |
+    \bs\w*id=[\w_-]+    |
+    halsid=[\w_-]+      |
+    locale=[\w_-]+
 }xi;
 
 # get urls from db:
@@ -121,12 +122,13 @@ foreach my $page (@{$pages}) {
       }
       # check for session variants:
       if ($url =~ /$session_id_re/) {
-	  my $url2 = $url;
+          my $url2 = $url;
 	  $url2 =~ s/$session_id_re//;
 	  foreach my $old_url (@old_urls) {
 	      next unless ($old_url =~ /$session_id_re/);
-	      $old_url =~ s/$session_id_re//;
-	      if ($url2 eq $old_url) {
+              my $old_url_fragment = $old_url;
+	      $old_url_fragment =~ s/$session_id_re//;
+	      if ($url2 eq $old_url_fragment) {
 		  print "session variant of $old_url\n" if ($verbosity > 1);
 		  next LINKS;
 	      }
@@ -137,11 +139,12 @@ foreach my $page (@{$pages}) {
       my $res = $db_insert_location->execute($url)
           or print DBI->errstr;
       if ($res eq '0E0') {
-          # This happens if the page has several links to the same url.
+          # insert ignored due to duplicate url
           next LINKS;
       }
       my $loc_id = $db_insert_location->{mysql_insertid};
       $db_insert_link->execute($page_id, $loc_id, $text);
+      push @old_urls, $url;
    }
    # remove disappeared links:
    foreach my $old_url (@old_urls) {
