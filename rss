@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use DBI;
+use CGI;
+use XML::RSS;
+my %cfg = do 'config.pl';
+
+# only show entries with less than this spamminess score:
+$cfg{'SPAM_THRESHOLD'}       = 0.4;
+# only show entries with more than this parser confidence:
+$cfg{'CONFIDENCE_THRESHOLD'} = 0.6;
+
+# set datetime range from when documents should be listed; can be
+# specified by CGI parameters 'since' and 'until'. If only 'since' is
+# given, until defaults to now, if neither is given, lists all
+# documents from yesterday (so that the feed content doesn't change
+# during the day, with repeated entries):
+my $cgi = new CGI;
+$cgi->charset("utf-8");
+my $since = $cgi->param('since');
+my $until = $cgi->param('since');
+if (!$since) {
+    my $yesterday = time() - 24*60*60;
+    my ($y, $m, $d) = (localtime($yesterday))[5,4,3];
+    $since = "$y-$m-$d 00:00";
+    $until = "$y-$m-$d 23:59";
+}
+elsif (!$until) {
+    my ($y, $m, $d, $h, $m) = (localtime(time()))[5,4,3,2,1];
+    $until = "$y-$m-$d $h:$m";
+}
+
+my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
+                       $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
+    or die "Couldn't connect to database: " . DBI->errstr;
+my $select = $dbh->prepare(<<SQL);
+   SELECT documents.*, locations.url, locations.filetype
+   FROM documents
+   INNER JOIN locations ON documents.document_id = locations.document_id
+   WHERE documents.last_modified > ?
+   AND documents.last_modified < ?
+   AND documents.meta_confidence > $cfg{'CONFIDENCE_THRESHOLD'}
+   AND locations.spamminess < $cfg{'SPAM_THRESHOLD'}
+   GROUP BY documents.document_id
+   LIMIT 1000
+SQL
+$select->execute($since, $until) or die DBI->errstr;
+
+my $rss = new XML::RSS (version => '1.0');
+$rss->channel(
+    title        => "opp-tools",
+    link         => "http://github.com/wo/opp-tools/",
+    description  => "",
+    );
+
+while (my $row = $select->fetchrow_hashref) {
+    my @authors = split(/\s*,\s*/, $row->{authors});
+    $rss->add_item(
+        title       => $row->{title},
+        link        => $row->{url},
+        description => $row->{abstract},
+        format      => $row->{filetype},
+        identifier  => $row->{document_id},
+        dc => {
+            creator  => \@authors,
+            source   => "url of source page",
+            format   => "filetype",
+        }
+    );
+}
+
+print $rss->as_string;
