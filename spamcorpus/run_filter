@@ -38,7 +38,8 @@ if ($url =~ /^\d+$/) {
     my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
                            $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
         or die "Couldn't connect to database: " . DBI->errstr;
-    ($url) = $dbh->selectrow_array("SELECT url FROM docs WHERE id = '$url'");
+    ($url) = $dbh->selectrow_array(
+        "SELECT url FROM locations WHERE document_id = '$url'");
     die "ID not in database" unless ($url);
 }
 print "fetching $url.\n";
