@@ -97,6 +97,7 @@ else {
         ."WHERE status = 0 ORDER BY location_id LIMIT ".$cfg{'NUM_URLS'};
     my @locations = @{$dbh->selectall_arrayref($query, { Slice => {} })};
     if (!@locations) {
+        print "No new locations to check. Verifying some old stuff.\n" if $verbosity;
 	# No. Toss a coin to decide whether to (a) verify old papers
 	# and re-check locations with HTTP errors, or (b) give old spam
 	# and parser errors a new chance. Mostly we want to do (a).
@@ -367,6 +368,9 @@ sub process_locations {
             $db_savedoc->execute($loc->{authors}, $loc->{title}, $loc->{abstract}, 
                                  $loc->{length}, $loc->{confidence}, $loc_id)
                 or print DBI->errstr;
+            $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
+                                 $loc->{spamminess}, $loc->{document_id}, $loc_id)
+                or print DBI->errstr;
             next;
         }
 
@@ -395,6 +399,11 @@ sub process_locations {
         $db_adddoc->execute($loc->{authors}, $loc->{title}, $loc->{abstract}, 
                             $loc->{length}, $loc->{confidence})
 	    or print DBI->errstr;
+        my $doc_id = $db_savedoc->{mysql_insertid};
+        $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
+                             $loc->{spamminess}, $doc_id, $loc_id)
+            or print DBI->errstr;
+
     }
 }
 
