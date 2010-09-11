@@ -38,8 +38,8 @@ my $select = $dbh->prepare(<<SQL);
    SELECT documents.*, locations.url, locations.filetype
    FROM documents
    INNER JOIN locations ON documents.document_id = locations.document_id
-   WHERE documents.last_modified > ?
-   AND documents.last_modified < ?
+   WHERE documents.found_date > ?
+   AND documents.found_date < ?
    AND documents.meta_confidence > $cfg{'CONFIDENCE_THRESHOLD'}
    AND locations.spamminess < $cfg{'SPAM_THRESHOLD'}
    GROUP BY documents.document_id

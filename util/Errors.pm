@@ -129,7 +129,7 @@ sub errorcode {
    902 => 'HTTPS is currently not supported',
    950 => 'steppingstone to already known location',
 
-   1000 => 'looks like a subpage with more links',
+   1000 => 'subpage with more links',
 );
 
 1;
