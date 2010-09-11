@@ -1189,7 +1189,7 @@ sub confidence {
     my $h2 = $h + $boost * ($boost > 0 ? 1-$h : $h)*2;
     $h2 = 0.05 if $h2 < 0.05;
     $self->{document}->{confidence} = $h2;
-    print "confidence $h => $h2: $msg.\n" if $self->verbosity;
+    print "confidence $h => $h2: $msg.\n" if $self->verbosity > 1;
 }
 
 sub max {

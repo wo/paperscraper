@@ -58,8 +58,7 @@ my $lockfile = $cfg{'PATH'}.'.processlock';
 if ( -e "$lockfile" ) {
     if ( -M "$lockfile" < 0.005) {
         # modified in the last ~10 mins
-        print "process already running (or last call crashed: remove .processlock)\n"
-            if $verbosity;
+        print "process already running (or last call crashed: remove .processlock)\n";
         exit;
     }
     print "killing previous run!\n";
@@ -153,6 +152,7 @@ sub process_locations {
 
     foreach my $loc (@locations) {
         my $loc_id = $loc->{location_id};
+        binmode STDOUT, ":utf8";
 	print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
 
         if ($loc->{url} =~ /^https:/) {
@@ -172,7 +172,6 @@ sub process_locations {
 	}
 	if (!$res || !$res->is_success) {
 	    my $status = $res ? $res->code : 900;
-	    print "status $status.\n" if $verbosity;
             $db_err->execute($status, $loc_id) or print DBI->errstr;
 	    next;
 	}

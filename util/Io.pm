@@ -20,7 +20,7 @@ sub fetch_url {
    my $url = shift or die "fetch_url requires url parameter";
    my $if_modified_since = shift || 0;
    my $ua = _get_ua();
-   print "fetching document $url.\n" if $verbosity;
+   print "fetching document $url.\n" if $verbosity > 1;
    my %headers = ( 'If-Modified-Since' => HTTP::Date::time2str($if_modified_since) );
    my $response = _ua_get($ua, $url, \%headers);
    $response->{url} = $url;
@@ -42,7 +42,7 @@ sub fetch_url {
       print "status ", $response->status_line, "\n" if $verbosity;
       return $response;
    }
-   print "ok, file retrieved\n" if $verbosity;
+   print "ok, file retrieved\n" if $verbosity > 1;
    $response->{filesize} = length($response->content);
    $response->{filetype} = _get_filetype($response);
    # convert to utf8:
@@ -105,7 +105,7 @@ sub _get_filetype {
    $filetype =~ s/msword/doc/;
    $filetype =~ s/htm$/html/;
    $filetype =~ s/text/txt/;
-   print "filetype: $filetype\n" if $verbosity;
+   print "filetype: $filetype\n" if $verbosity > 1;
    return $filetype;
 }
 
@@ -113,7 +113,7 @@ sub save {
    my $filename = shift or die 'save requires filename parameter';
    my $content = shift; # or die 'save requires content parameter'; disabled for empty files
    my $textmode = shift;
-   print "saving $filename\n" if $verbosity;
+   print "saving $filename\n" if $verbosity > 1;
    if (!open FH, '>'.$filename) {
        print "Error: cannot save local file $filename: $!" if $verbosity;
        return 0;

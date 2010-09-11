@@ -54,11 +54,11 @@ sub classify {
     my $is_spam = 0.5;
 
     if (defined($loc->{text})) {
-        print "running Bayesian classifier\n" if $verbosity;
+        print "running Bayesian classifier\n" if $verbosity > 1;
         eval {
             my $nb = AI::Categorizer::Learner::NaiveBayes->restore_state(
                 $cfg{'SPAMCORPUS'}.'filterstate');
-            $nb->verbose($verbosity ? 3 : 0);
+            $nb->verbose($verbosity > 1 ? 3 : 0);
             my $ai_doc = AI::Categorizer::Document->new(content => $loc->{text});
             my $ai_res = $nb->categorize($ai_doc);
             my $ai_ham = $ai_res->{scores}->{ham};
@@ -148,7 +148,7 @@ sub classify {
 sub _score {
    my ($h, $eh, $enh, $msg) = @_;
    my $hn = ($eh * $h)/($eh * $h + $enh * (1-$h)); 
-   print "$msg: $h => $hn\n" if $verbosity;
+   print "$msg: $h => $hn\n" if $verbosity > 1;
    return $hn;
 }
 
