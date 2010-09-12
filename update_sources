@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use CGI;
+use DBI;
+use Getopt::Long;
+use Encode;
+binmode STDOUT, ":utf8";
+my %cfg = do 'config.pl';
+
+my $usage = <<EOF;
+
+Update the list of tracked pages. Can be called from the command-line
+or as a CGI script. 
+
+Command-line usage: 
+
+$0 [options] <action> <url>
+
+<action> : one of "add", "delete", "modify"
+<url>    : URL of source page
+
+Options (only relevant for "add" and "modify"):
+--author : set default_author
+--crawl  : set crawl_depth
+--url    : set new URL
+
+For use via CGI, pass the analogous HTTP parameters "action", "url"
+and optionally "author", "crawl", "new_url". The script then outputs 
+a JSON object like
+
+   { status: 1, msg: "http://example.com deleted" }
+
+where "status" is 0 (failure) or 1 (success), and "msg" is an 
+explanatory string.
+
+EOF
+
+# CGI access is restricted to IP addresses that match the following
+# pattern. (You may want to add further security measures.)
+my $ALLOWED_IPS = '150.203.224.249';
+
+my $cgi = new CGI;
+$cgi->charset("utf-8");
+my $is_cgi = $cgi->param('action');
+
+sub ret {
+    my ($status, $msg) = @_;
+    if ($is_cgi) {
+        print "{ status:'$status', msg:'$msg' }\n";
+        exit;
+    }
+    print "".($status ? "OK" : "Error").": $msg\n";
+    exit $status;
+}
+
+my $action = '';
+my $url = '';
+my $author;
+my $new_url;
+my $crawl;
+
+if ($is_cgi) {
+    print $cgi->header('text/plain');
+    unless ($ENV{REMOTE_ADDR} =~ /$ALLOWED_IPS/) {
+        ret(0, "unauthorised access from $ENV{REMOTE_ADDR}") 
+    }
+    $action = $cgi->param('action');
+    $url = $cgi->param('url');
+    $author = $cgi->param('author') if $cgi->param('author');
+    $crawl = $cgi->param('crawl') if $cgi->param('crawl');
+    $new_url = $cgi->param('new_url') if $cgi->param('new_url');
+    ret(0, "url parameter missing") unless $url;
+}
+else {
+    if (scalar @ARGV < 2) {
+        print $usage; 
+        exit;
+    }
+    $action = $ARGV[0];
+    $url = $ARGV[1];
+    GetOptions('author=s' => \$author,
+               'crawl=i' => \$crawl,
+               'url=s' => \$new_url);
+}
+
+my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
+    $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
+    or ret(0, "Could not connect to database");
+
+my $dispatch = {};
+
+my $db_add = $dbh->prepare(<<SQL);
+   INSERT IGNORE INTO sources
+   (url, status, default_author, crawl_depth)
+   VALUES(?, 0, ?, ?)
+SQL
+
+$dispatch->{add} = sub {
+    my $res = $db_add->execute($url, $author, $crawl)
+        or ret(0, DBI->errstr);
+    ret(0, "$url already in database") if ($res eq '0E0');
+    my $source_id = $db_add->{mysql_insertid};
+    ret(0, "insert failed") unless $source_id;
+    ret(1, "inserted as source id $source_id");
+};
+
+my $db_delete_docs = $dbh->prepare(<<SQL);
+   DELETE documents.* FROM documents
+   INNER JOIN locations ON documents.document_id = locations.document_id
+   INNER JOIN links ON locations.location_id = links.location_id
+   WHERE links.source_id = ?
+   AND documents.document_id <> ANY
+      (SELECT document_id FROM locations 
+       GROUP BY document_id HAVING COUNT(document_id) > 1)
+   AND locations.location_id <> ANY
+      (SELECT location_id FROM links
+       GROUP BY location_id HAVING COUNT(location_id) > 1)
+SQL
+
+my $db_delete_locs = $dbh->prepare(<<SQL);
+   DELETE locations.*
+   FROM locations
+   INNER JOIN links ON locations.location_id = links.location_id
+   WHERE links.source_id = ?
+   AND locations.location_id <> ANY
+      (SELECT location_id FROM links
+       GROUP BY location_id HAVING COUNT(location_id) > 1)
+SQL
+
+my $db_delete_links = $dbh->prepare(<<SQL);
+   DELETE FROM links WHERE source_id = ?
+SQL
+
+my $db_delete_page = $dbh->prepare(<<SQL);
+   DELETE FROM sources WHERE url = ?
+SQL
+
+my $db_get_children = $dbh->prepare(<<SQL);
+   SELECT url FROM sources 
+   WHERE parent_id = 
+       (SELECT source_id FROM sources WHERE url = ?)
+SQL
+
+$dispatch->{delete} = sub {
+    my $del_url = shift || $url;
+    my $recursion = shift || 0;
+    my $keep_documents = shift || 0; # used in {modify}
+    # first delete all documents linked only from this page:
+    unless ($keep_documents) {
+        $db_delete_docs->execute($del_url)
+            or ret(0, DBI->errstr);
+    }
+    # then delete all locations and links unique to this page:
+    $db_delete_locs->execute($del_url)
+        or ret(0, DBI->errstr);
+    # then recursively delete all child pages:
+    my $children = $db_get_children->execute($del_url);
+    if ($children ne '0E0') {
+        foreach my $child (@{$children}) {
+            $dispatch->{delete}($child->{url}, $recursion+1);
+        }
+    }
+    # then delete the page itself:
+    $db_delete_page->execute($del_url)
+        or ret(0, DBI->errstr);
+    ret(1, "$del_url deleted") unless $recursion;
+};
+
+my $db_set_author = $dbh->prepare(<<SQL);
+   UPDATE sources SET default_author = ? WHERE url = ?
+SQL
+
+my $db_set_crawl = $dbh->prepare(<<SQL);
+   UPDATE sources SET crawl_depth = ? WHERE url = ?
+SQL
+
+my $db_set_url = $dbh->prepare(<<SQL);
+   UPDATE sources SET url = ? WHERE url = ?
+SQL
+
+$dispatch->{modify} = sub {
+    my ($cur_crawl, $cur_author) = $dbh->selectrow_array(
+        "SELECT crawl_depth, default_author FROM sources "
+        ."WHERE url = ".$dbh->quote($url))
+        or ret(0, DBI->errstr);
+    $cur_author = '' unless $cur_author;
+    if (($new_url && $new_url ne $url) ||
+        (defined($crawl) && $crawl != $cur_crawl)) {
+        # If the URL changed, child pages probably changed their
+        # location as well (or even disappeared); so we delete the
+        # current children and let any new ones be rediscovered. We
+        # also delete the current children if the crawl depth
+        # changed. In the rare event that the depth is increased from
+        # 1 or decreased from a value > 1, this means that some
+        # children will be rediscovered. In either case, we don't
+        # delete any documents, so no old documents will show up as
+        # new.
+        my $children = $db_get_children->execute($url);
+        if ($children ne '0E0') {
+            foreach my $child (@{$children}) {
+                $dispatch->{delete}($child->{url}, 1, 1);
+            }
+        }
+    }
+    # update the source itself:
+    if (defined($author) && $author ne $cur_author) {
+        # recursively change default_author of subpages:
+        change_author($url, $author);
+    }
+    if (defined($crawl) && $crawl ne $cur_crawl) {
+        $db_set_crawl->execute($crawl, $url)
+            or ret(0, DBI->errstr);
+    }
+    if (defined($new_url) && $new_url ne $url) {
+        $db_set_url->execute($new_url, $url)
+            or ret(0, DBI->errstr);
+    }
+    ret(1, "$url modified");
+};
+
+sub change_author {
+    my $mod_url = shift;
+    my $author = shift;
+    # passing an empty author string sets default_author to NULL:
+    $author = undef unless $author;
+    my $children = $db_get_children->execute($url);
+    if ($children ne '0E0') {
+        foreach my $child (@{$children}) {
+            change_author($child->{url}, $author);
+        }
+    }
+    $db_set_author->execute($author, $url)
+        or ret(0, DBI->errstr);
+}
+
+ret(0, "unknown action: $action") unless defined($dispatch->{$action});
+&{$dispatch->{$action}};
