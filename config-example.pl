@@ -13,7 +13,7 @@ FILETYPES  => ['pdf', 'ps', 'doc', 'rtf', 'html', 'txt'],
 # Number of links to process in one go:
 NUM_URLS   => 1,
 
-# SOFTWARE
+# Software:
 PS2PDF      => '/usr/bin/ps2pdf',
 UNOCONV     => '/usr/bin/unoconv',
 WKHTMLTOPDF => '/usr/bin/wkhtmltopdf',

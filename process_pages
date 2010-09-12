@@ -7,7 +7,6 @@ use Data::Dumper;
 use Getopt::Std;
 use Encode;
 binmode STDOUT, ":utf8";
-use lib '../';
 use util::Io;
 use util::Errors;
 
