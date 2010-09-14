@@ -92,16 +92,34 @@ my $dispatch = {};
 
 my $db_add = $dbh->prepare(<<SQL);
    INSERT IGNORE INTO sources
-   (url, status, default_author, crawl_depth)
-   VALUES(?, 0, ?, ?)
+   (url, status, default_author)
+   VALUES(?, 0, ?)
+SQL
+
+my $db_set_author = $dbh->prepare(<<SQL);
+   UPDATE sources SET default_author = ? WHERE url = ?
+SQL
+
+my $db_set_crawl = $dbh->prepare(<<SQL);
+   UPDATE sources SET crawl_depth = ? WHERE url = ?
+SQL
+
+my $db_set_url = $dbh->prepare(<<SQL);
+   UPDATE sources SET url = ? WHERE url = ?
 SQL
 
 $dispatch->{add} = sub {
-    my $res = $db_add->execute($url, $author, $crawl)
-        or ret(0, DBI->errstr);
+    my $res = $db_add->execute($url, $author)
+        or ret(0, DBI->errstr || "MySQL execution failed");
     ret(0, "$url already in database") if ($res eq '0E0');
     my $source_id = $db_add->{mysql_insertid};
     ret(0, "insert failed") unless $source_id;
+    if (defined($crawl)) {
+        # If crawl is included in the add command, then undefined
+        # crawl values are treated as 0. So we treat it separately.
+        $db_set_crawl->execute($crawl, $url)
+            or ret(0, DBI->errstr || "set failed");
+    } 
     ret(1, "inserted as source id $source_id");
 };
 
@@ -110,10 +128,10 @@ my $db_delete_docs = $dbh->prepare(<<SQL);
    INNER JOIN locations ON documents.document_id = locations.document_id
    INNER JOIN links ON locations.location_id = links.location_id
    WHERE links.source_id = ?
-   AND documents.document_id <> ANY
+   AND NOT documents.document_id IN
       (SELECT document_id FROM locations 
        GROUP BY document_id HAVING COUNT(document_id) > 1)
-   AND locations.location_id <> ANY
+   AND NOT locations.location_id IN
       (SELECT location_id FROM links
        GROUP BY location_id HAVING COUNT(location_id) > 1)
 SQL
@@ -123,7 +141,7 @@ my $db_delete_locs = $dbh->prepare(<<SQL);
    FROM locations
    INNER JOIN links ON locations.location_id = links.location_id
    WHERE links.source_id = ?
-   AND locations.location_id <> ANY
+   AND NOT locations.location_id IN
       (SELECT location_id FROM links
        GROUP BY location_id HAVING COUNT(location_id) > 1)
 SQL
@@ -146,14 +164,18 @@ $dispatch->{delete} = sub {
     my $del_url = shift || $url;
     my $recursion = shift || 0;
     my $keep_documents = shift || 0; # used in {modify}
+    my ($source_id) = $dbh->selectrow_array(
+        "SELECT source_id FROM sources WHERE url = ".$dbh->quote($url));
     # first delete all documents linked only from this page:
     unless ($keep_documents) {
-        $db_delete_docs->execute($del_url)
-            or ret(0, DBI->errstr);
+        $db_delete_docs->execute($source_id)
+            or ret(0, DBI->errstr || "delete failed");
     }
     # then delete all locations and links unique to this page:
-    $db_delete_locs->execute($del_url)
-        or ret(0, DBI->errstr);
+    $db_delete_locs->execute($source_id)
+        or ret(0, DBI->errstr || "delete failed");
+    $db_delete_links->execute($source_id)
+        or ret(0, DBI->errstr || "delete failed");
     # then recursively delete all child pages:
     my $children = $db_get_children->execute($del_url);
     if ($children ne '0E0') {
@@ -163,27 +185,15 @@ $dispatch->{delete} = sub {
     }
     # then delete the page itself:
     $db_delete_page->execute($del_url)
-        or ret(0, DBI->errstr);
+        or ret(0, DBI->errstr || "delete failed");
     ret(1, "$del_url deleted") unless $recursion;
 };
-
-my $db_set_author = $dbh->prepare(<<SQL);
-   UPDATE sources SET default_author = ? WHERE url = ?
-SQL
-
-my $db_set_crawl = $dbh->prepare(<<SQL);
-   UPDATE sources SET crawl_depth = ? WHERE url = ?
-SQL
-
-my $db_set_url = $dbh->prepare(<<SQL);
-   UPDATE sources SET url = ? WHERE url = ?
-SQL
 
 $dispatch->{modify} = sub {
     my ($cur_crawl, $cur_author) = $dbh->selectrow_array(
         "SELECT crawl_depth, default_author FROM sources "
         ."WHERE url = ".$dbh->quote($url))
-        or ret(0, DBI->errstr);
+        or ret(0, DBI->errstr || "cannot find record");
     $cur_author = '' unless $cur_author;
     if (($new_url && $new_url ne $url) ||
         (defined($crawl) && $crawl != $cur_crawl)) {
@@ -210,11 +220,11 @@ $dispatch->{modify} = sub {
     }
     if (defined($crawl) && $crawl ne $cur_crawl) {
         $db_set_crawl->execute($crawl, $url)
-            or ret(0, DBI->errstr);
+            or ret(0, DBI->errstr || "set failed");
     }
     if (defined($new_url) && $new_url ne $url) {
         $db_set_url->execute($new_url, $url)
-            or ret(0, DBI->errstr);
+            or ret(0, DBI->errstr || "set failed");
     }
     ret(1, "$url modified");
 };
@@ -231,7 +241,7 @@ sub change_author {
         }
     }
     $db_set_author->execute($author, $url)
-        or ret(0, DBI->errstr);
+        or ret(0, DBI->errstr || "set failed");
 }
 
 ret(0, "unknown action: $action") unless defined($dispatch->{$action});

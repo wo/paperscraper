@@ -50,6 +50,5 @@ CREATE TABLE links (
   anchortext VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (source_id, location_id),
   KEY (location_id),
-  FOREIGN KEY (source_id) REFERENCES sources (source_id),
-  FOREIGN KEY (location_id) REFERENCES locations (location_id)
+  KEY (source_id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
