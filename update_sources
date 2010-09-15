@@ -38,7 +38,7 @@ EOF
 
 # CGI access is restricted to IP addresses that match the following
 # pattern. (You may want to add further security measures.)
-my $ALLOWED_IPS = '150.203.224.249';
+my $ALLOWED_IPS = '127.0.0.1|150.203.224.249';
 
 my $cgi = new CGI;
 $cgi->charset("utf-8");

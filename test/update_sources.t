@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use DBI;
 use Test::More 'no_plan';
+use lib '../';
+use util::Io;
 
 do 'reset_db.pl';
 my %cfg = do '../config.pl';
@@ -88,8 +90,11 @@ system('./update_sources delete s2');
 ok(!defined($url), 'associated location deleted when no longer linked'); 
 
 sql("INSERT INTO documents (title) VALUES ('d1')");
+sql("INSERT INTO documents (title) VALUES ('d2')");
 ($doc_id) = $dbh->selectrow_array(
-    "SELECT document_id FROM documents LIMIT 1");
+    "SELECT document_id FROM documents WHERE title='d1'");
+my ($doc_id2) = $dbh->selectrow_array(
+    "SELECT document_id FROM documents WHERE title='d2'");
 sql("INSERT INTO sources (url) VALUES ('s1')");
 sql("INSERT INTO sources (url) VALUES ('s2')");
 ($id) = $dbh->selectrow_array(
@@ -98,6 +103,8 @@ sql("INSERT INTO sources (url) VALUES ('s2')");
     "SELECT source_id FROM sources WHERE url = 's2'");
 sql("INSERT INTO locations (url,document_id) VALUES ('l1', $doc_id)");
 sql("INSERT INTO locations (url,document_id) VALUES ('l2', $doc_id)");
+sql("INSERT INTO locations (url,document_id) VALUES ('l3', $doc_id2)");
+sql("INSERT INTO locations (url,document_id) VALUES ('l4', $doc_id2)");
 ($loc_id) = $dbh->selectrow_array(
     "SELECT location_id FROM locations WHERE url = 'l1'");
 my ($loc_id2) = $dbh->selectrow_array(
@@ -106,29 +113,44 @@ sql("INSERT INTO links (source_id, location_id) VALUES ($id, $loc_id)");
 sql("INSERT INTO links (source_id, location_id) VALUES ($id2, $loc_id2)");
 system('./update_sources delete s1');
 ($url) = $dbh->selectrow_array(
-    "SELECT document_id FROM documents LIMIT 1");
+    "SELECT document_id FROM documents WHERE title = 'd1'");
 ok(defined($url), 'associated document not deleted when also located elsewhere'); 
 ($url) = $dbh->selectrow_array(
     "SELECT location_id FROM locations WHERE location_id = $loc_id LIMIT 1");
 ok(!defined($url), 'associated location of multi-located document deleted');
 system('./update_sources delete s2');
 ($url) = $dbh->selectrow_array(
-    "SELECT document_id FROM documents LIMIT 1");
+    "SELECT document_id FROM documents WHERE title = 'd1'");
 ok(!defined($url), 'associated document deleted when no longer located elsewhere'); 
 
+# For testing CGI, set the URL of update_sources:
+my $UPDATE_URL = "http://localhost/opp-tools/update_sources";
 
-    my $sql = <<SQL;
-INSERT INTO sources (url) VALUES ('s1');
-INSERT INTO sources (url) VALUES ('s2');
-INSERT INTO sources (url) VALUES ('s3');
-INSERT INTO documents (title) VALUES ('doc1');
-INSERT INTO documents (title) VALUES ('doc2');
-INSERT INTO locations (url, document_id) VALUES ('l1', 1);
-INSERT INTO locations (url, document_id) VALUES ('l2', 2);
-INSERT INTO locations (url, document_id) VALUES ('l3', 2);
-INSERT INTO locations (url) VALUES ('l4');
-INSERT INTO links (source_id, location_id) VALUES (1,1);
-INSERT INTO links (source_id, location_id) VALUES (1,2);
-INSERT INTO links (source_id, location_id) VALUES (2,2);
-INSERT INTO links (source_id, location_id) VALUES (3,3);
-SQL
+sub read_url {
+    my $url = shift;
+    my $res = fetch_url($url);
+    return $res->{content};
+}
+
+SKIP: {
+
+    my $res = read_url("$UPDATE_URL?action=asdf");
+    skip "CGI not properly configured (url: $UPDATE_URL)"
+        unless $res && $res =~ /status:'0'/;
+
+    $res = read_url("$UPDATE_URL?action=add&url=u1"); 
+    ($author, $crawl, $url) = $dbh->selectrow_array(
+        "SELECT default_author, crawl_depth, url "
+        ."FROM sources WHERE url = 'u1'");
+    is($url, 'u1', 'add test url via CGI');
+    is($author, undef, 'default author NULL when added via CGI');
+    is($crawl, 1, 'default crawl 1 when added via CGI');
+
+    $res = read_url("$UPDATE_URL?action=modify&url=u1&new_url=u2&author=xyz");
+    ($author, $crawl, $url) = $dbh->selectrow_array(
+        "SELECT default_author, crawl_depth, url "
+        ."FROM sources WHERE url = 'u2'");
+    is($url, 'u2', 'can change url via CGI');
+    is($author, 'xyz', 'can set author via CGI');
+    
+}
