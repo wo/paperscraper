@@ -138,7 +138,10 @@ SKIP: {
     skip "CGI not properly configured (url: $UPDATE_URL)"
         unless $res && $res =~ /status:'0'/;
 
+    like($res, qr/status:'0'/, "invalid CGI command yields status 0");
+
     $res = read_url("$UPDATE_URL?action=add&url=u1"); 
+    like($res, qr/status:'1'/, "CGI add yields status 1");
     ($author, $crawl, $url) = $dbh->selectrow_array(
         "SELECT default_author, crawl_depth, url "
         ."FROM sources WHERE url = 'u1'");
