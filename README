@@ -37,7 +37,7 @@ HTML::Strip
 HTML::TreeBuilder
 XML::Writer
 XML::XPath
-CML::RSS
+XML::RSS
 Text::Capitalize
 String::Approx
 Algorithm::NaiveBayes

@@ -4,6 +4,7 @@ use warnings;
 use DBI;
 use CGI;
 use XML::RSS;
+use POSIX;
 my %cfg = do 'config.pl';
 
 # only show entries with less than this spamminess score:
@@ -18,17 +19,17 @@ $cfg{'CONFIDENCE_THRESHOLD'} = 0.6;
 # during the day, with repeated entries):
 my $cgi = new CGI;
 $cgi->charset("utf-8");
+print $cgi->header('text/plain');
+
 my $since = $cgi->param('since');
-my $until = $cgi->param('since');
+my $until = $cgi->param('until');
 if (!$since) {
     my $yesterday = time() - 24*60*60;
-    my ($y, $m, $d) = (localtime($yesterday))[5,4,3];
-    $since = "$y-$m-$d 00:00";
-    $until = "$y-$m-$d 23:59";
+    $since = strftime("%Y-%m-%d 00:00:00", localtime($yesterday));
+    $until = strftime("%Y-%m-%d 23:59:59", localtime($yesterday));
 }
 elsif (!$until) {
-    my ($y, $m, $d, $h, $m) = (localtime(time()))[5,4,3,2,1];
-    $until = "$y-$m-$d $h:$m";
+    $until = strftime("%Y-%m-%d 23:59:59", localtime());
 }
 
 my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
@@ -64,8 +65,6 @@ while (my $row = $select->fetchrow_hashref) {
         identifier  => $row->{document_id},
         dc => {
             creator  => \@authors,
-            source   => "url of source page",
-            format   => "filetype",
         }
     );
 }
