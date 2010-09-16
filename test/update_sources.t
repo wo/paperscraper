@@ -33,11 +33,13 @@ system('./update_sources modify s1 --author "xyz"');
 is($author, 'xyz', 'modify author changes author record'); 
 is($crawl, 1, 'modify author does not change crawl record'); 
 
-system('./update_sources modify s1 --crawl 2');
+my ($id) = $dbh->selectrow_array(
+    "SELECT source_id FROM sources LIMIT 1");
+system("./update_sources modify $id --crawl 2");
 ($author, $crawl) = $dbh->selectrow_array(
     "SELECT default_author, crawl_depth FROM sources WHERE url = 's1'");
 is($author, 'xyz', 'modify crawl does not change author record'); 
-is($crawl, 2, 'modify crawl changes crawl record'); 
+is($crawl, 2, 'modify crawl via ID changes crawl record'); 
 
 system('./update_sources modify s1 --author "" --crawl 3 --url "s2"');
 ($author, $crawl, $url) = $dbh->selectrow_array(
@@ -50,7 +52,7 @@ sql("INSERT INTO documents (title) VALUES ('d1')");
 my ($doc_id) = $dbh->selectrow_array(
     "SELECT document_id FROM documents LIMIT 1");
 sql("INSERT INTO locations (url, document_id) VALUES ('l1', $doc_id)");
-my ($id) = $dbh->selectrow_array(
+($id) = $dbh->selectrow_array(
     "SELECT source_id FROM sources LIMIT 1");
 my ($loc_id) = $dbh->selectrow_array(
     "SELECT location_id FROM locations LIMIT 1");
@@ -123,6 +125,26 @@ system('./update_sources delete s2');
     "SELECT document_id FROM documents WHERE title = 'd1'");
 ok(!defined($url), 'associated document deleted when no longer located elsewhere'); 
 
+sql("INSERT INTO sources (url) VALUES ('s1')");
+($id) = $dbh->selectrow_array(
+    "SELECT source_id FROM sources WHERE url = 's1'");
+sql("INSERT INTO sources (url, parent_id) VALUES ('s1c1', $id)");
+($id2) = $dbh->selectrow_array(
+    "SELECT source_id FROM sources WHERE url = 's1c1'");
+sql("INSERT INTO sources (url, parent_id) VALUES ('s1c1c', $id2)");
+sql("INSERT INTO sources (url, parent_id) VALUES ('s1c2', $id)");
+system('./update_sources modify s1 --author=abc');
+($author) = $dbh->selectrow_array(
+    "SELECT default_author FROM sources WHERE url = 's1c2'");
+is($author, 'abc', 'changing author propagates to child'); 
+($author) = $dbh->selectrow_array(
+    "SELECT default_author FROM sources WHERE url = 's1c1c'");
+is($author, 'abc', 'changing author propagates to grandchild'); 
+system('./update_sources delete s1');
+($url) = $dbh->selectrow_array(
+    "SELECT url FROM sources WHERE url = 's1c1c'");
+ok(!defined($url), 'deleting source deletes grandchildren'); 
+
 # For testing CGI, set the URL of update_sources:
 my $UPDATE_URL = "http://localhost/opp-tools/update_sources";
 
@@ -140,7 +162,7 @@ SKIP: {
 
     like($res, qr/status:'0'/, "invalid CGI command yields status 0");
 
-    $res = read_url("$UPDATE_URL?action=add&url=u1"); 
+    $res = read_url("$UPDATE_URL?action=add&id=u1"); 
     like($res, qr/status:'1'/, "CGI add yields status 1");
     ($author, $crawl, $url) = $dbh->selectrow_array(
         "SELECT default_author, crawl_depth, url "
@@ -149,7 +171,7 @@ SKIP: {
     is($author, undef, 'default author NULL when added via CGI');
     is($crawl, 1, 'default crawl 1 when added via CGI');
 
-    $res = read_url("$UPDATE_URL?action=modify&url=u1&new_url=u2&author=xyz");
+    $res = read_url("$UPDATE_URL?action=modify&id=u1&url=u2&author=xyz");
     ($author, $crawl, $url) = $dbh->selectrow_array(
         "SELECT default_author, crawl_depth, url "
         ."FROM sources WHERE url = 'u2'");

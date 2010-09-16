@@ -15,19 +15,22 @@ or as a CGI script.
 
 Command-line usage: 
 
-$0 [options] <action> <url>
+$0 [options] <action> <id>
 
 <action> : one of "add", "delete", "modify"
-<url>    : URL of source page
+<id>     : ID or URL of source page
 
 Options (only relevant for "add" and "modify"):
 --author : set default_author
 --crawl  : set crawl_depth
 --url    : set new URL
 
-For use via CGI, pass the analogous HTTP parameters "action", "url"
-and optionally "author", "crawl", "new_url". The script then outputs 
-a JSON object like
+Example:
+$0 add "http://example.com" --author "Paul Celan"
+
+For use via CGI, pass the analogous HTTP parameters "action", "id" and
+optionally "author", "crawl", "url". The script then outputs a JSON
+object like
 
    { status: 1, msg: "http://example.com deleted" }
 
@@ -55,9 +58,9 @@ sub ret {
 }
 
 my $action = '';
-my $url = '';
+my $id = '';
 my $author;
-my $new_url;
+my $url;
 my $crawl;
 
 if ($is_cgi) {
@@ -66,11 +69,11 @@ if ($is_cgi) {
         ret(0, "unauthorised access from $ENV{REMOTE_ADDR}") 
     }
     $action = $cgi->param('action');
-    $url = $cgi->param('url');
+    $id = $cgi->param('id');
     $author = $cgi->param('author') if $cgi->param('author');
     $crawl = $cgi->param('crawl') if $cgi->param('crawl');
-    $new_url = $cgi->param('new_url') if $cgi->param('new_url');
-    ret(0, "url parameter missing") unless $url;
+    $url = $cgi->param('url') if $cgi->param('url');
+    ret(0, "id/url parameter missing") unless $id;
 }
 else {
     if (scalar @ARGV < 2) {
@@ -78,10 +81,10 @@ else {
         exit;
     }
     $action = $ARGV[0];
-    $url = $ARGV[1];
+    $id = $ARGV[1];
     GetOptions('author=s' => \$author,
                'crawl=i' => \$crawl,
-               'url=s' => \$new_url);
+               'url=s' => \$url);
 }
 
 my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
@@ -97,27 +100,27 @@ my $db_add = $dbh->prepare(<<SQL);
 SQL
 
 my $db_set_author = $dbh->prepare(<<SQL);
-   UPDATE sources SET default_author = ? WHERE url = ?
+   UPDATE sources SET default_author = ? WHERE source_id = ?
 SQL
 
 my $db_set_crawl = $dbh->prepare(<<SQL);
-   UPDATE sources SET crawl_depth = ? WHERE url = ?
+   UPDATE sources SET crawl_depth = ? WHERE source_id = ?
 SQL
 
 my $db_set_url = $dbh->prepare(<<SQL);
-   UPDATE sources SET url = ? WHERE url = ?
+   UPDATE sources SET url = ? WHERE source_id = ?
 SQL
 
 $dispatch->{add} = sub {
-    my $res = $db_add->execute($url, $author)
+    my $res = $db_add->execute($id, $author)
         or ret(0, DBI->errstr || "MySQL execution failed");
-    ret(0, "$url already in database") if ($res eq '0E0');
+    ret(0, "$id already in database") if ($res eq '0E0');
     my $source_id = $db_add->{mysql_insertid};
     ret(0, "insert failed") unless $source_id;
     if (defined($crawl)) {
         # If crawl is included in the add command, then undefined
         # crawl values are treated as 0. So we treat it separately.
-        $db_set_crawl->execute($crawl, $url)
+        $db_set_crawl->execute($crawl, $id)
             or ret(0, DBI->errstr || "set failed");
     } 
     ret(1, "inserted as source id $source_id");
@@ -151,51 +154,58 @@ my $db_delete_links = $dbh->prepare(<<SQL);
 SQL
 
 my $db_delete_page = $dbh->prepare(<<SQL);
-   DELETE FROM sources WHERE url = ?
+   DELETE FROM sources WHERE source_id = ?
 SQL
 
-my $db_get_children = $dbh->prepare(<<SQL);
-   SELECT url FROM sources 
-   WHERE parent_id = 
-       (SELECT source_id FROM sources WHERE url = ?)
-SQL
+sub get_children {
+    my $id = shift;
+    return $dbh->selectall_arrayref(
+        "SELECT source_id FROM sources WHERE parent_id = ".$dbh->quote($id),
+        { Slice => {} });
+}
 
 $dispatch->{delete} = sub {
-    my $del_url = shift || $url;
+    my $del_id = shift || $id;
     my $recursion = shift || 0;
     my $keep_documents = shift || 0; # used in {modify}
-    my ($source_id) = $dbh->selectrow_array(
-        "SELECT source_id FROM sources WHERE url = ".$dbh->quote($url));
+    if ($del_id !~ /^\d+$/) {
+        ($del_id) = $dbh->selectrow_array(
+            "SELECT source_id FROM sources WHERE url = ".$dbh->quote($del_id));
+        ret(0, 'Address not in database') unless $del_id;
+    }
     # first delete all documents linked only from this page:
     unless ($keep_documents) {
-        $db_delete_docs->execute($source_id)
+        $db_delete_docs->execute($del_id)
             or ret(0, DBI->errstr || "delete failed");
     }
     # then delete all locations and links unique to this page:
-    $db_delete_locs->execute($source_id)
+    $db_delete_locs->execute($del_id)
         or ret(0, DBI->errstr || "delete failed");
-    $db_delete_links->execute($source_id)
+    $db_delete_links->execute($del_id)
         or ret(0, DBI->errstr || "delete failed");
     # then recursively delete all child pages:
-    my $children = $db_get_children->execute($del_url);
-    if ($children ne '0E0') {
-        foreach my $child (@{$children}) {
-            $dispatch->{delete}($child->{url}, $recursion+1);
-        }
+    my $children = get_children($del_id);
+    foreach my $child (@{$children}) {
+        $dispatch->{delete}($child->{source_id}, $recursion+1);
     }
     # then delete the page itself:
-    $db_delete_page->execute($del_url)
+    $db_delete_page->execute($del_id)
         or ret(0, DBI->errstr || "delete failed");
-    ret(1, "$del_url deleted") unless $recursion;
+    ret(1, "$del_id deleted") unless $recursion;
 };
 
 $dispatch->{modify} = sub {
-    my ($cur_crawl, $cur_author) = $dbh->selectrow_array(
-        "SELECT crawl_depth, default_author FROM sources "
-        ."WHERE url = ".$dbh->quote($url))
-        or ret(0, DBI->errstr || "cannot find record");
+    if ($id !~ /^\d+$/) {
+        ($id) = $dbh->selectrow_array(
+            "SELECT source_id FROM sources WHERE url = ".$dbh->quote($id));
+        ret(0, 'Address not in database') unless $id;
+    }
+    my ($cur_crawl, $cur_author, $cur_url) = $dbh->selectrow_array(
+        "SELECT crawl_depth, default_author, url FROM sources "
+        ."WHERE source_id = $id")
+        or ret(0, DBI->errstr || "ID not in database");
     $cur_author = '' unless $cur_author;
-    if (($new_url && $new_url ne $url) ||
+    if (($url && $url ne $cur_url) ||
         (defined($crawl) && $crawl != $cur_crawl)) {
         # If the URL changed, child pages probably changed their
         # location as well (or even disappeared); so we delete the
@@ -206,41 +216,38 @@ $dispatch->{modify} = sub {
         # children will be rediscovered. In either case, we don't
         # delete any documents, so no old documents will show up as
         # new.
-        my $children = $db_get_children->execute($url);
-        if ($children ne '0E0') {
-            foreach my $child (@{$children}) {
-                $dispatch->{delete}($child->{url}, 1, 1);
-            }
+        my $children = get_children($id);
+        foreach my $child (@{$children}) {
+            $dispatch->{delete}($child->{source_id}, 1, 1);
         }
     }
     # update the source itself:
     if (defined($author) && $author ne $cur_author) {
         # recursively change default_author of subpages:
-        change_author($url, $author);
+        print "changing $id ";
+        change_author($id, $author);
     }
     if (defined($crawl) && $crawl ne $cur_crawl) {
-        $db_set_crawl->execute($crawl, $url)
+        $db_set_crawl->execute($crawl, $id)
             or ret(0, DBI->errstr || "set failed");
     }
-    if (defined($new_url) && $new_url ne $url) {
-        $db_set_url->execute($new_url, $url)
+    if (defined($url) && $url ne $cur_url) {
+        $db_set_url->execute($url, $id)
             or ret(0, DBI->errstr || "set failed");
     }
-    ret(1, "$url modified");
+    ret(1, "$id modified");
 };
 
 sub change_author {
-    my $mod_url = shift;
+    my $mod_id = shift;
     my $author = shift;
     # passing an empty author string sets default_author to NULL:
     $author = undef unless $author;
-    my $children = $db_get_children->execute($url);
-    if ($children ne '0E0') {
-        foreach my $child (@{$children}) {
-            change_author($child->{url}, $author);
-        }
+    my $children = get_children($mod_id);
+    foreach my $child (@{$children}) {
+        change_author($child->{source_id}, $author);
     }
-    $db_set_author->execute($author, $url)
+    $db_set_author->execute($author, $mod_id)
         or ret(0, DBI->errstr || "set failed");
 }
 
