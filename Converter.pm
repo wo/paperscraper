@@ -50,8 +50,13 @@ sub convert2pdf {
 	  my $command = $cfg{'UNOCONV'}
 	      .' -f pdf'
               .' --stdout'
-	      ." $source";
+	      ." $source"
+              .' 2>&1';
 	  my $content = sysexec($command, 10, $verbosity) || '';
+          unless ($content && $content =~ /%PDF/) {
+              # unovonv often fails on first run, so we try again:
+              $content = sysexec($command, 10, $verbosity) || '';
+          }
 	  die "unoconv failed: $content" unless ($content && $content =~ /%PDF/);
 	  return save($target, $content);
       };
@@ -67,6 +72,10 @@ sub convert2pdf {
 	  return 1;
       };
       /ps/ && do {
+          # ps2pdf uses a made-up character map for the generated pdf,
+          # so pdftohtml won't be able to extract any text info, and we
+          # have to resort to OCR. Should look for a better converter.
+          # (pstopdf has the same problem.)
 	  push @converters_used, 'ps2pdf';
 	  my $command = $cfg{'PS2PDF'}
 	      ." $source"     # source file
@@ -146,7 +155,9 @@ sub convert2xml {
       };
       # convert other formats to PDF:
       if (convert2pdf($filename, "$filename.pdf")) {
-	  return convert2xml("$filename.pdf", "$filename.xml");
+	  my $out = convert2xml("$filename.pdf", "$filename.xml");
+          system("rm \"$filename.pdf\"");
+          return $out;
       }
       die "PDF conversion failed";
   }

@@ -37,7 +37,7 @@ my $output = new IO::File(">$outfile")
     or die "cannot create $outfile";
 my $xml = new XML::Writer(
     OUTPUT => $output,
-    NEWLINES => 1,
+    # NEWLINES => 1, ## doesn't match regexps in Extractor.pm
     ENCODING => 'utf-8',
     UNSAFE => 1);
 $xml->xmlDecl();
@@ -124,8 +124,8 @@ sub add_page {
     }
     foreach my $text (@texts) {
         $xml->startTag("text",
-                       "left" => $text->{left},
                        "top" => $text->{top},
+                       "left" => $text->{left},
                        "width" => $text->{width},
                        "height" => $text->{height},
                        "font" => $text->{font});

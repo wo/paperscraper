@@ -1,4 +1,11 @@
 #!/usr/bin/perl
+use strict;
+use warnings;
+use Encode;
+use FindBin qw($Bin);
+use lib $Bin;
+use util::Sysexec;
+binmode STDOUT, ":utf8";
 
 sub usage() {
     print <<EOD;
@@ -14,14 +21,6 @@ usage: $0 [-d int] [-p int] source.pdf target.xml
 EOD
    exit;
 }
-
-use strict;
-use warnings;
-use Encode;
-use FindBin qw($Bin);
-use lib $Bin;
-use util::Sysexec;
-binmode STDOUT, ":utf8";
 
 my $path = $Bin;
 use constant PDFTOHTML    => '/usr/bin/pdftohtml';
@@ -75,10 +74,10 @@ sub pdf2xml {
     print $res if $opt{'d'} > 1;
     $command = "$path/hocr2xml $tmp/out.hocr $tmp/out.xml";
     $res = sysexec($command, 5, $opt{'d'});
-    print $res if $opt{'d'} > 1;
     open INPUT, "$tmp/out.xml" or die "OCR failed.";
     while (<INPUT>) { $xml .= $_; }
     close INPUT;
+    print $xml if $opt{'d'} > 4;
     if (!$xml || $xml !~ /\w{5}.*<\/text/) {
         die "OCR failed. $xml $!";
     }

@@ -5,15 +5,17 @@ use Data::Dumper;
 #use HTML::StripScripts::Parser;
 use Text::Capitalize;
 use String::Approx 'amatch';
+use Cwd 'abs_path';
+use File::Basename;
 use Encode;
 use util::Io;
 use util::String;
 
 # known author names, firstnames, and strings that are not names:
-use constant DATA             => 'data/';
-use constant AUTHORS_FILE     => DATA.'names.txt';
-use constant FIRSTNAMES_FILE  => DATA.'firstnames.txt';
-use constant NOTNAMES_FILE    => DATA.'notnames.txt';
+my $path = dirname(abs_path(__FILE__));
+my $authors_file = "$path/data/names.txt";
+my $firstnames_file = "$path/data/firstnames.txt";
+my $notnames_file = "$path/data/notnames.txt";
 
 # these are defined at the end:
 my ($re_name, $re_pre_name, $re_post_name, $re_authors_separator,
@@ -1046,7 +1048,7 @@ sub is_known_author {
     my $name = lc(shift);
     if (!$self->{author_names}) {
    	$self->{author_names} = {};
-	open NAMES, AUTHORS_FILE or die "Couldn't open authors name list: $!";
+	open NAMES, $authors_file or die "Couldn't open authors name list: $!";
 	binmode(NAMES, ':utf8');
    	while (<NAMES>) {
 	    chomp $_;
@@ -1062,7 +1064,7 @@ sub add_author {
     my $self = shift;
     my $name = lc(shift);
     $self->{author_names}->{$name} = 1;
-    open NAMES, ">>".AUTHORS_FILE;
+    open NAMES, ">>".$authors_file;
     binmode(NAMES, ':utf8');
     print NAMES "$name\n";
     close NAMES;
@@ -1073,7 +1075,7 @@ sub is_known_notname {
     my $name = lc(shift);
     if (!$self->{not_names}) {
    	$self->{not_names} = {};
-	open NOTNAMES, NOTNAMES_FILE;
+	open NOTNAMES, $notnames_file;
 	binmode(NOTNAMES, ':utf8');
    	while (<NOTNAMES>) {
 	    chomp $_;
@@ -1089,7 +1091,7 @@ sub add_notname {
     my $self = shift;
     my $name = lc(shift);
     $self->{not_names}->{$name} = 1;
-    open NOTNAMES, ">>".NOTNAMES_FILE;
+    open NOTNAMES, ">>".$notnames_file;
     binmode(NOTNAMES, ':utf8');
     print NOTNAMES "$name\n";
     close NOTNAMES;
@@ -1101,7 +1103,7 @@ sub is_firstname {
     return 0 if length($name) < 2;
     if (!$self->{firstnames}) {
    	$self->{firstnames} = {};
-	open FNAMES, FIRSTNAMES_FILE;
+	open FNAMES, $firstnames_file;
 	binmode(FNAMES, ':utf8');
    	while (<FNAMES>) {
 	    chomp $_;
