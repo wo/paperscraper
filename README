@@ -52,15 +52,14 @@ Then copy config-example.pl to config.pl and adjust the values for the
 database connection and the installation path.
 
 At this point there aren't any pages in the database yet. To test the
-setup, you might try
+setup, you might run
 
-INSERT INTO sources (url) VALUES 
-  ('http://github.com/wo/opp-tools/wiki/Test-source-page');
+./update_sources add "http://consc.net/papers.html"
 
-Then run 
+and then
 
-process_pages -v1
-process_links -v1
+./process_pages -v1
+./process_links -v1
 
 The first of these looks for (new) links on the tracked pages, the
 second extracts information from (new) papers found behind these
