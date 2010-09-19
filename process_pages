@@ -44,7 +44,7 @@ my $ignore_url_re = qr{
     \.(?:css|mp3|avi|jpg|gif)$
 }xi;
 
-# ignore these session or locale in urls:
+# ignore these session IDs or locale in urls:
 my $session_id_re = qr{
     \bs\w*id=[\w_-]+    |
     halsid=[\w_-]+      |
@@ -69,7 +69,7 @@ my $db_insert_link = $dbh->prepare(
     "INSERT IGNORE INTO links (source_id, location_id, anchortext) "
     ."VALUES (?,?,?)");
 foreach my $page (@{$pages}) {
-   print "checking page $page->{url}\n" if $verbosity;
+   print "\nchecking page $page->{url}\n" if $verbosity;
    my $page_id = $page->{source_id};
    my $mtime = (defined $page->{last_checked}) ? $page->{last_checked} : 0;
    my $res = fetch_url($page->{url}, $mtime);
