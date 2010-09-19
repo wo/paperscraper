@@ -352,10 +352,17 @@ sub process_locations {
             next;
         }
 
-	print "RESULT: $loc->{authors}: '$loc->{title}' "
-            ."($loc->{filetype}, $loc->{filesize}b, $loc->{length}p, "
-            ."spam: $loc->{spamminess}, conf: $loc->{confidence})\n"
-            ."$loc->{abstract}\n\n" if $verbosity;
+	print <<EOD if $verbosity;
+=========== RESULT ===========
+authors:    $loc->{authors}
+title:      $loc->{title}
+filetype:   $loc->{filetype}
+spamminess: $loc->{spamminess}
+confidence: $loc->{confidence}
+abstract: 
+$loc->{abstract}
+==============================
+EOD
 
         if ($loc->{document_id}) {
             # location already links to a document; update the document:
@@ -397,13 +404,12 @@ sub process_locations {
         }
 
         # add document to database:
-        print "\n --- adding document to database.\n" if $verbosity > 1;
         next if $opts{n};
         $db_adddoc->execute($loc->{authors}, $loc->{title}, $loc->{abstract}, 
                             $loc->{length}, $loc->{confidence})
 	    or print DBI->errstr;
         my $doc_id = $db_adddoc->{mysql_insertid};
-        print "document added as id $doc_id\n";
+        print "document added as id $doc_id\n" if $verbosity;
         $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
                              $loc->{spamminess}, $doc_id, $loc_id)
             or print DBI->errstr;
