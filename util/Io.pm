@@ -115,7 +115,7 @@ sub save {
    my $textmode = shift;
    print "saving $filename\n" if $verbosity > 1;
    if (!open FH, '>'.$filename) {
-       print "Error: cannot save local file $filename: $!" if $verbosity;
+       print "Error: cannot save local file $filename: $!\n" if $verbosity;
        return 0;
    }
    if ($textmode) { 
