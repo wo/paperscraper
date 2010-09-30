@@ -124,6 +124,7 @@ else {
 
 print "done.\n" if $verbosity;
 
+system("mkdir -p $cfg{'TEMPDIR'}") unless (-e $cfg{'TEMPDIR'});
 system('rm -f '.$cfg{'TEMPDIR'}.'*') unless $verbosity;
 system("rm -f '$lockfile'");
 
