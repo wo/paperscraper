@@ -11,7 +11,7 @@ PATH       => '/home/wo/projects/opp-tools/',
 FILETYPES  => ['pdf', 'ps', 'doc', 'rtf', 'html', 'txt'],
 
 # Number of links to process in one go:
-NUM_URLS   => 1,
+NUM_URLS   => 5,
 
 # Software:
 PS2PDF      => '/usr/bin/ps2pdf',

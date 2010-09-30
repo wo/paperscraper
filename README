@@ -19,29 +19,36 @@ ps2pdf
 unoconv
 wkhtmltopdf
 
-On Ubuntu 10.04, the following installs everything except cuneiform:
+On Ubuntu 10.04, the following installs everything except cuneiform
+and wkhtmltopdf:
 
-sudo apt-get install poppler-utils pdftk imagemagick ghostscript \
-unoconv wkhtmltopdf
+aptitude install poppler-utils pdftk imagemagick ghostscript unoconv
 
-The cuneiform version in the standard repositories is too old. For
+The cuneiform version in the standard repositories too old. For
 Debian-based systems, you can get cuneiform 0.9 from
 http://notesalexp.org/. Otherwise see
 https://launchpad.net/cuneiform-linux/.
 
+For wkhtmltopdf, install a recent static binary from 
+http://code.google.com/p/wkhtmltopdf/, for instance by calling
+
+wget http://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.9.9-static-i386.tar.bz2
+tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
+sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
+
 Finally, make sure you have the following CPAN Perl modules:
 
-HTML::LinkExtractor
-HTML::Encoding
-HTML::Strip
-HTML::TreeBuilder
-XML::Writer
-XML::XPath
-XML::RSS
-Text::Capitalize
-String::Approx
-Algorithm::NaiveBayes
-AI::Categorizer
+perl -MCPAN -e 'install HTML::LinkExtractor'
+perl -MCPAN -e 'install HTML::Encoding'
+perl -MCPAN -e 'install HTML::Strip'
+perl -MCPAN -e 'install HTML::TreeBuilder'
+perl -MCPAN -e 'install XML::Writer'
+perl -MCPAN -e 'install XML::XPath'
+perl -MCPAN -e 'install XML::RSS'
+perl -MCPAN -e 'install Text::Capitalize'
+perl -MCPAN -e 'install String::Approx'
+perl -MCPAN -e 'install Algorithm::NaiveBayes'
+perl -MCPAN -e 'install AI::Categorizer'
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
