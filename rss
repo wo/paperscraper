@@ -19,7 +19,7 @@ $cfg{'CONFIDENCE_THRESHOLD'} = 0.6;
 # during the day, with repeated entries):
 my $cgi = new CGI;
 $cgi->charset("utf-8");
-print $cgi->header('text/plain');
+print $cgi->header('text/xml');
 
 my $since = $cgi->param('since');
 my $until = $cgi->param('until');
@@ -43,6 +43,7 @@ my $select = $dbh->prepare(<<SQL);
    AND documents.found_date < ?
    AND documents.meta_confidence > $cfg{'CONFIDENCE_THRESHOLD'}
    AND locations.spamminess < $cfg{'SPAM_THRESHOLD'}
+   AND locations.status = 1
    GROUP BY documents.document_id
    LIMIT 1000
 SQL
