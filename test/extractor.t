@@ -51,7 +51,7 @@ is(join(',', @{$result->{authors}}), 'Wolfgang Schwarz',
      "extractor recognises author of testdoc3.doc");
 is($result->{title}, 'Preferring the less reliable method',
      "extractor recognises title of testdoc3.doc");
-like($result->{abstract}, qr/^Compare the following.*It seems not.$/s,
+like($result->{abstract}, qr/^Compare the following.*irrational.$/s,
      "extractor recognises abstract of testdoc3.doc");
 like($result->{text}, qr/suppose you apply the Bad method/,
      "extractor returns plain text of testdoc3.doc");
@@ -62,7 +62,7 @@ is(join(',', @{$result->{authors}}), 'Wolfgang Schwarz',
      "extractor recognises author of testdoc3.ps");
 is($result->{title}, 'Preferring the less reliable method',
      "extractor recognises title of testdoc3.ps");
-like($result->{abstract}, qr/^Compare the following.*It seems not.$/s,
+like($result->{abstract}, qr/^Compare the following.*irrational.$/s,
      "extractor recognises abstract of testdoc3.ps");
 like($result->{text}, qr/suppose you apply the Bad method/,
      "extractor returns plain text of testdoc3.ps");
