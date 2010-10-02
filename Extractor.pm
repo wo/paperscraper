@@ -768,7 +768,7 @@ sub get_metadata {
   }
 
     # reduce confidence if (single) author is part of abstract:
-    my $au = $authors[0];
+    my $au = $authors[0] || '';
     $au =~ s/$re_name/$1/;
     $self->confidence(-0.15, "author in abstract") if ($au && $abstract =~ /\b\Q$au\E\b\D{4}/i);
 
