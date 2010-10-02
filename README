@@ -8,35 +8,39 @@ version 0.5 (2010-06-12)
 INSTALLATION AND SETUP
 ---------------------------------------------------------------------
 
-To process documents in various formats, a few additional software
-packages are required:
+To process documents in various formats, some additional software
+packages are required. (You may omit packages for formats you don't
+need.)
 
-pdftohtml (Poppler version)
+pdftohtml, the Poppler version
 pdftk
-cuneiform 0.9
-convert (ImageMagick)
-ps2pdf
-unoconv
-wkhtmltopdf
+cuneiform 0.9                    (for OCR processing)
+convert, from ImageMagick        (for OCR processing)
+ps2pdf                           (for Postscript files)
+openoffice.org                   (for Word/RTF files)
+unoconv                          (for Word/RTF files)
+wkhtmltopdf                      (for HTML files)
 
 On Ubuntu 10.04, the following installs everything except cuneiform
 and wkhtmltopdf:
 
-aptitude install poppler-utils pdftk imagemagick ghostscript unoconv
+aptitude install poppler-utils pdftk imagemagick ghostscript \
+oppenoffice.org unoconv
 
 The cuneiform version in the standard repositories too old. For
 Debian-based systems, you can get cuneiform 0.9 from
 http://notesalexp.org/. Otherwise see
 https://launchpad.net/cuneiform-linux/.
 
-For wkhtmltopdf, install a recent static binary from 
-http://code.google.com/p/wkhtmltopdf/, for instance by calling
+For wkhtmltopdf, I would recommend a recent static binary from
+http://code.google.com/p/wkhtmltopdf/, which you can install by
+calling something like
 
 wget http://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.9.9-static-i386.tar.bz2
 tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
 sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
 
-Finally, make sure you have the following CPAN Perl modules:
+Finally, make sure you have the following CPAN Perl modules.
 
 perl -MCPAN -e 'install HTML::LinkExtractor'
 perl -MCPAN -e 'install HTML::Encoding'
