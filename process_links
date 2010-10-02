@@ -85,6 +85,10 @@ if ($opts{p}) {
     else {
 	$url = $opts{p};
         ($id) = $dbh->selectrow_array("SELECT location_id FROM locations WHERE url = '$opts{p}'");
+        unless ($id) {
+            $id = 0;
+            $opts{n} = 1;
+        }
     }
     my @locations = ({ location_id => $id, url => $url });
     process_locations(@locations);
