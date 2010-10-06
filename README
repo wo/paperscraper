@@ -25,7 +25,7 @@ On Ubuntu 10.04, the following installs everything except cuneiform
 and wkhtmltopdf:
 
 aptitude install poppler-utils pdftk imagemagick ghostscript \
-oppenoffice.org unoconv
+openoffice.org unoconv
 
 The cuneiform version in the standard repositories too old. For
 Debian-based systems, you can get cuneiform 0.9 from
