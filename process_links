@@ -68,6 +68,7 @@ if ( -e "$lockfile" ) {
            ." | awk '{print \$2}' | xargs kill -9");
 }
 system("touch '$lockfile'");
+system("mkdir -p $cfg{'TEMPDIR'}") unless (-e $cfg{'TEMPDIR'});
 
 # find some documents to check:
 my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
@@ -128,7 +129,6 @@ else {
 
 print "done.\n" if $verbosity;
 
-system("mkdir -p $cfg{'TEMPDIR'}") unless (-e $cfg{'TEMPDIR'});
 system('rm -f '.$cfg{'TEMPDIR'}.'*') unless $verbosity;
 system("rm -f '$lockfile'");
 
