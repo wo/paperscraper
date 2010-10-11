@@ -21,15 +21,15 @@ openoffice.org                   (for Word/RTF files)
 unoconv                          (for Word/RTF files)
 wkhtmltopdf                      (for HTML files)
 
-On Ubuntu 10.04, the following installs everything except cuneiform
-and wkhtmltopdf:
+On Ubuntu 10.04 and 10.10, the following installs everything except
+cuneiform and wkhtmltopdf:
 
 aptitude install poppler-utils pdftk imagemagick ghostscript \
 openoffice.org unoconv
 
-The cuneiform version in the standard repositories too old. For
-Debian-based systems, you can get cuneiform 0.9 from
-http://notesalexp.org/. Otherwise see
+The cuneiform version in the standard repositories too old. (We need
+at least 0.9.) For Debian-based systems, you can get a recent version
+from http://notesalexp.org/. Otherwise see
 https://launchpad.net/cuneiform-linux/.
 
 For wkhtmltopdf, I would recommend a recent static binary from
@@ -40,7 +40,8 @@ wget http://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.9.9-static-i386.tar.b
 tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
 sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
 
-Finally, make sure you have the following CPAN Perl modules.
+Finally, make sure you have the following CPAN Perl modules. (You may
+need to install gcc first in order to install them.)
 
 perl -MCPAN -e 'install HTML::LinkExtractor'
 perl -MCPAN -e 'install HTML::Encoding'
