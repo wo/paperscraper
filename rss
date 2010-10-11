@@ -7,11 +7,6 @@ use XML::RSS;
 use POSIX;
 my %cfg = do 'config.pl';
 
-# only show entries with less than this spamminess score:
-$cfg{'SPAM_THRESHOLD'}       = 0.4;
-# only show entries with more than this parser confidence:
-$cfg{'CONFIDENCE_THRESHOLD'} = 0.6;
-
 # set datetime range from when documents should be listed; can be
 # specified by CGI parameters 'since' and 'until'. If only 'since' is
 # given, until defaults to now, if neither is given, lists all

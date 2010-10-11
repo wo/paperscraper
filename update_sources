@@ -39,9 +39,6 @@ explanatory string.
 
 EOF
 
-# CGI access is restricted to IP addresses that match the following
-# pattern. (You may want to add further security measures.)
-my $ALLOWED_IPS = '127.0.0.1|150.203.224.249';
 
 my $cgi = new CGI;
 $cgi->charset("utf-8");
@@ -65,7 +62,7 @@ my $crawl;
 
 if ($is_cgi) {
     print $cgi->header('text/plain');
-    unless ($ENV{REMOTE_ADDR} =~ /$ALLOWED_IPS/) {
+    unless ($ENV{REMOTE_ADDR} =~ /$cfg{ALLOWED_IPS}/) {
         ret(0, "unauthorised access from $ENV{REMOTE_ADDR}") 
     }
     $action = $cgi->param('action');
