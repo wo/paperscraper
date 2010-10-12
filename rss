@@ -9,19 +9,19 @@ my %cfg = do 'config.pl';
 
 # set datetime range from when documents should be listed; can be
 # specified by CGI parameters 'since' and 'until'. If only 'since' is
-# given, until defaults to now, if neither is given, lists all
-# documents from yesterday (so that the feed content doesn't change
-# during the day, with repeated entries):
+# given, until defaults to now, if neither is given, the latest 100
+# documents are listed:
 my $cgi = new CGI;
 $cgi->charset("utf-8");
 print $cgi->header('text/xml');
 
 my $since = $cgi->param('since');
 my $until = $cgi->param('until');
+my $limit = 1000;
 if (!$since) {
-    my $yesterday = time() - 24*60*60;
-    $since = strftime("%Y-%m-%d 00:00:00", localtime($yesterday));
-    $until = strftime("%Y-%m-%d 23:59:59", localtime($yesterday));
+    $limit = 100;
+    $since = "1970-01-01";
+    $until = strftime("%Y-%m-%d 23:59:59", localtime());
 }
 elsif (!$until) {
     $until = strftime("%Y-%m-%d 23:59:59", localtime());
@@ -40,9 +40,9 @@ my $select = $dbh->prepare(<<SQL);
    AND locations.spamminess < $cfg{'SPAM_THRESHOLD'}
    AND locations.status = 1
    GROUP BY documents.document_id
-   LIMIT 1000
+   LIMIT ?
 SQL
-$select->execute($since, $until) or die DBI->errstr;
+$select->execute($since, $until, $limit) or die DBI->errstr;
 
 my $rss = new XML::RSS (version => '1.0');
 $rss->channel(

@@ -45,27 +45,28 @@ SKIP: {
         ."VALUES ('author2', 'title2', 'abstract2', '2010-01-05 12:00', 0.8)");
     sql("INSERT INTO documents (authors,title,abstract,found_date,meta_confidence) "
         ."VALUES ('author3', 'title3', 'abstract3', '2010-02-05 12:00', 0.9)");
-    sql("INSERT INTO locations (document_id,url,spamminess) "
-        ."VALUES (1, 'u1', 0.1)");
-    sql("INSERT INTO locations (document_id,url,spamminess) "
-        ."VALUES (2, 'u2', 0.1)");
-    sql("INSERT INTO locations (document_id,url,spamminess) "
-        ."VALUES (3, 'u3', 0.1)");
+    sql("INSERT INTO locations (document_id,url,spamminess,status) "
+        ."VALUES (1, 'u1', 0.1, 1)");
+    sql("INSERT INTO locations (document_id,url,spamminess,status) "
+        ."VALUES (2, 'u2', 0.1,1)");
+    sql("INSERT INTO locations (document_id,url,spamminess,status) "
+        ."VALUES (3, 'u3', 0.1,1)");
 
     $res = read_url("$RSS_URL");
     my $xp = XML::XPath->new(xml => $res);
     my $nodes = $xp->find('//channel');
     ok(defined $nodes, "rss script outputs valid XML");
     $nodes = $xp->find('//item');
+    my $count = 0;
     foreach my $node ($nodes->get_nodelist()) {
-        my $nodestr = XML::XPath::XMLParser::as_string($node);
-        like($nodestr, qr/title1/, "RSS contains document from (only) yesterday");
+        $count++;
     }
+    is($count, 3, "default RSS contains all recent documents");
 
     $res = read_url("$RSS_URL?since=2008-01-01");
     $xp = XML::XPath->new(xml => $res);
     $nodes = $xp->find('//item');
-    my $count = 0;
+    $count = 0;
     foreach my $node ($nodes->get_nodelist()) {
         $count++;
     }
