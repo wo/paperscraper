@@ -2,147 +2,149 @@
 opp-tools is a collection of tools to track academic papers uploaded
 to (or linked from) certain web pages.
 
-version 0.9 (2010-10-02)
+version 0.9 (2010-10-16)
 
 ---------------------------------------------------------------------
 INSTALLATION AND SETUP
 ---------------------------------------------------------------------
 
-To process documents in various formats, some additional software
-packages are required. (You may omit packages for formats you don't
-need.)
+Some additional software packages are required to handle documents of
+various formats. (You may omit packages for formats you don't need.)
 
-pdftohtml, the Poppler version
-pdftk
-cuneiform 0.9                    (for OCR processing)
-convert, from ImageMagick        (for OCR processing)
-ps2pdf                           (for Postscript files)
-openoffice.org                   (for Word/RTF files)
-unoconv                          (for Word/RTF files)
-wkhtmltopdf                      (for HTML files)
+pdftohtml, the Poppler version   (all formats)
+pdftk                            (all formats)
+cuneiform 0.9                    (PDF/OCR, Postscript)
+convert, from ImageMagick        (PDF/OCR, Postscript)
+ps2pdf                           (Postscript)
+openoffice.org                   (Word, RTF)
+unoconv                          (Word, RTF)
+wkhtmltopdf                      (HTML)
 
 On Ubuntu 10.04 and 10.10, the following installs everything except
 cuneiform and wkhtmltopdf:
 
-aptitude install poppler-utils pdftk imagemagick ghostscript \
-openoffice.org unoconv
+  sudo aptitude install poppler-utils pdftk imagemagick ghostscript \
+  openoffice.org unoconv
 
-The cuneiform version in the standard repositories too old. (We need
-at least 0.9.) For Debian-based systems, you can get a recent version
-from http://notesalexp.org/. Otherwise see
-https://launchpad.net/cuneiform-linux/.
+The cuneiform version in the standard repositories too old: we need at
+least 0.9. For Debian-based systems, you can get a recent version from
+http://notesalexp.org/.
 
-For wkhtmltopdf, I would recommend a recent static binary from
+For wkhtmltopdf, I recommend a recent static binary from
 http://code.google.com/p/wkhtmltopdf/, which you can install by
 calling something like
 
-wget http://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.9.9-static-i386.tar.bz2
-tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
-sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
+  wget http://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.9.9-static-i386.tar.bz2
+  tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
+  sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
 
 Finally, make sure you have the following CPAN Perl modules. (You may
 need to install gcc first in order to install them.)
 
-perl -MCPAN -e 'install HTML::LinkExtractor'
-perl -MCPAN -e 'install HTML::Encoding'
-perl -MCPAN -e 'install HTML::Strip'
-perl -MCPAN -e 'install HTML::TreeBuilder'
-perl -MCPAN -e 'install XML::Writer'
-perl -MCPAN -e 'install XML::XPath'
-perl -MCPAN -e 'install XML::RSS'
-perl -MCPAN -e 'install Text::Capitalize'
-perl -MCPAN -e 'install String::Approx'
-perl -MCPAN -e 'install Algorithm::NaiveBayes'
-perl -MCPAN -e 'install AI::Categorizer'
+  sudo perl -MCPAN -e 'install HTML::LinkExtractor'
+  sudo perl -MCPAN -e 'install HTML::Encoding'
+  sudo perl -MCPAN -e 'install HTML::Strip'
+  sudo perl -MCPAN -e 'install HTML::TreeBuilder'
+  sudo perl -MCPAN -e 'install XML::Writer'
+  sudo perl -MCPAN -e 'install XML::XPath'
+  sudo perl -MCPAN -e 'install XML::RSS'
+  sudo perl -MCPAN -e 'install Text::Capitalize'
+  sudo perl -MCPAN -e 'install String::Approx'
+  sudo perl -MCPAN -e 'install Algorithm::NaiveBayes'
+  sudo perl -MCPAN -e 'install AI::Categorizer'
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
 
-mysql -u dbuser -p dbname < setup.sql 
+  mysql -u dbuser -p dbname < setup.sql 
 
-Then copy config-example.pl to config.pl and adjust the values for the
-database connection and the installation path.
+Then rename config-example.pl to config.pl and adjust the values for
+the database connection and the installation path.
 
 At this point there aren't any pages in the database yet. To test the
 setup, you might run
 
-./update_sources add "http://consc.net/papers.html"
-
-and then
-
-./process_pages -v1
-./process_links -v1
-
-The first of these looks for (new) links on the tracked pages, the
-second extracts information from (new) papers found behind these
-links.
-
-To keep an up-to-date record, run these two scripts as a cron job
-every few minutes.
+  ./update_sources add "http://consc.net/papers.html"
+  ./process_pages -v1
+  ./process_links -v1
 
 
 ---------------------------------------------------------------------
-INTERNALS
+USAGE
 ---------------------------------------------------------------------
 
-Here is a flowchart of the steps in process_links.pl. Boxed terms
-stand for applications that are part of opp-tools, underlined ones
-denote other applications that may also be installed. Capitalised
-steps without boxes are performed directly in process_link.pl.
+At the core of opp-tools lie two Perl modules, Converter and
+Extractor. The Converter module converts documents from PDF, Word,
+HTML and some other formats into XML. The Extractor module extracts
+metadata from such XML documents. These two modules can be used on
+their own, without any database or internet connection:
 
+  #! /usr/bin/perl
+  use Converter;
+  use Extractor;
+  my %cfg = do 'config.pl';
+  Converter::cfg(\%cfg);
+  Converter::convert2xml("test.pdf", "test.xml");
+  my $extractor = Extractor->new("test.xml");
+  my $result = $extractor->parse();
+  print "authors: ", join(', ', @{$result->{authors}}), "\n";
+  print "title: ", $result->{title}, "\n";
 
-                              url
+The rest of the package makes use of the Converter and Extractor
+modules to keep track of documents that are linked to from certain web
+pages. The tracked pages are stored in the "sources" table of the
+database. Instead of manually editing the MySQL table, you can use
+update_sources, as in:
 
-                               |
-                               V
-                                      server error?   
-                             FETCH    unsupported filetype?
-                               &      intermediate page?
-                            CONFIRM  --------------------->  STORE
-                                     
-                               |
-                               |
-                               V
-                            
-                             SPAM      spam?
-                             CHECK   -------->  STORE
-               
-                               |
-                _______________|________________
-               |         |           |          |
-               | ps?     | pdf?      | doc?     | html?
-               |         |           | rtf?     | txt?
-               V         V           V          V
-                      +------+              +-------+
-            ps2pdf -> | RPDF | <- antiword  | RHTML | 
-            ------    +------+    --------  +-------+
-                         |                      |
-                         |_____ ________________|
-                               |
-                               V
-                          +---------+   
-                          |  TIDY   |  
-                          +---------+   
-                               |
-                               V
+  ./update_sources add "http://consc.net/papers.html"
 
-                            ENRICH    
+See
 
-                               |
-                               V
-                          +---------+   
-                          |  META   |  
-                          +---------+   
-                               |
-                               V
-                          
-                             SPAM      spam?
-                             CHECK   -------->  STORE
-                          
-                               |
-                               V
- 
-                             STORE
+  ./update_sources -h
+
+for more usage information.
+
+The two main scripts for retrieving document information from the
+source pages are process_pages and process_links. The first checks for
+links on the source pages and stores them in the "locations" table in
+the database. The second fetches the linked documents, extracts
+metadata and stores the result in the "documents" table. The two
+scripts are meant to be called regularly, e.g. every 5 minutes, by a
+cron job, so that the database is always up-to-date with the source
+pages. 
+
+Often a source page will not only contain links to papers but also to
+irrelevant stuff like a department home page or a CV. To filter these
+out, process_links assigns a "spamminess" score between 0 and 1 to
+each processed URL; the score is stored in the "locations" table. It
+is calculated by a combination of ad hoc heuristics and a Bayesian
+classifier.
+
+The classifier comes pre-trained with a small "ham" and "spam" corpus,
+which is included in the spamcorpus directory. To adjust the filter,
+you can add or remove documents in the ham and spam directories and
+then run
+
+  ./train_filter
+
+in the spamcorpus directory. The documents in the ham and spam
+directory should be in plain text format. To add e.g. a PDF or HTML
+document, you can run
+
+  ./add_document -s http://example.com/department/index.html
+
+This adds the text content of the given URL to the spam
+corpus. Without the -s flag, the content is added to the ham corpus.
+
+The Extractor module that extracts metadata from a document also
+estimates its own accuracy for a given document. This is stored as
+"meta_confidence" in the "documents" table. A confidence value of 0.5
+suggests that it is roughly as likely that the extracted values are
+correct than not.
+
+It is up to you to do anything further with the contents of the
+"documents" table. Included is a script called "rss" that generates an
+RSS feed of the most recently found documents.
 
 
 ---------------------------------------------------------------------
