@@ -5,6 +5,8 @@ use Encode;
 use Data::Dumper;
 use File::Spec;
 use FindBin qw($Bin);
+use Cwd 'abs_path';
+use File::Basename;
 use Exporter;
 use util::Sysexec;
 use util::String;
@@ -12,6 +14,9 @@ use util::Io;
 binmode STDOUT, ":utf8";
 our @ISA = ('Exporter');
 our @EXPORT = qw(&convert2text &convert2pdf &convert2xml &converters);
+
+my $path = dirname(abs_path(__FILE__));
+my $rpdf_path = "$path/rpdf/rpdf";
 
 my $verbosity = 0;
 sub verbosity {
@@ -144,7 +149,7 @@ sub convert2xml {
     print "getting XML from $filename\n" if $verbosity;
   SWITCH: for ($filetype) {
       /pdf/ && do {
-	  my $command = $cfg{'RPDF'}
+	  my $command = $rpdf_path
               ." -d$verbosity"
 	      ." $filename"
               ." $target"
