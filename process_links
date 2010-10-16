@@ -22,7 +22,6 @@ my %cfg = do 'config.pl';
 
 # A few more config settings:
 $cfg{'TEMPDIR'}       = $cfg{'PATH'}.'temp/';
-$cfg{'RPDF'}          = $cfg{'PATH'}.'rpdf/rpdf';
 $cfg{'SPAMCORPUS'}    = $cfg{'PATH'}.'spamcorpus/';
 $cfg{'RTF2PDF'}       = $cfg{'PATH'}.'util/rtf2pdf.sh';
 # Spam score threshold where we don't store the document:
