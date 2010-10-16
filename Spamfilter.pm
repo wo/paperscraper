@@ -23,7 +23,7 @@ our @EXPORT = qw(&classify);
 #
 # TODO: run the Bayesian classifier on all relevant features (in the
 # XML representation), rather than just the plain text content. This
-# would hopefully be able to replace many of the heurists.
+# would hopefully replace many of the heurists.
 #
 
 my $verbosity = 0;
