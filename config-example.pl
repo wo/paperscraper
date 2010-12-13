@@ -25,5 +25,5 @@ SPAM_THRESHOLD        => 0.4,
 CONFIDENCE_THRESHOLD  => 0.6,
 
 # CGI access to update_sources is restricted to IP addresses matching
-# the following pattern:
-ALLOWED_IPS  => '127.0.0.1|150.203.224.249',
+# the following pattern (regexp):
+ALLOWED_IPS  => '127.0.0.1',
