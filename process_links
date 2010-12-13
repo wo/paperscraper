@@ -96,7 +96,7 @@ if ($opts{p}) {
 else {
     # from database.
     # Do we have unprocessed locations?
-    my $query = "SELECT * FROM locations "
+    my $query = "SELECT *,UNIX_TIMESTAMP(last_checked) AS last_checked FROM locations "
         ."WHERE status = 0 ORDER BY location_id LIMIT ".$cfg{'NUM_URLS'};
     my @locations = @{$dbh->selectall_arrayref($query, { Slice => {} })};
     if (!@locations) {
