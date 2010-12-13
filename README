@@ -38,8 +38,10 @@ calling something like
   tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
   sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
 
-Finally, make sure you have the following CPAN Perl modules. (You may
-need to install gcc first in order to install them.)
+Finally, make sure you have the following CPAN Perl modules. You may
+need to install gcc and openssl first:
+
+  sudo aptitude install gcc openssl libssl-dev
 
   sudo perl -MCPAN -e 'install HTML::LinkExtractor'
   sudo perl -MCPAN -e 'install HTML::Encoding'

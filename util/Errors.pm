@@ -126,7 +126,6 @@ sub errorcode {
 
    900 => 'cannot fetch document',
    901 => 'document is empty',
-   902 => 'HTTPS is currently not supported',
    950 => 'steppingstone to already known location',
 
    1000 => 'subpage with more links',

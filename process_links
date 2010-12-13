@@ -159,12 +159,6 @@ sub process_locations {
         binmode STDOUT, ":utf8";
 	print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
 
-        if ($loc->{url} =~ /^https:/) {
-	    error("HTTPS is currently not supported");
-	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-	    next;
-        }
-
 	# retrieve document:
 	my $mtime = (defined $loc->{last_checked} && !$cfg{'REPROCESS_ALL'}) ? 
             $loc->{last_checked} : 0;
