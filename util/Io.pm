@@ -49,9 +49,9 @@ sub fetch_url {
    $response->{content} = $response->decoded_content if ($response->decoded_content);
    # sometimes when a server wrongly sends "Partial Content", ->{content} is empty and
    # ->{_content} has all the content; so we copy it over:
-   #if (($response->content eq '') and defined($response->{_content})) {
-   #    $response->{content} = $response->{_content};
-   #}
+   if (!$response->{content} and defined($response->{_content})) {
+       $response->{content} = $response->{_content};
+   }
    print Dumper $response if $verbosity >= 7;
    return $response;
 }
