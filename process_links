@@ -204,7 +204,7 @@ sub process_locations {
 	}
 
 	# save local copy:
-	my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex($loc->{url}).'.'.$loc->{filetype};
+	my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex(''.$loc->{url}).'.'.$loc->{filetype};
 	if (!save($file, $loc->{content}, $loc->{filetype} eq 'html' ? 1 : 0)) {
 	    error("cannot save local file");
 	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
