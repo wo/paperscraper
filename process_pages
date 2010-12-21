@@ -175,13 +175,15 @@ sub remove_link {
         # it is orphaned so that it can be removed.
         $dbh->do(
             "DELETE FROM locations WHERE location_id = $loc_id");
-        my ($locs_left) = $dbh->selectrow_array(
-            "SELECT location_id FROM locations WHERE document_id = $doc_id");
-        if (!$locs_left || $locs_left eq '0') {
-            print "deleting orphaned document $doc_id.\n" if $verbosity > 1;
-            $dbh->do(
-                "DELETE FROM documents WHERE document_id = $doc_id");
-        }
+	if ($doc_id) {
+	    my ($locs_left) = $dbh->selectrow_array(
+		"SELECT location_id FROM locations WHERE document_id = $doc_id");
+	    if (!$locs_left || $locs_left eq '0') {
+		print "deleting orphaned document $doc_id.\n" if $verbosity > 1;
+		$dbh->do(
+		    "DELETE FROM documents WHERE document_id = $doc_id");
+	    }
+	}
     }
     return 1;
 }
