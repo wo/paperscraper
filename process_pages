@@ -174,7 +174,7 @@ sub remove_link {
         # in process_links for every spammy or dead location whether
         # it is orphaned so that it can be removed.
         $dbh->do(
-            "DELETE FROM locations WHERE location_id = $loc_id AND source_id = $page_id");
+            "DELETE FROM locations WHERE location_id = $loc_id");
         my ($locs_left) = $dbh->selectrow_array(
             "SELECT location_id FROM locations WHERE document_id = $doc_id");
         if (!$locs_left || $locs_left eq '0') {

@@ -477,9 +477,9 @@ sub check_steppingstone {
     }
     # other intermediate pages are short and have at least one link to a pdf file:
     return 0 if $loc->{filesize} > 5000;
-    return 0 if $loc->{content} =~ /\.pdf/i;
+    return 0 if $loc->{content} !~ /\.pdf/i;
     # prevent loops with redirects to login?req=foo.pdf
-    return 0 if $loc->{url} !~ m/\.pdf$/i;
+    return 0 if $loc->{url} =~ m/\.pdf$/i;
     print "might be a steppingstone page?\n" if $verbosity > 1;
     my $link_extractor = new HTML::LinkExtractor(undef, $http_res->base, 1);
     eval {
