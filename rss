@@ -52,17 +52,22 @@ $rss->channel(
     );
 
 while (my $row = $select->fetchrow_hashref) {
-    my @authors = split(/\s*,\s*/, $row->{authors});
-    $rss->add_item(
-        title       => $row->{title},
-        link        => $row->{url},
-        description => $row->{abstract},
-        format      => $row->{filetype},
-        identifier  => $row->{document_id},
-        dc => {
-            creator  => \@authors,
-        }
-    );
+   my @authors = split(/\s*,\s*/, $row->{authors});
+   $rss->add_item(
+       title       => dec($row->{title}),
+       link        => $row->{url},
+       description => dec($row->{abstract}),
+       format      => $row->{filetype},
+       identifier  => $row->{document_id},
+       dc => {
+           creator  => [map { dec($_) } @authors],
+       }
+   );
 }
 
 print $rss->as_string;
+
+sub dec {
+   use Encode 'decode';
+   return decode('utf8',shift());
+}
