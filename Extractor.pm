@@ -19,14 +19,14 @@ my $notnames_file = "$path/data/notnames.txt";
 
 # these are defined at the end:
 my ($re_name, $re_pre_name, $re_post_name, $re_authors_separator,
-    $re_bad_author, $re_bad_title, $re_bad_abstract);
+    $re_bad_author, $re_bad_title, $re_bad_abstract, $re_reference_heading);
 
 sub new {
-    my ($class, $filename) = @_;
+    my ($class, $filename, $verbosity) = @_;
     die "Extractor::new() requires filename parameter" unless defined($filename);
     my $self  = {
 	filename  => $filename,
-	verbosity => 0,
+	verbosity => $verbosity,
 	converters => '', # OCR, pdftohtml, etc.
 	document  => {
 	    pages        => 0,
@@ -47,6 +47,7 @@ sub new {
 	},
     };
     bless $self, $class;
+    $self->prepare();
     return $self;
 }
 
@@ -67,7 +68,7 @@ sub prior {
     $self->{_priors}->{$field}{$value} = $prob;
 }
 
-sub parse {
+sub prepare {
     my $self = shift;
     print "parsing file ".$self->{filename}."\n" if $self->verbosity > 3;
     die "local file ".$self->{filename}." not found" unless -e $self->{filename};
@@ -79,30 +80,39 @@ sub parse {
     $self->confidence(-0.05, 'HTML') if $self->{converters} =~ /mozilla/;
     $self->confidence(-0.05, 'Word') if $self->{converters} =~ /rtf|word/;
     $xml = fix_chars($xml) if $self->{converters} =~ /pdftohtml/;
-    my $blocks = $self->parse_xml(\$xml);
-    # my $startblocks = $self->get_startblocks($blocks);
-    # $self->get_metadata($startblocks);
-    $self->get_metadata($blocks);
     $self->{document}->{text} = strip_tags($xml);
+    $self->parse_xml(\$xml);
+}
+
+sub metaparse {
+    my $self = shift;
+    $self->get_metadata();
+    $self->citparse();
     return $self->{document};
+}
+
+sub citparse {
+    my $self = shift;
+    return $self->get_citations();
 }
 
 sub parse_xml {
     my $self = shift;
     my $xmlref = shift or die 'parse_xml requires string ref parameter';
     my $chunks = $self->xml2chunks($xmlref) or die 'no text found in converted document';
-    my $lines  = $self->chunks2lines($chunks);
+    my $lines = $self->chunks2lines($chunks);
     die 'no text found in converted document (2)' unless defined($lines->[1]);
     my $blocks = $self->lines2blocks($lines);
     # later, we presuppose that there are at least 2 blocks, that's why we check that here.
     die 'no text found in converted document (3)' unless defined($blocks->[1]);
-    return $blocks;
+    $self->{lines} = $lines;
+    $self->{blocks} = $blocks;
 }
 
 sub xml2chunks {
     my $self = shift;
     my $xmlref = shift or die 'xml2chunks requires string ref parameter';
-    print "\n\n=== EXTRACTING TEXT CHUNKS ===\n" if $self->verbosity >= 3;
+    print "\n\n=== EXTRACTING TEXT CHUNKS ===\n" if $self->verbosity >= 4;
     # parse fontsize declarations:
     my %fontsizes = $$xmlref =~ /<fontspec id=\"(\d+)\" size=\"(\d+)\"/og; # id => size
     # parse all xml body chunks into @chunks array:
@@ -458,7 +468,8 @@ sub get_startblocks { # xxxx this is not used any more, looking for author name 
 
 sub get_metadata {
     my $self = shift;
-    my $blocks = shift or die 'get_metadata requires blocks parameter';
+    my $blocks = shift;
+    $blocks = $self->{blocks} unless $blocks;
     print "\n\n=== scanning for author, title, abstract ===\n" if $self->verbosity > 2;
 
     my (@authors, $first_author_id, $last_author_id);
@@ -1182,6 +1193,86 @@ sub in_google {
     return 1;
 }
 
+sub get_citations {
+    my $self = shift;
+    print "\n\n=== scanning for citations ===\n" if $self->verbosity > 2;
+
+    my $cit_section = $self->get_cit_section();
+    foreach my $line (@{$cit_section}) {
+	print $line->{text}."\n";
+    }
+
+    # We go through all blocks and assign to each a title_score based
+    # on facts like font size, text content, position on page,
+    # etc. Then we do the same with author_score, and (later)
+    # with abstract_score.
+#    my %title_score;     # id => score, a negative or positive number; 0 means neutral
+ #   my %author_score;
+  #  foreach my $id (0 .. $#$blocks) {
+#	$author_score{$id} = $self->author_score($blocks, $id);
+ #   }
+  #  foreach my $id (0 .. $#$blocks) {
+#	$title_score{$id} = $self->title_score($blocks, $id) if ($id < 30);
+ #   }
+
+    # Order ids by scores:
+  #  my @title_order =  sort {$title_score{$b} <=> $title_score{$a} } keys %title_score;
+   # my @author_order =  sort {$author_score{$b} <=> $author_score{$a} } keys %author_score;
+}
+
+sub get_cit_section {
+    my $self = shift;
+    my $lines = $self->{lines};
+    my $heading_id = -1000;
+    my $numlines = scalar(@{$lines});
+    for (my $id=0; $id<=$numlines; $id++) {
+	my $line = $lines->[$id];
+	my $text = $line->{text} || '';
+	$text = tidy($text);
+	my $score = 0;
+	print "\nscore reference '".substr($text,0,20)."' ($id): "
+	    if $self->verbosity > 3;
+	if ($text =~ /^$re_reference_heading$/) {
+	    $heading_id = $id;
+	    print "heading '$text' " if $self->verbosity > 3;
+	}
+	# reference is (not too far) after "references" heading: 
+        my $dist = $id - $heading_id;
+	$score += 2 if $dist > 0 and $dist < 1000;
+	$score += 2 if $dist < 100;
+	print $score, '|' if $self->verbosity > 3;
+	# references are in second half of paper:
+	$score += ($id > $numlines/2 ? +1 : -1);
+	print $score, '|' if $self->verbosity > 3;
+	# previous lines had high score:
+	$score += $lines->[$id-1]->{score}/3 
+	    if $id and $lines->[$id-1]->{score} > 4;
+	$score += $lines->[$id-2]->{score}/6
+	    if $id-1 > 0 and $lines->[$id-2]->{score} > 4;
+	print $score, '|' if $self->verbosity > 3;
+	# contains a four-digit number:
+	$score += ($text =~ /\d{4}/ ? +2 : -2);
+	print $score, '|' if $self->verbosity > 3;
+	# has high ratio of capitalised letters:
+	my $len = length($text);
+	my $num_caps = 1; $num_caps++ while $text =~ /\p{IsUpper}/g;
+	$score += ($len/$num_caps < 10 ? +1 : -1);
+	print $score, '|' if $self->verbosity > 3;
+	# has high ratio of numbers:
+	my $num_nums = 1; $num_nums++ while $text =~ /\d/g;
+	$score += ($len/$num_nums < 10 ? +1 : -1);
+	print $score, '|' if $self->verbosity > 3;
+	# decrease previous line's score if this one has low score:
+	$lines->[$id-1]->{score} -= 2 if $id && $score < 5;
+	$lines->[$id]->{score} = $score;
+    }
+    my @refs;
+    foreach my $line (@{$lines}) {
+	push @refs, $line if $line->{score} > 5;
+    }
+    return \@refs;
+}
+
 sub confidence {
     # simple method to boost or lower confidence. If current confidence is 0.5,
     # resulting confidence is 0.5 + arg; otherwise the effect is scaled according
@@ -1329,5 +1420,10 @@ $re_bad_abstract = qr/(?:
     \bthank
     )/ix;
 
+$re_reference_heading = qr/\s*.{0,4}\s*
+    (references?|bibliography|
+     references\s+cited|\w+\s+cited)
+    \s*.{0,4}\s*
+    /ix;
 
 1;
