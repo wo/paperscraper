@@ -35,7 +35,7 @@ unless (caller) { # called from command-line
     doctidy($file, $opts{v});
 }
 
-my $verbose = 1;
+my $verbose = 0;
 
 sub doctidy {
     my $file = shift;
@@ -62,7 +62,7 @@ sub doctidy {
     close IN;
     close OUT;
 
-#    rename "$file.tidy", $file;
+    rename "$file.tidy", $file;
 }
 
 sub pagetidy {
