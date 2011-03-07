@@ -873,10 +873,12 @@ sub parsebib {
             }
             elsif ($block->{label}->{AUTHOR}) {
                 my @authors = Text::Names::parseNames($block->{text});
+                @authors = map { Text::Names::reverseName($_) } @authors;
                 $res->{authors} = \@authors;
             }
             elsif ($block->{label}->{YEAR}) {
                 $res->{year} = $block->{text};
+                $res->{year} =~ s/.*(\d{4}(?:$re_dash\d{2,4})?).*/$1/;
             }
         }
     }

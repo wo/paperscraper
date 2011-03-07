@@ -481,7 +481,6 @@ $f{'begins with dash'} = memoize(begins($re_dash));
 
 $f{'begins with possible name'} = memoize(sub {
     my @parts = split($re_name_separator, $_[0]->{plaintext}, 2);
-    print "part 0:", $parts[0], "\n";
     return 0 if ($parts[0] =~ /$re_noname/);
     return 1 if ($parts[0] =~ /(?:$re_name_before)?$re_name(?:$re_name_after)?/);
     return 0;
@@ -503,7 +502,7 @@ $f{'contains actual name'} = memoize(sub {
 
 
 $f{'contains year'} = memoize(sub {
-    $_[0]->{plaintext} =~ /\d{4}/;    
+    $_[0]->{plaintext} =~ /(?<!\d)\d{4}(?!\d)/;    
 });
 
 $f{'contains letters'} = memoize(sub {

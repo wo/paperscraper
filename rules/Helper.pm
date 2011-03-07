@@ -109,7 +109,8 @@ sub extract_names {
     my %res; # name => probability
     my @parts = split($re_name_separator, $str);
     foreach my $part (@parts) {
-        if ($part =~ /$re_noname/ || $part !~ $re_name) {
+        if ($part =~ /$re_noname/ 
+            || $part !~ /(?:$re_name_before)?$re_name(?:$re_name_after)?/) {
             next;
         } 
         my $p = 0.5;

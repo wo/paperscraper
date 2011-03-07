@@ -226,7 +226,7 @@ sub matches {
     };
 }
     
-$f{'year'} = matches('\D?\d{4}\D?');
+$f{'year'} = matches('(?<!\d)\d{4}(?!\d)');
 
 $f{'publication status'} = matches($re_year_words);
 
