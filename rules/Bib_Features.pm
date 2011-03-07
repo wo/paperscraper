@@ -37,7 +37,7 @@ $word_features{AUTHORDASH} = [
     ];
 
 $word_features{TITLE} = [
-    [$or->('contains letter', 'is dash'), [0.6, -0.3]],
+    [$or->('contains letter', 'is dash'), [0.5, -0.3]],
     ['in quotes', [0.6, -0.3]],
     ['italic', [0.4, -0.1]],
     ['in parentheses', [-0.2, 0]],
@@ -79,7 +79,7 @@ $block_features{TITLE} = [
     ['maybe TITLE', [1, -1]],
     ['begins with uppercase letter', [0.1, -0.3]],
     ['ends with punctuation', [0.2, -0.4]],
-    ['surrounded by quotes or italics', [0.2, -0.2]],
+    ['surrounded by quotes or italics', [0.4, -0.2]],
     ['followed by OTHER block', [0.05, -0.2]],
     ['contains journal or publisher word', [-0.25, 0]],
     ['journal/publisher word after punct.', [-0.2, 0]],
@@ -108,8 +108,8 @@ our @parsing_features = (
     ['author part has high score', [0.7, -0.8]],
     ['title part has high score', [0.7, -0.8]],
     ['has title', [0.1, -1]],
-    ['good title word OTHERed', [-0.6, 0.4]], 
-    ['good author word OTHERed', [-0.6, 0.4]], 
+    ['good title word OTHERed', [-0.5, 0.2]], 
+    ['good author word OTHERed', [-0.5, 0.3]], 
     ['lengthy OTHER block before title', [-0.3, 0.05]], 
     );
 
@@ -174,7 +174,7 @@ $f{'followed by OTHER'} = sub {
 
 $f{'followed by number'} = memoize(sub {
     my $w = $_[0]->{next};
-    return 1 if ($w && $w->{text} =~ /^\d/);
+    return 1 if ($w && $w->{text} =~ /^(?:<[^>]+>\s*)?\d/);
     return 0;
 });
 
@@ -184,14 +184,14 @@ sub enclosed {
 	my $w = $_[0];
 	my $closed = 0;
 	while ($w && $w->{text} !~ /$start/) {
-	    $closed++ if $w->{text} !~ /$end/;
+	    $closed++ if $w->{text} =~ /$end/;
 	    $w = $w->{prev};
 	}
 	return 0 unless $w;
 	$w = $_[0];
 	my $opened = 0;
 	while ($w && $w->{text} !~ /$end/) {
-	    $opened++ if $w->{text} !~ /$start/;
+	    $opened++ if $w->{text} =~ /$start/;
 	    $w = $w->{next};
 	}
 	if ($closed || $opened) {
@@ -313,7 +313,7 @@ foreach my $lab (qw/TITLE AUTHOR AUTHORDASH YEAR OTHER/) {
 $f{'ends with punctuation'} = memoize(matches('[\.,;\?!](?:<[^>]+>)?.?$'));
 
 $f{'surrounded by quotes or italics'} = 
-    memoize(matches("^(<i>|$re_lquote).+(</i>|$re_rquote).?\$"));
+    memoize(matches("^(?:<i>.+</i>)|(?:$re_lquote.+$re_rquote).?\$"));
 
 $f{'followed by OTHER block'} = sub {
     my $bl = $_[0]->{next};
@@ -378,7 +378,7 @@ sub othered {
 	foreach my $ch (@{$ch0->{best}->{$label}}) {
 	    my $bl = chunk2block($ch, $_[0]->{blocks});
 	    if ($bl->{label}->{OTHER}) {
-		return ($ch->{p}->($label)-0.5)*2;
+		return max(0, ($ch->{p}->($label)-0.2)*1.25);
 	    }
 	}
 	return 0;
