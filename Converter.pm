@@ -16,18 +16,13 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(&convert2text &convert2pdf &convert2xml &converters);
 
 my $path = dirname(abs_path(__FILE__));
-my $rpdf_path = "$path/rpdf/rpdf";
+my $RPDF = "$path/rpdf/rpdf";
+my %cfg = do "$path/config.pl";
 
 my $verbosity = 0;
 sub verbosity {
    $verbosity = shift if @_;
    return $verbosity;
-}
-
-my %cfg;
-sub cfg {
-   %cfg = %{$_[0]} if @_;
-   return %cfg;
 }
 
 my @converters_used;
@@ -149,7 +144,7 @@ sub convert2xml {
     print "getting XML from $filename\n" if $verbosity;
   SWITCH: for ($filetype) {
       /pdf/ && do {
-	  my $command = $rpdf_path
+	  my $command = $RPDF
               ." -d$verbosity"
 	      ." $filename"
               ." $target"

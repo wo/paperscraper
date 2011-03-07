@@ -20,6 +20,8 @@ openoffice.org                   (Word, RTF)
 unoconv                          (Word, RTF)
 wkhtmltopdf                      (HTML)
 
+aspell-en libaspell-dev
+
 On Ubuntu 10.04 and 10.10, the following installs everything except
 cuneiform and wkhtmltopdf:
 
