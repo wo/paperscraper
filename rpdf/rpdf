@@ -58,12 +58,11 @@ sub pdf2xml {
         .' '.$source      # source file
         .' 2>&1';         # stderr to stdout
     my $xml = sysexec($command, 10, $opt{'d'}) || '';
+    $xml = Encode::decode_utf8($xml);
     # strip anchors (inserted by pdftohtml for footnotes):
     $xml =~ s/<a[^>]+>(.+?)<\/a>/$1/gi;
     if ($xml && $xml =~ /<text.+?>.*\w{5}.*</) {
-        # sometimes $text isn't really UTF8 and decode_utf8() returns undef
-        $xml = Encode::decode_utf8($xml) || $xml;
-        return $xml;
+	return $xml;
     }
     # if pdftohtml failed, we use OCR:
     print "pdftohtml failed on parsing. Using OCR.\n" if $opt{'d'};

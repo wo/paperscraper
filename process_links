@@ -15,6 +15,7 @@ use Getopt::Std;
 use util::Io;
 use util::Errors;
 use util::String;
+use Doctidy 'doctidy';
 use Spamfilter;
 use Converter;
 use Extractor;
@@ -22,8 +23,6 @@ my %cfg = do 'config.pl';
 
 # A few more config settings:
 $cfg{'TEMPDIR'}       = $cfg{'PATH'}.'temp/';
-$cfg{'SPAMCORPUS'}    = $cfg{'PATH'}.'spamcorpus/';
-$cfg{'RTF2PDF'}       = $cfg{'PATH'}.'util/rtf2pdf.sh';
 # Spam score threshold where we don't store the document:
 $cfg{'CERT_SPAM'}     = 0.8;
 $cfg{'REPROCESS_ALL'} = 0;
@@ -269,7 +268,6 @@ sub process_locations {
             $loc->{text} = strip_tags($loc->{content});
         }
 	my $spamminess = 0;
-        Spamfilter::cfg(\%cfg);
         Spamfilter::verbosity($verbosity);
 	eval {
 	    $spamminess = Spamfilter::classify($loc);
@@ -296,10 +294,10 @@ sub process_locations {
         $loc->{spamminess} = $spamminess;
 
         # convert file to xml:
-        Converter::cfg(\%cfg);
         Converter::verbosity($verbosity);
         eval {
             convert2xml($file);
+            doctidy("$file.xml");
         };
 	if ($@) {
 	    error("$@");
@@ -314,13 +312,11 @@ sub process_locations {
         $cand_title = '' if $cand_title =~ /$loc->{filetype}|version/i;
         my $cand_author = $loc->{default_author};
         # TODO: these values should have been put into the XML; see above.
-	my $result;
+        my $result = Extractor->new();
+        $result->verbosity($verbosity);
 	eval {
-	    my $extractor = Extractor->new("$file.xml");
-	    $extractor->verbosity($verbosity);
-	    $extractor->prior('author', $cand_author, 0.7) if ($cand_author);
-	    $extractor->prior('title', $cand_title, 0.5) if ($cand_title);
-	    $result = $extractor->parse();
+            $result->init("$file.xml");
+            $result->extract(qw/authors title abstract/);
 	};
 	if ($@) {
 	    error("$@");

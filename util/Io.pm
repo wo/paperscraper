@@ -132,7 +132,7 @@ sub save {
 sub readfile {
     my $filename = shift or die "readfile requires filename parameter";
     my $content = '';
-    open INPUT, $filename or die $!;
+    open INPUT, '<:encoding(utf8)', $filename or die $!;
     while (<INPUT>) { $content .= $_; }
     close INPUT;
     return $content;

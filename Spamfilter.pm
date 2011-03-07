@@ -6,7 +6,10 @@ use Digest::MD5;
 use AI::Categorizer::Learner::NaiveBayes;
 use AI::Categorizer::Document;
 use Algorithm::NaiveBayes::Model::Frequency;
-use File::Basename qw/dirname/;
+use File::Basename;
+use FindBin qw($Bin);
+use Cwd 'abs_path';
+use File::Basename;
 use Exporter;
 use util::Io;
 binmode STDOUT, ":utf8";
@@ -14,7 +17,7 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(&classify);
 
 #
-# A function to guess whether a link is a philosophy paper or not
+# A module to guess whether a link is a philosophy paper or not
 # ('spam').
 #
 # I use a combination of Bayesian text classification and various
@@ -25,6 +28,9 @@ our @EXPORT = qw(&classify);
 # XML representation), rather than just the plain text content. This
 # would hopefully replace many of the heurists.
 #
+
+my $path = dirname(abs_path(__FILE__));
+my $SPAMCORPUS = "$path/spamcorpus";
 
 my $verbosity = 0;
 sub verbosity {
@@ -57,7 +63,7 @@ sub classify {
         print "running Bayesian classifier\n" if $verbosity > 1;
         eval {
             my $nb = AI::Categorizer::Learner::NaiveBayes->restore_state(
-                $cfg{'SPAMCORPUS'}.'filterstate');
+                "$SPAMCORPUS/filterstate");
             $nb->verbose($verbosity > 1 ? 3 : 0);
             my $ai_doc = AI::Categorizer::Document->new(content => $loc->{text});
             my $ai_res = $nb->categorize($ai_doc);
