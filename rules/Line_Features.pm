@@ -80,7 +80,7 @@ $features{ABSTRACTSTART} = [
     ];
 
 $features{CONTENT} = [
-    ['normal font', [0.3, -0.6]],
+    ['normal font', [0.3, -0.6], 2],
     ['bold', [-0.3, 0.05]],
     ['centered', [-0.5, 0.1]],
     ['justified', [0.3, -0.1]],
@@ -92,13 +92,16 @@ $features{CONTENT} = [
     ];
 
 $features{ABSTRACTCONTENT} = [
-    # This is basically CONTENT, but at the beginning of the
-    # document. Spares us from going through multiple stages of
-    # labeling almost the entire document when looking for an
-    # abstract.
-    ['probable CONTENT', [0.8, -0.8], 2],
-    ['among first CONTENT lines', [0.2, -0.8], 2],
-    ['near other ABSTRACTCONTENT', [0.3, -0.3], 2],
+    [$or->('normal font', 'small font'), [0.3, -0.6]],
+    ['centered', [-0.2, 0.1]],
+    ['justified', [0.2, -0.1]],
+    [$or->('gap above', 'gap below'), [-0.2, 0.1]],
+    [$and->('gap above', 'gap below'), [-0.6, 0.1]],
+    ['high punctuation frequency', [-0.2, 0.1]],
+    ['long', [0.1, -0.2]],
+    ['matches content pattern', [0.2, -0.3]],
+    ['not far into content', [0.2, -0.8], 2],
+    ['near other ABSTRACTCONTENT', [0.3, -0.3], 3],
     ];
 
 $features{FOOTNOTE} = [
@@ -444,7 +447,7 @@ $f{'near other ABSTRACTCONTENT'} =
     someof(neighbours('prev', 'ABSTRACTCONTENT'), 
            neighbours('next', 'ABSTRACTCONTENT'));
 
-$f{'among first CONTENT lines'} = sub {
+$f{'not far into content'} = sub {
     my $ch = $_[0];
     my $n = 1;
     while ($ch = $ch->{prev}) {

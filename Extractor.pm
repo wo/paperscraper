@@ -660,10 +660,10 @@ sub extract_abstract {
     say(2, "\nextracting abstract");
 
     my $chunk = shift @{$self->{best_chunks}->{ABSTRACTSTART}};
-    my $maxlen = 1000;
+    my $maxlen = 1400;
     unless ($chunk) {
         say(3, "no designated abstract");
-        # use first proper content chunk:
+        # use first ABSTRACTCONTENT chunk:
         foreach my $ch (@{$self->{chunks}}) {
             next if $ch->{p}->('ABSTRACTCONTENT') < 0.7;
             do {
@@ -672,19 +672,20 @@ sub extract_abstract {
                      && $ch->{p}->('ABSTRACTCONTENT') > 0.5);
             last;
         }
-        $maxlen = 600;
+        $maxlen = 800;
     }
 
     while ($chunk) {
         say(5, $chunk->{text});
-        if ($chunk->{p}->('ABSTRACTCONTENT') < 0.5) {
-            last if $self->{abstract} && $chunk->{p}->('HEADING') > 0.5;
-            next if length($self->{abstract}) < 100;
+        if ($chunk->{p}->('ABSTRACTCONTENT') > 0.5) {
+            $self->{abstract} .= $chunk->{text}."\n";
+            if (length($self->{abstract}) > $maxlen) {
+                say(5, 'abstract is getting too long');
+                $self->{abstract} =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
+                last;
+            }
         }
-        $self->{abstract} .= $chunk->{text}."\n";
-        if (length($self->{abstract}) > $maxlen) {
-            say(5, 'abstract is getting too long');
-            $self->{abstract} =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
+        elsif ($self->{abstract} && $chunk->{p}->('HEADING') > 0.5) {
             last;
         }
         $chunk = $chunk->{next};

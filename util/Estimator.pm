@@ -134,7 +134,8 @@ sub makeLabeler {
 	my $label = shift;
 	my $e = __PACKAGE__->new();
 	foreach (@{$features->{$label}}) {
-	    if (!defined($_->[3]) || $_->[3] <= $stage) {
+	    if (!$_->[3] || ($_->[3] > 0 && $_->[3] <= $stage)
+                || ($_->[3] < 0 && $_->[3] >= $stage*-1)) {
 		$e->add_feature(@$_);
 	    }
 	}
