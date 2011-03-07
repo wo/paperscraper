@@ -459,10 +459,6 @@ sub begins {
     my $field = @_ ? 'plaintext' : 'text';
     return sub {
         my $ch = shift;
-        if ($ch->{$field} =~ /^($re)/) {
-            print $1;
-            print " fuck ", $&, "\n" unless (!$re_no || $& !~ /$re_no/);
-        }
         if ($ch->{$field} =~ /^($re)/ && (!$re_no || $& !~ /$re_no/)) {
             return 1;
         }
@@ -480,8 +476,13 @@ $f{'begins with "abstract:"'} = memoize(begins($re_abstract));
 
 $f{'begins with dash'} = memoize(begins($re_dash));
 
-$f{'begins with possible name'} = 
-    memoize(begins("$re_name_before?$re_name", $re_noname));
+$f{'begins with possible name'} = memoize(sub {
+    my @parts = split($re_name_separator, $_[0]->{plaintext}, 2);
+    print "part 0:", $parts[0], "\n";
+    return 0 if ($parts[0] =~ /$re_noname/);
+    return 1 if ($parts[0] =~ /(?:$re_name_before)?$re_name(?:$re_name_after)?/);
+    return 0;
+});
 
 $f{'begins with possible bib name'} = 
     memoize(begins("(?:$re_name)|(?:$re_name_inverted)", $re_noname));

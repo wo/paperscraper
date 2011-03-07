@@ -107,8 +107,11 @@ sub speller {
 sub extract_names {
     my $str = shift;
     my %res; # name => probability
-    while ($str =~ /$re_name/g) {
-        next if $& =~ /$re_noname/;
+    my @parts = split($re_name_separator, $str);
+    foreach my $part (@parts) {
+        if ($part =~ /$re_noname/ || $part !~ $re_name) {
+            next;
+        } 
         my $p = 0.5;
         my ($name, $first, $last) = ($&, $1, $2);
         foreach my $w (split /\s+/, $first) {
