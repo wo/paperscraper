@@ -159,9 +159,7 @@ our $re_cit_label = qr/
    \[.+\]
    /x;
 
-our $re_dash = qr/
-   [-–—−—]
-   /x;
+our $re_dash = '[–—−—]';
 
 our $re_lquote = '["“`‘¨‘‛‟„‵‶‷❛❝]';
 

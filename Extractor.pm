@@ -1,7 +1,6 @@
 package Extractor;
 use strict;
 use warnings;
-use Data::Dumper;
 use Memoize;
 use List::Util qw/min max reduce/;
 use Statistics::Lite 'stddev';
@@ -441,7 +440,6 @@ sub generate_parsings {
         }
         $finished = 1 if $cursor == scalar @state;
         
-        use Data::Dumper;
         return $chunks;
     };
 }
@@ -730,6 +728,10 @@ sub extract_bibliography {
     foreach my $block (@{$parsing->{blocks}}) {
         my $entry = parsebib($block);
         if ($entry) {
+            if ($entry->{authors} && $entry->{authors}->[0] eq '-'
+                && @{$self->{bibliography}}) {
+                $entry->{authors} = $self->{bibliography}->[-1]->{authors};
+            }
             push @{$self->{bibliography}}, $entry;
         }
     }
@@ -743,7 +745,8 @@ sub parsebib {
 
     my @words;
     my $textpos = 0;
-    foreach my $str (split /\s+/, $entry->{text}) {
+    my $word_separator = "\\s+|$re_dash+\\K"; # split --1986
+    foreach my $str (split /$word_separator/, $entry->{text}) {
         my $w = {
             text => $str,
             id => scalar @words,
@@ -832,6 +835,9 @@ sub parsebib {
             if ($block->{label}->{TITLE}) {
                 $res->{title} = tidy_text($block->{text}, 1)
             }
+            if ($block->{label}->{AUTHORDASH}) {
+                $res->{authors} = ['-'];
+            }
             elsif ($block->{label}->{AUTHOR}) {
                 my @authors = Text::Names::parseNames($block->{text});
                 @authors = map { Text::Names::reverseName($_) } @authors;
@@ -853,8 +859,8 @@ sub tidy_text {
     # put closing tags before space:
     $txt =~ s| </([^>]+)>|</$1> |g;
     # combine word-parts that are split at linebreak:
-    $txt =~ s|\b-\n\s*||g;
-    $txt =~ s|\b-</([^>]+)>\n\s*<\1>||g;
+    $txt =~ s|\b-\n\s*(?=\p{Lower})||g;
+    $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})||g;
     # merge HTML elements split at linebreak:
     $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
     if ($thorough) {
@@ -863,7 +869,8 @@ sub tidy_text {
         # and footnote marks:
         $txt =~ s|<sup>\W?.\W?<.sup>$||;
         # and surrounding tags:
-        $txt =~ s|^<([^>])>(.+)</\1>$|$2|mg;
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|mg;
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|mg; # <i><b>Title</b></i>
         # and surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?$|$1|s;
         # chop footnote star *:

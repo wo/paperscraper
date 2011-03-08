@@ -243,7 +243,7 @@ $f{'contains uppercase letter'} = matches('\p{Upper}');
 $f{'contains journal or publisher word'} =
     memoize(matches("$re_journal|$re_publisher"));
 
-$f{'is dash'} = matches("^$re_dash\$");
+$f{'is dash'} = matches("^$re_dash+\$");
 
 $f{'author separator'} = matches("^$re_name_separator\$");
 
