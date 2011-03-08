@@ -129,10 +129,11 @@ $features{BIBSTART} = [
     ['probable BIB', [0.1, -0.6], 2],
     ['greater gap above than below', [0.3, -0.05], 2],
     ['next line indented', [0.3, -0.1], 2],
-    ['indented relative to previous line', [-0.3, 0.05], 2],
+    ['indented relative to previous line', [-0.35, 0.05], 2],
     ['long', [0.2, -0.2], 2],
     ['begins with citation label', [0.3, -0.05], 2],
-    ['begins with possible bib name', [0.5, -0.05], 2],
+    ['begins with possible bib name', [0.4, -0.05], 2],
+    ['begins in italic', [-0.2, 0.05], 2],
     ['begins with dash', [0.4, 0], 2],
     ['previous line short', [0.6, -0.1], 2],
     ['previous line ends with terminator', [0.4, -0.1], 2],
@@ -294,7 +295,7 @@ $f{'gap below'} = memoize(sub {
 $f{'greater gap above than below'} = memoize(sub {
     my $gap_above = gap($_[0], 'prev') || 0.7;
     my $gap_below = gap($_[0], 'next') || 0.7;
-    return $gap_above > $gap_below;
+    return $gap_above > $gap_below + 0.1;
 });
 
 $f{'matches title pattern'} = memoize(sub {
@@ -401,14 +402,18 @@ $f{'like source author'} = sub {
 };
 
 $f{'in bibliography section'} = sub {
-    # xxx stub, should consider real headings, and should not take
-    # everything after a bib heading to be the bib section.
     my $prev = $_[0];
     $_[0]->{_in_bib} = 0;
+    my $other_heading = 0;
     while ($prev = $prev->{prev}) {
-        if ($prev->{plaintext} =~ $re_bib_heading) {
-            $_[0]->{_in_bib} = 1;
-            last;
+        if ($prev->{p}->('HEADING') > 0.4) {
+            if ($prev->{plaintext} =~ /^$re_bib_heading$/) {
+                $_[0]->{_in_bib} = $other_heading ? 0.5 : 1; 
+                last;
+            }
+            else {
+                $other_heading = 1;
+            }
         }
         if (exists $prev->{_in_bib}) {
             $_[0]->{_in_bib} = $prev->{_in_bib};
@@ -472,6 +477,8 @@ sub begins {
 $f{'begins with section number'} = memoize(begins($re_sec_number));
  
 $f{'begins with footnote label'} = memoize(begins($re_footnote_label, '', 1));
+
+$f{'begins in italic'} = begins('\s*<i>', '', 1);
 
 $f{'begins with citation label'} = memoize(begins($re_cit_label));
 

@@ -45,7 +45,7 @@ our $re_journal = qr/\b(?:
     )\b/ix;
 
 our $re_publisher = qr/\b(?:
-    university|press|oxford|cambridge|clarendon|reidel|
+    university|press|oxford|cambridge|clarendon|reidel|springer|
     routledge|macmillan|publish.+
     )\b/ix;
 
@@ -136,15 +136,16 @@ our $re_content = qr/
     )
     /x;
 
-# possible bibliography headings:
-our $re_bib_heading = qr/^\s*(?:
-    references|bibliography|references\s+cited
-    )\s*$/ix;
-
 # begins with section number, e.g. '1' or '1.2':
 our $re_sec_number = qr/^\s*
    [\divx\.]+
    \b/x;
+
+our $re_bib_heading = qr/\s*.{0,4}\s*\b
+    (?:references?|bibliography|
+     references\s+cited|\w+\s+cited)
+    \b\s*.{0,4}\s*
+    /ix;
 
 our $re_abstract = qr/
    abstract
@@ -163,21 +164,13 @@ our $re_dash = qr/
    /x;
 
 our $re_lquote = '["“`‘¨‘‛‟„‵‶‷❛❝]';
+
 our $re_rquote = '["¨´’’‛”′″‴⁗❜❞]';
 
-our $re_year_words = '(?:forthcoming|manuscript|unpublished)';
+our $re_year_words = 
+    '\b(?:forthcoming|manuscript|unpublished|typescript|draft)\b';
 
-my $DASH = '(?:-|–|—|−|—)'; 
-my $YEAR = '(?:(?:\d\d\d\d[a-z]?|forthcoming|in press|manuscript|unpublished)(?:(?:\/|:|,|' . $DASH . ')\s?\d{1,4})?)';
-my $QUOTE_T = '"“”`¨´‘’‛“”‟„′″‴‵‶‷⁗❛❜❝❞';
-my $QUOTE = "[$QUOTE_T]";
-my $QUOTE_ALL = "[$QUOTE_T']";
-my $ISSUE = '(?:\d+|' .
-            join("|", qw/january february march april may june july august september october november december winter summer spring fall autumn/) .
-            join("|", map {"$_\.?"} qw/jan feb mar apr may jun jul aug sep sept oct nov dec/) .
-            ")";
 
- 
 
 my $re_bad_abstract = qr/(?:
     ^\s*<sup>|
@@ -186,11 +179,5 @@ my $re_bad_abstract = qr/(?:
     @|url|http|
     \bthank
     )/ix;
-
-my $re_reference_heading = qr/\s*.{0,4}\s*
-    (references?|bibliography|
-     references\s+cited|\w+\s+cited)
-    \s*.{0,4}\s*
-    /ix;
 
 

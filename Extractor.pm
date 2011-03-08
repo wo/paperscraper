@@ -441,6 +441,7 @@ sub generate_parsings {
         }
         $finished = 1 if $cursor == scalar @state;
         
+        use Data::Dumper;
         return $chunks;
     };
 }
@@ -511,45 +512,6 @@ sub parsing_evaluator {
         }
         return $estim->test($parsing);
     }
-}
-
-sub evaluate_parsings {
-    my ($parsings, $block_featmap, $parsing_feats) = @_;
-    say(4, "\n\n evaluate parsings");
-
-    my $label = makeLabeler($block_featmap);
-    util::Estimator->verbose(1) if $verbosity > 4;
-    foreach my $parsing (@$parsings) {
-        foreach my $block (@{$parsing->{blocks}}) {
-            next if $block->{p};
-            $block->{p} = memoize($label->($block));
-            my $b = $block;
-            foreach (keys %$block_featmap) {
-                say(4, $_, ': ', $b->{p}->($_));
-            }
-        }
-    }
-    say(4, "\n");
-
-    my $est = util::Estimator->new();
-    $est->verbose(1) if $verbosity > 4;
-    foreach (@$parsing_feats) {
-        $est->add_feature(@$_);
-    }
-
-    my @res;
-    foreach (@$parsings) {
-        $_->{quality} = $est->test($_);
-        push @res, $_;
-    }
-    @res = sort { $b->{quality} <=> $a->{quality} } @res;
-    if ($verbosity) {
-        say(3, scalar @res, " parsings");
-        for my $i (0 .. min(10, $#res)) {
-            say(4, $res[$i]->{quality}, ': ', $res[$i]->{text});
-        }
-    }
-    return @res;
 }
 
 sub extract_authors_and_title {
@@ -736,7 +698,6 @@ sub extract_bibliography {
           last;
       }
       say(5, "evaluating parsing $counter");
-      next unless $chunks->[0]->{label}->{BIBSTART};
       my @blocks;
       my $mkblock = make_block("\n", 'ENTRY');
       my ($author, $title);
@@ -894,6 +855,8 @@ sub tidy_text {
     # combine word-parts that are split at linebreak:
     $txt =~ s|\b-\n\s*||g;
     $txt =~ s|\b-</([^>]+)>\n\s*<\1>||g;
+    # merge HTML elements split at linebreak:
+    $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
     if ($thorough) {
         # chop whitespace at beginning and end of lines:
         $txt =~ s|^\s*(.+?)\s*$|$1|gm;

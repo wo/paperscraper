@@ -9,12 +9,12 @@ use Exporter;
 our @ISA = ('Exporter');
 our @EXPORT_OK = qw/%block_features @parsing_features/;
 
-
 our %block_features;
 
 $block_features{ENTRY} = [
     ['bibstart chunks have high score', [1, -1]],
     ['bib chunks have high score', [1, -1]],
+    ['contains year', [0.1, -0.3]],
     #['chunks are consecutive', [0.1, -1]],
     #['chunks have same font size', [0.3, -0.3]],
     #['chunks have same alignment', [0.3, -0.6]],
@@ -38,6 +38,10 @@ sub min_prob {
 $f{'(min) probability BIB'} = min_prob('BIB');
 
 $f{'(min) probability BIBSTART'} = min_prob('BIBSTART');
+
+$f{'contains year'} = sub {
+    return $_[0]->{text} =~ /(?<!\d)\d{4}(?!\d)|$re_year_words/i;
+};
 
 sub p {
     my $label = shift;

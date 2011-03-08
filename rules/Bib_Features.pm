@@ -40,7 +40,7 @@ $word_features{TITLE} = [
     [$or->('contains letter', 'is dash'), [0.5, -0.3]],
     ['in quotes', [0.6, -0.3]],
     ['italic', [0.4, -0.1]],
-    ['in parentheses', [-0.2, 0]],
+    ['in parentheses', [-0.3, 0]],
     ['early in entry', [0.2, -0.4]],
     ['after year', [0.2, -0.1]],
     ['after "in"', [-0.2, 0]], 
@@ -65,6 +65,7 @@ $word_features{OTHER} = [
     ['in parentheses', [0.3, -0.05], 2],
     ['after "in"', [0.2, 0], 2],
     ['followed by number', [0.2, -0.1], 2],
+    ['ends in colon', [0.2, 0], 2], # Berlin: Springer
     ['near end of entry', [0.3, -0.05], 2],
     ['after italics', [0.15, 0], 2], 
     ['after quote', [0.15, 0], 2],
@@ -79,7 +80,8 @@ $block_features{TITLE} = [
     ['maybe TITLE', [1, -1]],
     ['begins with uppercase letter', [0.1, -0.3]],
     ['ends with punctuation', [0.2, -0.4]],
-    ['surrounded by quotes or italics', [0.4, -0.2]],
+    ['surrounded by quotes or italics', [0.5, -0.2]],
+    ['contains unclosed opening construct', [-0.3, 0.05]],
     ['followed by OTHER block', [0.05, -0.2]],
     ['contains journal or publisher word', [-0.25, 0]],
     ['journal/publisher word after punct.', [-0.2, 0]],
@@ -108,8 +110,8 @@ our @parsing_features = (
     ['author part has high score', [0.7, -0.8]],
     ['title part has high score', [0.7, -0.8]],
     ['has title', [0.1, -1]],
-    ['good title word OTHERed', [-0.5, 0.2]], 
-    ['good author word OTHERed', [-0.5, 0.3]], 
+    ['good title word OTHERed', [-0.5, 0.5]], 
+    ['good author word OTHERed', [-0.5, 0.5]], 
     ['lengthy OTHER block before title', [-0.3, 0.05]], 
     );
 
@@ -247,6 +249,8 @@ $f{'author separator'} = matches("^$re_name_separator\$");
 
 $f{'editor string'} = matches($re_editor);
 
+$f{'ends in colon'} = matches(':$');
+
 $f{'after "in"'} = memoize(sub {
     my $w = $_[0];
     do {
@@ -324,7 +328,7 @@ $f{'journal/publisher word after punct.'} =
     memoize(matches("[,\\.:].*(?:$re_journal|$re_publisher)"));
 
 $f{'begins with uppercase letter'} = 
-    matches('^.?\p{Upper}');
+    matches('^(?:<[^>]+>|)?.?\p{Upper}');
 
 $f{'at least two words per author'} = memoize(sub {
     foreach my $au (split /\b(?:and|&)\b/, $_[0]->{text}, -1) {
@@ -342,6 +346,19 @@ $f{'contains late first comma'} = memoize(sub {
     return 0.5 if $words == 2;
     return 0;
 });
+
+$f{'contains unclosed opening construct'} = sub {
+    if ($_[0]->{text} =~ /.*$re_lquote(.*)/) {
+        return 1 unless $1 =~ /$re_rquote/;
+    }
+    if ($_[0]->{text} =~ /.*\((.*)/) {
+        return 1 unless $1 =~ /\)/;
+    }
+    if ($_[0]->{text} =~ /.*<.>(.*)/) {
+        return 1 unless $1 =~ /<\/.*>/;
+    }
+    return 0;
+};
 
 # for parsings:
 
@@ -381,7 +398,7 @@ sub othered {
 		return max(0, ($ch->{p}->($label)-0.2)*1.25);
 	    }
 	}
-	return 0;
+	return 0.5; # don't reward having no OTHER parts
     }
 }
 
