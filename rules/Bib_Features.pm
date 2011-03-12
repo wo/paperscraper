@@ -42,9 +42,9 @@ $word_features{TITLE} = [
     ['in quotes', [0.6, -0.2]],
     ['italic', [0.4, -0.1]],
     ['in parentheses', [-0.3, 0]],
-    ['early in entry', [0.2, -0.4]],
+    ['early in entry', [0.2, -0.6]],
     ['after year string', [0.2, -0.1]],
-    ['after "in"', [-0.2, 0]], 
+    ['after "in"', [-0.3, 0]], 
     ['after italics', [-0.4, 0]], 
     ['after quote', [-0.4, 0.05]],
     ['probable AUTHOR', [-0.2, 0.05], 2], 
@@ -129,7 +129,7 @@ $f{'near beginning of entry'} = memoize(sub {
 
 $f{'early in entry'} = memoize(sub {
     my $pos = max($_[0]->{textpos} - 20, 0);
-    return 1 - min($pos/80, 1);
+    return 1 - min($pos/150, 1);
 });
 
 $f{'near end of entry'} = memoize(sub {
@@ -138,16 +138,18 @@ $f{'near end of entry'} = memoize(sub {
     return 1 - min(($end-$pos)/30, 1);
 });
 
+my $re_year = '(?<!\d)[1-2]\d{3}(?!\d)';
+
 $f{'after year string'} = memoize(sub {
     my $w = $_[0];
     while ($w = $w->{prev}) {
-	return 1 if ($w->{text} =~ /\D?\d{4}\D?|$re_year_words/);
+	return 1 if ($w->{text} =~ /$re_year|$re_year_words/);
     }
     return 0;
 });
 
 $f{'follows year string'} = memoize(sub {
-    return 1 if ($_[0]->{text} =~ /\D?\d{4}\D?|$re_year_words/);
+    return 1 if ($_[0]->{text} =~ /$re_year|$re_year_words/);
     return 0;
 });
 
@@ -281,7 +283,7 @@ sub matches {
     };
 }
     
-$f{'year'} = matches('(?<!\d)\d{4}(?!\d)');
+$f{'year'} = matches('^[1-2]\d{3}(?!\d)');
 
 $f{'publication status'} = matches($re_year_words);
 
@@ -449,7 +451,7 @@ sub othered {
 	my $ch0 = $_[0]->{blocks}->[0]->{chunks}->[0];
 	foreach my $ch (@{$ch0->{best}->{$label}}) {
 	    my $bl = chunk2block($ch, $_[0]->{blocks});
-	    if ($bl->{label}->{OTHER}) {
+	    if ($bl->{$label}->{OTHER}) {
 		return max(0, ($ch->{p}->($label)-0.2)*1.25);
 	    }
 	}

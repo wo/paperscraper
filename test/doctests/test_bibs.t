@@ -374,7 +374,7 @@ my %tests = (
    {
     authors => ["David Hume"],
     title => "A Treatise of Human Nature",
-    year => "1739",
+    year => "1739–40",
    },
    {
     authors => ["Richard Jeffrey"],

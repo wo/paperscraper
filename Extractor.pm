@@ -747,7 +747,7 @@ sub parsebib {
 
     my @words;
     my $textpos = 0;
-    my $word_separator = '\s+|\s*'.$re_dash.'+\K'; # split --1986
+    my $word_separator = '\s+|[^\w]'.$re_dash.'+\K'; # split --1986
     foreach my $str (split /$word_separator/, $entry->{text}) {
         my $w = {
             text => $str,

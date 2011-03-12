@@ -152,7 +152,7 @@ our $re_abstract = qr/
    /ix;
 
 our $re_footnote_label = qr/
-   (?:<sup>)?\s*(?:\*|\x{2217}|\d+)\s*(?:<\/sup>)?
+   (?:<sup>)\s*(?:\*|\x{2217}|\d+)\s*(?:<\/sup>)
    /x;
 
 our $re_cit_label = qr/

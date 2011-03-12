@@ -107,9 +107,9 @@ $features{ABSTRACTCONTENT} = [
     ];
 
 $features{FOOTNOTE} = [
-    ['small font', [0.7, -0.7]],
+    ['small font', [0.7, -0.8]],
     ['contains letters', [0, -0.3]],
-    ['text block begins with footnote label', [0.4, -0.1]],
+    ['text block begins with footnote label', [0.3, -0.1]],
     ['largest text on rest of page', [0.2, -0.5]],
     ['near bottom of page', [0.2, -0.2]],
     ];
@@ -496,7 +496,7 @@ $f{'begins in italic'} = begins('\s*<i>', '', 1);
 $f{'text block begins with footnote label'} = sub {
     my $ch = $_[0];
     do {
-        return 1 if $ch->{text} =~ /$re_footnote_label/;
+        return 1 if $ch->{text} =~ /^$re_footnote_label/;
         $ch = $ch->{prev};
     } while ($ch
              && $ch->{fsize} == $_[0]->{fsize}
