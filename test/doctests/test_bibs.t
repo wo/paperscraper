@@ -60,7 +60,7 @@ my %tests = (
    {
     authors => ["B. D. Bernheim"],
     title => "Rationalizable strategic behaviour",
-    year => "1007–28",
+    year => "1984",
    },
    {
     authors => ["J. Bjornerstedt", "J. Weibull"],
@@ -85,7 +85,7 @@ my %tests = (
    {
     authors => ["J. Duffy", "R. Nagel"],
     title => "On the robustness of behaviour in experimental “Beauty Contest” games",
-    year => "1684–700",
+    year => "1997",
    },
    {
     authors => ["D. Fudenberg", "D. Levine"],
@@ -149,8 +149,8 @@ my %tests = (
    },
    {
     authors => ["D. Hume"],
-    title => "<i>Enquiries Concerning Human Understanding and Concerning the Principles of Morals</i>",
-    year => "1777",
+    title => "Enquiries Concerning Human Understanding and Concerning the Principles of Morals",
+    year => "1975",
    },
    {
     authors => ["J. M. Keynes"],
@@ -175,7 +175,7 @@ my %tests = (
    {
     authors => ["P. Milgrom", "D. North", "B. Weingast"],
     title => "The role of institutions in the revival of trade: The law merchant, private judges, and the champagne fairs",
-    year => "2005",
+    year => "1990",
    },
    {
     authors => ["H. Moulin"],
@@ -185,12 +185,12 @@ my %tests = (
    {
     authors => ["R. Nagel"],
     title => "Unravelling in guessing games:An experimental study",
-    year => "1313–26",
+    year => "1995",
    },
    {
     authors => ["D. G. Pearce"],
     title => "Rationalizable strategic behaviour and the problem of perfection",
-    year => "1029–50",
+    year => "1984",
    },
    {
     authors => ["P. L. Sacco"],
@@ -279,7 +279,7 @@ my %tests = (
    },
    {
     authors => ["B. Spinoza"],
-    title => "<i>Ethics:The Collected Works of Spinoza, Volume I</i>",
+    title => "Ethics:The Collected Works of Spinoza, Volume I",
     year => "1985",
    },
    {
@@ -325,11 +325,396 @@ my %tests = (
    {
     authors => ["J. Weibull"],
     title => "Evolutionary Game Theory",
-    year => "2005",
+    year => "1997",
    },
  ],
 
+
+ '/home/wo/programming/opp-tools/test/doctests/11-Byrne-Hayek-Hume.pdf' => [
+   {
+    authors => ["Horacio Arló Costa", "John Collins", "Isaac Levi"],
+    title => "Desire-as-Belief Implies Opinionation or Indifference",
+    year => "1995",
+   },
+   {
+    authors => ["John Collins"],
+    title => "Belief, Desire, and Revision",
+    year => "1988",
+   },
+   {
+    authors => ["John Collins"],
+    title => "Belief Revision",
+    year => "1991",
+   },
+   {
+    authors => ["Peter Gärdenfors"],
+    title => "Imaging and Conditionalization",
+    year => "1982",
+   },
+   {
+    authors => ["Allan Gibbard", "William Harper"],
+    title => "Counterfactuals and Two Kinds of Expected Utility",
+    year => "1978",
+   },
+   {
+    authors => ["Alan Hájek"],
+    title => "Triviality on the Cheap?",
+    year => "1994",
+   },
+   {
+    authors => ["Alan Hájek"],
+    title => "The Fearless and Moderate Revision: Extending Lewis’s Triviality Results",
+    year => "1996",
+   },
+   {
+    authors => ["Alan Hájek", "Philip Pettit"],
+    title => "In the Spirit of Desire-as-Belief",
+    year => "1996",
+   },
+   {
+    authors => ["David Hume"],
+    title => "A Treatise of Human Nature",
+    year => "1739",
+   },
+   {
+    authors => ["Richard Jeffrey"],
+    title => "The Logic of Decision",
+    year => "1965",
+   },
+   {
+    authors => ["David Lewis"],
+    title => "Probabilities of Conditionals and Conditional Probabilities",
+    year => "1976",
+   },
+   {
+    authors => ["David Lewis"],
+    title => "Counterfactual Dependence and Time’s Arrow",
+    year => "1979",
+   },
+   {
+    authors => ["David Lewis"],
+    title => "Causal Decision Theory",
+    year => "1981",
+   },
+   {
+    authors => ["David Lewis"],
+    title => "<i>Philosophical Papers,</i> vol. II",
+    year => "1986",
+   },
+   {
+    authors => ["David Lewis"],
+    title => "Desire as Belief",
+    year => "1988",
+   },
+   {
+    authors => ["David Lewis"],
+    title => "Dispositional Theories of Value",
+    year => "1989",
+   },
+   {
+    authors => ["David Lewis"],
+    title => "Desire as Belief II",
+    year => "1996",
+   },
+   {
+    authors => ["Huw Price"],
+    title => "Defending Desire-as-Belief",
+    year => "1989",
+   },
+   {
+    authors => ["Robert Stalnaker"],
+    title => "A Theory of Conditionals",
+    year => "1968",
+   },
+   {
+    authors => ["Paul Teller"],
+    title => "Conditionalization and Observation",
+    year => "1973",
+   },
+ ],
+
+
+ '/home/wo/programming/opp-tools/test/doctests/11-Chalmers-probability.pdf' => [
+   {
+    authors => ["D. F. Austin"],
+    title => "What’s the Meaning of “This”?",
+    year => "1990",
+   },
+   {
+    authors => ["D. Braun"],
+    title => "Russellianism and psychological generalization",
+    year => "2000",
+   },
+   {
+    authors => ["D. J. Chalmers"],
+    title => "Does conceivability entail possibility?",
+    year => "2002",
+   },
+   {
+    authors => ["D. J. Chalmers"],
+    title => "Epistemic two-dimensional semantics",
+    year => "2004",
+   },
+   {
+    authors => ["D. J. Chalmers", "F. Jackson"],
+    title => "Conceptual analysis and reductive explanation",
+    year => "2001",
+   },
+   {
+    authors => ["A. Elga"],
+    title => "Self-locating belief and the Sleeping Beauty problem",
+    year => "2000",
+   },
+   {
+    authors => ["D. Lewis"],
+    title => "A subjectivist’s guide to objective chance",
+    year => "1980",
+   },
+   {
+    authors => ["D. Lewis"],
+    title => "Attitudes de dicto and de se",
+    year => "1983",
+   },
+   {
+    authors => ["F. Jackson"],
+    title => "From Metaphysics to Ethics",
+    year => "1998",
+   },
+   {
+    authors => ["R. Stalnaker"],
+    title => "Inquiry",
+    year => "1984",
+   },
+ ],
+
+
+ '/home/wo/programming/opp-tools/test/doctests/11-Rayo-Generality.pdf' => [
+   {
+    authors => ["W. Alston"],
+    title => "Ontological Commitments",
+    year => "1957",
+   },
+   {
+    authors => ["J. Azzouni"],
+    title => "On ‘On What There Is’",
+    year => "1998",
+   },
+   {
+    authors => ["J. Beall"],
+    title => "Liars and Heaps",
+    year => "2003",
+   },
+   {
+    authors => ["G. Boolos"],
+    title => "Meaning and Method: Essays in Honor of Hilary Putnam",
+    year => "1990",
+   },
+   {
+    authors => ["O. Bueno", "Ø. Linnebo"],
+    title => "New Waves in Philosophy of Mathematics",
+    year => "(forthcoming)",
+   },
+   {
+    authors => ["J. Burgess"],
+    title => "Being Explained Away",
+    year => "2005",
+   },
+   {
+    authors => ["R. Cartwright"],
+    title => "Ontology and the theory of meaning",
+    year => "1954",
+   },
+   {
+    authors => ["R. Cartwright"],
+    title => "Philosophical Essays",
+    year => "1987",
+   },
+   {
+    authors => ["K. Fine"],
+    title => "The Question of Realism",
+    year => "2001",
+   },
+   {
+    authors => ["W. Goldfarb"],
+    title => "Metaphysics and Nonsense: On Cora Diamond’s The Realistic Spirit",
+    year => "1997",
+   },
+   {
+    authors => ["P. Hacker"],
+    title => "Insight and Illusion: Themes in the Philosophy of Wittgenstein",
+    year => "1986",
+   },
+   {
+    authors => ["J. Heil"],
+    title => "From an Ontological Point of View",
+    year => "2003",
+   },
+   {
+    authors => ["H. T. Hodes"],
+    title => "Ontological Commitments: Thick and Thin",
+    year => "1990",
+   },
+   {
+    authors => ["F. Jackson"],
+    title => "Ontological Commitment and Paraphrase",
+    year => "1980",
+   },
+   {
+    authors => ["S. Kanger", " S. Öhman"],
+    title => "Philosophy and Grammar",
+    year => "1980",
+   },
+   {
+    authors => ["D. Lewis"],
+    title => "Index, context, and content",
+    year => "1980",
+   },
+   {
+    authors => ["D. Lewis"],
+    title => "New Work for a Theory of Universals",
+    year => "1983",
+   },
+   {
+    authors => ["D. Lewis"],
+    title => "Noneism or Allism",
+    year => "1990",
+   },
+   {
+    authors => ["D. Lewis"],
+    title => "Papers in Philosophical Logic",
+    year => "1998",
+   },
+   {
+    authors => ["D. Lewis"],
+    title => "Papers in Metaphysics and Epistemology",
+    year => "1999",
+   },
+   {
+    authors => ["J. Melia"],
+    title => "On What There Isn’t",
+    year => "1995",
+   },
+   {
+    authors => ["C. Parsons"],
+    title => "Sets and Classes",
+    year => "1974",
+   },
+   {
+    authors => ["T. Parsons"],
+    title => "Are There Non-existent Objects?",
+    year => "1982",
+   },
+   {
+    authors => ["D. Pears"],
+    title => "The False Prison: A Study of the Development of Wittgenstein’s Philosophy",
+    year => "1987",
+   },
+   {
+    authors => ["G. Priest"],
+    title => "Towards Non-Being: the Logic and Metaphysics of Intentionality",
+    year => "2005",
+   },
+   {
+    authors => ["H. Putnam"],
+    title => "The Many Faces of Realism",
+    year => "1987",
+   },
+   {
+    authors => ["W. V. Quine"],
+    title => "On what there is",
+    year => "1948",
+   },
+   {
+    authors => ["W. V. Quine"],
+    title => "On Carnap’s Views on Ontology",
+    year => "1951",
+   },
+   {
+    authors => ["W. V. Quine"],
+    title => "Ontology and Ideology",
+    year => "1951",
+   },
+   {
+    authors => ["W. V. Quine"],
+    title => "From a Logical Point of View",
+    year => "1953",
+   },
+   {
+    authors => ["W. V. Quine"],
+    title => "Logic and the Reification of Universals",
+    year => "1953",
+   },
+   {
+    authors => ["A. Rayo"],
+    title => "Word and Objects",
+    year => "2002",
+   },
+   {
+    authors => ["A. Rayo"],
+    title => "When does ‘everything’ mean everything?",
+    year => "2003",
+   },
+   {
+    authors => ["A. Rayo"],
+    title => "Towards a Trivialist Account of Mathematics",
+    year => "2009",
+   },
+   {
+    authors => ["A. Rayo"],
+    title => "Neo-Fregeanism Reconsidered",
+    year => "(forthcoming)",
+   },
+   {
+    authors => ["A. Rayo"],
+    title => "Possibility and Content: Metaphysics without Deep Metaphysics",
+    year => "(typescript)",
+   },
+   {
+    authors => ["A. Rayo", "G. Uzquiano"],
+    title => "Toward a Theory of Second-Order Consequence",
+    year => "1999",
+   },
+   {
+    authors => ["A. Rayo", " G. Uzquiano"],
+    title => "Absolute Generality",
+    year => "2006",
+   },
+   {
+    authors => ["A. Rayo", "G. Uzquiano"],
+    title => "Introduction to Absolute Generality",
+    year => "2006",
+   },
+   {
+    authors => ["A. Rayo", "T. Williamson"],
+    title => "A Completeness Theorem for Unrestricted First-Order Languages",
+    year => "2003",
+   },
+   {
+    authors => ["R. Routley"],
+    title => "On What There Is Not",
+    year => "1982",
+   },
+   {
+    authors => ["T. Sider"],
+    title => "Writing the Book of theWorld",
+    year => "(typescript)",
+   },
+   {
+    authors => ["L. Wittgenstein"],
+    title => "Tractatus Logico-Philosophicus",
+    year => "1922",
+   },
+   {
+    authors => ["S. Yablo"],
+    title => "Does Ontology Rest on a Mistake",
+    year => "1998",
+   },
+ ],
+
+
+
 );
+
 
 sub proc {
     my $file = shift;
@@ -343,10 +728,17 @@ sub proc {
 
 while (my ($file, $res) = each(%tests)) {
     my $bib = proc($file);
-    my $max = @{$bib} > @{$res} ? @{$bib} : @{$res};
-    for my $i (0 .. $max-1) {
+    print "\n",("=" x 70),"\n== $file\n", ("=" x 70), "\n\n";
+    if (scalar @$bib != scalar @$res) {
+        print "\n!! Document has ",scalar @$res," references, ",
+              "but ",scalar @$bib, " retrieved!\n\n";
+    }
+    my $min = @{$bib} > @{$res} ? @{$res} : @{$bib};
+    for my $i (0 .. $min-1) {
         my $act = $bib->[$i];
         my $ref = $res->[$i];
+        print "== testing ",join(", ", @{$ref->{authors}}),": ",
+              $ref->{title},"\n";
         is(join(", ", @{$act->{authors}}), join(", ", @{$ref->{authors}}));
         is($act->{title}, $ref->{title});
         is($act->{year}, $ref->{year});

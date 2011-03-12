@@ -18,6 +18,11 @@ my %tests = (
    title => "Probability and Propositions",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/11-Byrne-Hayek-Hume.pdf' => {
+   authors => ["ALEX BYRNE", "ALAN H�JEK"],
+   title => "David Hume, David Lewis, and Decision Theory",
+ },
+
 );
 
 sub proc {
