@@ -117,6 +117,7 @@ our @parsing_features = (
     ['good title word OTHERed', [-0.5, 0.5]], 
     ['good author word OTHERed', [-0.5, 0.5]], 
     ['lengthy OTHER block before title', [-0.3, 0.05]], 
+    ['is known work', [1, 0]],
     );
 
 
@@ -478,6 +479,21 @@ $f{'lengthy OTHER block before title'} = sub {
 	    }
 	}
     }
+};
+
+$f{'is known work'} = sub {
+    my (@authors, $title, $year);
+    foreach my $bl (@{$_[0]->{blocks}}) {
+        if ($bl->{label}->{TITLE}) {
+            $title = $bl->{text};
+        }
+        elsif ($bl->{label}->{AUTHOR}) {
+            push @authors, $bl->{text};
+        }
+    }
+    return 0 unless (@authors && $title);
+    # TODO: tidy up authors and title?
+    return known_work(authors => \@authors, title => $title);
 };
 
 compile(\%word_features, \%f);

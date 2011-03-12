@@ -1,7 +1,8 @@
-package rules::Knownwork;
+package rules::KnownWork;
 use strict;
 use warnings;
 use Exporter;
+use DBI;
 use File::Basename;
 use Cwd 'abs_path';
 use Biblio::Citation::Compare 'sameWork';
@@ -13,7 +14,7 @@ my $path = dirname(abs_path(__FILE__));
 my $dbh;
 sub dbh {
     return $dbh if $dbh;
-    my %cfg = do "$path/config.pl";
+    my %cfg = do "$path/../config.pl";
     $dbh = DBI->connect(
         'DBI:mysql:'.$cfg{'MYSQL_DB'}, 
         $cfg{'MYSQL_USER'},
