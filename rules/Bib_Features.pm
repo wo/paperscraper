@@ -16,15 +16,16 @@ our %word_features;
 
 $word_features{AUTHOR} = [
     ['contains letter', [0.1, -0.7]],
-    [$or->('contains uppercase letter', 'author separator'), [0.2, -0.3]],
+    ['contains uppercase letter', [0.1, -0.2]],
     ['lonely cap(s)', [0.3, 0]],
-    ['editor string', [-0.5, 0]],
+    ['editor string', [-0.6, 0]],
     ['contains digit', [-0.7, 0.1]],
     ['near beginning of entry', [0.7, -0.2]],
     ['early in entry', [0.2, -0.4]],
-    ['in quotes', [-0.7, 0.1]],
-    ['italic', [-0.4, -0.1]],
-    ['after year', [-0.3, 0.1]],
+    ['in quotes', [-0.7, 0.05]],
+    ['italic', [-0.4, 0.05]],
+    ['after year string', [-0.4, 0.1]],
+    ['after parenthesis', [-0.3, 0.05]],
     ['continues author', [0.6, -0.6], 2], 
     [$or->('is surname', 'is firstname', 'author separator'), [0.3, -0.2], 2],
     ['is English word', [-0.2, 0.2], 2],
@@ -37,40 +38,43 @@ $word_features{AUTHORDASH} = [
     ];
 
 $word_features{TITLE} = [
-    [$or->('contains letter', 'is dash'), [0.5, -0.3]],
-    ['in quotes', [0.6, -0.3]],
+    [$or->('contains letter', 'is dash'), [0.4, -0.3]],
+    ['in quotes', [0.6, -0.2]],
     ['italic', [0.4, -0.1]],
     ['in parentheses', [-0.3, 0]],
     ['early in entry', [0.2, -0.4]],
-    ['after year', [0.2, -0.1]],
+    ['after year string', [0.2, -0.1]],
     ['after "in"', [-0.2, 0]], 
     ['after italics', [-0.4, 0]], 
     ['after quote', [-0.4, 0.05]],
     ['probable AUTHOR', [-0.2, 0.05], 2], 
     ['contains journal or publisher word', [-0.2, 0], 2],
-    ['continues title', [0.5, -0.5], 2], 
-    ['is English word', [0.2, -0.2], 2],
+    ['part of lengthy unpunctuated string between punctuations', [0.3, -0.05]],
+    [$or->('continues title', 'follows year string'), [0.5, -0.4], 2], 
+    ['continues OTHER', [-0.1, 0.1], 2], 
+    ['followed by title', [0.4, 0], 2], 
+    ['is English word', [0.15, -0.15], 2],
     ];
  
 $word_features{YEAR} = [
-    ['year', [1, -0.8]],
-    ['publication status', [1, -0.1]],
+    ['year', [0.9, -0.8]],
+    ['publication status', [0.9, -0.1]],
     ];
 
 $word_features{OTHER} = [
     ['default', [0.1, 0]],
     [$or->('probable AUTHOR', 'probable TITLE', 'probable YEAR'),
 	    [-0.4, 0.5], 2],
-    ['italic', [0.2, -0.05], 2], # journal name
-    ['in parentheses', [0.3, -0.05], 2],
+    ['italic', [0.2, 0], 2], # journal name
+    ['in parentheses', [0.3, 0], 2],
     ['after "in"', [0.2, 0], 2],
-    ['followed by number', [0.2, -0.1], 2],
+    ['followed by number', [0.2, 0], 2],
     ['ends in colon', [0.2, 0], 2], # Berlin: Springer
     ['near end of entry', [0.3, -0.05], 2],
     ['after italics', [0.15, 0], 2], 
     ['after quote', [0.15, 0], 2],
     ['editor string', [0.6, 0], 2],
-    ['contains journal or publisher word', [0.3, 0], 2],
+    ['contains journal or publisher word', [0.4, 0], 2],
     ['followed by OTHER', [0.2, -0.1], 3],
     ];
 
@@ -133,11 +137,16 @@ $f{'near end of entry'} = memoize(sub {
     return 1 - min(($end-$pos)/30, 1);
 });
 
-$f{'after year'} = memoize(sub {
+$f{'after year string'} = memoize(sub {
     my $w = $_[0];
     while ($w = $w->{prev}) {
-	return 1 if ($w->{text} =~ /\D?\d{4}\D?/);
+	return 1 if ($w->{text} =~ /\D?\d{4}\D?|$re_year_words/);
     }
+    return 0;
+});
+
+$f{'follows year string'} = memoize(sub {
+    return 1 if ($_[0]->{text} =~ /\D?\d{4}\D?|$re_year_words/);
     return 0;
 });
 
@@ -149,6 +158,26 @@ $f{'after italics'} = memoize(sub {
     return 0;
 });
 
+$f{'part of lengthy unpunctuated string between punctuations'} = sub {
+    my $count = 1;
+    my $stop = qr/[,\.!\?\)\]]$/;
+    my $w = $_[0];
+    if ($w->{text} !~ /$stop/) {
+        while ($w = $w->{next}) {
+            return 0 unless $w;
+            $count++;
+            last if $w->{text} =~ /$stop/;
+        }
+    }
+    $w = $_[0];
+    while ($w = $w->{prev}) {
+        return 0 unless $w;
+        last if $w->{text} =~ /$stop/;
+        $count++;
+    }
+    return max(0, min(1, ($count-2)/4));
+};
+
 $f{'continues title'} = sub {
     my $w = $_[0]->{prev};
     return 0.5 unless $w;
@@ -156,6 +185,12 @@ $f{'continues title'} = sub {
 	return $w->{p}->('TITLE');
     }
     return $w->{p}->('TITLE') / 2;
+};
+
+$f{'continues OTHER'} = sub {
+    my $w = $_[0]->{prev};
+    return 0.5 unless $w;
+    return $w->{p}->('TITLE');
 };
 
 $f{'continues author'} = sub {
@@ -171,6 +206,14 @@ $f{'continues author'} = sub {
 $f{'followed by OTHER'} = sub {
     my $w = $_[0]->{next};
     return $w->{p}->('OTHER') if $w;
+    return 0;
+};
+
+$f{'followed by title'} = sub {
+    my $w = $_[0]->{next};
+    if ($w && $_[0]->{text} =~ /\pL$/ && $w->{text} =~ /^\pL/) {
+	return $w->{p}->('TITLE');
+    }
     return 0;
 };
 
@@ -221,6 +264,15 @@ $f{'after quote'} = memoize(sub {
     return 0;
 });
 
+$f{'after parenthesis'} = memoize(sub {
+    my $w = $_[0];
+    do {
+        # don't count citation label parentheses:
+	return 1 if ($w->{text} =~ /[\(\[]/ && $w->{prev});
+    } while ($w = $w->{prev});
+    return 0;
+});
+
 sub matches {
     my $re = shift;
     return sub {
@@ -253,9 +305,11 @@ $f{'ends in colon'} = matches(':$');
 
 $f{'after "in"'} = memoize(sub {
     my $w = $_[0];
-    do {
-	return 1 if ($w->{text} =~ /^in$/i);
-    } while ($w = $w->{prev});
+    while ($w) {
+        my $prev = $w->{prev};
+	return 1 if ($w->{text} =~ /^in$/i && $prev && $prev->{text} !~ /\pL$/);
+        $w = $prev;
+    };
     return 0;
 });
 
@@ -284,7 +338,7 @@ $f{'is English word'} = memoize(sub {
     my $str = $_[0]->{text};
     $str =~ s/^\P{Letter}*(.+?)\P{Letter}*$/$1/;
     return 0 unless $str;
-    return speller()->check($str);
+    return english($str);
 });
 
 $f{'default'} = sub {
@@ -317,7 +371,7 @@ foreach my $lab (qw/TITLE AUTHOR AUTHORDASH YEAR OTHER/) {
 $f{'ends with punctuation'} = memoize(matches('[\.,;\?!](?:<[^>]+>)?.?$'));
 
 $f{'surrounded by quotes or italics'} = 
-    memoize(matches("^(?:<i>.+</i>)|(?:$re_lquote.+$re_rquote).?\$"));
+    memoize(matches("^(?:<i>.+</i>|$re_lquote.+$re_rquote).?\$"));
 
 $f{'followed by OTHER block'} = sub {
     my $bl = $_[0]->{next};

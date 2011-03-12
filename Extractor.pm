@@ -205,10 +205,12 @@ sub relativize_fsize {
     # to 0 etc.
     my $def = $self->{fontsize};
     foreach my $ch (@{$self->{chunks}}) {
-        $ch->{fsize} = int(($ch->{fsize} - $def) * 10/$def);
-        if ($self->{fromOCR}) {
-            $ch->{fsize} = int($ch->{fsize}/2) * 2;
-        }
+        #print "relativising $ch->{text}: ($ch->{fsize} - $def) * 10/$def";
+        $ch->{fsize} = sprintf "%.0f\n", (($ch->{fsize} - $def) * 10/$def);
+        #print " = $ch->{fsize}\n";
+        #if ($self->{fromOCR}) {
+        #    $ch->{fsize} = int(0.5 + $ch->{fsize}/2) * 2;
+        #}
     }
 }
 
@@ -357,7 +359,7 @@ sub label_chunks {
         say(4, "\ncomputing result");
         my @res;
         foreach my $ch (@$chunks) {
-            my @labs = grep { $ch->{p}->($_) > .5 }
+            my @labs = grep { $ch->{p}->($_) > $min_p }
                        sort { $ch->{p}->($b) <=> $ch->{p}->($a) } 
                        keys %$features;
             push @res, join(' ', @labs)." >> ".$ch->{text};
@@ -745,7 +747,7 @@ sub parsebib {
 
     my @words;
     my $textpos = 0;
-    my $word_separator = "\\s+|$re_dash+\\K"; # split --1986
+    my $word_separator = '\s+|\s*'.$re_dash.'+\K'; # split --1986
     foreach my $str (split /$word_separator/, $entry->{text}) {
         my $w = {
             text => $str,
@@ -843,7 +845,7 @@ sub parsebib {
                 @authors = map { Text::Names::reverseName($_) } @authors;
                 $res->{authors} = \@authors;
             }
-            elsif ($block->{label}->{YEAR}) {
+            elsif ($block->{label}->{YEAR} && !$res->{year}) {
                 $res->{year} = $block->{text};
                 $res->{year} =~ s/.*(\d{4}(?:$re_dash\d{2,4})?).*/$1/;
             }
@@ -870,7 +872,6 @@ sub tidy_text {
         $txt =~ s|<sup>\W?.\W?<.sup>$||;
         # and surrounding tags:
         $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|mg;
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|mg; # <i><b>Title</b></i>
         # and surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?$|$1|s;
         # chop footnote star *:
@@ -881,6 +882,8 @@ sub tidy_text {
         $txt =~ s|([\pL\?!])\d$|$1|;
         # and odd trailing punctuations:
         $txt =~ s|[\.,:;]$||;
+        # surrounding tags again:
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|mg;
     }
     return $txt;
 }

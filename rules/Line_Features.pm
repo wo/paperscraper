@@ -89,6 +89,7 @@ $features{CONTENT} = [
     ['high punctuation frequency', [-0.2, 0.1]],
     ['long', [0.1, -0.2]],
     ['matches content pattern', [0.2, -0.3]],
+    ['probable FOOTNOTE', [-0.8, 0.1]],
     ];
 
 $features{ABSTRACTCONTENT} = [
@@ -102,12 +103,13 @@ $features{ABSTRACTCONTENT} = [
     ['matches content pattern', [0.2, -0.3]],
     ['not far into content', [0.2, -0.8], 2],
     ['near other ABSTRACTCONTENT', [0.3, -0.3], 3],
+    ['probable FOOTNOTE', [-0.8, 0.1]],
     ];
 
 $features{FOOTNOTE} = [
     ['small font', [0.7, -0.7]],
     ['contains letters', [0, -0.3]],
-    ['begins with footnote label', [0.4, -0.1]],
+    ['text block begins with footnote label', [0.4, -0.1]],
     ['largest text on rest of page', [0.2, -0.5]],
     ['near bottom of page', [0.2, -0.2]],
     ];
@@ -120,32 +122,36 @@ $features{BIB} = [
     ['high uppercase frequency', [0.1, -0.2]],
     ['high numeral frequency', [0.1, -0.2]],
     ['high punctuation frequency', [0.1, -0.2]],
+    ['page number', [-1, 0]],
     # recursive tests that make use of label probabilities:
     ['near other BIBs', [0.3, -0.3], 2],
     ['resembles best BIB', [0.3, -0.6], 3],
+    ['probable FOOTNOTE', [-0.8, 0.1]],
     ];
 
 $features{BIBSTART} = [
-    ['probable BIB', [0.1, -0.6], 2],
+    ['probable BIB', [0.15, -0.7], 2],
     ['greater gap above than below', [0.3, -0.05], 2],
     ['next line indented', [0.3, -0.1], 2],
-    ['indented relative to previous line', [-0.35, 0.05], 2],
+    ['indented relative to previous line', [-0.4, 0.05], 2],
     ['long', [0.2, -0.2], 2],
     ['begins with citation label', [0.3, -0.05], 2],
-    ['begins with possible bib name', [0.4, -0.05], 2],
+    ['begins with possible bib name', [0.3, -0.05], 2],
+    ['begins with dictionary word', [-0.2, 0.05], 2],
     ['begins in italic', [-0.2, 0.05], 2],
-    ['begins with dash', [0.4, 0], 2],
+    ['begins inside quote', [-0.2, 0.05], 2],
+    ['begins with dash', [0.5, 0], 2],
     ['previous line short', [0.6, -0.1], 2],
-    ['previous line ends with terminator', [0.4, -0.1], 2],
+    ['previous line ends with terminator', [0.4, -0.25], 2],
     # recursive:
     ['previous line BIBSTART', [-0.2, 0.1], 3],
     ['near other BIBs', [0.3, -0.3], 2],
-    ['resembles best BIBSTART', [0.3, -0.3], 3],
+    ['resembles best BIBSTART', [0.3, -0.7], 3],
     ];
 
 1;
 
-my @labels = qw/TITLE AUTHOR CONTENT HEADING ABSTRACTSTART
+my @labels = qw/TITLE AUTHOR CONTENT HEADING FOOTNOTE ABSTRACTSTART
                 ABSTRACTCONTENT BIB BIBSTART/;
 
 my %f;
@@ -207,7 +213,7 @@ $f{'normal font'} = memoize(sub {
 });
 
 $f{'small font'} = memoize(sub {
-    .5 + max(min(-1*$_[0]->{fsize}-4, 5), -5) / 10;
+    .5 + max(min(-1*$_[0]->{fsize}-1, 3), -3) / 6;
 });
 
 $f{'among first few lines'} = memoize(sub { 
@@ -237,7 +243,7 @@ $f{'on last page'} = memoize(sub {
     return $_[0]->{page}->{number} == $_[0]->{doc}->{pages};
 });
 
-my $alignment = sub {
+sub alignment {
     # this doesn't work well for text in columns
     my $dist_left = $_[0]->{left} - $_[0]->{page}->{left};
     my $dist_right = $_[0]->{page}->{right} - $_[0]->{right};
@@ -248,17 +254,17 @@ my $alignment = sub {
     }
     return 'left' if $dist_left < $dist_right;
     return 'right';
-};
+}
 
 $f{'centered'} = memoize(sub {
-    my $align = $alignment->($_[0]);
+    my $align = alignment($_[0]);
     return 1 if $align eq 'center';
     return .5 if $align eq 'justify';
     return 0;
 });
 
 $f{'justified'} = memoize(sub {
-    return $alignment->($_[0]) eq 'justify';
+    return alignment($_[0]) eq 'justify';
 });
 
 sub gap {
@@ -298,6 +304,13 @@ $f{'greater gap above than below'} = memoize(sub {
     return $gap_above > $gap_below + 0.1;
 });
 
+$f{'page number'} = memoize(sub {
+    return 0 unless $_[0]->{plaintext} =~ /^\d+$/;
+    return 1 if alignment($_[0]) eq 'center';
+    return 1 if (gap($_[0], 'prev') || 0) > 1.5;
+    return 0;
+});
+
 $f{'matches title pattern'} = memoize(sub {
     $_[0]->{plaintext} =~ $re_title;
 });
@@ -322,8 +335,8 @@ $f{'may continue title'} = sub {
     $score += 0.2 if ($prev->{plaintext} =~ /([\:\;\-\,])$/);
     $score += ($_[0]->{fsize} == $prev->{fsize}) ? 0.1 : -0.1;
     $score -= (gap($_[0], 'prev')-1.5) / 10;
-    my $align1 = $alignment->($_[0]);
-    my $align2 = $alignment->($prev);
+    my $align1 = alignment($_[0]);
+    my $align2 = alignment($prev);
     $score -= 0.2 if ($align1 ne 'justify' && $align2 ne 'justify'
                  && $align1 ne $align2);
     return max(0, min(1, $score));
@@ -357,7 +370,7 @@ $f{'resembles best author'} = sub {
     return 0 if ($_[0]->{id} < $title) != ($best->{id} < $title);
     # smaller flaws:
     my $ret = 1;
-    $ret -= 0.3 if $alignment->($_[0]) ne $alignment->($best);
+    $ret -= 0.3 if alignment($_[0]) ne alignment($best);
     $ret -= 0.3 if $_[0]->{fsize} != $best->{fsize};
 #    $ret -= 0.3 if $bold->($_[0]) != $bold->($best);
     # far away:
@@ -383,11 +396,13 @@ $f{'resembles best BIBSTART'} = sub {
     return 0 unless $best;
     return 1 if $_[0] == $best;
     my $ret = 1;
-    $ret -= 0.6 if $_[0]->{fsize} != $best->{fsize};
-    $ret -= 0.5 if abs($_[0]->{left} - $best->{left}) > 10;
-    $ret -= abs($_[0]->{page}->{number} - $best->{page}->{number})/10;
+    $ret *= 0.3 if $_[0]->{fsize} != $best->{fsize};
+    $ret *= 0.3 if abs($_[0]->{left} - $best->{left}) > 10;
+    $ret *= 1 - abs($_[0]->{page}->{number} - $best->{page}->{number})/10;
     my $inbib = $f{'in bibliography section'};
-    $ret -= 0.8 if $inbib->($best) && !$inbib->($_[0]);
+    $ret *= 0.2 if $inbib->($best) && !$inbib->($_[0]);
+    my $citlab = $f{'begins with citation label'};
+    $ret *= 0.3 if $citlab->($best) && !$citlab->($_[0]);
     return max($ret, 0);
 };
 
@@ -476,9 +491,33 @@ sub begins {
 
 $f{'begins with section number'} = memoize(begins($re_sec_number));
  
-$f{'begins with footnote label'} = memoize(begins($re_footnote_label, '', 1));
-
 $f{'begins in italic'} = begins('\s*<i>', '', 1);
+
+$f{'text block begins with footnote label'} = sub {
+    my $ch = $_[0];
+    do {
+        return 1 if $ch->{text} =~ /$re_footnote_label/;
+        $ch = $ch->{prev};
+    } while ($ch
+             && $ch->{fsize} == $_[0]->{fsize}
+             && $ch->{page} == $_[0]->{page});
+    return 0;
+};
+
+$f{'begins inside quote'} = sub {
+    if ($_[0]->{plaintext} =~ /^(.+?)$re_rquote/
+        && $1 !~ /$re_lquote/
+        && $_[0]->{prev}
+        && $_[0]->{prev}->{plaintext} =~ /$re_lquote(.+?)$/
+        && $1 !~ /$re_rquote/) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+};
+
+begins('\s*<i>', '', 1);
 
 $f{'begins with citation label'} = memoize(begins($re_cit_label));
 
@@ -491,6 +530,12 @@ $f{'begins with possible name'} = memoize(sub {
     return 0 if ($parts[0] =~ /$re_noname/);
     return 1 if ($parts[0] =~ /(?:$re_name_before)?$re_name(?:$re_name_after)?/);
     return 0;
+});
+
+$f{'begins with dictionary word'} = memoize(sub {
+    my $w = $_[0]->{plaintext};
+    $w =~ s/^(\p{Letter}+)/$1/;
+    return ($w && english($w)) ? 1 : 0;
 });
 
 $f{'begins with possible bib name'} = 
@@ -539,30 +584,32 @@ sub largest_text {
     my $dir = shift;
     return sub {
         my $ch = $_[0];
-        my $anything_smaller = 0;
+        #my $anything_smaller = 0;
         while (($ch = $ch->{$dir}) && $ch->{page} == $_[0]->{page}) {
             next if (length($ch->{plaintext}) < 5);
             return 0 if $ch->{fsize} > $_[0]->{fsize};
-            $anything_smaller = 1 if $ch->{fsize} < $_[0]->{fsize};
+            #$anything_smaller = 1 if $ch->{fsize} < $_[0]->{fsize};
         }
-        return $anything_smaller ? 1 : 0.5;
+        #return $anything_smaller ? 1 : 0.5;
+        return 1;
     }
 }
 
 $f{'largest text on rest of page'} = memoize(largest_text('next'));
+
 $f{'largest text on page'} = memoize(allof(largest_text('next'),
                                             largest_text('prev')));
 
 $f{'previous line short'} = memoize(sub {
     my $prev = $_[0]->{prev};
     return 0.5 unless $prev;
-    return min(max(2 - length($prev)/10, 1), 0);
+    return min(max(2 - length($prev)/40, 1), 0);
 });   
 
 $f{'previous line ends with terminator'} = memoize(sub {
     my $prev = $_[0]->{prev};
     return 0.5 unless $prev;
-    return $prev =~ /\.!\?\s*$/;
+    return $prev =~ /[\.!\?]\s*(?:<[^>]+>)?\s*$/;
 });
 
 $f{'previous line BIBSTART'} = sub {
@@ -577,7 +624,8 @@ $f{'is BIB'} = sub {
 
 $f{'next line indented'} = memoize(sub {
     my $next = $_[0]->{next};
-    return 0.5 unless $next;
+    my $gap = gap($_[0], 'next');
+    return 0.5 unless ($gap && $gap < 2);
     return 1 if ($next->{left} - $_[0]->{left} > 5);
 });
  

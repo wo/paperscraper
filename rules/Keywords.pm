@@ -59,7 +59,7 @@ our $re_noname = qr/
     \b(?:thanks?|
        @|
        abstract|introduction|overview|
-       on|the|for|of|with|to|about|this|what|new|account|by|and|
+       the|for|of|with|to|about|this|what|new|account|
        search|home|
        free|
        see

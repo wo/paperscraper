@@ -11,7 +11,7 @@ use util::Io;
 use util::Functools qw/someof allof/;
 use rules::Keywords;
 our @ISA = ('Exporter');
-our @EXPORT = qw(&in_dict &speller &extract_names &compile $or $and $not);
+our @EXPORT = qw(&in_dict &english &extract_names &compile $or $and $not);
 
 my $path = dirname(abs_path(__FILE__));
 
@@ -102,6 +102,11 @@ sub speller {
         $speller->set_option('sug-mode', 'fast');
     }
     return $speller;
+}
+
+sub english {
+    my $sp = speller();
+    return $sp && $sp->check($_[0]);
 }
 
 sub extract_names {

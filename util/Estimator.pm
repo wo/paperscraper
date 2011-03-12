@@ -79,7 +79,6 @@ sub add_feature {
     $self->{features}->{$name} = [$func, $scores->[0], $scores->[1]];
 }
 
-my %cache;
 sub test {
     # This is a bit of a hack. The basic idea is that if two features
     # both support a hypothesis, then they are more likely to not be
@@ -103,11 +102,7 @@ sub test {
 
     while (my ($fname, $fvals) = each %{$self->{features}}) {
 	my ($attrib, $w1, $w0) = @$fvals;
-	print "  $fname? " if $verbose;
-	unless (exists $cache{$ob.$attrib}) {
-	    $cache{$ob.$attrib} = $attrib->($ob);
-	}
-	my $is = $cache{$ob.$attrib};
+        my $is = $attrib->($ob);
 	my $score = $is * $w1 + (1-$is) * $w0;
 	if ($score >= 0) {
 	    $pos += (1-$pos) * $score;
@@ -117,7 +112,7 @@ sub test {
 	    $neg += $neg * $score;
 	    $neg_w += exp((0.5-$score) * 5);
 	}
-	print "$is => $score\n" if $verbose;
+	print "$fname? $is => $score\n" if $verbose;
     };
 
     my $p = ($pos * $pos_w + $neg * $neg_w) / ($pos_w + $neg_w);
@@ -128,7 +123,6 @@ sub test {
 sub makeLabeler {
     my ($features, $stage) = @_;
 
-    %cache = ();
     my %estimators;
     my $estim = sub {
 	my $label = shift;

@@ -2,6 +2,7 @@ package Doctidy;
 use strict;
 use warnings;
 use Encode;
+use utf8;
 use Getopt::Std;
 use List::Util qw/max min/;
 use Data::Dumper;
@@ -91,7 +92,7 @@ sub elem {
            return $str =~ /$attr="(.*?)"/ && $1;
        }
        if ($str =~ /^<.+?>(.*)<.+?>$/) {
-           return fixchars($1);
+           return tidy_text($1);
        }
     };
 }
@@ -126,7 +127,8 @@ sub mergechunks {
     my ($lines, $chunk) = (@_);
 
     # skip empty chunks:
-    unless ($chunk->{text} && $chunk->{text} =~ /\S/) {
+    if (!$chunk->{text} 
+        || $chunk->{text} =~ /^(?:<[^>]+>)?\s*(?:<[^>]+>)?$/) {
         return $lines;
     }
     print "chunk: ", $chunk->{text}, "\n" if $verbose;
@@ -161,12 +163,29 @@ sub mergechunks {
     # Does the chunk begin too far right or left?
     my $chunk_x = $chunk->{left};
     my $ex = $line->{width} / length($line->{text});
-    my $min_x = $line->{right} - $ex; # chunks overlap!
     my $max_x = $line->{right} + 7*$ex;
-    if ($chunk_x > $max_x || $chunk_x < $min_x) {
-        print "  $chunk_x out of X range $min_x-$max_x\n" if $verbose;
+    if ($chunk_x > $max_x) {
+        print "  $chunk_x > $max_x: too far right\n" if $verbose;
         push @$lines, $chunk;
         return $lines;
+    }
+    my $overlap = $line->{right} - $chunk_x;
+    if ($overlap > 3*$ex) {
+        print "  chunks overlap by $overlap!\n" if $verbose;
+        push @$lines, $chunk;
+        return $lines;
+    }
+    elsif ($overlap > $ex/2) {
+        print "  chunks overlap ($overlap)!\n" if $verbose;
+        # do the overlapping chunks compose a single letter?
+        my $last = substr($line->{text}, -1);
+        my $first = substr($chunk->{text}, 0, 1);
+        my $combined = combine_letters($last, $first);
+        if ($combined) {
+            print "  merging $last and $first into $combined\n" if $verbose;
+            substr($line->{text}, -1) = $combined;
+            $chunk->{text} = substr($chunk->{text}, 1);
+        }
     }
 
     # OK, now merge $chunk into $line:
@@ -183,27 +202,45 @@ sub append {
     $line->{top} = min($line->{top}, $chunk->{top});
     my $bottom = max($line->{bottom}, $chunk->{top} + $chunk->{height});
     $line->{height} = $bottom - $line->{top};
-    $line->{width} += $chunk->{right} - $chunk->{left};
     if (length($chunk->{text}) > length($line->{text})) {
         $line->{font} = $chunk->{font};
     }
-    if ($chunk->{left} - $line->{right} > $ex/5) {
+    if ($chunk->{left} - $line->{right} > $ex/4) {
         print "  inserting whitespace\n" if $verbose;
         $line->{text} .= ' ';
     }
     if ($chunk->{bottom} < $line->{bottom}
         && $chunk->{top} < $line->{top}) {
-        print "  chunk is <sup>\n" if $verbose;
-        $line->{text} .= '<sup>'.$chunk->{text}.'</sup>';
+        print "chunk is sup (or line sub)\n" if $verbose;
+        if ($chunk->{width} <= $line->{width}) {
+            $line->{text} .= "<sup>".$chunk->{text}."</sup>";
+        }
+        else {
+            $line->{text} = "<sub>".$line->{text}."</sub>".$chunk->{text};
+        }
     }
     elsif ($chunk->{bottom} > $line->{bottom}
            && $chunk->{top} > $line->{top}) {
-        print "  chunk is <sub>\n" if $verbose;
-        $line->{text} .= '<sub>'.$chunk->{text}.'</sub>';
+        print "chunk is sub (or line sup)\n" if $verbose;
+        if ($chunk->{width} <= $line->{width}) {
+            $line->{text} .= "<sub>".$chunk->{text}."</sub>";
+        }
+        else {
+            $line->{text} = "<sup>".$line->{text}."</sup>".$chunk->{text};
+        }
     }
     else {
         $line->{text} .= $chunk->{text};
     }
+    $line->{width} = $chunk->{right} - $line->{left};
+    $line->{right} = $chunk->{right};
+}
+
+sub combine_letters {
+    my ($x, $y) = @_;
+    # stub!
+    return $y if ($x =~ /[\s´\`¨]/);
+    return $x if ($y =~ /[\s´\`¨]/);
 }
 
 sub sortlines {
@@ -306,6 +343,15 @@ sub sortlines {
                         $b->{col}*1000 + $b->{top} } @newlines;
     }
     return @newlines;
+}
+
+sub tidy_text {
+    my $str = shift;
+    # strip empty tags:
+    while ($str =~ /<([^>\s]+)[^>]*>\s*<\/\1>/) {
+        $str =~ s/$&//;
+    }
+    return fixchars($str);
 }
 
 sub fixchars {
