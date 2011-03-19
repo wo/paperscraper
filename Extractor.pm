@@ -89,7 +89,7 @@ sub init {
     my @chunks;
     my $pageno = 0; # first element of @pages isn't a page
     my $charno = 1;
-    my $lineno = 1;
+    my $lineno = 0;
     for my $page (@pages) {
         my @pagechunks;
         while ($page =~ /(<text.*?>.*?<\/text>)/isgo) {
@@ -226,12 +226,12 @@ sub extract {
     use rules::Line_Features;
     util::Estimator->verbose($verbosity > 4 ? 1 : 0);
     
-    # These are the line labels we need to extract the required info:
+    # These are the line labels needed to extract the required info:
     my %labels = (
-        'authors'      => ['AUTHOR', 'TITLE', 'HEADING'],
-        'title'        => ['AUTHOR', 'TITLE', 'HEADING'],
+        'authors'      => ['AUTHOR', 'TITLE'],
+        'title'        => ['AUTHOR', 'TITLE'],
         'abstract'     => ['ABSTRACTSTART', 'ABSTRACTCONTENT'],
-        'bibliography' => ['BIB', 'BIBSTART', 'HEADING'],
+        'bibliography' => ['BIB', 'BIBSTART'],
         );
     my @labels = merge(map { $labels{$_} } @fields);
 
@@ -296,21 +296,21 @@ sub label_chunks {
         my $labeler = makeLabeler($features, $i);
 
         # cache probability values, and don't use advanced stage
-        # computations if initial P < min_p or the relevant label is
-        # uninteresting:
+        # computations if previous probability very low:
         my $make_p = sub {
-            my $ch = shift;
+            my $chunk = shift;
             my %cache;
-            my $oldp = $ch->{p};
-            my $newp = $labeler->($ch);
-            my $threshold = $arg{relabel_all} ? 0.2 : $min_p;
+            my $oldp = $chunk->{p};
+            my $newp = $labeler->($chunk);
+            my $threshold = 0.3;
             return sub {
                 my $label = shift;
                 return $cache{$label} if exists($cache{$label});
-                #print "computing $ch p $label\n";
+                #print "computing p $label for $chunk->{text}\n";
                 if ($oldp) {
                     my $val = $oldp->($label);
-                    if ($val < $threshold || !grep /$label/, @labels) {
+                    #if ($val < $threshold || !grep /$label/, @labels) {
+                    if ($val < $threshold) {
                         #print "using oldp $val\n";
                         return $cache{$label} = $val;
                     }
@@ -319,6 +319,7 @@ sub label_chunks {
                 return $cache{$label} = $newp->($label);
             };
         };
+
         # Features at iteration > 1 may refer to the probability from
         # earlier iterations, so we leave ->{p} in place until the new
         # probability has been computed:
@@ -326,20 +327,20 @@ sub label_chunks {
         foreach my $ch (@$chunks) {
             $ch->{$p} = $make_p->($ch);
         }
+
         # At this point, $chunk->{$p} is a function that calculates
         # the probability for the label given as argument; but the
         # calculation has not yet been made.
         foreach my $label (@labels) {
-            my $candidates = $arg{relabel_all} ? $chunks : $best{$label};
             my @best;
-            foreach my $c (@$candidates) {
-                if ($c->{$p}->($label) >= $min_p) {
-                    push @best, $c;
+            foreach my $chunk (@$chunks) {
+                if ($chunk->{$p}->($label) >= $min_p) {
+                    push @best, $chunk;
                 }
             }
             @best = sort { $b->{$p}->($label) <=> $a->{$p}->($label) } @best;
             if ($verbosity > 3) {
-                say(4, "\n$label chunks (stage $i):\n  ", 
+                say(4, "\n$label chunks (stage $i):\n  ",
                     join("\n  ", map {
                     $_->{text}.' => '.$_->{$p}->($label) } @best));
                 say(5, "\n");
@@ -347,22 +348,24 @@ sub label_chunks {
             $best{$label} = \@best;
         }
 
-        foreach my $ch (@$chunks) {
+        foreach my $chunk (@$chunks) {
             # inform chunks about best chunks:
-            $ch->{best} = \%best;
+            $chunk->{best} = \%best;
             if ($i > 1) {
-                $ch->{p} = $ch->{$p};
+                $chunk->{p} = $chunk->{$p};
             }
         }
     }
+
     if ($verbosity > 3) {
         say(4, "\ncomputing result");
         my @res;
-        foreach my $ch (@$chunks) {
-            my @labs = grep { $ch->{p}->($_) > $min_p }
-                       sort { $ch->{p}->($b) <=> $ch->{p}->($a) } 
-                       keys %$features;
-            push @res, join(' ', @labs)." >> ".$ch->{text};
+        foreach my $chunk (@$chunks) {
+            my @labs = grep { $chunk->{p}->($_) > $min_p }
+                       sort { $chunk->{p}->($b) <=> $chunk->{p}->($a) } 
+                       #keys %$features;
+                       @labels;
+            push @res, join(' ', @labs)." >> ".$chunk->{text};
         }
         say(4, "\nresult:\n", join("\n", @res), "\n");
     }

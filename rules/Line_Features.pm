@@ -20,22 +20,21 @@ our %features;
 $features{TITLE} = [
     ['among first few lines', [0.4, -0.3]],
     ['within first few pages', [0.1, -1]],
-    [$and->('large font', 'largest text on rest of page'), [0.5, -0.6]],
-    ['bold', [0.2, -0.05]],
-    ['centered', [0.4, -0.2]],
-    ['gap above', [0.3, -0.3]],
-    ['gap below', [0.2, -0.2]],
-    ['matches title pattern', [0.1, -0.5]],
-    ['several words', [0.1, -0.3]],
-    ['high uppercase frequency', [0.1, -0.2]],
-    # recursive tests that make use of label probabilities:
+    [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
+    ['bold', [0.2, -0.05], 2],
+    ['centered', [0.4, -0.2], 2],
+    ['gap above', [0.3, -0.3], 2],
+    ['gap below', [0.2, -0.2], 2],
+    ['matches title pattern', [0.1, -0.5], 2],
+    ['several words', [0.1, -0.3], 2],
+    ['high uppercase frequency', [0.1, -0.2], 2],
     [$or->('best title', 'may continue title'), [0.1, -0.3], 3],
-    ['probable HEADING', [-0.2, 0.1]],
+    ['probable HEADING', [-0.2, 0.1], 3],
     ];
 
 if (defined $_[0]->{doc}->{anchortexts}) { # TODO
     push @{$features{'TITLE'}},
-         ['resembles anchor text', [0.6, 0]];
+         ['resembles anchor text', [0.6, 0], 2];
 }
 
 $features{AUTHOR} = [
@@ -43,44 +42,42 @@ $features{AUTHOR} = [
     [$or->('within first few pages', 'on last page'), [0.05, -0.8]],
     ['narrowish', [0.3, -0.3]],
     ['centered', [0.3, -0.2]],
-    ['small font', [-0.5, 0.2]],
-    ['largest text on page', [-0.4, 0]],
-    ['contains digit', [-0.2, 0.05]],
-    ['gap above', [0.3, -0.3]],
-    ['gap below', [0.2, -0.2]],
+    ['small font', [-0.2, 0.2]],
     ['begins with possible name', [0.5, -0.5]],
-    # recursive tests that make use of label probabilities:
-    [$and->('best title', 'other good authors'), [-0.2, 0.05], 2],
+    ['largest text on page', [-0.4, 0], 2],
+    ['contains digit', [-0.2, 0.05], 2],
+    ['gap above', [0.3, -0.3], 2],
+    ['gap below', [0.2, -0.2], 2],
+    [$and->('best title', 'other good authors'), [-0.2, 0.05], 3],
     ['probable HEADING', [-0.5, 0], 3],
-    ['contains actual name', [0.2, -0.3], 4],
-    ['resembles best author', [0.1, -0.4], 5],
+    ['contains actual name', [0.2, -0.3], 3],
+    ['resembles best author', [0.1, -0.4], 4],
     ];
 
 $features{HEADING} = [
     ['large font', [0.5, -0.3]],
     ['bold', [0.3, -0.2]],
+    ['contains letters', [0, -0.5]],
+    ['several words', [0.05, -0.2]],
     ['centered', [0.1, -0.05]],
     ['justified', [-0.4, 0]],
     ['gap above', [0.3, -0.5]],
     ['gap below', [0.2, -0.3]],
-    ['contains letters', [0, -0.5]],
-    ['several words', [0.05, -0.2]],
     ['high uppercase frequency', [0.1, -0.2]],
     ['begins with section number', [0.4, -0.1]],
-    ['probable CONTENT', [-0.5, 0.05]],
-    ['preceeds CONTENT', [0.3, -0.3]],
-    ['follows CONTENT', [0.4, -0.2]],
+#    ['probable CONTENT', [-0.5, 0.05], 3],
+#    ['preceeds CONTENT', [0.3, -0.3], 3],
+#    ['follows CONTENT', [0.4, -0.2], 3],
     ];
 
 $features{ABSTRACTSTART} = [
     ['"abstract" heading', [1, -0.3]],
-    [$and->('begins with "abstract:"', 'gap above'), [0.8, -0.3]],
+    [$and->('begins with "abstract:"', 'gap above'), [0.8, -0.3], 1],
     # recursive:
     ['preceeds CONTENT', [0.1, -0,3], 4],
     ];
 
 $features{CONTENT} = [
-    ['normal font', [0.3, -0.6], 2],
     ['bold', [-0.3, 0.05]],
     ['centered', [-0.5, 0.1]],
     ['justified', [0.3, -0.1]],
@@ -88,8 +85,9 @@ $features{CONTENT} = [
     [$and->('gap above', 'gap below'), [-0.6, 0.1]],
     ['high punctuation frequency', [-0.2, 0.1]],
     ['long', [0.1, -0.2]],
+    ['normal font', [0.3, -0.6]],
     ['matches content pattern', [0.2, -0.3]],
-    ['probable FOOTNOTE', [-0.8, 0.1]],
+    ['probable FOOTNOTE', [-0.8, 0.1], 3],
     ];
 
 $features{ABSTRACTCONTENT} = [
@@ -103,7 +101,7 @@ $features{ABSTRACTCONTENT} = [
     ['matches content pattern', [0.2, -0.3]],
     ['not far into content', [0.2, -0.8], 2],
     ['near other ABSTRACTCONTENT', [0.3, -0.3], 3],
-    ['probable FOOTNOTE', [-0.8, 0.1]],
+    ['probable FOOTNOTE', [-0.8, 0.1], 3],
     ];
 
 $features{FOOTNOTE} = [
@@ -123,10 +121,9 @@ $features{BIB} = [
     ['high numeral frequency', [0.1, -0.2]],
     ['high punctuation frequency', [0.1, -0.2]],
     ['page number', [-1, 0]],
-    # recursive tests that make use of label probabilities:
     ['near other BIBs', [0.3, -0.3], 2],
     ['resembles best BIB', [0.3, -0.6], 3],
-    ['probable FOOTNOTE', [-0.8, 0.1]],
+    ['probable FOOTNOTE', [-0.8, 0.1], 3],
     ];
 
 $features{BIBSTART} = [
@@ -143,7 +140,6 @@ $features{BIBSTART} = [
     ['begins with dash', [0.5, 0], 2],
     ['previous line short', [0.6, -0.1], 2],
     ['previous line ends with terminator', [0.4, -0.25], 2],
-    # recursive:
     ['previous line BIBSTART', [-0.2, 0.1], 3],
     ['near other BIBs', [0.3, -0.3], 2],
     ['resembles best BIBSTART', [0.3, -0.7], 3],
@@ -217,12 +213,12 @@ $f{'small font'} = memoize(sub {
 });
 
 $f{'among first few lines'} = memoize(sub { 
-    3 / max($_[0]->{id}, 3);
+    3 / max($_[0]->{id}+1, 3);
 });
 
 $f{'in second half of paper'} = memoize(sub {
     my $num = @{$_[0]->{doc}->{chunks}};
-    return $_[0]->{id} > $num/2 ? 1 : 0;
+    return $_[0]->{id}+1 > $num/2 ? 1 : 0;
 });
 
 $f{'near top of page'} = memoize(sub {
@@ -416,12 +412,60 @@ $f{'like source author'} = sub {
     return 0;
 };
 
-$f{'in bibliography section'} = sub {
+
+sub in_section {
+    my $re_title = shift;
+    my $min_heading = 0.4;
+    return sub {
+        #print "** finding heading for $_[0]->{text}\n";
+        my @chunks;
+        if ($_[0]->{_headings}) {
+            # only go through ancestors that have previously been
+            # identified as possible section headings:
+            #print "** found _headings\n";
+            @chunks = @{$_[0]->{_headings}};
+        }
+        else {
+            for (my $i = $_[0]->{id}; $i >= 0; $i--) {
+                my $chunk = $_[0]->{doc}->{chunks}->[$i];
+                if ($chunk->{_headings}) {
+                    #print "** found headings at ancestor $i\n";
+                    push @chunks, @{$chunk->{_headings}};
+                    last;
+                }
+                else {
+                    #print "** adding chunk $i to check\n";
+                    push @chunks, $chunk;
+                }
+            }
+        }
+        $_[0]->{_headings} = [];
+        my $res = 0;
+        foreach my $chunk (@chunks) {
+            my $p = $chunk->{p}->('HEADING');
+            next unless $p > $min_heading + @{$_[0]->{_headings}}/20;
+            #print "** heading $p: $chunk->{text}\n";
+            push @{$_[0]->{_headings}}, $chunk;
+            if ($chunk->{plaintext} =~ /$re_title/ && !$res) {
+                $res = $p * 1/@{$_[0]->{_headings}};            
+            }
+            last if @{$_[0]->{_headings}} == 5;
+        }
+        #print "** result: $res\n";
+        return $res;
+    };
+}
+
+$f{'in bibliography section'} = in_section("^$re_bib_heading\$");
+
+sub old_inbib {
     my $prev = $_[0];
     $_[0]->{_in_bib} = 0;
     my $other_heading = 0;
     while ($prev = $prev->{prev}) {
+        print "previous is $prev->{text}\n";
         if ($prev->{p}->('HEADING') > 0.4) {
+            print "previous is heading\n";
             if ($prev->{plaintext} =~ /^$re_bib_heading$/) {
                 $_[0]->{_in_bib} = $other_heading ? 0.5 : 1; 
                 last;
@@ -431,6 +475,7 @@ $f{'in bibliography section'} = sub {
             }
         }
         if (exists $prev->{_in_bib}) {
+            print "previous has in_bib\n";
             $_[0]->{_in_bib} = $prev->{_in_bib};
             last;
         }
