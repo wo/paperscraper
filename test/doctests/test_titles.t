@@ -19,7 +19,7 @@ my %tests = (
  },
 
  '/home/wo/programming/opp-tools/test/doctests/11-Byrne-Hayek-Hume.pdf' => {
-   authors => ["ALEX BYRNE", "ALAN HÁJEK"],
+   authors => ["Alex Byrne", "Alan Hájek"],
    title => "David Hume, David Lewis, and Decision Theory",
  },
 
