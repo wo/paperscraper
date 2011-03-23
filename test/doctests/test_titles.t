@@ -13,14 +13,29 @@ my %cfg = do 'config.pl';
 
 my %tests = (
 
- '/home/wo/programming/opp-tools/test/doctests/1-Chalmers-probability.pdf' => {
+ '/home/wo/programming/opp-tools/test/doctests/11-Chalmers-probability.pdf' => {
    authors => ["David J. Chalmers"],
    title => "Probability and Propositions",
  },
 
  '/home/wo/programming/opp-tools/test/doctests/11-Byrne-Hayek-Hume.pdf' => {
-   authors => ["ALEX BYRNE", "ALAN H�JEK"],
+   authors => ["ALEX BYRNE", "ALAN HÁJEK"],
    title => "David Hume, David Lewis, and Decision Theory",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/11-Avigad-Understanding.pdf' => {
+   authors => ["Jeremy Avigad"],
+   title => "Understanding, formal verification, and\nthe philosophy of mathematics",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/11-Rayo-Generality.pdf' => {
+   authors => ["Agustín Rayo"],
+   title => "Absolute Generality Reconsidered",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/11-Skyrms-Game.pdf' => {
+   authors => ["Brian Skyrms"],
+   title => "Game Theory, Rationality and\nEvolution of the Social Contract",
  },
 
 );
