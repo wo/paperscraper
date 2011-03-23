@@ -38,6 +38,11 @@ my %tests = (
    title => "Game Theory, Rationality and\nEvolution of the Social Contract",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/11-Incurvati-Smith-Rejection.pdf' => {
+   authors => ["Luca Incurvati", "Peter Smith"],
+   title => "Rejection and valuations",
+ },
+
 );
 
 sub proc {
