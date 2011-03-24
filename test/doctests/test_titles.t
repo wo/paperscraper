@@ -43,6 +43,18 @@ my %tests = (
    title => "Rejection and valuations",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Kolodny-Myth.pdf' => {
+   authors => ["Niko Kolodny"],
+   title => "The Myth of Practical Consistency",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/Newman-Wholes.pdf' => {
+   authors => ["Andrew Newman"],
+   title => "In Defence of Real Composite Wholes",
+ },
+
+
+
 );
 
 sub proc {

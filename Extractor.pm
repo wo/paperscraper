@@ -306,15 +306,15 @@ sub label_chunks {
             return sub {
                 my $label = shift;
                 return $cache{$label} if exists($cache{$label});
-                #print "computing p $label for $chunk->{text}\n";
+                #print "**computing p $label for $chunk->{text}\n";
                 if ($oldp) {
                     my $val = $oldp->($label);
                     #if ($val < $threshold || !grep /$label/, @labels) {
                     if ($val < $threshold) {
-                        #print "using oldp $val\n";
+                        #print "**using oldp $val\n";
                         return $cache{$label} = $val;
                     }
-                    #print "not using oldp\n";
+                    #print "**not using oldp\n";
                 }
                 return $cache{$label} = $newp->($label);
             };
@@ -596,16 +596,15 @@ sub extract_authors_and_title {
 
     $self->{confidence} = $parsing->{quality};
     foreach my $block (@{$parsing->{blocks}}) {
-        my $text = tidy_text($block->{text}, 1);
         if ($block->{label}->{TITLE}) {
-            $self->{title} = $text;
+            $self->{title} = tidy_text($block->{text}, 1);
             # TODO: remove authors from title if block is also title
-            # TODO $title = capitalize_title($title) if ($title !~ /\p{isLower}/);
         }
         if ($block->{label}->{AUTHOR}) {
             foreach my $chunk (@{$block->{chunks}}) {
                 foreach my $name (keys %{$chunk->{names}}) {
-                    # remove duplicates:
+                    # normalise and remove duplicates:
+                    $name = tidy_text($name, 1);
                     my $ok = 1;
                     foreach my $old (@{$self->{authors}}) {
                         $ok = 0 if Text::Names::samePerson($name, $old);
@@ -870,11 +869,11 @@ sub tidy_text {
     $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
     if ($thorough) {
         # chop whitespace at beginning and end of lines:
-        $txt =~ s|^\s*(.+?)\s*$|$1|gm;
+        $txt =~ s|^\s*(.+?)\s*$|$1|gsm;
         # and footnote marks:
         $txt =~ s|<sup>\W?.\W?<.sup>$||;
         # and surrounding tags:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|mg;
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gsm;
         # and surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?$|$1|s;
         # chop footnote star *:
@@ -885,8 +884,10 @@ sub tidy_text {
         $txt =~ s|([\pL\?!])\d$|$1|;
         # and odd trailing punctuations:
         $txt =~ s|[\.,:;]$||;
-        # surrounding tags again:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|mg;
+        # strip surrounding tags again:
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gsm;
+        # replace allcaps:
+        $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
     }
     return $txt;
 }

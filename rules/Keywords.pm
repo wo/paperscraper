@@ -21,6 +21,7 @@ $re_footnote_label
 $re_cit_label
 $re_journal
 $re_publisher
+$re_publication_word
 $re_year_words
 $re_lquote
 $re_rquote
@@ -34,7 +35,7 @@ my $re_address_word = qr/\b(?:
     )\b/ix;
 
 # stuff that commonly occurs in publication info:
-my $re_publication_word = qr/\b(?:
+our $re_publication_word = qr/\b(?:
     forthcoming|editors?|edited|publish\w*|press|volume
     to appear in|draft|editor\w*|\d{4}|reprints?|excerpt|
     circulation|cite

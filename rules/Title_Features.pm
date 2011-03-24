@@ -11,11 +11,11 @@ our @EXPORT_OK = qw/%block_features @parsing_features/;
 our %block_features;
 
 $block_features{TITLE} = [
-    ['probable TITLE', [1, -1]],
+    ['probable TITLE', [0.8, -0.8]],
     #['chunks are consecutive', [0.1, -1]],
     #['chunks have same font size', [0.3, -0.3]],
     #['chunks have same alignment', [0.3, -0.6]],
-    ['adjacent chunks probable title', [-0.3, 0.1]],
+    ['adjacent chunks probable title', [-0.5, 0.2]],
     ];
 
 $block_features{AUTHOR} = [
@@ -23,8 +23,8 @@ $block_features{AUTHOR} = [
     ];
 
 our @parsing_features = (
-    ['author parts have high score', [1, -1]],
-    ['title parts have high score', [1, -1]],
+    ['author parts have high score', [1, -0.9]],
+    ['title parts have high score', [1, -0.9]],
 #    ['author parts resemble each other', [0.2, -0.4]],
     );
 
@@ -51,7 +51,7 @@ sub p {
     my $label = shift;
     return sub {
         if (exists $_[0]->{chunks}) {
-            return min(map { $_->{p}->($label) } @{$_[0]->{chunks}});
+            return mean(map { $_->{p}->($label) } @{$_[0]->{chunks}});
         }
         return $_[0]->{p}->($label);
     };

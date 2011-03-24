@@ -21,6 +21,7 @@ $features{TITLE} = [
     ['among first few lines', [0.4, -0.3]],
     ['within first few pages', [0.1, -1]],
     [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
+    ['largest text on rest of page', [0.2, 0], 2],
     ['bold', [0.2, -0.05], 2],
     ['centered', [0.4, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
@@ -49,7 +50,10 @@ $features{AUTHOR} = [
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
     [$and->('best title', 'other good authors'), [-0.2, 0.05], 3],
-    ['probable HEADING', [-0.5, 0], 3],
+    ['probable HEADING', [-0.3, 0.1], 3],
+    ['contains publication keywords', [-0.4, 0], 3],
+    ['contains year', [-0.1, 0], 3],
+    ['contains page-range', [-0.3, 0], 3],
     ['contains actual name', [0.2, -0.3], 3],
     ['resembles best author', [0.1, -0.4], 4],
     ];
@@ -65,9 +69,9 @@ $features{HEADING} = [
     ['gap below', [0.2, -0.3]],
     ['high uppercase frequency', [0.1, -0.2]],
     ['begins with section number', [0.4, -0.1]],
-#    ['probable CONTENT', [-0.5, 0.05], 3],
-#    ['preceeds CONTENT', [0.3, -0.3], 3],
-#    ['follows CONTENT', [0.4, -0.2], 3],
+    ['probable CONTENT', [-0.5, 0.05], 3],
+    ['preceeds CONTENT', [0.3, -0.3], 3],
+    ['follows CONTENT', [0.4, -0.2], 3],
     ];
 
 $features{ABSTRACTSTART} = [
@@ -117,6 +121,7 @@ $features{BIB} = [
     ['in bibliography section', [0.5, -0.2]],
     ['begins with possible bib name', [0.15, -0.15]],
     ['contains year', [0.15, -0.15]],
+    ['contains page-range', [0.15, -0.15]],
     ['high uppercase frequency', [0.1, -0.2]],
     ['high numeral frequency', [0.1, -0.2]],
     ['high punctuation frequency', [0.1, -0.2]],
@@ -161,15 +166,10 @@ sub matches {
 
 $f{'contains digit'} = matches('\d');
 
-sub p {
-    my $label = shift;
-    return sub {
+foreach my $label (@labels) {
+    $f{"probable $label"} = sub {
         return $_[0]->{p}->($label);
     };
-}
-
-foreach (@labels) {
-    $f{"probable $_"} = p($_);
 }
 
 $f{'narrowish'} = sub {
@@ -267,14 +267,19 @@ sub gap {
     # gap($chunk, 'prev') == 2 means vertical distance to previous
     # chunk is twice the default linespacing
     my ($chunk, $dir) = @_;
-    my $default = $chunk->{doc}->{linespacing};
+    my $default = min(1.5, $chunk->{doc}->{linespacing});
     my $sibling = $chunk->{$dir};
     while ($sibling && $sibling->{page} == $chunk->{page}) {
         my $sp = $dir eq 'prev' ? $chunk->{top} - $sibling->{top} :
             $sibling->{top} - $chunk->{top};
         if ($sp > 0) {
-            return ($sp/min($chunk->{height}, $sibling->{height}))
-                / $default;
+            # large fonts often include large gaps:
+            my $fsize = max($chunk->{fsize}, $sibling->{fsize});
+            #print "** fsize: $fsize, sp: $sp => ";
+            $sp *= 1 + $fsize/10;
+            my $height = min($chunk->{height}, $sibling->{height});
+            #print "$sp, $height: $height, gap: ($sp/$height) / $default\n";
+            return ($sp/$height) / $default;
         }
         $sibling = $sibling->{$dir};
     }
@@ -598,16 +603,24 @@ $f{'contains actual name'} = memoize(sub {
 });
 
 
-$f{'contains year'} = memoize(sub {
+$f{'contains year'} = sub {
     $_[0]->{plaintext} =~ /(?<!\d)\d{4}(?!\d)/;    
-});
+};
 
-$f{'contains letters'} = memoize(sub {
+$f{'contains page-range'} = sub {
+    $_[0]->{plaintext} =~ /\d(?:-|$re_dash)\d/;    
+};
+
+$f{'contains letters'} = sub {
     my $num_alpha = $_[0]->{plaintext} =~ tr/[a-zA-Z]//;
     return 1 if $num_alpha > 1;
     return 0 if $num_alpha == 0;
     return 0.5;
-});
+};
+
+$f{'contains publication keywords'} = sub {
+    $_[0]->{plaintext} =~ /$re_year_words|$re_publication_word|$re_journal/;    
+};
 
 sub freq {
     my ($pattern, $frequency) = @_;
@@ -627,23 +640,23 @@ $f{'high punctuation frequency'} = memoize(freq('[,\.:\(\)\[\]-]', 5));
 
 sub largest_text {
     my $dir = shift;
+    my $count_allequal = shift;
     return sub {
         my $ch = $_[0];
-        #my $anything_smaller = 0;
+        my $anything_smaller = 0;
         while (($ch = $ch->{$dir}) && $ch->{page} == $_[0]->{page}) {
             next if (length($ch->{plaintext}) < 5);
             return 0 if $ch->{fsize} > $_[0]->{fsize};
-            #$anything_smaller = 1 if $ch->{fsize} < $_[0]->{fsize};
+            $anything_smaller = 1 if $ch->{fsize} < $_[0]->{fsize};
         }
-        #return $anything_smaller ? 1 : 0.5;
-        return 1;
+        return $count_allequal ? $anything_smaller : 1;
     }
 }
 
 $f{'largest text on rest of page'} = memoize(largest_text('next'));
 
-$f{'largest text on page'} = memoize(allof(largest_text('next'),
-                                            largest_text('prev')));
+$f{'largest text on page'} = memoize(allof(largest_text('next', 1),
+                                            largest_text('prev', 1)));
 
 $f{'previous line short'} = memoize(sub {
     my $prev = $_[0]->{prev};

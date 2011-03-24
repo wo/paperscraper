@@ -130,9 +130,6 @@ sub extract_names {
             elsif (in_dict($w, 'commonwords')) {
                 $p -= 0.2
             }
-            elsif (speller()->check($w)) {
-                $p -= 0.1;
-            }
         }
         foreach my $w (split /\s+/, $last) {
             if (in_dict($w, 'surnames')) {
