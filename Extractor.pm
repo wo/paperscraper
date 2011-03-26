@@ -589,6 +589,11 @@ sub extract_authors_and_title {
       push @parsings, $parsing;
   }
 
+    unless (@parsings) {
+        say(1, "no parsing for authors and title found!");
+        return 0;
+    }
+
     @parsings = sort { $b->{quality} <=> $a->{quality} } @parsings;
 
     my $parsing = shift @parsings;

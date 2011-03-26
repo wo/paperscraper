@@ -23,7 +23,7 @@ $features{TITLE} = [
     [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
     ['largest text on rest of page', [0.2, 0], 2],
     ['bold', [0.3, -0.05], 2],
-    ['centered', [0.4, -0.2], 2],
+    ['centered', [0.3, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
     ['matches title pattern', [0.1, -0.5], 2],
@@ -31,7 +31,7 @@ $features{TITLE} = [
     ['high uppercase frequency', [0.1, -0.2], 2],
     [$or->('best title', 'may continue title'), [0.1, -0.4], 3],
     ['probable HEADING', [-0.2, 0.1], 3],
-    ['probable AUTHOR', [-0.2, 0], 3],
+    ['probable AUTHOR', [-0.2, 0.05], 3],
     ];
 
 if (defined $_[0]->{doc}->{anchortexts}) { # TODO
@@ -45,13 +45,14 @@ $features{AUTHOR} = [
     ['narrowish', [0.3, -0.3]],
     ['centered', [0.3, -0.2]],
     ['small font', [-0.2, 0.2]],
-    ['begins with possible name', [0.5, -0.5]],
+    ['begins with possible name', [0.4, -0.5]],
     ['largest text on page', [-0.4, 0], 2],
     ['contains digit', [-0.2, 0.05], 2],
-    ['gap above', [0.3, -0.3], 2],
-    ['gap below', [0.2, -0.2], 2],
-    [$and->('best title', 'other good authors'), [-0.2, 0.05], 3],
+    ['gap above', [0.25, -0.3], 2],
+    ['gap below', [0.15, -0.15], 2],
+    [$and->('best title', 'other good authors'), [-0.3, 0.05], 3],
     ['probable HEADING', [-0.3, 0.1], 3],
+    ['probable BIB', [-0.3, 0.1], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     ['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
@@ -626,7 +627,7 @@ $f{'contains publication keywords'} = sub {
 sub freq {
     my ($pattern, $frequency) = @_;
     return sub {
-        my $strlen = min(length($_[0]->{plaintext}), 1);
+        my $strlen = max(length($_[0]->{plaintext}), 1);
         my $num_p = 0;
         $num_p++ while $_[0]->{plaintext} =~ /$pattern/g;
         return min($num_p*$frequency / $strlen, 1);

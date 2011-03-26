@@ -443,15 +443,13 @@ sub chunk2block {
     }
 }
 
-# memoize this?
-
 sub othered {
     my $label = shift;
     return sub {
 	my $ch0 = $_[0]->{blocks}->[0]->{chunks}->[0];
 	foreach my $ch (@{$ch0->{best}->{$label}}) {
 	    my $bl = chunk2block($ch, $_[0]->{blocks});
-	    if ($bl->{$label}->{OTHER}) {
+	    if ($bl->{label}->{OTHER}) {
 		return max(0, ($ch->{p}->($label)-0.2)*1.25);
 	    }
 	}

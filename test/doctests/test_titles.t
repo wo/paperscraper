@@ -48,14 +48,19 @@ my %tests = (
    title => "The Myth of Practical Consistency",
  },
 
- '/home/wo/programming/opp-tools/test/doctests/Newman-Wholes.pdf' => {
+ '/home/wo/programming/opp-tools/test/doctests/22-Newman-Wholes.pdf' => {
    authors => ["Andrew Newman"],
    title => "In Defence of Real Composite Wholes",
  },
 
- '/home/wo/programming/opp-tools/test/doctests/Polger-Shapiro-Understanding.pdf' => {
+ '/home/wo/programming/opp-tools/test/doctests/21-Polger-Shapiro-Understanding.pdf' => {
    authors => ["Thomas W. Polger", "Lawrence A. Shapiro"],
    title => "Understanding the Dimensions of Realization",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/22-Roxborough-Cumby-Folk.pdf' => {
+   authors => ["Craig Roxborough", "Jill Cumby"],
+   title => "Folk Psychological Concepts: Causation",
  },
 
 );
