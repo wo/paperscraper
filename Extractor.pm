@@ -862,6 +862,8 @@ sub tidy_text {
     my $thorough = shift;
     # put closing tags before space:
     $txt =~ s| </([^>]+)>|</$1> |g;
+    # merge consecutive HTML elements:
+    $txt =~ s|</([^>]+)>(\s*)<\1>|$2|g;
     # combine word-parts that are split at linebreak:
     $txt =~ s|\b-\n\s*(?=\p{Lower})||g;
     $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})||g;

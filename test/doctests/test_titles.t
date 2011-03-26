@@ -53,7 +53,10 @@ my %tests = (
    title => "In Defence of Real Composite Wholes",
  },
 
-
+ '/home/wo/programming/opp-tools/test/doctests/Polger-Shapiro-Understanding.pdf' => {
+   authors => ["Thomas W. Polger", "Lawrence A. Shapiro"],
+   title => "Understanding the Dimensions of Realization",
+ },
 
 );
 

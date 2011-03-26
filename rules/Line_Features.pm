@@ -22,15 +22,16 @@ $features{TITLE} = [
     ['within first few pages', [0.1, -1]],
     [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
     ['largest text on rest of page', [0.2, 0], 2],
-    ['bold', [0.2, -0.05], 2],
+    ['bold', [0.3, -0.05], 2],
     ['centered', [0.4, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
     ['matches title pattern', [0.1, -0.5], 2],
     ['several words', [0.1, -0.3], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
-    [$or->('best title', 'may continue title'), [0.1, -0.3], 3],
+    [$or->('best title', 'may continue title'), [0.1, -0.4], 3],
     ['probable HEADING', [-0.2, 0.1], 3],
+    ['probable AUTHOR', [-0.2, 0], 3],
     ];
 
 if (defined $_[0]->{doc}->{anchortexts}) { # TODO

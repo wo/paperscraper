@@ -71,7 +71,7 @@ our $re_noname = qr/
 my $re_notitle = qr/(?:
     $re_address_word |
     $re_publication_word |
-    \bthanks?\b|
+    \bthanks?\b|@|
     abstract
     )/ix;
 
