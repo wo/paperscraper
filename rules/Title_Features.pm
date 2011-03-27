@@ -23,6 +23,7 @@ $block_features{AUTHOR} = [
     ];
 
 our @parsing_features = (
+    ['has title', [0.2, -0.6]],
     ['author parts have high score', [1, -0.9]],
     ['title parts have high score', [1, -0.9]],
     ['good author block missed', [-0.5, 0.5]],
@@ -51,6 +52,13 @@ $f{'adjacent chunks probable title'} = sub {
     $ch = $_[0]->{chunks}->[-1]->{next};
     $p = max($p, $ch ? $ch->{p}->('TITLE') : 0);
     return $p;
+};
+
+$f{'has title'} = sub {
+    foreach (@{$_[0]->{blocks}}) {
+        return 1 if $_->{label}->{TITLE};
+    }
+    return 0;
 };
 
 sub ok_parts {

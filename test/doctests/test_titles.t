@@ -73,6 +73,11 @@ my %tests = (
    title => "Expressives and identity conditions",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/31-Seidenfeld-et-al-Preference.pdf' => {
+   authors => ["Joseph B. Kadane", "Mark J. Schervish", "Teddy Seidenfeld"],
+   title => "Preference for equivalent random variables: A price for unbounded utilities",
+ },
+
 );
 
 sub proc {
