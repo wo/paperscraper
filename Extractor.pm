@@ -620,7 +620,7 @@ sub extract_authors_and_title {
         }
     }
 
-    say(1, "authors: '", (join "', '", @{$self->{authors}}));
+    say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
     say(1, "title: '", $self->{title}, "'");
 }
 

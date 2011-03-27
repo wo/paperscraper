@@ -41,7 +41,10 @@ if (defined $_[0]->{doc}->{anchortexts}) { # TODO
 
 $features{AUTHOR} = [
     ['among first few lines', [0.3, -0.2]],
-    [$or->('within first few pages', 'on last page'), [0.05, -0.8]],
+    #[$or->('within first few pages', 'on last page'), [0.05, -0.8]],
+    # need to make sure bib entries aren't taken as authors at end of
+    # a paper; so right now I'm only considering authors at the start.
+    ['within first few pages', [0.05, -0.8]],
     ['narrowish', [0.3, -0.3]],
     ['centered', [0.3, -0.2]],
     ['small font', [-0.2, 0.2]],
@@ -52,7 +55,6 @@ $features{AUTHOR} = [
     ['gap below', [0.15, -0.15], 2],
     [$and->('best title', 'other good authors'), [-0.3, 0.05], 3],
     ['probable HEADING', [-0.3, 0.1], 3],
-    ['probable BIB', [-0.3, 0.1], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     ['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
@@ -634,7 +636,7 @@ sub freq {
     }
 }
 
-$f{'high uppercase frequency'} = memoize(freq('\b\p{IsUpper}', 8));
+$f{'high uppercase frequency'} = memoize(freq('\b\p{IsUpper}', 10));
 
 $f{'high numeral frequency'} = memoize(freq('\d', 10));
 

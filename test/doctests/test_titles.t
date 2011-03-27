@@ -63,6 +63,11 @@ my %tests = (
    title => "Folk Psychological Concepts: Causation",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Anon-Ramsey.pdf' => {
+   authors => [""],
+   title => "Two Interpretations of the Ramsey Test",
+ },
+
 );
 
 sub proc {
