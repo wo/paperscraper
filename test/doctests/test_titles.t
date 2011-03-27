@@ -68,6 +68,11 @@ my %tests = (
    title => "Two Interpretations of the Ramsey Test",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Potts-et-al-Expressives.pdf' => {
+   authors => ["Christopher Potts", "Ash Asudeh", "Seth Cable", "Yurie Hara", "Eric McCready", "Martin Walkow", "Luis Alonso-Ovalle", "Rajesh Bhatt", "Christopher Davis", "Angelika Kratzer", "Tom Roeper"],
+   title => "Expressives and identity conditions",
+ },
+
 );
 
 sub proc {

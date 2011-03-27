@@ -58,8 +58,9 @@ $features{AUTHOR} = [
     ['contains publication keywords', [-0.4, 0], 3],
     ['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
-    ['contains actual name', [0.2, -0.3], 3],
-    ['resembles best author', [0.1, -0.4], 4],
+    ['contains actual name', [0.2, -0.4], 3],
+    ['contains several English words', [-0.4, 0.1], 3],
+    ['resembles best author', [0.1, -0.5], 4],
     ];
 
 $features{HEADING} = [
@@ -189,16 +190,23 @@ $f{'long'} = memoize(sub {
     return min(length($_[0]->{plaintext})/70, 1);
 });
 
-$f{'bold'} = memoize(sub {
-    $_[0]->{text} =~ /^\s*
-        (?:<.+>)?    # optional second tag: <i><b>title<.b><.i>
-        <(b>)        # start tag 
-        .+           # content
-        <\/.>        # end tag
-        \W*          # optional junk appended
-        $/iox;
-    # yes, this catches '<b>foo</b> bar <i>foo</i>'
-});
+sub in_tag {
+    my $tag = shift;
+    return sub {
+        $_[0]->{text} =~ /^\s*
+          (?:<.+>)?    # optional second tag: <i><b>title<.b><.i>
+          <$tag>       # start tag 
+          .+           # content
+          <\/.>        # end tag
+          \W*          # optional junk appended
+          $/ix;
+        # yes, this catches '<b>foo</b> bar <i>foo</i>'..
+    };
+}
+
+$f{'bold'} = in_tag('b');
+
+$f{'italic'} = in_tag('i');
 
 $f{'all caps'} = memoize(sub {
     $_[0]->{plaintext} =~ /(?!\p{IsLower})\p{IsUpper}/;
@@ -377,10 +385,12 @@ $f{'resembles best author'} = sub {
     my $ret = 1;
     $ret -= 0.3 if alignment($_[0]) ne alignment($best);
     $ret -= 0.3 if $_[0]->{fsize} != $best->{fsize};
-#    $ret -= 0.3 if $bold->($_[0]) != $bold->($best);
+    foreach my $feat ('bold', 'italic') {
+        $ret -= 0.7 if $f{$feat}->($_[0]) != $f{$feat}->($best);
+    }
     # far away:
     my $dist = abs($_[0]->{textpos} - $best->{textpos});
-    $ret -= $dist/500;
+    $ret -= $dist/1000;
     return max($ret, 0);
 };
 
@@ -606,6 +616,14 @@ $f{'contains actual name'} = memoize(sub {
     return max(values %{$_[0]->{names}}) || 0; 
 });
 
+$f{'contains several English words'} = memoize(sub {
+    my $c = 0;
+    foreach my $w (split ' ', $_[0]->{plaintext}) {
+        $c++ if english($w);
+        return 1 if $c > 3;
+    }
+    return $c/4;
+});
 
 $f{'contains year'} = sub {
     $_[0]->{plaintext} =~ /(?<!\d)\d{4}(?!\d)/;    
