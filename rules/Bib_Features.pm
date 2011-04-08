@@ -283,7 +283,7 @@ sub matches {
     };
 }
     
-$f{'year'} = matches('^[1-2]\d{3}(?!\d)');
+$f{'year'} = matches('^\D?[1-2]\d{3}(?!\d)\D?');
 
 $f{'publication status'} = matches($re_year_words);
 
