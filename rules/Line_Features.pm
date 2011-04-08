@@ -27,7 +27,7 @@ $features{HEADER} = [
 $features{FOOTER} = [
     ['gap above', [0.2, -0.3]],
     ['small font', [0.2, -0.2]],
-    ['begins or ends with digit', [0.2, -0.1]],
+    ['is digit', [0.3, -0.1]],
     ['resembles other FOOTERs', [0.2, -0.3], 2]
     ];
 
@@ -144,7 +144,7 @@ $features{BIB} = [
     ['high uppercase frequency', [0.1, -0.2]],
     ['high numeral frequency', [0.1, -0.2]],
     ['high punctuation frequency', [0.1, -0.2]],
-    ['near other BIBs', [0.3, -0.3], 2],
+    ['near other BIBs', [0.3, -0.2], 2],
     ['resembles best BIB', [0.3, -0.6], 3],
     ['probable FOOTNOTE', [-0.8, 0.1], 3],
     ];
@@ -186,10 +186,13 @@ $f{'contains digit'} = matches('\d');
 
 $f{'begins or ends with digit'} = matches('^\d|\d$');
 
+$f{'is digit'} = matches('^\d+$');
+
 $f{'resembles other HEADERs'} = sub {
     my $num = scalar @{$_[0]->{best}->{HEADER}} || 1;
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{HEADER}}) {
+        next if $_[0] == $h;
         next if $_[0]->{top} != $h->{top};
         next if $_[0]->{fsize} != $h->{fsize};
         next if length($_[0]->{text}) != length($h->{text});
@@ -202,6 +205,7 @@ $f{'resembles other FOOTERs'} = sub {
     my $num = scalar @{$_[0]->{best}->{FOOTER}} || 1;
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{FOOTER}}) {
+        next if $_[0] == $h;
         next if $_[0]->{bottom} != $h->{bottom};
         next if $_[0]->{fsize} != $h->{fsize};
         next if length($_[0]->{text}) != length($h->{text});
@@ -721,7 +725,9 @@ $f{'previous line short'} = memoize(sub {
 $f{'previous line ends with terminator'} = memoize(sub {
     my $prev = $_[0]->{prev};
     return 0.5 unless $prev;
-    return $prev->{plaintext} =~ /[\.!\?]\s*(?:<[^>]+>)?\s*$/;
+    return $prev->{plaintext} =~ /
+       [\.!\?]\s*(?:<[^>]+>)?(?:$re_rquote)?\s*$
+       /xo;
 });
 
 $f{'previous line BIBSTART'} = sub {

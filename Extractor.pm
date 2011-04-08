@@ -236,30 +236,29 @@ sub strip_marginals {
 
     # strip header and footer lines -- they tend to confuse the line
     # classification.
-    my @chunks;
-    foreach my $ch (@{$self->{chunks}}) {
-        if (!$ch->{prev} || $ch->{page} != $ch->{prev}->{page}) {
-            # first line on page
-            push @chunks, $ch;
-        }
-        elsif (!$ch->{next} || !$ch->{next}->{next} ||
-               $ch->{page} != $ch->{next}->{next}->{page}) {
-            # among last two lines on page
-            push @chunks, $ch;
-        }
-    }
-
     use rules::Line_Features;
     util::Estimator->verbose($verbosity > 4 ? 1 : 0);
-    my $result = label_chunks(
-        chunks => \@chunks,
-        iterations => 3,
-        features => \%rules::Line_Features::features,
-        labels => ['HEADER', 'FOOTER'],
-        );
-    @chunks = (@{$result->{HEADER}}, @{$result->{FOOTER}});
 
-    foreach my $ch (@chunks) {
+    my @chunks = grep {
+        !$_->{prev} || $_->{page} != $_->{prev}->{page}
+    } @{$self->{chunks}};
+    my $headers = label_chunks(
+        chunks => \@chunks,
+        features => \%rules::Line_Features::features,
+        labels => ['HEADER'],
+        );
+
+    @chunks = grep {
+        !$_->{next} || !$_->{next}->{next} ||
+        $_->{page} != $_->{next}->{next}->{page}
+    } @{$self->{chunks}};
+    my $footers = label_chunks(
+        chunks => \@chunks,
+        features => \%rules::Line_Features::features,
+        labels => ['FOOTER'],
+        );
+
+    foreach my $ch (@{$headers->{HEADER}}, @{$footers->{FOOTER}}) {
         say(5, "'$ch->{text}' is marginal");
         push @{$self->{marginals}}, $ch;
         removelink($ch);
