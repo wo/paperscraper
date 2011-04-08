@@ -28,8 +28,12 @@ sub new {
         pages => 0,
         fontsize => 0,
         linespacing => 0,
+        content => '',
+        marginals => [],
+        footnotes => [],
         authors => [],
         title => '',
+        abstract => '',
         bibliography => [],
     };
     bless $self, $class;
@@ -68,6 +72,16 @@ sub pushlink(\@@) {
         $first->{prev} = $arr->[-1];
     }
     push @$arr, $first, @rest;
+}
+
+sub removelink {
+    my $el = shift;
+    if ($el->{prev}) {
+        $el->{prev}->{next} = $el->{next};
+    }
+    if ($el->{next}) {
+        $el->{next}->{prev} = $el->{prev};
+    }
 }
 
 sub init {
@@ -109,8 +123,11 @@ sub init {
 
     $self->{pages} = $#pages;
     $self->{chunks} = \@chunks;
+
     $self->fontinfo();
     $self->relativize_fsize();
+    $self->strip_marginals();
+
 }
 
 sub elem {
@@ -214,6 +231,41 @@ sub relativize_fsize {
     }
 }
 
+sub strip_marginals {
+    my $self = shift;
+
+    # strip header and footer lines -- they tend to confuse the line
+    # classification.
+    my @chunks;
+    foreach my $ch (@{$self->{chunks}}) {
+        if (!$ch->{prev} || $ch->{page} != $ch->{prev}->{page}) {
+            # first line on page
+            push @chunks, $ch;
+        }
+        elsif (!$ch->{next} || !$ch->{next}->{next} ||
+               $ch->{page} != $ch->{next}->{next}->{page}) {
+            # among last two lines on page
+            push @chunks, $ch;
+        }
+    }
+
+    use rules::Line_Features;
+    util::Estimator->verbose($verbosity > 4 ? 1 : 0);
+    my $result = label_chunks(
+        chunks => \@chunks,
+        iterations => 3,
+        features => \%rules::Line_Features::features,
+        labels => ['HEADER', 'FOOTER'],
+        );
+    @chunks = (@{$result->{HEADER}}, @{$result->{FOOTER}});
+
+    foreach my $ch (@chunks) {
+        say(5, "'$ch->{text}' is marginal");
+        push @{$self->{marginals}}, $ch;
+        removelink($ch);
+    }
+}
+
 ##### metadata extraction #####
 
 sub extract {
@@ -302,7 +354,7 @@ sub label_chunks {
             my %cache;
             my $oldp = $chunk->{p};
             my $newp = $labeler->($chunk);
-            my $threshold = 0.3;
+            my $threshold = 0.2;
             return sub {
                 my $label = shift;
                 return $cache{$label} if exists($cache{$label});
@@ -667,11 +719,6 @@ sub extract_bibliography {
     my $self = shift;
     say(2, "\nextracting bibliography");
 
-    use rules::Bibblock_Features;
-    my $evaluator = parsing_evaluator(
-                    \%rules::Bibblock_Features::block_features,
-                    \@rules::Bibblock_Features::parsing_features);
-
     # use exclusive labels for generate_parsings: 
     my $redefine_p = sub {
         my $p = $_[0]->{p};
@@ -695,6 +742,11 @@ sub extract_bibliography {
         chunks => \@chunks,
         labels => ['BIB', 'BIBSTART'],
         );
+
+    use rules::Bibblock_Features;
+    my $evaluator = parsing_evaluator(
+                    \%rules::Bibblock_Features::block_features,
+                    \@rules::Bibblock_Features::parsing_features);
 
     my @parsings;
     my $counter = 0;

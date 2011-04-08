@@ -17,6 +17,20 @@ our @EXPORT_OK = qw/%features/;
 
 our %features;
 
+$features{HEADER} = [
+    ['gap below', [0.2, -0.3]],
+    ['small font', [0.2, -0.2]],
+    ['begins or ends with digit', [0.2, -0.1]],
+    ['resembles other HEADERs', [0.2, -0.3], 2]
+    ];
+
+$features{FOOTER} = [
+    ['gap above', [0.2, -0.3]],
+    ['small font', [0.2, -0.2]],
+    ['begins or ends with digit', [0.2, -0.1]],
+    ['resembles other FOOTERs', [0.2, -0.3], 2]
+    ];
+
 $features{TITLE} = [
     ['among first few lines', [0.4, -0.3]],
     ['within first few pages', [0.1, -1]],
@@ -130,7 +144,6 @@ $features{BIB} = [
     ['high uppercase frequency', [0.1, -0.2]],
     ['high numeral frequency', [0.1, -0.2]],
     ['high punctuation frequency', [0.1, -0.2]],
-    ['page number', [-1, 0]],
     ['near other BIBs', [0.3, -0.3], 2],
     ['resembles best BIB', [0.3, -0.6], 3],
     ['probable FOOTNOTE', [-0.8, 0.1], 3],
@@ -170,6 +183,32 @@ sub matches {
 }
 
 $f{'contains digit'} = matches('\d');
+
+$f{'begins or ends with digit'} = matches('^\d|\d$');
+
+$f{'resembles other HEADERs'} = sub {
+    my $num = scalar @{$_[0]->{best}->{HEADER}} || 1;
+    my $count = 0;
+    foreach my $h (@{$_[0]->{best}->{HEADER}}) {
+        next if $_[0]->{top} != $h->{top};
+        next if $_[0]->{fsize} != $h->{fsize};
+        next if length($_[0]->{text}) != length($h->{text});
+        $count++;
+    }
+    return min(1, $count / $num*2);
+};
+
+$f{'resembles other FOOTERs'} = sub {
+    my $num = scalar @{$_[0]->{best}->{FOOTER}} || 1;
+    my $count = 0;
+    foreach my $h (@{$_[0]->{best}->{FOOTER}}) {
+        next if $_[0]->{bottom} != $h->{bottom};
+        next if $_[0]->{fsize} != $h->{fsize};
+        next if length($_[0]->{text}) != length($h->{text});
+        $count++;
+    }
+    return min(1, $count / $num*3);
+};
 
 foreach my $label (@labels) {
     $f{"probable $label"} = sub {
@@ -315,13 +354,6 @@ $f{'greater gap above than below'} = memoize(sub {
     my $gap_above = gap($_[0], 'prev') || 0.7;
     my $gap_below = gap($_[0], 'next') || 0.7;
     return $gap_above > $gap_below + 0.1;
-});
-
-$f{'page number'} = memoize(sub {
-    return 0 unless $_[0]->{plaintext} =~ /^\d+$/;
-    return 1 if alignment($_[0]) eq 'center';
-    return 1 if (gap($_[0], 'prev') || 0) > 1.5;
-    return 0;
 });
 
 $f{'matches title pattern'} = memoize(sub {
@@ -683,13 +715,13 @@ $f{'largest text on page'} = memoize(allof(largest_text('next', 1),
 $f{'previous line short'} = memoize(sub {
     my $prev = $_[0]->{prev};
     return 0.5 unless $prev;
-    return min(max(2 - length($prev)/40, 1), 0);
-});   
+    return max(min(2 - length($prev->{plaintext})/40, 1), 0);
+});
 
 $f{'previous line ends with terminator'} = memoize(sub {
     my $prev = $_[0]->{prev};
     return 0.5 unless $prev;
-    return $prev =~ /[\.!\?]\s*(?:<[^>]+>)?\s*$/;
+    return $prev->{plaintext} =~ /[\.!\?]\s*(?:<[^>]+>)?\s*$/;
 });
 
 $f{'previous line BIBSTART'} = sub {
