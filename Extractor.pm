@@ -28,7 +28,6 @@ sub new {
         pages => 0,
         fontsize => 0,
         linespacing => 0,
-        content => '',
         marginals => [],
         footnotes => [],
         authors => [],
@@ -82,6 +81,7 @@ sub removelink {
     if ($el->{next}) {
         $el->{next}->{prev} = $el->{prev};
     }
+    $el->{_REMOVED} = 1;
 }
 
 sub init {
@@ -127,6 +127,7 @@ sub init {
     $self->fontinfo();
     $self->relativize_fsize();
     $self->strip_marginals();
+    $self->strip_footnotes();
 
 }
 
@@ -259,9 +260,35 @@ sub strip_marginals {
         );
 
     foreach my $ch (@{$headers->{HEADER}}, @{$footers->{FOOTER}}) {
-        say(5, "'$ch->{text}' is marginal");
+        say(5, "marginal: $ch->{text}");
         push @{$self->{marginals}}, $ch;
         removelink($ch);
+    }
+}
+
+sub strip_footnotes {
+    my $self = shift;
+
+    use rules::Line_Features;
+    util::Estimator->verbose($verbosity > 4 ? 1 : 0);
+
+    my $notes = label_chunks(
+        chunks => $self->{chunks},
+        features => \%rules::Line_Features::features,
+        labels => ['FOOTNOTESTART'],
+        );
+
+    my %note_lines;
+    foreach my $ch (@{$notes->{FOOTNOTESTART}}) {
+        next if $note_lines{$ch};
+        say(0, "footnote: $ch->{text}...");
+        while (1) {
+            push @{$self->{footnotes}}, $ch;
+            removelink($ch);
+            $note_lines{$ch} = 1;
+            last unless $ch->{next} && $ch->{page} == $ch->{next}->{page};
+            $ch = $ch->{next};
+        }
     }
 }
 
@@ -334,6 +361,9 @@ sub label_chunks {
         ($arg{chunks}, $arg{iterations} || 5, $arg{features});
     my @labels = $arg{labels} ? @{$arg{labels}} : keys %$features;
     my $min_p = exists($arg{min_p}) ? $arg{min_p} : 0.5;
+
+    # ignore removed chunks:
+    $chunks = [ grep { ! $_->{_REMOVED} } @$chunks ];
 
     # Here we will store the chunks with P >= $min_p:
     my %best;

@@ -31,6 +31,18 @@ $features{FOOTER} = [
     ['resembles other FOOTERs', [0.2, -0.3], 2]
     ];
 
+$features{FOOTNOTESTART} = [
+    ['gap above', [0.1, -0.1]],
+    ['small font', [0.5, -0.5]],
+    ['long', [0.1, -0.2]],
+    ['previous line has larger font', [0.2, -0.3]],
+    ['indented relative to previous line', [0.1, -0.15], 2],
+    ['begins with footnote label', [0.3, -0.1], 2],
+    ['rest of page has same font size', [0.15, -0.5], 2],
+    ['near bottom of page', [0.1, -0.1], 2],
+    ['resembles best FOOTNOTESTART', [0.2, -0.3], 3],
+    ];
+
 $features{TITLE} = [
     ['among first few lines', [0.4, -0.3]],
     ['within first few pages', [0.1, -1]],
@@ -110,7 +122,6 @@ $features{CONTENT} = [
     ['long', [0.1, -0.2]],
     ['normal font', [0.3, -0.6]],
     ['matches content pattern', [0.2, -0.3]],
-    ['probable FOOTNOTE', [-0.8, 0.1], 3],
     ];
 
 $features{ABSTRACTCONTENT} = [
@@ -124,15 +135,6 @@ $features{ABSTRACTCONTENT} = [
     ['matches content pattern', [0.2, -0.3]],
     ['not far into content', [0.2, -0.8], 2],
     ['near other ABSTRACTCONTENT', [0.3, -0.3], 3],
-    ['probable FOOTNOTE', [-0.8, 0.1], 3],
-    ];
-
-$features{FOOTNOTE} = [
-    ['small font', [0.7, -0.8]],
-    ['contains letters', [0, -0.3]],
-    ['text block begins with footnote label', [0.3, -0.1]],
-    ['largest text on rest of page', [0.2, -0.5]],
-    ['near bottom of page', [0.2, -0.2]],
     ];
 
 $features{BIB} = [
@@ -146,7 +148,6 @@ $features{BIB} = [
     ['high punctuation frequency', [0.1, -0.2]],
     ['near other BIBs', [0.3, -0.2], 2],
     ['resembles best BIB', [0.3, -0.6], 3],
-    ['probable FOOTNOTE', [-0.8, 0.1], 3],
     ];
 
 $features{BIBSTART} = [
@@ -170,7 +171,7 @@ $features{BIBSTART} = [
 
 1;
 
-my @labels = qw/TITLE AUTHOR CONTENT HEADING FOOTNOTE ABSTRACTSTART
+my @labels = qw/TITLE AUTHOR CONTENT HEADING ABSTRACTSTART
                 ABSTRACTCONTENT BIB BIBSTART/;
 
 my %f;
@@ -212,6 +213,17 @@ $f{'resembles other FOOTERs'} = sub {
         $count++;
     }
     return min(1, $count / $num*3);
+};
+
+$f{'resembles best FOOTNOTESTART'} = sub {
+    my $best = $_[0]->{best}->{FOOTNOTESTART}->[0];
+    return 0 unless $best;
+    my $ret = 1;
+    $ret -= 0.6 if alignment($_[0]) ne alignment($best);
+    $ret -= 0.8 if $_[0]->{fsize} != $best->{fsize};
+    $ret -= 0.8 if $f{'begins with footnote label'}->($_[0])
+        != $f{'begins with footnote label'}->($best);
+    return max($ret, 0);
 };
 
 foreach my $label (@labels) {
@@ -577,32 +589,28 @@ $f{'not far into content'} = sub {
     return 1 - $n/100;
 };
 
-sub begins {
-    my ($re, $re_no) = @_;
-    my $field = @_ ? 'plaintext' : 'text';
+sub mk_begins {
+    my $field = shift;
     return sub {
-        my $ch = shift;
-        if ($ch->{$field} =~ /^($re)/ && (!$re_no || $& !~ /$re_no/)) {
-            return 1;
+        my ($re, $re_no) = @_;
+        return sub {
+            my $ch = shift;
+            if ($ch->{$field} =~ /^($re)/
+                && (!$re_no || $& !~ /$re_no/)) {
+                return 1;
+            }
+            return 0;
         }
-        return 0;
     }
 };
+*begins = mk_begins('text');
+*begins_plain = mk_begins('plaintext');
 
-$f{'begins with section number'} = memoize(begins($re_sec_number));
+$f{'begins with section number'} = begins_plain($re_sec_number);
  
-$f{'begins in italic'} = begins('\s*<i>', '', 1);
+$f{'begins in italic'} = begins('\s*<i>');
 
-$f{'text block begins with footnote label'} = sub {
-    my $ch = $_[0];
-    do {
-        return 1 if $ch->{text} =~ /^$re_footnote_label/;
-        $ch = $ch->{prev};
-    } while ($ch
-             && $ch->{fsize} == $_[0]->{fsize}
-             && $ch->{page} == $_[0]->{page});
-    return 0;
-};
+$f{'begins with footnote label'} = begins($re_footnote_label);
 
 $f{'begins inside quote'} = sub {
     if ($_[0]->{plaintext} =~ /^(.+?)$re_rquote/
@@ -617,13 +625,11 @@ $f{'begins inside quote'} = sub {
     }
 };
 
-begins('\s*<i>', '', 1);
+$f{'begins with citation label'} = begins_plain($re_cit_label);
 
-$f{'begins with citation label'} = memoize(begins($re_cit_label));
+$f{'begins with "abstract:"'} = begins_plain($re_abstract);
 
-$f{'begins with "abstract:"'} = memoize(begins($re_abstract));
-
-$f{'begins with dash'} = memoize(begins($re_dash));
+$f{'begins with dash'} = begins_plain($re_dash);
 
 $f{'begins with possible name'} = memoize(sub {
     my @parts = split($re_name_separator, $_[0]->{plaintext}, 2);
@@ -639,7 +645,7 @@ $f{'begins with dictionary word'} = memoize(sub {
 });
 
 $f{'begins with possible bib name'} = 
-    memoize(begins("(?:$re_name)|(?:$re_name_inverted)", $re_noname));
+    memoize(begins_plain("(?:$re_name)|(?:$re_name_inverted)", $re_noname));
 
 $f{'contains possible name'} = memoize(sub {
     $_[0]->{plaintext} =~ /$re_name/;    
@@ -715,6 +721,23 @@ $f{'largest text on rest of page'} = memoize(largest_text('next'));
 
 $f{'largest text on page'} = memoize(allof(largest_text('next', 1),
                                             largest_text('prev', 1)));
+
+$f{'rest of page has same font size'} = sub {
+    my $ch = $_[0];
+    while (($ch = $ch->{next}) && $ch->{page} == $_[0]->{page}) {
+        next if (length($ch->{plaintext}) < 5);
+        return 0 if $ch->{fsize} != $_[0]->{fsize};
+    }
+    return 1;
+};
+
+$f{'previous line has larger font'} = sub {
+    if ($_[0]->{prev} && $_[0]->{page} == $_[0]->{prev}->{page}
+        && $_[0]->{prev}->{fsize} > $_[0]->{fsize}) {
+        return 1;
+    }
+    return 0;
+};
 
 $f{'previous line short'} = memoize(sub {
     my $prev = $_[0]->{prev};
