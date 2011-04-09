@@ -151,8 +151,8 @@ sub mergechunks {
     my $chunk_y = $chunk->{top} + $chunk->{height} / 2;
     my $min_y = $line->{top};
     my $max_y = $line->{bottom};
-    if ($chunk->{length} < 5 || $line->{length} < 5) {
-        # line or chunk might be a footnote label or the like:
+    if ($chunk->{length} < 7 || $line->{length} < 7) {
+        # line or chunk might be sub/sup:
         $min_y -= $line->{height}/3;
         $max_y += $line->{height}/3;
     }
