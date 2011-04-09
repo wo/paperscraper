@@ -7,6 +7,7 @@ use Getopt::Std;
 use List::Util qw/max min/;
 use Data::Dumper;
 use util::Io;
+use util::String 'strip_tags';
 use util::Functools qw/reduce/;
 use Exporter;
 our @ISA = ('Exporter');
@@ -101,16 +102,17 @@ sub xml2chunk {
     my $str = shift;
     my $el = elem($str);
     my $chunk = {
-        'top'     => $el->('top'),
-        'left'    => $el->('left'),
-        'width'   => $el->('width'),
-        'height'  => $el->('height'),
-        'font'    => $el->('font'),
-        'text'    => $el->(),
+        'top'       => $el->('top'),
+        'left'      => $el->('left'),
+        'width'     => $el->('width'),
+        'height'    => $el->('height'),
+        'font'      => $el->('font'),
+        'text'      => $el->(),
     };
     $chunk->{right} = $chunk->{left} + $chunk->{width};
     $chunk->{bottom} = $chunk->{top} + $chunk->{height};
     $chunk->{col} = 0;
+    $chunk->{length} = length(strip_tags($chunk->{text}));
     return $chunk;
 }
 
@@ -149,10 +151,10 @@ sub mergechunks {
     my $chunk_y = $chunk->{top} + $chunk->{height} / 2;
     my $min_y = $line->{top};
     my $max_y = $line->{bottom};
-    if (length($chunk->{text}) < 5 || length($line->{text}) < 5) {
+    if ($chunk->{length} < 5 || $line->{length} < 5) {
         # line or chunk might be a footnote label or the like:
-        $min_y -= $line->{height}/4;
-        $max_y += $line->{height}/4;
+        $min_y -= $line->{height}/3;
+        $max_y += $line->{height}/3;
     }
     if ($chunk_y > $max_y || $chunk_y < $min_y) {
         print "  $chunk_y out of Y range $min_y-$max_y\n" if $verbose;
@@ -162,7 +164,7 @@ sub mergechunks {
 
     # Does the chunk begin too far right or left?
     my $chunk_x = $chunk->{left};
-    my $ex = $line->{width} / length($line->{text});
+    my $ex = $line->{width} / $line->{length};
     my $max_x = $line->{right} + 7*$ex;
     if ($chunk_x > $max_x) {
         print "  $chunk_x > $max_x: too far right\n" if $verbose;
@@ -198,16 +200,17 @@ sub mergechunks {
 sub append {
     my ($line, $chunk) = @_;
 
-    my $ex = $line->{width} / length($line->{text});
+    my $ex = $line->{width} / $line->{length};
     $line->{top} = min($line->{top}, $chunk->{top});
     my $bottom = max($line->{bottom}, $chunk->{top} + $chunk->{height});
     $line->{height} = $bottom - $line->{top};
-    if (length($chunk->{text}) > length($line->{text})) {
+    if ($chunk->{length} > $line->{length}) {
         $line->{font} = $chunk->{font};
     }
     if ($chunk->{left} - $line->{right} > $ex/4) {
         print "  inserting whitespace\n" if $verbose;
         $line->{text} .= ' ';
+        $line->{length}++;
     }
     if ($chunk->{bottom} < $line->{bottom}
         && $chunk->{top} < $line->{top}) {
@@ -234,6 +237,7 @@ sub append {
     }
     $line->{width} = $chunk->{right} - $line->{left};
     $line->{right} = $chunk->{right};
+    $line->{length} += $chunk->{length}
 }
 
 sub combine_letters {
@@ -271,8 +275,8 @@ sub sortlines {
         $lines[$i]->{col} = $numcols unless $lines[$i]->{col};
 
         next unless ($lines[$i+1]
-                     && length($lines[$i]->{text}) > 5
-                     && length($lines[$i+1]->{text}) > 5
+                     && $lines[$i]->{length} > 5
+                     && $lines[$i+1]->{length} > 5
                      && $lines[$i+1]->{left} > $lines[$i]->{right}
                      && $lines[$i+1]->{col} <= $lines[$i]->{col});
 
@@ -330,7 +334,7 @@ sub sortlines {
             print "ignoring columnisation: too small\n" if $verbose;
             # Merge chunks that are on the same line and not in
             # different columns, unless they are really far apart:
-            my $ex = $lines[$i]->{width} / length($lines[$i]->{text});
+            my $ex = $lines[$i]->{width} / $lines[$i]->{length};
             if ($lines[$i]->{right} + 10*$ex < $lines[$i+1]->{left}) {
                 print "appending\n" if $verbose;
                 append($lines[$i], $lines[$i+1]);
