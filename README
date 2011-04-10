@@ -2,8 +2,6 @@
 opp-tools is a collection of tools to track academic papers uploaded
 to (or linked from) certain web pages.
 
-version 0.9 (2010-10-16)
-
 ---------------------------------------------------------------------
 INSTALLATION AND SETUP
 ---------------------------------------------------------------------
@@ -19,14 +17,14 @@ ps2pdf                           (Postscript)
 openoffice.org                   (Word, RTF)
 unoconv                          (Word, RTF)
 wkhtmltopdf                      (HTML)
-
-aspell-en libaspell-dev
+aspell-en                        (all formats)
+libaspell-dev                    (all formats)
 
 On Ubuntu 10.04 and 10.10, the following installs everything except
 cuneiform and wkhtmltopdf:
 
   sudo aptitude install poppler-utils pdftk imagemagick ghostscript \
-  openoffice.org unoconv
+  openoffice.org unoconv aspell-en libaspell-dev
 
 The cuneiform version in the standard repositories too old: we need at
 least 0.9. For Debian-based systems, you can get a recent version from
@@ -40,22 +38,24 @@ calling something like
   tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
   sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
 
-Finally, make sure you have the following CPAN Perl modules. You may
-need to install gcc and openssl first:
+Finally, make sure you have the following CPAN Perl modules. (You may
+need to install gcc and openssl first.)
 
   sudo aptitude install gcc openssl libssl-dev
 
-  sudo perl -MCPAN -e 'install HTML::LinkExtractor'
-  sudo perl -MCPAN -e 'install HTML::Encoding'
-  sudo perl -MCPAN -e 'install HTML::Strip'
-  sudo perl -MCPAN -e 'install HTML::TreeBuilder'
-  sudo perl -MCPAN -e 'install XML::Writer'
-  sudo perl -MCPAN -e 'install XML::XPath'
-  sudo perl -MCPAN -e 'install XML::RSS'
-  sudo perl -MCPAN -e 'install Text::Capitalize'
-  sudo perl -MCPAN -e 'install String::Approx'
-  sudo perl -MCPAN -e 'install Algorithm::NaiveBayes'
-  sudo perl -MCPAN -e 'install AI::Categorizer'
+  sudo cpan -i HTML::LinkExtractor
+  sudo cpan -i HTML::Encoding
+  sudo cpan -i HTML::Strip
+  sudo cpan -i HTML::TreeBuilder
+  sudo cpan -i XML::Writer
+  sudo cpan -i XML::XPath
+  sudo cpan -i XML::RSS
+  sudo cpan -i Text::Capitalize
+  sudo cpan -i Text::Names
+  sudo cpan -i String::Approx
+  sudo cpan -i Algorithm::NaiveBayes
+  sudo cpan -i AI::Categorizer
+  sudo cpan -i Statistics::Lite
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
@@ -79,24 +79,22 @@ USAGE
 
 At the core of opp-tools lie two Perl modules, Converter and
 Extractor. The Converter module converts documents from PDF, Word,
-HTML and some other formats into XML. The Extractor module extracts
+HTML and some other formats to XML. The Extractor module extracts
 metadata from such XML documents. These two modules can be used on
 their own, without any database or internet connection:
 
   #! /usr/bin/perl
   use Converter;
   use Extractor;
-  my %cfg = do 'config.pl';
-  Converter::cfg(\%cfg);
   Converter::convert2xml("test.pdf", "test.xml");
-  my $extractor = Extractor->new("test.xml");
-  my $result = $extractor->parse();
-  print "authors: ", join(', ', @{$result->{authors}}), "\n";
-  print "title: ", $result->{title}, "\n";
+  my $ex = Extractor->new("test.xml");
+  $ex->extract('authors', 'title');
+  print "authors: ", join(', ', @{$ex->{authors}}), "\n";
+  print "title: ", $ex->{title}, "\n";
 
-The rest of the package makes use of the Converter and Extractor
-modules to keep track of documents that are linked to from certain web
-pages. The tracked pages are stored in the "sources" table of the
+Most of the rest of the package makes use of these modules to keep
+track of documents that are linked to from certain web pages. The
+tracked pages are stored in the "sources" table of the
 database. Instead of manually editing the MySQL table, you can use
 update_sources, as in:
 
@@ -140,11 +138,10 @@ document, you can run
 This adds the text content of the given URL to the spam
 corpus. Without the -s flag, the content is added to the ham corpus.
 
-The Extractor module that extracts metadata from a document also
-estimates its own accuracy for a given document. This is stored as
-"meta_confidence" in the "documents" table. A confidence value of 0.5
-suggests that it is roughly as likely that the extracted values are
-correct than not.
+The Extractor module also estimates its own accuracy for a given
+document. This is stored as "meta_confidence" in the "documents"
+table. A confidence value of 0.5 suggests that it is roughly as likely
+that the extracted values are correct than not.
 
 It is up to you to do anything further with the contents of the
 "documents" table. Included is a script called "rss" that generates an
@@ -155,10 +152,9 @@ RSS feed of the most recently found documents.
 SMALL PRINT 
 ---------------------------------------------------------------------
 
-The development of this software will be partly supported by the
-University of London and the UK Joint Information Systems Committee as
-part of the PhilPapers 2.0 project (Information Environment
-programme).
+The development of this software is supported by the University of
+London and the UK Joint Information Systems Committee as part of the
+PhilPapers 2.0 project (Information Environment programme).
 
 Copyright (c) 2003-2010 Wolfgang Schwarz, wo@umsu.de
 
