@@ -77,6 +77,7 @@ sub doctidy {
 sub pagetidy {
     my $page = shift;
     print "== tidying page ==\n" if $verbose;
+    $page =~ s/<br .>//g;
     my @texts = split /\n/, $page;
     my @chunks = map { xml2chunk($_) } @texts;
     my $lines = reduce(\&mergechunks, [], @chunks);

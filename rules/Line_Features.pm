@@ -33,11 +33,12 @@ $features{FOOTER} = [
 
 $features{FOOTNOTESTART} = [
     ['gap above', [0.1, -0.1]],
-    ['small font', [0.5, -0.5]],
+    ['small font', [0.3, -0.4]],
     ['long', [0.1, -0.2]],
     ['previous line has larger font', [0.2, -0.3]],
+    ['previous line is bibliography heading', [-0.3, 0]],
     ['indented relative to previous line', [0.1, -0.15], 2],
-    ['begins with footnote label', [0.3, -0.2], 2],
+    ['begins with footnote label', [0.3, -0.5], 2],
     ['rest of page has same font size', [0.15, -0.5], 2],
     ['near bottom of page', [0.1, -0.1], 2],
     ['resembles best FOOTNOTESTART', [0.2, -0.3], 3],
@@ -522,29 +523,12 @@ sub in_section {
 
 $f{'in bibliography section'} = in_section("^$re_bib_heading\$");
 
-sub old_inbib {
-    my $prev = $_[0];
-    $_[0]->{_in_bib} = 0;
-    my $other_heading = 0;
-    while ($prev = $prev->{prev}) {
-        print "previous is $prev->{text}\n";
-        if ($prev->{p}->('HEADING') > 0.4) {
-            print "previous is heading\n";
-            if ($prev->{plaintext} =~ /^$re_bib_heading$/) {
-                $_[0]->{_in_bib} = $other_heading ? 0.5 : 1; 
-                last;
-            }
-            else {
-                $other_heading = 1;
-            }
-        }
-        if (exists $prev->{_in_bib}) {
-            print "previous has in_bib\n";
-            $_[0]->{_in_bib} = $prev->{_in_bib};
-            last;
-        }
+$f{'previous line is bibliography heading'} = sub {
+    if ($_[0]->{prev} &&
+        $_[0]->{prev}->{plaintext} =~ /^$re_bib_heading$/) {
+        return 1;
     }
-    return $_[0]->{_in_bib};
+    return 0;
 };
 
 $f{'"abstract" heading'} = sub {
