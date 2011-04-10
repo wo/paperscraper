@@ -128,10 +128,10 @@ sub makeLabeler {
     my $estim = sub {
 	my $label = shift;
 	my $e = __PACKAGE__->new();
-	foreach (@{$features->{$label}}) {
-	    if (!$_->[3] || ($_->[3] > 0 && $_->[3] <= $stage)
-                || ($_->[3] < 0 && $_->[3] >= $stage*-1)) {
-		$e->add_feature(@$_);
+	foreach my $f (@{$features->{$label}}) {
+	    if (!$f->[3] || ($f->[3] > 0 && $f->[3] <= $stage)
+                || ($f->[3] < 0 && $f->[3] >= $stage*-1)) {
+		$e->add_feature(@$f);
 	    }
 	}
 	return $e;

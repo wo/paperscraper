@@ -93,11 +93,10 @@ $features{HEADING} = [
     ['large font', [0.5, -0.3]],
     ['bold', [0.3, -0.2]],
     ['contains letters', [0, -0.5]],
-    ['several words', [0.05, -0.2]],
-    ['centered', [0.1, -0.05]],
+    ['centered', [0.2, -0.05]],
     ['justified', [-0.4, 0]],
-    ['gap above', [0.3, -0.5]],
-    ['gap below', [0.2, -0.3]],
+    ['gap above', [0.3, -0.4]],
+    ['gap below', [0.2, -0.2]],
     ['high uppercase frequency', [0.1, -0.2]],
     ['begins with section number', [0.4, -0.1]],
     ['probable CONTENT', [-0.5, 0.05], 3],
@@ -151,7 +150,7 @@ $features{BIB} = [
     ];
 
 $features{BIBSTART} = [
-    ['probable BIB', [0.15, -0.7], 2],
+    ['probable BIB', [0.2, -0.8], 2],
     ['greater gap above than below', [0.3, -0.05], 2],
     ['next line indented', [0.3, -0.1], 2],
     ['indented relative to previous line', [-0.4, 0.05], 2],
@@ -162,7 +161,7 @@ $features{BIBSTART} = [
     ['begins in italic', [-0.2, 0.05], 2],
     ['begins inside quote', [-0.2, 0.05], 2],
     ['begins with dash', [0.5, 0], 2],
-    ['previous line short', [0.6, -0.1], 2],
+    ['previous line short', [0.5, -0.1], 2],
     ['previous line ends with terminator', [0.4, -0.25], 2],
     ['previous line BIBSTART', [-0.2, 0.1], 3],
     ['near other BIBs', [0.3, -0.3], 2],
@@ -390,7 +389,7 @@ $f{'resembles anchor text'} = memoize(sub {
 $f{'may continue title'} = sub {
     # errs on the side of 'yes'
     my $prev = $_[0]->{prev};
-    return 0 unless $prev;
+    return 0 unless $prev && $prev->{page} == $_[0]->{page};
     my $score = 0.5;
     $score += $prev->{p}->('TITLE') - 0.8;
     $score += 0.2 if ($prev->{plaintext} =~ /([\:\;\-\,])$/);
@@ -484,25 +483,23 @@ sub in_section {
     my $re_title = shift;
     my $min_heading = 0.4;
     return sub {
-        #print "** finding heading for $_[0]->{text}\n";
+        #print "** finding heading for $_[0]->{id}: $_[0]->{text}\n";
         my @chunks;
         if ($_[0]->{_headings}) {
             # only go through ancestors that have previously been
             # identified as possible section headings:
-            #print "** found _headings\n";
+            #print "** has _headings\n";
             @chunks = @{$_[0]->{_headings}};
         }
         else {
-            for (my $i = $_[0]->{id}; $i >= 0; $i--) {
+            for (my $i = $_[0]->{id}-1; $i >= 0; $i--) {
                 my $chunk = $_[0]->{doc}->{chunks}->[$i];
+                #print "** adding chunk $i: $chunk->{text}\n";
+                push @chunks, $chunk;
                 if ($chunk->{_headings}) {
-                    #print "** found headings at ancestor $i\n";
+                    #print "** found _headings at $i: $chunk->{text}\n";
                     push @chunks, @{$chunk->{_headings}};
                     last;
-                }
-                else {
-                    #print "** adding chunk $i to check\n";
-                    push @chunks, $chunk;
                 }
             }
         }
@@ -510,8 +507,8 @@ sub in_section {
         my $res = 0;
         foreach my $chunk (@chunks) {
             my $p = $chunk->{p}->('HEADING');
-            next unless $p > $min_heading + @{$_[0]->{_headings}}/20;
             #print "** heading $p: $chunk->{text}\n";
+            next unless $p > $min_heading + @{$_[0]->{_headings}}/20;
             push @{$_[0]->{_headings}}, $chunk;
             if ($chunk->{plaintext} =~ /$re_title/ && !$res) {
                 $res = $p * 1/@{$_[0]->{_headings}};            

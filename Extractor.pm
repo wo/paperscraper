@@ -264,6 +264,12 @@ sub strip_marginals {
         push @{$self->{marginals}}, $ch;
         removelink($ch);
     }
+
+    # ignore removed chunks:
+    $self->{chunks} = [ grep { ! $_->{_REMOVED} } @{$self->{chunks}} ];
+    for my $i (0 .. $#{$self->{chunks}}) {
+        $self->{chunks}->[$i]->{id} = $i;
+    }
 }
 
 sub strip_footnotes {
@@ -289,6 +295,12 @@ sub strip_footnotes {
             last unless $ch->{next} && $ch->{page} == $ch->{next}->{page};
             $ch = $ch->{next};
         }
+    }
+
+    # ignore removed chunks:
+    $self->{chunks} = [ grep { ! $_->{_REMOVED} } @{$self->{chunks}} ];
+    for my $i (0 .. $#{$self->{chunks}}) {
+        $self->{chunks}->[$i]->{id} = $i;
     }
 }
 
@@ -362,26 +374,23 @@ sub label_chunks {
     my @labels = $arg{labels} ? @{$arg{labels}} : keys %$features;
     my $min_p = exists($arg{min_p}) ? $arg{min_p} : 0.5;
 
-    # ignore removed chunks:
-    $chunks = [ grep { ! $_->{_REMOVED} } @$chunks ];
-
     # Here we will store the chunks with P >= $min_p:
     my %best;
     foreach (@labels) {
         $best{$_} = $chunks;
     }
 
-    foreach my $i (1 .. $iterations) {
-        say(4, "\nlabeling chunks, stage $i");
+    foreach my $stage (1 .. $iterations) {
+        say(4, "\nlabeling chunks, stage $stage");
 
-        my $labeler = makeLabeler($features, $i);
+        my $labeler = makeLabeler($features, $stage);
 
         # cache probability values, and don't use advanced stage
         # computations if previous probability very low:
         my $make_p = sub {
             my $chunk = shift;
             my %cache;
-            my $oldp = $chunk->{p};
+            my $oldp = $stage > 1 ? $chunk->{p} : undef;
             my $newp = $labeler->($chunk);
             my $threshold = 0.2;
             return sub {
@@ -404,7 +413,7 @@ sub label_chunks {
         # Features at iteration > 1 may refer to the probability from
         # earlier iterations, so we leave ->{p} in place until the new
         # probability has been computed:
-        my $p = $i > 1 ? 'p2' : 'p';
+        my $p = $stage > 1 ? 'p2' : 'p';
         foreach my $ch (@$chunks) {
             $ch->{$p} = $make_p->($ch);
         }
@@ -421,7 +430,7 @@ sub label_chunks {
             }
             @best = sort { $b->{$p}->($label) <=> $a->{$p}->($label) } @best;
             if ($verbosity > 3) {
-                say(4, "\n$label chunks (stage $i):\n  ",
+                say(4, "\n$label chunks (stage $stage):\n  ",
                     join("\n  ", map {
                     $_->{text}.' => '.$_->{$p}->($label) } @best));
                 say(5, "\n");
@@ -432,7 +441,7 @@ sub label_chunks {
         foreach my $chunk (@$chunks) {
             # inform chunks about best chunks:
             $chunk->{best} = \%best;
-            if ($i > 1) {
+            if ($stage > 1) {
                 $chunk->{p} = $chunk->{$p};
             }
         }
@@ -562,18 +571,6 @@ sub parsing {
         $res->{text} = join ' ', '', map { $_->{debug} } @$sequence;
     };
     return $res;
-}
-
-sub bits {
-    # returns the set of bit positions set in a number, e.g. 5 =>
-    # {0,2} because 5 = 101
-    my $num = shift;
-    my @res;
-    for (my $pos=0; $num; $pos++) {
-        push(@res, $pos) if ($num & 1);
-        $num >>= 1;
-    }
-    return @res;
 }
 
 sub parsing_evaluator {
