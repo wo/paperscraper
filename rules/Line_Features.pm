@@ -37,7 +37,7 @@ $features{FOOTNOTESTART} = [
     ['long', [0.1, -0.2]],
     ['previous line has larger font', [0.2, -0.3]],
     ['indented relative to previous line', [0.1, -0.15], 2],
-    ['begins with footnote label', [0.3, -0.1], 2],
+    ['begins with footnote label', [0.3, -0.2], 2],
     ['rest of page has same font size', [0.15, -0.5], 2],
     ['near bottom of page', [0.1, -0.1], 2],
     ['resembles best FOOTNOTESTART', [0.2, -0.3], 3],
@@ -215,8 +215,8 @@ $f{'resembles other FOOTERs'} = sub {
 };
 
 $f{'resembles best FOOTNOTESTART'} = sub {
+    return 0.5 if scalar @{$_[0]->{best}->{FOOTNOTESTART}} <= 1;
     my $best = $_[0]->{best}->{FOOTNOTESTART}->[0];
-    return 0 unless $best;
     my $ret = 1;
     $ret -= 0.6 if alignment($_[0]) ne alignment($best);
     $ret -= 0.8 if $_[0]->{fsize} != $best->{fsize};

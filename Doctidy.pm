@@ -200,7 +200,7 @@ sub mergechunks {
 sub append {
     my ($line, $chunk) = @_;
 
-    my $ex = $line->{width} / $line->{length};
+    my $ex = $chunk->{width} / $chunk->{length};
     $line->{top} = min($line->{top}, $chunk->{top});
     my $bottom = max($line->{bottom}, $chunk->{top} + $chunk->{height});
     $line->{height} = $bottom - $line->{top};
@@ -374,7 +374,6 @@ sub fixchars {
 
     $str =~ s/\x{a8}([AOUaou])/&$1uml;/g; # e.g. in 56544
 
-
     my %transl = (
                   "\x{fb00}" => "ff",
                   "\x{fb01}" => "fi",
@@ -387,6 +386,7 @@ sub fixchars {
                   "\x1d" => 'fl',
                   "\x10" => '"',
                   "\x10" => '"',
+                  "¤"    => 'ff'
                  );
     while (my ($key,$esc) = each(%transl)) {
         $str =~ s/$key/$esc/g;

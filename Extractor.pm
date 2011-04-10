@@ -240,21 +240,21 @@ sub strip_marginals {
     use rules::Line_Features;
     util::Estimator->verbose($verbosity > 4 ? 1 : 0);
 
-    my @chunks = grep {
-        !$_->{prev} || $_->{page} != $_->{prev}->{page}
-    } @{$self->{chunks}};
     my $headers = label_chunks(
-        chunks => \@chunks,
+        chunks => [ 
+            grep { $_->{top} <= $_->{page}->{top} + 5 }
+                 @{$self->{chunks}}
+        ],
         features => \%rules::Line_Features::features,
         labels => ['HEADER'],
         );
 
-    @chunks = grep {
-        !$_->{next} || !$_->{next}->{next} ||
-        $_->{page} != $_->{next}->{next}->{page}
-    } @{$self->{chunks}};
     my $footers = label_chunks(
-        chunks => \@chunks,
+        chunks => [
+            grep {
+                $_->{bottom} >= $_->{page}->{bottom} - $_->{height}*1.5
+            } @{$self->{chunks}}
+        ],
         features => \%rules::Line_Features::features,
         labels => ['FOOTER'],
         );
