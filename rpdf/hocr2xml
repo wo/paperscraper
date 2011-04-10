@@ -37,7 +37,7 @@ my $output = new IO::File(">$outfile")
     or die "cannot create $outfile";
 my $xml = new XML::Writer(
     OUTPUT => $output,
-    # NEWLINES => 1, ## doesn't match regexps in Extractor.pm
+    NEWLINES => 1,
     ENCODING => 'utf-8',
     UNSAFE => 1);
 $xml->xmlDecl();
@@ -61,6 +61,30 @@ $xml->endTag("content");
 $xml->endTag("document");
 $xml->end();
 $output->close();
+
+# fix insane newlines used by XML::Writer:
+open IN, "$outfile" or die $!;
+open OUT, ">$outfile.fix" or die $!;
+binmode(OUT, ":utf8");
+my $prev;
+while (<IN>) {
+    chomp;
+    $_ = Encode::decode_utf8($_);
+    if ($prev && $prev =~ /<(\w+)/ && /<\/$1/) {
+        $prev .= $_;
+        next;
+    }
+    if ($prev && /^(>| \/>)/) {
+        $prev .= $1;
+        $_ =~ s/^$1//;
+    }
+    print OUT "$prev\n";
+    $prev = $_;
+}
+print OUT "$prev\n";
+close IN;
+close OUT;
+rename "$outfile.fix", "$outfile";
 
 sub add_page {
     # This code is not as simple as it should because XML::Writer

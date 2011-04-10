@@ -18,9 +18,9 @@ binmode STDOUT, ":utf8";
 sub usage() {
     print <<EOF;
 
-Tidies up XML produced by pdftohtml: merges continuous text blocks,
-inserts <sup> and <sub> tags, puts text blocks in right order, fixes
-a few characters and words.
+Tidies up XML produced by pdftohtml or rpdf: merges continuous text
+blocks, inserts <sup> and <sub> tags, puts text blocks in right order,
+fixes a few characters and words.
 
 Can be called from the command-line, or included as a module.
 Command-line usage: $0 [-hv] <file>

@@ -77,7 +77,7 @@ cleanup() {
     echo "cleaning up"
     cd - > /dev/null
     if test -e "$OUTFILE"; then
-        echo "</body></html>" >> "$OUTFILE"
+        echo "\n</body></html>" >> "$OUTFILE"
     fi
     if test "$KEEP" = 0; then
         rm -f "$DIR"/*
