@@ -14,10 +14,16 @@ our @EXPORT_OK = qw/%word_features %block_features @parsing_features/;
 
 our %word_features;
 
+$word_features{CITLABEL} = [
+    ['at beginning of entry', [0.2, -1]],
+    ['contains digit', [0.2, -0.3]],
+    ['in parentheses', [0.2, -0.3]],
+    ];
+
 $word_features{AUTHOR} = [
-    ['contains letter', [0.1, -0.7]],
+    ['contains letter', [0, -0.7]],
     ['contains uppercase letter', [0.1, -0.2]],
-    ['lonely cap(s)', [0.3, 0]],
+    ['lonely cap(s)', [0.25, 0]],
     ['editor string', [-0.6, 0]],
     ['contains digit', [-0.7, 0.1]],
     ['near beginning of entry', [0.7, -0.2]],
@@ -50,7 +56,8 @@ $word_features{TITLE} = [
     ['probable AUTHOR', [-0.2, 0.05], 2], 
     ['contains journal or publisher word', [-0.2, 0], 2],
     ['part of lengthy unpunctuated string between punctuations', [0.3, -0.05]],
-    [$or->('continues title', 'follows year string'), [0.5, -0.4], 2], 
+    [$or->('continues title', 'follows year', 'follows author'),
+     [0.5, -0.5], 2], 
     ['continues OTHER', [-0.1, 0.1], 2], 
     ['followed by title', [0.4, 0], 2], 
     ['is English word', [0.15, -0.15], 2],
@@ -63,12 +70,12 @@ $word_features{YEAR} = [
 
 $word_features{OTHER} = [
     ['default', [0.1, 0]],
-    [$or->('probable AUTHOR', 'probable TITLE', 'probable YEAR'),
-	    [-0.4, 0.5], 2],
+    [$or->('probable CITLABEL', 'probable AUTHOR',
+           'probable TITLE', 'probable YEAR'), [-0.4, 0.5], 2],
     ['italic', [0.2, 0], 2], # journal name
     ['in parentheses', [0.3, 0], 2],
     ['after "in"', [0.2, 0], 2],
-    ['followed by number', [0.2, 0], 2],
+    ['part of string followed by number', [0.2, 0], 2],
     ['ends in colon', [0.2, 0], 2], # Berlin: Springer
     ['near end of entry', [0.3, -0.05], 2],
     ['after italics', [0.15, 0], 2], 
@@ -106,6 +113,10 @@ $block_features{AUTHORDASH} = [
     ['maybe AUTHORDASH', [1, -1]],
     ];
 
+$block_features{CITLABEL} = [
+    ['maybe CITLABEL', [1, -1]],
+    ];
+
 $block_features{OTHER} = [
     ['maybe OTHER', [1, -1]],
     ];
@@ -123,14 +134,18 @@ our @parsing_features = (
 
 my %f;
 
-$f{'near beginning of entry'} = memoize(sub {
-    return 1 - min($_[0]->{textpos}/30, 1);
-});
+$f{'at beginning of entry'} = sub {
+    return $_[0]->{textpos} == 0 ? 1 : 0;
+};
 
-$f{'early in entry'} = memoize(sub {
+$f{'near beginning of entry'} = sub {
+    return 1 - min($_[0]->{textpos}/30, 1);
+};
+
+$f{'early in entry'} = sub {
     my $pos = max($_[0]->{textpos} - 20, 0);
     return 1 - min($pos/150, 1);
-});
+};
 
 $f{'near end of entry'} = memoize(sub {
     my $end = length($_[0]->{entry}->{text});
@@ -148,10 +163,17 @@ $f{'after year string'} = memoize(sub {
     return 0;
 });
 
-$f{'follows year string'} = memoize(sub {
+$f{'follows year'} = memoize(sub {
     return 1 if ($_[0]->{text} =~ /$re_year|$re_year_words/);
     return 0;
 });
+
+$f{'follows author'} = sub {
+    my $w = $_[0]->{prev};
+    return 0 unless $w && $w->{text} =~ /[,:\.]$/;
+    my $p = max(0, $w->{p}->('AUTHOR') - 0.3) * 1.4;
+    return $p / (($& eq ',') ? 2 : 1); 
+};
 
 $f{'after italics'} = memoize(sub {
     my $w = $_[0];
@@ -184,10 +206,10 @@ $f{'part of lengthy unpunctuated string between punctuations'} = sub {
 $f{'continues title'} = sub {
     my $w = $_[0]->{prev};
     return 0.5 unless $w;
-    if ($w->{text} =~ /\pL$/) {
-	return $w->{p}->('TITLE');
+    if ($w->{text} =~ /[^\pL]$/) {
+        return $w->{p}->('TITLE') / (($& eq '.') ? 3 : 2); 
     }
-    return $w->{p}->('TITLE') / 2;
+    return $w->{p}->('TITLE');
 };
 
 $f{'continues OTHER'} = sub {
@@ -220,11 +242,16 @@ $f{'followed by title'} = sub {
     return 0;
 };
 
-$f{'followed by number'} = memoize(sub {
+$f{'part of string followed by number'} = sub {
     my $w = $_[0]->{next};
-    return 1 if ($w && $w->{text} =~ /^(?:<[^>]+>\s*)?\d/);
+    my $stop = qr/[,\.!\?\)\]]$/;
+    while ($w) {
+        return 1 if ($w->{text} =~ /^(?:<[^>]+>\s*)?\d/);
+        last if ($w->{prev}->{text} =~ /$stop/);
+        $w = $w->{next};
+    }
     return 0;
-});
+};
 
 sub enclosed {
     my ($start, $end) = @_;
@@ -359,11 +386,11 @@ sub p {
     };
 }
 
-foreach (qw/TITLE AUTHOR AUTHORDASH YEAR OTHER/) {
+foreach (qw/CITLABEL TITLE AUTHOR AUTHORDASH YEAR OTHER/) {
     $f{"maybe $_"} = p($_);
 }
 
-foreach my $lab (qw/TITLE AUTHOR AUTHORDASH YEAR OTHER/) {
+foreach my $lab (qw/CITLABEL TITLE AUTHOR AUTHORDASH YEAR OTHER/) {
     $f{"probable $lab"} = sub {
 	return max(0, (p($lab)->($_[0]) - 0.2) * 1.25);
     };

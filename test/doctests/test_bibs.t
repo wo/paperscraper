@@ -730,8 +730,9 @@ while (my ($file, $res) = each(%tests)) {
     my $bib = proc($file);
     print "\n",("=" x 70),"\n== $file\n", ("=" x 70), "\n\n";
     if (scalar @$bib != scalar @$res) {
-        die "\n!! Document has ",scalar @$res," references, ",
-              "but ",scalar @$bib, " retrieved!\n\n";
+         "\n\n\n!! Document has ",scalar @$res," references, ",
+              "but ",scalar @$bib, " retrieved!\n\n\n";
+         next;
     }
     my $min = @{$bib} > @{$res} ? @{$res} : @{$bib};
     for my $i (0 .. $min-1) {
