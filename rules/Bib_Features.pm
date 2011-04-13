@@ -9,22 +9,22 @@ use rules::Keywords;
 use rules::KnownWork 'known_work';
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT_OK = qw/%word_features %block_features @parsing_features/;
+our @EXPORT_OK = qw/%fragment_features %block_features @parsing_features/;
 
 
-our %word_features;
+our %fragment_features;
 
-$word_features{CITLABEL} = [
+$fragment_features{CITLABEL} = [
     ['at beginning of entry', [0.2, -1]],
     ['contains digit', [0.2, -0.3]],
     ['in parentheses', [0.2, -0.3]],
     ];
 
-$word_features{AUTHOR} = [
+$fragment_features{AUTHOR} = [
     ['contains letter', [0, -0.7]],
     ['contains uppercase letter', [0.1, -0.2]],
     ['lonely cap(s)', [0.25, 0]],
-    ['editor string', [-0.6, 0]],
+    ['contains editor string', [-0.6, 0]],
     ['contains digit', [-0.7, 0.1]],
     ['near beginning of entry', [0.7, -0.2]],
     ['early in entry', [0.2, -0.4]],
@@ -33,20 +33,22 @@ $word_features{AUTHOR} = [
     ['after year string', [-0.4, 0.1]],
     ['after parenthesis', [-0.3, 0.05]],
     ['continues author', [0.6, -0.6], 2], 
-    [$or->('is surname', 'is firstname', 'author separator'), [0.3, -0.2], 2],
-    ['is English word', [-0.2, 0.2], 2],
+    ['part of best author sequence', [0.3, -0.3], 2],
+    ['only name words', [0.3, -0.2], 2],
+    ['mostly dictionary words', [-0.2, 0.2], 2],
     ['after title', [-0.4, 0.2], 3],
     ];
 
-$word_features{AUTHORDASH} = [
+$fragment_features{AUTHORDASH} = [
     ['is dash', [0.5, -1]],
     ['near beginning of entry', [0.8, -0.8]],
     ];
 
-$word_features{TITLE} = [
-    [$or->('contains letter', 'is dash'), [0.4, -0.3]],
+$fragment_features{TITLE} = [
+    ['default', [0.2, 0]],
+    ['contains letter', [0.1, -0.6]],
     ['in quotes', [0.6, -0.2]],
-    ['italic', [0.4, -0.1]],
+    ['italic', [0.3, -0.1]],
     ['in parentheses', [-0.3, 0]],
     ['early in entry', [0.2, -0.6]],
     ['after year string', [0.2, -0.1]],
@@ -54,33 +56,33 @@ $word_features{TITLE} = [
     ['after italics', [-0.4, 0]], 
     ['after quote', [-0.4, 0.05]],
     ['probable AUTHOR', [-0.2, 0.05], 2], 
+    ['part of best author sequence', [-0.3, 0.3], 2],
     ['contains journal or publisher word', [-0.2, 0], 2],
-    ['part of lengthy unpunctuated string between punctuations', [0.3, -0.05]],
+    ['long', [0.3, -0.05]],
     [$or->('continues title', 'follows year', 'follows author'),
-     [0.5, -0.5], 2], 
+     [0.6, -0.6], 2], 
     ['continues OTHER', [-0.1, 0.1], 2], 
-    ['followed by title', [0.4, 0], 2], 
-    ['is English word', [0.15, -0.15], 2],
+    ['mostly dictionary words', [0.15, -0.15], 2],
     ];
  
-$word_features{YEAR} = [
+$fragment_features{YEAR} = [
     ['year', [0.9, -0.8]],
     ['publication status', [0.9, -0.1]],
     ];
 
-$word_features{OTHER} = [
+$fragment_features{OTHER} = [
     ['default', [0.1, 0]],
     [$or->('probable CITLABEL', 'probable AUTHOR',
            'probable TITLE', 'probable YEAR'), [-0.4, 0.5], 2],
     ['italic', [0.2, 0], 2], # journal name
     ['in parentheses', [0.3, 0], 2],
     ['after "in"', [0.2, 0], 2],
-    ['part of string followed by number', [0.2, 0], 2],
+    ['followed by number', [0.2, 0], 2],
     ['ends in colon', [0.2, 0], 2], # Berlin: Springer
     ['near end of entry', [0.3, -0.05], 2],
     ['after italics', [0.15, 0], 2], 
     ['after quote', [0.15, 0], 2],
-    ['editor string', [0.6, 0], 2],
+    ['contains editor string', [0.6, 0], 2],
     ['contains journal or publisher word', [0.4, 0], 2],
     ['followed by OTHER', [0.2, -0.1], 3],
     ];
@@ -90,18 +92,20 @@ our %block_features;
 $block_features{TITLE} = [
     ['maybe TITLE', [1, -1]],
     ['begins with uppercase letter', [0.1, -0.3]],
-    ['ends with punctuation', [0.2, -0.4]],
-    ['surrounded by quotes or italics', [0.5, -0.2]],
+    ['ends with punctuation', [0.15, -0.4]],
+    ['surrounded by quotes or italics', [0.4, -0.15]],
     ['contains unclosed opening construct', [-0.3, 0.05]],
-    ['followed by OTHER block', [0.05, -0.2]],
-    ['contains journal or publisher word', [-0.25, 0]],
-    ['journal/publisher word after punct.', [-0.2, 0]],
+    ['contains dot and follows comma', [-0.15, 0]],
+    ['followed by OTHER block', [0.05, -0.15]],
+    ['contains journal or publisher word', [-0.2, 0]],
+    ['journal/publisher word after punct.', [-0.15, 0]],
     ['contains late first comma', [-0.3, 0]],
     ];
 
 $block_features{AUTHOR} = [
     ['maybe AUTHOR', [1, -1]],
-    ['at least two words per author', [0.2, -0.4]],
+    ['at least two words per author', [0.1, -0.4]],
+    ['contains comma and ends in comma', [-0.3, 0]],
     # parse, and check against known authors...
     ];
 
@@ -125,8 +129,8 @@ our @parsing_features = (
     ['author part has high score', [0.7, -0.8]],
     ['title part has high score', [0.7, -0.8]],
     ['has title', [0.1, -1]],
-    ['good title word OTHERed', [-0.5, 0.5]], 
-    ['good author word OTHERed', [-0.5, 0.5]], 
+    ['good title fragment OTHERed', [-0.4, 0.4]], 
+    ['good author fragment OTHERed', [-0.4, 0.4]], 
     ['lengthy OTHER block before title', [-0.3, 0.05]], 
     ['is known work', [1, 0]],
     );
@@ -163,16 +167,22 @@ $f{'after year string'} = memoize(sub {
     return 0;
 });
 
-$f{'follows year'} = memoize(sub {
-    return 1 if ($_[0]->{text} =~ /$re_year|$re_year_words/);
+$f{'follows year'} = sub {
+    if ($_[0]->{prev} && 
+        $_[0]->{text} =~ /$re_year|$re_year_words/) {
+        return 1;
+    }
     return 0;
-});
+};
 
 $f{'follows author'} = sub {
     my $w = $_[0]->{prev};
-    return 0 unless $w && $w->{text} =~ /[,:\.]$/;
+    return 0 unless $w && $w->{text} =~ /(.)[,:\.]$/;
     my $p = max(0, $w->{p}->('AUTHOR') - 0.3) * 1.4;
-    return $p / (($& eq ',') ? 2 : 1); 
+    if ($& eq ',' || $1 =~ /\p{Upper}/) { # initial
+        $p /= 2;
+    }
+    return $p;
 };
 
 $f{'after italics'} = memoize(sub {
@@ -183,31 +193,17 @@ $f{'after italics'} = memoize(sub {
     return 0;
 });
 
-$f{'part of lengthy unpunctuated string between punctuations'} = sub {
-    my $count = 1;
-    my $stop = qr/[,\.!\?\)\]]$/;
-    my $w = $_[0];
-    if ($w->{text} !~ /$stop/) {
-        while ($w = $w->{next}) {
-            return 0 unless $w;
-            $count++;
-            last if $w->{text} =~ /$stop/;
-        }
-    }
-    $w = $_[0];
-    while ($w = $w->{prev}) {
-        return 0 unless $w;
-        last if $w->{text} =~ /$stop/;
-        $count++;
-    }
-    return max(0, min(1, ($count-2)/4));
+$f{'long'} = sub {
+    my $count = length($_[0]->{text});
+    $count += 5 while ($_[0]->{text} =~ /\s/g);
+    return max(0, min(1, ($count-20)/40));
 };
 
 $f{'continues title'} = sub {
     my $w = $_[0]->{prev};
     return 0.5 unless $w;
-    if ($w->{text} =~ /[^\pL]$/) {
-        return $w->{p}->('TITLE') / (($& eq '.') ? 3 : 2); 
+    if ($w->{text} =~ /[^\pL\pN]$/) {
+        return $w->{p}->('TITLE') / (($& eq '.') ? 4 : 2); 
     }
     return $w->{p}->('TITLE');
 };
@@ -221,11 +217,22 @@ $f{'continues OTHER'} = sub {
 $f{'continues author'} = sub {
     my $w = $_[0]->{prev};
     return 0.5 unless $w;
-    # previous word ends in letter or comma or 'X.':
-    if ($w->{text} =~ /(?:\pL|\b\pL\.),?$/) {
+    if ($w->{text} =~ /(?:\b\pL\.,?|,)$/) {
 	return $w->{p}->('AUTHOR');
     }
     return $w->{p}->('AUTHOR') / 4;
+};
+
+$f{'part of best author sequence'} = sub {
+    my $w = $_[0]->{best}->{AUTHOR}->[0];
+    return 0 unless $w;
+    my $dir = $w->{id} < $_[0]->{id} ? 'next' : 'prev';
+    while ($w != $_[0] && ($w = $w->{$dir})) {
+        next if ($w->{text} =~ /(?:\b\pL\.,?|,)$/);
+        next if ($w->{text} =~ /^$re_name_separator$/);
+	return 0;
+    }
+    return 1;
 };
 
 $f{'followed by OTHER'} = sub {
@@ -242,14 +249,9 @@ $f{'followed by title'} = sub {
     return 0;
 };
 
-$f{'part of string followed by number'} = sub {
+$f{'followed by number'} = sub {
     my $w = $_[0]->{next};
-    my $stop = qr/[,\.!\?\)\]]$/;
-    while ($w) {
-        return 1 if ($w->{text} =~ /^(?:<[^>]+>\s*)?\d/);
-        last if ($w->{prev}->{text} =~ /$stop/);
-        $w = $w->{next};
-    }
+    return 1 if ($w && $w->{text} =~ /^(?:<[^>]+>\s*)?\d/);
     return 0;
 };
 
@@ -327,9 +329,7 @@ $f{'contains journal or publisher word'} =
 
 $f{'is dash'} = matches("^$re_dash+\$");
 
-$f{'author separator'} = matches("^$re_name_separator\$");
-
-$f{'editor string'} = matches($re_editor);
+$f{'contains editor string'} = matches($re_editor);
 
 $f{'ends in colon'} = matches(':$');
 
@@ -350,25 +350,28 @@ $f{'after title'} = sub {
     return $titles[0]->{p}->('TITLE');
 };
 
-$f{'is surname'} = memoize(sub {
+$f{'only name words'} = memoize(sub {
     my $str = $_[0]->{text};
-    $str =~ s/^\P{Letter}*(.+?)\P{Letter}*$/$1/;
-    return 0 unless length($str) > 1;
-    return in_dict($str, 'surnames');
+    my ($names, $all) = (0, 0);
+    while ($str =~ /\pL{2,}/g) {
+        $names++ if (in_dict($&, 'surnames')
+                     || in_dict($&, 'firstnames')
+                     || $& =~ /^$re_name_separator$/);
+        $all++;
+    }
+    return 0.5 unless $all;
+    return max(0, $names/$all - 0.5) * 2;
 });
 
-$f{'is firstname'} = memoize(sub {
+$f{'mostly dictionary words'} = memoize(sub {
     my $str = $_[0]->{text};
-    $str =~ s/^\P{Letter}*(.+?)\P{Letter}*$/$1/;
-    return 0 unless $str;
-    return in_dict($str, 'firstnames');
-});
-
-$f{'is English word'} = memoize(sub {
-    my $str = $_[0]->{text};
-    $str =~ s/^\P{Letter}*(.+?)\P{Letter}*$/$1/;
-    return 0 unless $str;
-    return english($str);
+    my ($dict, $all) = (0, 0);
+    while ($str =~ /\pL{2,}/g) {
+        $dict++ if english($&);
+        $all++;
+    }
+    return 0.5 unless $all;
+    return max(0, $dict/$all - 0.5) * 2;
 });
 
 $f{'default'} = sub {
@@ -431,6 +434,19 @@ $f{'contains late first comma'} = memoize(sub {
     return 0;
 });
 
+$f{'contains dot and follows comma'} = sub {
+   if ($_[0]->{text} =~ /\pL\./ && $_[0]->{prev}
+       && $_[0]->{prev}->{text} =~ /,\s*$/) {
+        return 1;
+    }
+    return 0;
+};
+
+$f{'contains comma and ends in comma'} = sub {
+    return 1 if ($_[0]->{text} =~ /,.+,\s*$/);
+    return 0;
+};
+
 $f{'contains unclosed opening construct'} = sub {
     if ($_[0]->{text} =~ /.*$re_lquote(.*)/) {
         return 1 unless $1 =~ /$re_rquote/;
@@ -484,9 +500,9 @@ sub othered {
     }
 }
 
-$f{'good title word OTHERed'} = othered('TITLE');
+$f{'good title fragment OTHERed'} = othered('TITLE');
 
-$f{'good author word OTHERed'} = othered('AUTHOR');
+$f{'good author fragment OTHERed'} = othered('AUTHOR');
 
 $f{'has title'} = sub {
     my @parts = grep { $_->{label}->{TITLE} }
@@ -523,7 +539,7 @@ $f{'is known work'} = sub {
     return known_work(authors => \@authors, title => $title);
 };
 
-compile(\%word_features, \%f);
+compile(\%fragment_features, \%f);
 compile(\%block_features, \%f);
 compile(\@parsing_features, \%f);
 

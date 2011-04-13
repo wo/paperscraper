@@ -711,6 +711,178 @@ my %tests = (
    },
  ],
 
+ '/home/wo/programming/opp-tools/test/doctests/12-Avigad-Understanding.pdf' => [
+   {
+    authors => ["Jeremy Avigad"],
+    title => "Number theory and elementary arithmetic",
+    year => "2003",
+   },
+   {
+    authors => ["Jeremy Avigad"],
+    title => "Mathematical method and proof",
+    year => "2006",
+   },
+   {
+    authors => ["Jeremy Avigad"],
+    title => "Understanding proofs",
+    year => "",
+   },
+   {
+    authors => ["Jeremy Avigad", "Edward Dean", "John Mumma"],
+    title => "A formal system for Euclid’s Elements",
+    year => "2009",
+   },
+   {
+    authors => ["Jeremy Avigad", "Kevin Donnelly", "David Gray", "Paul Raff"],
+    title => "A formally verified proof of the prime number theorem",
+    year => "2007",
+   },
+   {
+    authors => ["H. Furstenberg"],
+    title => "Ergodic behavior of diagonal measures and a theorem of Szemeredi on arithmetic progressions",
+    year => "1977",
+   },
+   {
+    authors => ["Marcus Giaquinto"],
+    title => "Visual Thinking in Mathematics: An Epistemological Study",
+    year => "2007",
+   },
+   {
+    authors => ["Georges Gonthier"],
+    title => "Formal proof—the four-color theorem",
+    year => "2008",
+   },
+   {
+    authors => ["Georges Gonthier", "Assia Mahboubi"],
+    title => "A small scale reflection extension for the coq system",
+    year => "2008",
+   },
+   {
+    authors => ["Georges Gonthier", "Assia Mahboubi", "Laurence Rideau", "Enrico Tassi", "Laurent Thery"],
+    title => "A modular formalisation of finite group theory",
+    year => "2007",
+   },
+   {
+    authors => ["Thomas C. Hales"],
+    title => "The Jordan curve theorem, formally and informally",
+    year => "2007",
+   },
+   {
+    authors => ["Thomas C. Hales"],
+    title => "Formal proof",
+    year => "2008",
+   },
+   {
+    authors => ["John Harrison"],
+    title => "A formalized proof of dirichlet’s theorem on primes in arithmetic progression",
+    year => "2009",
+   },
+   {
+    authors => ["John Harrison"],
+    title => "Formalizing an analytic proof of the prime number theorem",
+    year => "2009",
+   },
+   {
+    authors => ["John Harrison"],
+    title => "Handbook of Practical Logic and Automated Reasoning",
+    year => "2009",
+   },
+   {
+    authors => ["Steven Kieffer", "Jeremy Avigad", "Harvey Friedman"],
+    title => "A language for mathematical language management",
+    year => "2009",
+   },
+   {
+    authors => ["Penelope Maddy"],
+    title => "Second Philosophy: A Naturalistic Method",
+    year => "2007",
+   },
+   {
+    authors => ["Paolo Mancosu"],
+    title => "The Philosophy of Mathematical Practice",
+    year => "2008",
+   },
+   {
+    authors => ["Kenneth Manders"],
+    title => "The Euclidean diagram",
+    year => "",
+   },
+   {
+    authors => ["Henri Poincare"],
+    title => "Science et Methode",
+    year => "1908",
+   },
+   {
+    authors => ["Pavel Pudlak"],
+    title => "The lengths of proofs",
+    year => "1998",
+   },
+   {
+    authors => ["John Alan Robinson", "Andrei Voronkov"],
+    title => "Handbook of Automated Reasoning (in 2 volumes)",
+    year => "2001",
+   },
+   {
+    authors => ["P. Rudnicki"],
+    title => "An overview of the mizar project",
+    year => "1992",
+   },
+   {
+    authors => ["Bertrand Russell"],
+    title => "The Problems of Philosophy",
+    year => "1912",
+   },
+   {
+    authors => ["C. Smorynski"],
+    title => "“Big” news from Archimedes to Friedman",
+    year => "1983",
+   },
+   {
+    authors => ["E. Szemeredi"],
+    title => "On sets of integers containing no k elements in arithmetic progression",
+    year => "1975",
+   },
+   {
+    authors => ["Terence Tao"],
+    title => "A quantitative ergodic theory proof of Szemeredi’s theorem",
+    year => "2006",
+   },
+   {
+    authors => ["Jamie Tappenden"],
+    title => "Proof style and understanding in mathematics I: visualization, unification, and axiom choice",
+    year => "2005",
+   },
+   {
+    authors => ["Alasdair Urquhart"],
+    title => "Mathematics and physics: strategies of assimilation",
+    year => "",
+   },
+   {
+    authors => ["V. S. Varadarajan"],
+    title => "Euler Through Time: A New Look at Old Themes",
+    year => "2006",
+   },
+   {
+    authors => ["Makarius Wenzel"],
+    title => "Isabelle/Isar—a generic framework for human-readable proof documents",
+    year => "2007",
+   },
+   {
+    authors => ["Freek Wiedijk"],
+    title => "The Seventeen Provers of the World",
+    year => "2006",
+   },
+   {
+    authors => ["Mark Wilson"],
+    title => "Wandering Significance: An Essay on Conceptual Behavior",
+    year => "",
+   },
+   {
+    authors => ["Ludwig Wittgenstein"],
+    title => "Remarks on the Foundations of Mathematics",
+    year => "1956",
+   },
+ ],
 
 
 );
@@ -730,9 +902,9 @@ while (my ($file, $res) = each(%tests)) {
     my $bib = proc($file);
     print "\n",("=" x 70),"\n== $file\n", ("=" x 70), "\n\n";
     if (scalar @$bib != scalar @$res) {
-         "\n\n\n!! Document has ",scalar @$res," references, ",
-              "but ",scalar @$bib, " retrieved!\n\n\n";
-         next;
+        print "\n\n\n!! Document has ",scalar @$res," references, ",
+              "but ",scalar @$bib, " retrieved! Skipping.\n\n\n";
+        next;
     }
     my $min = @{$bib} > @{$res} ? @{$res} : @{$bib};
     for my $i (0 .. $min-1) {

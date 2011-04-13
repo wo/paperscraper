@@ -830,25 +830,33 @@ sub parsebib {
     
     $entry->{text} = tidy_text($entry->{text});
 
-    my @words;
+    # split the entry into consecutive strings without punctuation:
+    my @fragments;
+    my $separator = qr/(?:
+         [^\pL\pN]\s |           # split 'Kamp. Formal', '71) 12'
+         \s(?=[^\pL\pN]) |       # split 'Kamp (1971'
+         [\PL\PN^]$re_dash |     # split '--1971', '--Kamp'
+         \pL\s*(?=\d{4})         # split 'Kamp 1971', 'Kamp1971'
+         )\K                     # keep the separator
+         /ox;
     my $textpos = 0;
-    my $word_separator = '\s+|[^\w]'.$re_dash.'+\K'; # split --1986
-    foreach my $str (split /$word_separator/, $entry->{text}) {
-        my $w = {
+    foreach my $str (split /$separator/, $entry->{text}) {
+        my $frag = {
             text => $str,
-            id => scalar @words,
+            id => scalar @fragments,
             textpos => $textpos,
             entry => $entry,
         };
-        $textpos += length($str)+1; # +1 from split \s
-        pushlink @words, $w;
+        $frag->{text} =~ s/^\s*(.+?)\s*$/$1/;
+        $textpos += length($str);
+        pushlink @fragments, $frag;
     }
 
     use rules::Bib_Features;
-    my @labels = keys %rules::Bib_Features::word_features;
+    my @labels = keys %rules::Bib_Features::fragment_features;
     my $best = label_chunks(
-        chunks => \@words,
-        features => \%rules::Bib_Features::word_features,
+        chunks => \@fragments,
+        features => \%rules::Bib_Features::fragment_features,
         relabel_all => 1,
         min_p => 0.4,
         );
@@ -858,7 +866,7 @@ sub parsebib {
                     \@rules::Bib_Features::parsing_features);
 
     my $parsings = generate_parsings(
-        chunks => \@words,
+        chunks => \@fragments,
         labels => \@labels,
         min_p => 0.4,
         );
@@ -867,8 +875,7 @@ sub parsebib {
     my $satisfaction = 0;
     my $counter = 0;
   PARSING: while (my $chunks = $parsings->()) {
-      $counter++;
-      if ($counter > 2000 - $satisfaction) {
+      if (++$counter > 2000 - $satisfaction) {
           last;
       }
       say(5, "evaluating parsing $counter (sat $satisfaction)");
@@ -920,19 +927,23 @@ sub parsebib {
         say(3, "best parsing", $parsing->{text});
         foreach my $block (@{$parsing->{blocks}}) {
             if ($block->{label}->{TITLE}) {
-                $res->{title} = tidy_text($block->{text}, 1)
+                $res->{title} = tidy_text($block->{text}, 1);
+                say(3, "title: $res->{title}");
             }
-            if ($block->{label}->{AUTHORDASH}) {
+            elsif ($block->{label}->{AUTHORDASH}) {
                 $res->{authors} = ['-'];
+                say(3, 'authors: -');
             }
             elsif ($block->{label}->{AUTHOR}) {
                 my @authors = Text::Names::parseNames($block->{text});
                 @authors = map { Text::Names::reverseName($_) } @authors;
                 $res->{authors} = \@authors;
+                say(3, 'authors: '.join('; ', @authors));
             }
             elsif ($block->{label}->{YEAR} && !$res->{year}) {
                 $res->{year} = $block->{text};
                 $res->{year} =~ s/.*(\d{4}(?:$re_dash\d{2,4})?).*/$1/;
+                say(3, "year: $res->{year}");
             }
         }
     }
@@ -952,6 +963,8 @@ sub tidy_text {
     $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})||g;
     # merge HTML elements split at linebreak:
     $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
+    # replace other linebreaks by single space:
+    $txt =~ s|\n| |g;
     if ($thorough) {
         # chop whitespace at beginning and end of lines:
         $txt =~ s|^\s*(.+?)\s*$|$1|gsm;
