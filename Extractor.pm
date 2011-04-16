@@ -287,7 +287,7 @@ sub strip_footnotes {
     my %note_lines;
     foreach my $ch (@{$notes->{FOOTNOTESTART}}) {
         next if $note_lines{$ch};
-        say(0, "footnote: $ch->{text}...");
+        say(4, "footnote: $ch->{text}...");
         while (1) {
             push @{$self->{footnotes}}, $ch;
             removelink($ch);

@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use utf8;
 use Encode;
-use File::Basename qw/dirname/;
-binmode STDOUT, ":utf8";
-chdir(dirname($0));
+use FindBin qw($Bin);
+use Cwd 'abs_path';
+use File::Basename 'dirname';
 use DBI;
 use Digest::MD5;
 use HTML::LinkExtractor;
@@ -19,13 +19,11 @@ use Doctidy 'doctidy';
 use Spamfilter;
 use Converter;
 use Extractor;
-my %cfg = do 'config.pl';
+binmode STDOUT, ":utf8";
+chdir(dirname($0));
 
-# A few more config settings:
-$cfg{'TEMPDIR'}       = $cfg{'PATH'}.'temp/';
-# Spam score threshold where we don't store the document:
-$cfg{'CERT_SPAM'}     = 0.8;
-$cfg{'REPROCESS_ALL'} = 0;
+my %cfg = do 'config.pl';
+my $path = dirname(abs_path(__FILE__));
 
 my %opts;
 getopts("v:p:nh", \%opts);
@@ -39,7 +37,7 @@ arguments, or with arguments for testing and debugging:
 Usage: $0 [-hn] [-p url or location id] [-v verbosity]
 
 -p        : url or id that will be processed
--v        : verbosity level (0-10)
+-v        : verbosity level (0-10, default: 1)
 -n        : dry run, do not write result to DB
 -h        : this message
 
@@ -47,16 +45,24 @@ EOF
     exit;
 }
 
-my $verbosity = $opts{v} || 0;
-util::Errors::verbosity($verbosity);
-util::Io::verbosity($verbosity);
+my $TEMPDIR = "$path/temp/";
+my $CERT_SPAM = 0.8; # don't score documents with higher spam score
+my $REPROCESS_ALL = 0;
 
-# don't run multiple processes in parallel:
-my $lockfile = $cfg{'PATH'}.'.processlock';
+my $verbosity = $opts{v} || 1;
+util::Errors::verbosity($verbosity);
+util::Io::verbosity($verbosity > 1 ? $verbosity-1 : 0);
+
+# This script never stops by itself, but it can easily crash, and it
+# needs to be restarted on reboot. So it's best to add a cron job that
+# call it every few minutes. If another instance is properly running,
+# the call is aborted. This lock file is constantly updated while
+# things go well.
+my $lockfile = "$path/.processlock";
 if ( -e "$lockfile" ) {
     if ( -M "$lockfile" < 0.005) {
         # modified in the last ~10 mins
-        print "process already running (or last call crashed: remove .processlock)\n";
+        print "process already running (remove .processlock?)\n";
         exit;
     }
     print "killing previous run!\n";
@@ -65,288 +71,285 @@ if ( -e "$lockfile" ) {
     system("ps -ef | grep 'process_links' | grep -v grep"
            ." | awk '{print \$2}' | xargs kill -9");
 }
-system("touch '$lockfile'");
-system("mkdir -p $cfg{'TEMPDIR'}") unless (-e $cfg{'TEMPDIR'});
 
-# find some documents to check:
-my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
-    $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
+system("mkdir -p $TEMPDIR") unless (-e $TEMPDIR);
+
+my $dbh = DBI->connect(
+    'DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
+    $cfg{'MYSQL_PASS'}, { RaiseError => 1 })
     or die "Couldn't connect to database: " . DBI->errstr;
+
 $dbh->{'mysql_auto_reconnect'} = 1;
-if ($opts{p}) {
-    # from command-line
-    my ($url, $id);
-    if ($opts{p} =~ /^\d+$/) {
-        $id = $opts{p};
- 	($url) = $dbh->selectrow_array("SELECT url FROM locations WHERE location_id = $opts{p}");
-	die "ID $opts{p} not in database" unless ($url);
+
+$SIG{INT} = sub {
+    system('rm -f "$TEMPDIR*"') unless $verbosity;
+    system("rm -f '$lockfile'");
+    $dbh->disconnect() if $dbh;
+    exit;
+};
+
+my @queue = @{next_locations()};
+while (1) {
+    while (my $loc = shift @queue) {
+        system("touch '$lockfile'");
+        process($loc);
+    }
+    push @queue, @{next_locations()} unless $opts{p};
+    unless (@queue) {
+        $SIG{INT}->();
+        last;
+    }
+}
+
+sub next_locations {
+    if ($opts{p}) {
+        # document specified on command-line
+        my ($url, $id);
+        if ($opts{p} =~ /^\d+$/) {
+            $id = $opts{p};
+            ($url) = $dbh->selectrow_array("SELECT url FROM locations"
+                ." WHERE location_id = $opts{p}");
+            die "ID $opts{p} not in database" unless $url;
+        }
+        else {
+            $url = $opts{p};
+            ($id) = $dbh->selectrow_array("SELECT location_id"
+                 ." FROM locations WHERE url = '$opts{p}'");
+            unless ($id) {
+                $id = 0;
+                $opts{n} = 1;
+            }
+        }
+        return [{ location_id => $id, url => $url }];
     }
     else {
-	$url = $opts{p};
-        ($id) = $dbh->selectrow_array("SELECT location_id FROM locations WHERE url = '$opts{p}'");
-        unless ($id) {
-            $id = 0;
-            $opts{n} = 1;
+        # get documents from database:
+        my $NUM_LOCS = 10;
+        my $fetch = sub {
+            my $where = shift;
+            my $qu = "SELECT *, UNIX_TIMESTAMP(last_checked)"
+                ." AS last_checked"
+                ." FROM locations WHERE $where"
+                ." ORDER BY last_checked, location_id"
+                ." LIMIT $NUM_LOCS";
+            return $dbh->selectall_arrayref($qu, { Slice => {} });
+        };
+        # Do we have unprocessed locations?
+        my @locations = @{$fetch->("status = 0")};
+        if (!@locations) {
+            print "no new locations.\n" if $verbosity;
+            my $where;
+            my $min_age = time() - 24*60*60;
+            # No. Toss a coin to decide whether to (a) verify old
+            # papers and re-check locations with HTTP errors, or (b)
+            # give old spam and parser errors a new chance. Mostly we
+            # want to do (a). 
+            if (rand(10) <= 9) {
+                # (a) re-process old papers and HTTP errors:
+                $where = "(status NOT BETWEEN 2 AND 99) AND"
+                    ." NOT spamminess > 0.5 AND"
+                    ." last_checked < $min_age";
+            }
+            else {
+                # (b) give old spam and parser errors a second chance:
+                $where = "last_checked < $min_age AND"
+                    ." ((status = 1 AND spamminess > 0.5) OR"
+                    ." (status BETWEEN 2 AND 99))";
+            }
+            @locations = @{$fetch->($where)};
+            if (!@locations) {
+                print "nothing to do; resting.\n" if $verbosity;
+                sleep(300);
+            }
         }
+        return [@locations];
     }
-    my @locations = ({ location_id => $id, url => $url });
-    process_locations(@locations);
-}
-else {
-    # from database.
-    # Do we have unprocessed locations?
-    my $query = "SELECT *,UNIX_TIMESTAMP(last_checked) AS last_checked FROM locations "
-        ."WHERE status = 0 ORDER BY location_id LIMIT ".$cfg{'NUM_URLS'};
-    my @locations = @{$dbh->selectall_arrayref($query, { Slice => {} })};
-    if (!@locations) {
-        print "No new locations to check. Verifying some old stuff.\n" if $verbosity;
-	# No. Toss a coin to decide whether to (a) verify old papers
-	# and re-check locations with HTTP errors, or (b) give old spam
-	# and parser errors a new chance. Mostly we want to do (a).
-	# But first, check if we reprocess everything.
-	if ($cfg{'REPROCESS_ALL'}) {
-	    $query = "SELECT *,UNIX_TIMESTAMP(last_checked) AS last_checked FROM locations "
-                ."ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
-	}
-	elsif (rand(10) <= 9) {
-	    # (a) re-process old papers and HTTP errors:
-	    $query = "SELECT *,UNIX_TIMESTAMP(last_checked) AS last_checked FROM locations "
-                ."WHERE (status NOT BETWEEN 2 AND 99) AND NOT spamminess > 0.5 "
-                ."ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
-	}
-	else {
-	    # (b) give old spam and parser errors a second chance:
-	    $query = "SELECT *,UNIX_TIMESTAMP(last_checked) AS last_checked FROM locations "
-                ."WHERE (status = 1 AND spamminess > 0.5) OR status BETWEEN 2 AND 99 "
-                ."ORDER BY last_checked LIMIT ".$cfg{'NUM_URLS'};
-	}
-	@locations = @{$dbh->selectall_arrayref($query, { Slice => {} })};
-    }
-    process_locations(@locations);
 }
 
-print "done.\n" if $verbosity;
+my $really = $opts{n} ? "AND 1 = 0" : "";
+my $db_verify = $dbh->prepare(
+    "UPDATE locations SET last_checked = NOW()"
+    ." WHERE location_id = ? $really");
+my $db_err = $dbh->prepare(
+    "UPDATE locations SET status = ?, last_checked = NOW() "
+    ."WHERE location_id = ? $really");
+my $db_saveloc = $dbh->prepare(
+    "UPDATE locations SET status = 1, filetype = ?, filesize = ?, "
+    ."spamminess = ?, document_id = ?, last_checked = NOW() "
+    ."WHERE location_id = ? $really");
+my $db_savedoc = $dbh->prepare(
+    "UPDATE documents SET authors = ?, title = ?, abstract = ?, "
+    ."length = ?, meta_confidence = ? WHERE document_id = ? "
+    ."$really");
+my $db_adddoc = $dbh->prepare(
+    "INSERT IGNORE INTO documents "
+    ."(found_date, authors, title, abstract, length, "
+    ."meta_confidence) VALUES (NOW(),?,?,?,?,?)");
 
-system('rm -f '.$cfg{'TEMPDIR'}.'*') unless $verbosity;
-system("rm -f '$lockfile'");
+sub process {
+    my $loc = shift;
+    my $loc_id = $loc->{location_id};
+    binmode STDOUT, ":utf8";
+    print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
 
-$dbh->disconnect() if ($dbh);
+    # fetch document:
+    my $res = fetch_document($loc) or return;
+    $loc->{filesize} = $res->{filesize};
+    $loc->{filetype} = $res->{filetype};
+    $loc->{content} = $res->{content};
 
-sub process_locations {
-    my @locations = @_;
+    # save local copy:
+    my $file = $TEMPDIR.Digest::MD5::md5_hex(''.$loc->{url})
+        .'.'.$loc->{filetype};
+    my $is_text = $loc->{filetype} eq 'html' ? 1 : 0;
+    if (!save($file, $loc->{content}, $is_text)) {
+        error("cannot save local file");
+        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        return;
+    }
 
-    my $really = $opts{n} ? "AND 1 = 0" : "";
-    my $db_verify = $dbh->prepare(
-        "UPDATE locations SET last_checked = NOW() WHERE location_id = ? $really");
-    my $db_err = $dbh->prepare(
-        "UPDATE locations SET status = ?, last_checked = NOW() "
-        ."WHERE location_id = ? $really");
-    my $db_saveloc = $dbh->prepare(
-        "UPDATE locations SET status = 1, filetype = ?, filesize = ?, "
-        ."spamminess = ?, document_id = ?, last_checked = NOW() "
-        ."WHERE location_id = ? $really");
-    my $db_savedoc = $dbh->prepare(
-        "UPDATE documents SET authors = ?, title = ?, abstract = ?, "
-        ."length = ?, meta_confidence = ? WHERE document_id = ? $really");
-    my $db_adddoc = $dbh->prepare(
-        "INSERT IGNORE INTO documents "
-        ."(found_date, authors, title, abstract, length, meta_confidence) "
-        ."VALUES (NOW(),?,?,?,?,?)");
+    # check if this is a subpage with further links to papers:
+    if (is_subpage($loc)) {
+        # is_supage stores the subpage in the 'sources' table, so
+        # we only need to indicate in 'locations' that this isn't
+        # a document URL; we use the status field for that:
+        error("subpage with more links");
+        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        return;
+    }
 
-    foreach my $loc (@locations) {
-        my $loc_id = $loc->{location_id};
-        binmode STDOUT, ":utf8";
-	print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
-
-	# retrieve document:
-	my $mtime = (defined $loc->{last_checked} && !$cfg{'REPROCESS_ALL'}) ? 
-            $loc->{last_checked} : 0;
-	my $res = fetch_url($loc->{url}, $mtime);
-	if ($res && $res->code == 304 && defined $loc->{last_checked}) {
-	    print "not modified.\n" if $verbosity;
-	    $db_verify->execute($loc_id) or print DBI->errstr;
-	    next;
-	}
-	if (!$res || !$res->is_success) {
-	    my $status = $res ? $res->code : 900;
-            $db_err->execute($status, $loc_id) or print DBI->errstr;
-	    next;
-	}
-	if (!$res->content || !$res->{filesize}) {
-	    error("document is empty");
-	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-	    next;
-	}
-        print "file retrieved, $res->{filesize} bytes\n" if $verbosity;
-
-	# We want to make sure that we only update an old link if it
-	# has really (substantially) changed. HTTP headers are not to
-	# be trusted on this. So we also check for changes in
-	# filesize:
-        my $old_filesize = defined $loc->{filesize} ? $loc->{filesize} : 0;
-	if ($old_filesize && abs($old_filesize-$res->{filesize})/$res->{filesize} < 0.2 
-            && !$cfg{'REPROCESS_ALL'}) {
-	    print "no substantial change in filesize.\n" if $verbosity;
-	    $db_verify->execute($loc_id) or print DBI->errstr;
-	    next;
-	}
-
-	$loc->{filesize} = $res->{filesize};
-	$loc->{filetype} = $res->{filetype};
-	$loc->{content} = $res->{content};
-
-	# check if filetype is supported:
-        unless (grep {$loc->{filetype} eq $_} @{$cfg{'FILETYPES'}}) {
-	    error("unsupported filetype ".$loc->{filetype}."\n"); 
-	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-	    next;
-	}
-
-	# save local copy:
-	my $file = $cfg{'TEMPDIR'}.Digest::MD5::md5_hex(''.$loc->{url}).'.'.$loc->{filetype};
-	if (!save($file, $loc->{content}, $loc->{filetype} eq 'html' ? 1 : 0)) {
-	    error("cannot save local file");
-	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-	    next;
-	}
-
-	# check if this is a subpage with further links to papers:
-        if (is_subpage($loc)) {
-            # is_supage stores the subpage in the 'sources' table, so
-            # we only need to indicate in 'locations' that this isn't
-            # a document URL; we use the status field for that:
-            error("subpage with more links");
+    # check if this is an intermediate page leading to the actual paper:
+    my $target = check_steppingstone($loc, $res);
+    if ($target) {
+        my ($is_dupe) = $dbh->selectrow_array(
+            "SELECT 1 FROM locations WHERE url = ".$dbh->quote($target));
+        if ($is_dupe) {
+            error("steppingstone to already known location");
             $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
             next;
         }
+        print "adding target link to queue: $target.\n" if $verbosity;
+        $loc->{url} = $target;
+        push @queue, $loc;
+        # We could alternatively replace the URL in the database, but
+        # then we'd constantly rediscover the steppingstone link in
+        # the source page and treat it as new. Perhaps the cleanest
+        # response would be to add the target location separately to
+        # the database, with a link to the redirecting location
+        # $loc. (Without such a link, the location would appear to be
+        # an orphan.) To find the source page of an article, one would
+        # then have to retrieve a source page linking to a parent of
+        # (a parent of ...) a location of the document. That's
+        # cumbersome, so instead I simply overwrite the current
+        # location, but keep its URL.
+        return;
+    }
 
-	# check if this is an intermediate page leading to the actual paper:
-        my $target = check_steppingstone($loc, $res);
-        if ($target) {
-            my ($is_dupe) = $dbh->selectrow_array(
-                "SELECT 1 FROM locations WHERE url = ".$dbh->quote($target));
-            if ($is_dupe) {
-                error("steppingstone to already known location");
-                $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-                next;
-            }
-            print "adding target link to queue: $target.\n" if $verbosity;
-            $loc->{url} = $target;
-            push @locations, $loc;
-            # We could alternatively replace the URL in the database,
-            # but then we'd constantly rediscover the steppingstone
-            # link in the source page and treat it as new. Perhaps the
-            # cleanest response would be to add the target location
-            # separately to the database, with a link to the
-            # redirecting location $loc. (Without such a link, the
-            # location would appear to be an orphan.) To find the
-            # source page of an article, one would then have to
-            # retrieve a source page linking to a parent of (a parent
-            # of ...) a location of the document. That's cumbersome,
-            # so instead I simply overwrite the current location, but
-            # keep its URL.
-            next;
-	}
-
-	# get anchor text and default author from source page:
-        # TODO: this assumes there is only one source page; I should
-        # move this info into the XML file and let the spam filter
-        # run on that. (See the 'TODO' comment in Spamfilter.pm.)
-	$loc->{anchortext} = '';
-        $loc->{default_author} = '';
-        if ($loc_id) {
-            ($loc->{anchortext}, $loc->{default_author}) = $dbh->selectrow_array(
+    # get anchor text and default author from source page:
+    # TODO: this assumes there is only one source page; I should
+    # move this info into the XML file and let the spam filter
+    # run on that. (See the 'TODO' comment in Spamfilter.pm.)
+    $loc->{anchortext} = '';
+    $loc->{default_author} = '';
+    if ($loc_id) {
+        ($loc->{anchortext}, $loc->{default_author}) =
+            $dbh->selectrow_array(
                 "SELECT links.anchortext, sources.default_author "
-                ."FROM links INNER JOIN sources ON links.source_id = sources.source_id "
+                ."FROM links INNER JOIN sources ON "
+                ."links.source_id = sources.source_id "
                 ."WHERE links.location_id = $loc_id LIMIT 1");
+    }
+
+    # Except for html documents, we don't have the text content
+    # yet, but we nevertheless do a preliminary spam test now,
+    # so that we can stop processing if something is clear spam:
+    if ($loc->{filetype} eq 'html') {
+        $loc->{text} = strip_tags($loc->{content});
+    }
+    my $spamminess = 0;
+    Spamfilter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
+    eval {
+        $spamminess = Spamfilter::classify($loc);
+    };
+    if ($@) {
+        error($@);
+        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        return;
+    }
+    if ($spamminess > 0.5) {
+        if (defined $loc->{spamminess} && $loc->{spamminess} > 0.5) {
+            print "was previously recognized as spam, "
+                ."still looks like that\n" if $verbosity;
+            $db_verify->execute($loc_id);
+            return;
         }
-
-	# Except for html documents, we don't have the text content
-        # yet, but we nevertheless do a preliminary spam test now,
-        # so that we can stop processing if something is clear spam:
-        if ($loc->{filetype} eq 'html') {
-            $loc->{text} = strip_tags($loc->{content});
-        }
-	my $spamminess = 0;
-        Spamfilter::verbosity($verbosity);
-	eval {
-	    $spamminess = Spamfilter::classify($loc);
-	};
-	if ($@) {
-	    error($@);
-	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-	    next;
-	}
-	if ($spamminess > 0.5) {
-	    if (defined $loc->{spamminess} && $loc->{spamminess} > 0.5) {
-                print "was previously recognized as spam, still looks like that\n" if $verbosity;
-		$db_verify->execute($loc_id);
-		next;
-	    }
-	    if ($spamminess >= $cfg{'CERT_SPAM'}) {
-                print "spam score $spamminess, not checking any further\n" if $verbosity;
-                $db_saveloc->execute($loc->{filetype}, $loc->{filesize}, 
-                                     $spamminess, undef, $loc_id)
-                    or print DBI->errstr;
-		next;
-	    }
-	}
-        $loc->{spamminess} = $spamminess;
-
-        # convert file to xml:
-        Converter::verbosity($verbosity);
-        eval {
-            convert2xml($file);
-            doctidy("$file.xml");
-        };
-	if ($@) {
-	    error("$@");
-	    error("parser error") if errorcode() == 99;
-	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-	    next;
-	}
-
-	# extract author, title, abstract:
-        my $cand_title = $loc->{anchortext};
-        $cand_title = '' if $cand_title !~ /\w\w/;
-        $cand_title = '' if $cand_title =~ /$loc->{filetype}|version/i;
-        my $cand_author = $loc->{default_author};
-        # TODO: these values should have been put into the XML; see above.
-        my $result = Extractor->new();
-        $result->verbosity($verbosity);
-	eval {
-            $result->init("$file.xml");
-            $result->extract(qw/authors title abstract/);
-	};
-	if ($@) {
-	    error("$@");
-	    error("parser error") if errorcode() == 99;
-	    $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-	    next;
-	}
-
-	$loc->{authors} = force_utf8(join ', ', @{$result->{authors}});
-	$loc->{title} = force_utf8($result->{title});
-	$loc->{abstract} = force_utf8($result->{abstract});
-	$loc->{confidence} = $result->{confidence};
-	$loc->{length} = $result->{pages};
-        $loc->{text} = $result->{text};
-        # TODO: these should be added to the XML file by the extractor.
-
-	# guess spamminess again, now that we have the text content:
-	Spamfilter::verbosity($verbosity);
-        eval {
-	    $loc->{spamminess} = Spamfilter::classify($loc);
-	};
-        if ($loc->{spamminess} >= $cfg{'CERT_SPAM'}) {
-            print "spam score $loc->{spamminess}, not storing document\n" if $verbosity;
-            $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
-                                 $loc->{spamminess}, undef, $loc_id)
+        if ($spamminess >= $CERT_SPAM) {
+            print "spam score $spamminess, "
+                ."not checking any further\n" if $verbosity;
+            $db_saveloc->execute($loc->{filetype}, $loc->{filesize}, 
+                                 $spamminess, undef, $loc_id)
                 or print DBI->errstr;
-            next;
+            return;
         }
+    }
+    $loc->{spamminess} = $spamminess;
 
-	print <<EOD if $verbosity;
+    # convert file to xml:
+    Converter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
+    eval {
+        convert2xml($file);
+        doctidy("$file.xml");
+    };
+    if ($@) {
+        error("$@");
+        error("parser error") if errorcode() == 99;
+        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        next;
+    }
+
+    # extract author, title, abstract:
+    my $cand_title = $loc->{anchortext};
+    $cand_title = '' if $cand_title !~ /\w\w/;
+    $cand_title = '' if $cand_title =~ /$loc->{filetype}|version/i;
+    my $cand_author = $loc->{default_author};
+    # TODO: these values should have been put into the XML; see above.
+    my $result = Extractor->new();
+    $result->verbosity($verbosity > 1 ? $verbosity-1 : 0);
+    eval {
+        $result->init("$file.xml");
+        $result->extract(qw/authors title abstract/);
+    };
+    if ($@) {
+        error("$@");
+        error("parser error") if errorcode() == 99;
+        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        next;
+    }
+
+    $loc->{authors} = force_utf8(join ', ', @{$result->{authors}});
+    $loc->{title} = force_utf8($result->{title});
+    $loc->{abstract} = force_utf8($result->{abstract});
+    $loc->{confidence} = $result->{confidence};
+    $loc->{length} = $result->{pages};
+    $loc->{text} = $result->{text};
+    # TODO: these should be added to the XML file by the extractor.
+
+    # guess spamminess again, now that we have the text content:
+    Spamfilter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
+    eval {
+        $loc->{spamminess} = Spamfilter::classify($loc);
+    };
+    if ($loc->{spamminess} >= $CERT_SPAM) {
+        print "spam score $loc->{spamminess}, "
+            ."not storing document\n" if $verbosity;
+        $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
+                             $loc->{spamminess}, undef, $loc_id)
+            or print DBI->errstr;
+        next;
+    }
+    
+    binmode STDOUT, ":utf8";
+    print <<EOD if $verbosity;
 =========== RESULT ===========
 authors:    $loc->{authors}
 title:      $loc->{title}
@@ -358,79 +361,137 @@ $loc->{abstract}
 ==============================
 EOD
 
-        if ($loc->{document_id}) {
-            # location already links to a document; update the document:
-            my ($old_confidence) = $dbh->selectrow_array(
-                "SELECT meta_confidence FROM documents "
-                ."WHERE document_id != $loc->{document_id} ");
-            if ($loc->{confidence} <= $old_confidence) {
-                print "results aren't more confident, nothing to update.\n" if $verbosity;
-                next;
-            }
-            print "new confidence exceeds old one, updating document.\n" if $verbosity;
-            $db_savedoc->execute($loc->{authors}, $loc->{title}, $loc->{abstract}, 
-                                 $loc->{length}, $loc->{confidence}, $loc_id)
-                or print DBI->errstr;
-            $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
-                                 $loc->{spamminess}, $loc->{document_id}, $loc_id)
-                or print DBI->errstr;
-            next;
+    if ($loc->{document_id}) {
+        # location already links to a document; update the document:
+        my ($old_confidence) = $dbh->selectrow_array(
+            "SELECT meta_confidence FROM documents "
+            ."WHERE document_id != $loc->{document_id} ");
+        if ($loc->{confidence} <= $old_confidence) {
+            print "results aren't more confident, "
+                ."nothing to update.\n" if $verbosity;
+            return;
         }
-
-        # check whether we already have this paper:
-        my ($orig_id, $orig_url) = $dbh->selectrow_array(
-            "SELECT documents.document_id, locations.url FROM documents "
-            ."INNER JOIN locations ON documents.document_id = locations.document_id "
-            ."WHERE status = 1 AND location_id != $loc_id "
-            ."AND authors = ".$dbh->quote($loc->{authors})." "
-            ."AND title = ".$dbh->quote($loc->{title})." "
-            ."LIMIT 1");
-        # better, with  the MySQL levenshtein UDF from joshdrew.com:
-        #    ."AND levenshtein(authors,".$dbh->quote($loc->{authors}).") < 4 "
-        #    ."AND levenshtein(title,".$dbh->quote($loc->{title}).") < 4 "
-        #    ."AND levenshtein(abstract,".$dbh->quote($loc->{abstract}).") < 15 "
-        if ($orig_id) {
-            print "document already known at $orig_url.\n" if $verbosity;
-            $db_saveloc->execute($loc->{filetype}, $loc->{filesize}, 
-                                 $loc->{spamminess}, $orig_id, $loc_id)
-                or print DBI->errstr;
-            next;
-        }
-
-        # add document to database:
-        next if $opts{n};
-        $db_adddoc->execute($loc->{authors}, $loc->{title}, $loc->{abstract}, 
-                            $loc->{length}, $loc->{confidence})
-	    or print DBI->errstr;
-        my $doc_id = $db_adddoc->{mysql_insertid};
-        print "document added as id $doc_id\n" if $verbosity;
-        $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
-                             $loc->{spamminess}, $doc_id, $loc_id)
+        print "new confidence exceeds old, updating.\n" if $verbosity;
+        $db_savedoc->execute(
+            $loc->{authors}, $loc->{title}, $loc->{abstract}, 
+            $loc->{length}, $loc->{confidence}, $loc_id)
             or print DBI->errstr;
-
+        $db_saveloc->execute(
+            $loc->{filetype}, $loc->{filesize},
+            $loc->{spamminess}, $loc->{document_id}, $loc_id)
+            or print DBI->errstr;
+        return;
     }
+
+    # check whether we already have this paper:
+    my ($orig_id, $orig_url) = $dbh->selectrow_array(
+        "SELECT documents.document_id, locations.url FROM documents "
+        ."INNER JOIN locations ON "
+        ."documents.document_id = locations.document_id "
+        ."WHERE status = 1 AND location_id != $loc_id "
+        ."AND authors = ".$dbh->quote($loc->{authors})." "
+        ."AND title = ".$dbh->quote($loc->{title})." "
+        ."LIMIT 1");
+    # better, with  the MySQL levenshtein UDF from joshdrew.com:
+    #    ."AND levenshtein(authors,".$dbh->quote($loc->{authors}).") < 4 "
+    #    ."AND levenshtein(title,".$dbh->quote($loc->{title}).") < 4 "
+    #    ."AND levenshtein(abstract,".$dbh->quote($loc->{abstract}).") < 15 "
+    if ($orig_id) {
+        print "document already known at $orig_url.\n" if $verbosity;
+        $db_saveloc->execute(
+            $loc->{filetype}, $loc->{filesize}, 
+            $loc->{spamminess}, $orig_id, $loc_id)
+            or print DBI->errstr;
+        return;
+    }
+
+    # add document to database:
+    return if $opts{n};
+    $db_adddoc->execute(
+        $loc->{authors}, $loc->{title}, $loc->{abstract}, 
+        $loc->{length}, $loc->{confidence})
+        or print DBI->errstr;
+    my $doc_id = $db_adddoc->{mysql_insertid};
+    print "document added as id $doc_id\n" if $verbosity;
+    $db_saveloc->execute(
+        $loc->{filetype}, $loc->{filesize},
+        $loc->{spamminess}, $doc_id, $loc_id)
+        or print DBI->errstr;
+}
+
+sub fetch_document {
+    my $loc = shift;
+    my $loc_id = $loc->{location_id};
+
+    my $mtime = (defined $loc->{last_checked} && !$REPROCESS_ALL) ? 
+        $loc->{last_checked} : 0;
+    my $res = fetch_url($loc->{url}, $mtime);
+
+    if ($res && $res->code == 304 && defined $loc->{last_checked}) {
+        print "not modified.\n" if $verbosity;
+        $db_verify->execute($loc_id) or print DBI->errstr;
+        return;
+    }
+
+    if (!$res || !$res->is_success) {
+        my $status = $res ? $res->code : 900;
+        $db_err->execute($status, $loc_id) or print DBI->errstr;
+        return;
+    }
+
+    if (!$res->content || !$res->{filesize}) {
+        error("document is empty");
+        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        return;
+    }
+
+    print "file retrieved, $res->{filesize} bytes\n" if $verbosity > 1;
+
+    # We want to make sure that we only update an old link if it
+    # has really (substantially) changed. HTTP headers are not to
+    # be trusted on this. So we also check for changes in
+    # filesize:
+    my $old_filesize = defined $loc->{filesize} ? $loc->{filesize} : 0;
+    if ($old_filesize && 
+        abs($old_filesize-$res->{filesize}) / $res->{filesize} < 0.2) {
+        print "no substantial change in filesize.\n" if $verbosity;
+        $db_verify->execute($loc_id) or print DBI->errstr;
+        return;
+    }
+
+    # check if filetype is supported:
+    unless (grep {$res->{filetype} eq $_ } @{$cfg{'FILETYPES'}}) {
+        error("unsupported filetype ".$res->{filetype}."\n"); 
+        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        return;
+    }
+
+    return $res;
 }
 
 sub is_subpage {
     my $loc = shift;
-    return 0 unless $loc->{location_id}; # when called manually with URL parameter
-    return 0 unless $loc->{filetype} eq 'html';
+    return 0 unless $loc->{location_id} && $loc->{filetype} eq 'html';
+
     # subpage must have high link density:
     my $numlinks = 0;
     $numlinks++ while ($loc->{content} =~ /<a href/gi);
-    return 0 unless ($numlinks > 4 && ($numlinks/$loc->{filesize} > 0.002));
+    return 0 unless 
+        ($numlinks > 4 && ($numlinks/$loc->{filesize} > 0.002));
+
     # subpage must have at least three links of paper filetypes:
     $numlinks = 0;
     $numlinks++ while ($loc->{content} =~ /\.pdf|\.doc/gi);
     return 0 unless $numlinks > 2;
+
     # fetch potential parent pages:
-    my $query = "SELECT sources.* FROM links "
+    my $qu = "SELECT sources.* FROM links "
         ."INNER JOIN sources ON links.source_id = sources.source_id "
         ."WHERE links.location_id = $loc->{location_id}";
-    my @sources = @{$dbh->selectall_arrayref($query, { Slice => {} })};
+    my @sources = @{$dbh->selectall_arrayref($qu, { Slice => {} })};
     my @parents;
     foreach my $source (@sources) {
-        # subpage must be located at same host and path as parent page:
+        # subpage must be located at same host and path as parent:
         my $source_path = $source->{url};
         $source_path =~ s/[^\/]+\.[^\/]+$//; # strip filename
         next unless $loc->{url} =~ /^$source_path/;
@@ -444,6 +505,7 @@ sub is_subpage {
         print "Oops, more than one candidate parent page!\n";
         return 0;
     }
+
     # Store page as new source:
     my $parent = pop @parents;
     my $db_addsub = $dbh->prepare(
@@ -464,24 +526,28 @@ sub check_steppingstone {
     # catch intermediate pages that redirect with meta refresh
     # (e.g. http://www.princeton.edu/~graff/papers/ucsbhandout.html):
     my $target = '';
-    if ($loc->{content} =~ /<meta.*http-equiv.*refresh.*content.*\n*url=([^\'\">]+)/i) {
+    if ($loc->{content} =~ 
+        /<meta.*http-equiv.*refresh.*content.*\n*url=([^\'\">]+)/i) {
         print "address redirects to $1.\n" if $verbosity;
         $target = URI->new($1);
         $target = $target->abs(URI->new($loc->{url}));
         $target =~ s/\s/%20/g; # fix links with whitespace
         return $target if length($target) < 256;
     }
-    # other intermediate pages are short and have at least one link to a pdf file:
+    # other intermediate pages are short and have at least one link to
+    # a pdf file:
     return 0 if $loc->{filesize} > 5000;
     return 0 if $loc->{content} !~ /\.pdf/i;
     # prevent loops with redirects to login?req=foo.pdf
     return 0 if $loc->{url} =~ m/\.pdf$/i;
     print "might be a steppingstone page?\n" if $verbosity > 1;
-    my $link_extractor = new HTML::LinkExtractor(undef, $http_res->base, 1);
+    my $link_extractor = 
+        new HTML::LinkExtractor(undef, $http_res->base, 1);
     eval {
         $link_extractor->parse(\$http_res->{content});
     };
-    my @as = grep { $$_{tag} eq 'a' && $$_{href} =~ /\.pdf$/ } @{$link_extractor->links};
+    my @as = grep { $$_{tag} eq 'a' && $$_{href} =~ /\.pdf$/ }
+                  @{$link_extractor->links};
     print Dumper @as if $verbosity > 1;
     return 0 if @as != 1; # want exactly one pdf link
     $target = ${$as[0]}{href};
@@ -490,8 +556,8 @@ sub check_steppingstone {
 }
 
 sub force_utf8 {
-    # when parsing PDFs, we sometimes get mess that is not valid UTF-8, which can
-    # make the HTML/RSS invalid.
+    # when parsing PDFs, we sometimes get mess that is not valid
+    # UTF-8, which can make the HTML/RSS invalid.
     my $str = shift;
     return $str if (Encode::is_utf8($str, 1));
     $str = decode 'utf8', $str;
