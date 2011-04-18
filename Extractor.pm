@@ -36,6 +36,7 @@ sub new {
         title => '',
         abstract => '',
         bibliography => [],
+        text => '',
     };
     bless $self, $class;
     $self->init($xmlfile) if $xmlfile;
@@ -134,6 +135,7 @@ sub init {
     $self->relativize_fsize();
     $self->strip_marginals();
     $self->strip_footnotes();
+    $self->get_text();
 
 }
 
@@ -307,6 +309,13 @@ sub strip_footnotes {
     $self->{chunks} = [ grep { ! $_->{_REMOVED} } @{$self->{chunks}} ];
     for my $i (0 .. $#{$self->{chunks}}) {
         $self->{chunks}->[$i]->{id} = $i;
+    }
+}
+
+sub get_text {
+    my $self = shift;
+    foreach my $ch (@{$self->{chunks}} ) {
+        $self->{text} .= $ch->{plaintext};
     }
 }
 
