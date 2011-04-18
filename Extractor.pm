@@ -24,6 +24,8 @@ sub new {
         xmlfile => $xmlfile,
         converters => [],
         fromOCR => 0,
+        anchortexts => [],
+        sourceauthors => [],
         chunks => [],
         pages => 0,
         fontsize => 0,
@@ -92,9 +94,13 @@ sub init {
     my $xml = readfile($xmlfile);
     say(6, $xml);
 
-    my @converters = $xml =~ /<converter>(.+?)<\/converter>/og;
+    my @converters = $xml =~ /<converter>(.+?)<\/converter>/g;
     $self->{converters} = \@converters;
     $self->{fromOCR} = 1 if grep 'OCR', @converters;
+    my @anchortexts = $xml =~ /<anchortext>(.+?)<\/anchortext>/g;
+    $self->{anchortexts} = \@anchortexts;
+    my @sourceauthors = $xml =~ /<sourceauthor>(.+?)<\/sourceauthor>/g;
+    $self->{sourceauthors} = \@sourceauthors;
 
     say(3, "collecting text chunks");
 

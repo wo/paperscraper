@@ -56,15 +56,12 @@ $features{TITLE} = [
     ['matches title pattern', [0.1, -0.5], 2],
     ['several words', [0.1, -0.3], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
+    ['resembles anchor text', [0.5, -0.1], 2],
+    ['occurs in marginals', [0.25, 0], 2],
     [$or->('best title', 'may continue title'), [0.1, -0.4], 3],
     ['probable HEADING', [-0.2, 0.1], 3],
     ['probable AUTHOR', [-0.2, 0.05], 3],
     ];
-
-if (defined $_[0]->{doc}->{anchortexts}) { # TODO
-    push @{$features{'TITLE'}},
-         ['resembles anchor text', [0.6, 0], 2];
-}
 
 $features{AUTHOR} = [
     ['among first few lines', [0.3, -0.2]],
@@ -80,6 +77,7 @@ $features{AUTHOR} = [
     ['contains digit', [-0.2, 0.05], 2],
     ['gap above', [0.25, -0.3], 2],
     ['gap below', [0.15, -0.15], 2],
+    ['occurs in marginals', [0.2, 0], 2],
     [$and->('best title', 'other good authors'), [-0.3, 0.05], 3],
     ['probable HEADING', [-0.3, 0.1], 3],
     ['contains publication keywords', [-0.4, 0], 3],
@@ -87,6 +85,7 @@ $features{AUTHOR} = [
     ['contains page-range', [-0.3, 0], 3],
     ['contains actual name', [0.2, -0.4], 3],
     ['contains several English words', [-0.4, 0.1], 3],
+    ['resembles source author', [0.1, -0.1], 3],
     ['resembles best author', [0.1, -0.5], 4],
     ];
 
@@ -381,12 +380,33 @@ $f{'matches content pattern'} = memoize(sub {
 });
 
 $f{'resembles anchor text'} = memoize(sub {
-    for my $a (@{$_[0]->{doc}->{anchortexts}}) {
-        return 1 if (amatch($a, ['i 30%'], $_[0]->{plaintext}));
+    my $ret = 0;
+    for my $str (@{$_[0]->{doc}->{anchortexts}}) {
+        if ($str !~ /\w\w/ ||
+            $str =~ /$_[0]->{doc}->{filetype}|version/i) {
+            $ret = 0.5;
+            next;
+        }
+        return 1 if (amatch($str, ['i 20%'], $_[0]->{plaintext}));
+    }
+    return $ret;
+});
+ 
+$f{'resembles source author'} = memoize(sub {
+    for my $str (@{$_[0]->{doc}->{sourceauthors}}) {
+       return 1 if (amatch($str, ['i 30%'], $_[0]->{plaintext}));
     }
     return 0;
 });
- 
+
+$f{'occurs in marginals'} = memoize(sub {
+    for my $str (@{$_[0]->{doc}->{marginals}}) {
+       return 1 if (amatch($str, ['i 10%'], $_[0]->{plaintext}));
+    }
+    return 0;
+});
+
+
 $f{'may continue title'} = sub {
     # errs on the side of 'yes'
     my $prev = $_[0]->{prev};

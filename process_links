@@ -47,7 +47,6 @@ EOF
 
 my $TEMPDIR = "$path/temp/";
 my $CERT_SPAM = 0.8; # don't score documents with higher spam score
-my $REPROCESS_ALL = 0;
 
 my $verbosity = $opts{v} || 1;
 util::Errors::verbosity($verbosity);
@@ -55,9 +54,9 @@ util::Io::verbosity($verbosity > 1 ? $verbosity-1 : 0);
 
 # This script never stops by itself, but it can easily crash, and it
 # needs to be restarted on reboot. So it's best to add a cron job that
-# call it every few minutes. If another instance is properly running,
-# the call is aborted. This lock file is constantly updated while
-# things go well.
+# calls it every few minutes. If another instance is properly running,
+# the call is aborted. The following lock file is constantly updated
+# while things go well.
 my $lockfile = "$path/.processlock";
 if ( -e "$lockfile" ) {
     if ( -M "$lockfile" < 0.005) {
@@ -115,10 +114,8 @@ sub next_locations {
             $url = $opts{p};
             ($id) = $dbh->selectrow_array("SELECT location_id"
                  ." FROM locations WHERE url = '$opts{p}'");
-            unless ($id) {
-                $id = 0;
-                $opts{n} = 1;
-            }
+            $id = 0;
+            $opts{n} = 1;
         }
         return [{ location_id => $id, url => $url }];
     }
@@ -199,8 +196,8 @@ sub process {
     $loc->{content} = $res->{content};
 
     # save local copy:
-    my $file = $TEMPDIR.Digest::MD5::md5_hex(''.$loc->{url})
-        .'.'.$loc->{filetype};
+    my $hashname = Digest::MD5::md5_hex(''.$loc->{url});
+    my $file = $TEMPDIR.$hashname.'.'.$loc->{filetype};
     my $is_text = $loc->{filetype} eq 'html' ? 1 : 0;
     if (!save($file, $loc->{content}, $is_text)) {
         error("cannot save local file");
@@ -245,10 +242,8 @@ sub process {
         return;
     }
 
-    # get anchor text and default author from source page:
-    # TODO: this assumes there is only one source page; I should
-    # move this info into the XML file and let the spam filter
-    # run on that. (See the 'TODO' comment in Spamfilter.pm.)
+    # get anchor text and default author from source pages:
+    # TODO: this assumes there is only one source page.
     $loc->{anchortext} = '';
     $loc->{default_author} = '';
     if ($loc_id) {
@@ -306,13 +301,10 @@ sub process {
         $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
         next;
     }
+    add_meta("$file.xml", 'anchortext', $loc->{anchortext});
+    add_meta("$file.xml", 'sourceauthor', $loc->{default_author});
 
     # extract author, title, abstract:
-    my $cand_title = $loc->{anchortext};
-    $cand_title = '' if $cand_title !~ /\w\w/;
-    $cand_title = '' if $cand_title =~ /$loc->{filetype}|version/i;
-    my $cand_author = $loc->{default_author};
-    # TODO: these values should have been put into the XML; see above.
     my $result = Extractor->new();
     $result->verbosity($verbosity > 1 ? $verbosity-1 : 0);
     eval {
@@ -331,6 +323,9 @@ sub process {
     $loc->{abstract} = force_utf8($result->{abstract});
     $loc->{confidence} = $result->{confidence};
     $loc->{length} = $result->{pages};
+
+
+
     $loc->{text} = $result->{text};
     # TODO: these should be added to the XML file by the extractor.
 
@@ -423,7 +418,7 @@ sub fetch_document {
     my $loc = shift;
     my $loc_id = $loc->{location_id};
 
-    my $mtime = (defined $loc->{last_checked} && !$REPROCESS_ALL) ? 
+    my $mtime = (defined $loc->{last_checked}) ? 
         $loc->{last_checked} : 0;
     my $res = fetch_url($loc->{url}, $mtime);
 
@@ -553,6 +548,25 @@ sub check_steppingstone {
     $target = ${$as[0]}{href};
     $target =~ s/\s/%20/g; # fix links with whitespace
     return $target if length($target) < 256;
+}
+
+sub add_meta {
+    # add metadata elements to XML file.
+    my ($file, $element, $content) = @_;
+
+    open IN, $file or die $!;
+    open OUT, ">$file.new" or die $!;
+    binmode(OUT, ":utf8");
+    while (<IN>) {
+        # $_ = Encode::decode_utf8($_);
+        if (/^<pdf2xml/) { 
+            print OUT "<$element>$content</$element>\n";
+        }
+        print OUT $_;
+    }
+    close IN;
+    close OUT;
+    rename "$file.new", $file;
 }
 
 sub force_utf8 {
