@@ -5,6 +5,8 @@ use utf8;
 use Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw/
+$re_ignore_url
+$re_session_id
 $re_name
 $re_name_inverted
 $re_noname
@@ -27,6 +29,23 @@ $re_lquote
 $re_rquote
 $re_dash
 /;
+
+# ignore the following links on source pages:
+our $re_ignore_url = qr{
+    \#|
+    ^mailto|
+    ^javascript|
+    ^.+//[^/]+/?$|          # TLD
+    twitter\.com|
+    \.(?:css|mp3|avi|jpg|gif)$
+}xi;
+
+# ignore this part of a URL when checking for new links:
+our $re_session_id = qr{
+    \bs\w*id=[\w_-]+|
+    halsid=[\w_-]+|
+    locale=[\w_-]+
+}xi;
 
 # stuff that commonly occurs in addresses or affiliations:
 my $re_address_word = qr/\b(?:
