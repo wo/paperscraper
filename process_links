@@ -57,12 +57,13 @@ util::Io::verbosity($verbosity > 1 ? $verbosity-1 : 0);
 # calls it every few minutes. If another instance is properly running,
 # the call is aborted. The following lock file is constantly updated
 # while things go well.
-my $lockfile = "$path/.processlock";
+my $lockfile = "$path/.process_links";
 if ( -e "$lockfile" ) {
     if ( -M "$lockfile" < 0.005) {
         # modified in the last ~10 mins
-        print "process already running (remove .processlock?)\n";
-        exit;
+        print "process already running (remove $lockfile?)\n"
+            if $verbosity;
+        exit 1;
     }
     print "killing previous run!\n";
     system("rm -f '$lockfile'");
@@ -79,6 +80,26 @@ my $dbh = DBI->connect(
     or die "Couldn't connect to database: " . DBI->errstr;
 
 $dbh->{'mysql_auto_reconnect'} = 1;
+
+my $really = $opts{n} ? "AND 1 = 0" : "";
+my $db_verify = $dbh->prepare(
+    "UPDATE locations SET last_checked = NOW()"
+    ." WHERE location_id = ? $really");
+my $db_err = $dbh->prepare(
+    "UPDATE locations SET status = ?, last_checked = NOW() "
+    ."WHERE location_id = ? $really");
+my $db_saveloc = $dbh->prepare(
+    "UPDATE locations SET status = 1, filetype = ?, filesize = ?, "
+    ."spamminess = ?, document_id = ?, last_checked = NOW() "
+    ."WHERE location_id = ? $really");
+my $db_savedoc = $dbh->prepare(
+    "UPDATE documents SET authors = ?, title = ?, abstract = ?, "
+    ."length = ?, meta_confidence = ? WHERE document_id = ? "
+    ."$really");
+my $db_adddoc = $dbh->prepare(
+    "INSERT IGNORE INTO documents "
+    ."(found_date, authors, title, abstract, length, "
+    ."meta_confidence) VALUES (NOW(),?,?,?,?,?)");
 
 $SIG{INT} = sub {
     system('rm -f "$TEMPDIR*"') unless $verbosity;
@@ -155,7 +176,7 @@ sub next_locations {
             }
             @locations = @{$fetch->($where)};
             if (!@locations) {
-                print "nothing to do; resting.\n" if $verbosity;
+                print "nothing to do; resting 5 min.\n" if $verbosity;
                 sleep(300);
             }
         }
@@ -163,25 +184,6 @@ sub next_locations {
     }
 }
 
-my $really = $opts{n} ? "AND 1 = 0" : "";
-my $db_verify = $dbh->prepare(
-    "UPDATE locations SET last_checked = NOW()"
-    ." WHERE location_id = ? $really");
-my $db_err = $dbh->prepare(
-    "UPDATE locations SET status = ?, last_checked = NOW() "
-    ."WHERE location_id = ? $really");
-my $db_saveloc = $dbh->prepare(
-    "UPDATE locations SET status = 1, filetype = ?, filesize = ?, "
-    ."spamminess = ?, document_id = ?, last_checked = NOW() "
-    ."WHERE location_id = ? $really");
-my $db_savedoc = $dbh->prepare(
-    "UPDATE documents SET authors = ?, title = ?, abstract = ?, "
-    ."length = ?, meta_confidence = ? WHERE document_id = ? "
-    ."$really");
-my $db_adddoc = $dbh->prepare(
-    "INSERT IGNORE INTO documents "
-    ."(found_date, authors, title, abstract, length, "
-    ."meta_confidence) VALUES (NOW(),?,?,?,?,?)");
 
 sub process {
     my $loc = shift;
@@ -323,14 +325,11 @@ sub process {
     $loc->{abstract} = force_utf8($result->{abstract});
     $loc->{confidence} = $result->{confidence};
     $loc->{length} = $result->{pages};
-
-
-
     $loc->{text} = $result->{text};
-    # TODO: these should be added to the XML file by the extractor.
+    # TODO: these should be added to the XML file by the extractor,
+    # and used by the spam filter.
 
     # guess spamminess again, now that we have the text content:
-    Spamfilter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
     eval {
         $loc->{spamminess} = Spamfilter::classify($loc);
     };
