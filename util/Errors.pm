@@ -8,7 +8,7 @@ our @EXPORT = qw(&error &errorcode);
 
 my $error = '';
 my $errorcode = 10; # 10 means "no error", should never be returned
-my %errors; # overwritten below; Perl complains if undefined
+my %errors;
 
 my $verbosity = 0;
 sub verbosity {
@@ -33,12 +33,10 @@ sub errorcode {
    if ($e !~ /^\d+$/) {
        $e =~ s/\n/ /g;
        $e =~ s/^\s+//g;
-       while (my ($key, $value) = each(%errors)) {
-	   return $key if ($value && $e =~ /$value/); # suffices that $e BEGINS WITH $errors{key}
-       }
        return 10 if !$e;
        while (my ($key, $value) = each(%errors)) {
-	   return $key if ($value && $e =~ /$value/); # suffices that $e BEGINS WITH $errors{key}
+	   return $key if ($value && $e =~ /$value/);
+           # suffices that $e BEGINS WITH $errors{key}
        }
        return errorcode('unknown error');
    }
@@ -49,6 +47,8 @@ sub errorcode {
 
 %errors = (
    10 => 'no error!',
+
+   30 => 'process_links terminated during processing',
 
    42 => 'cannot read local file',
    43 => 'cannot save local file',
@@ -70,9 +70,6 @@ sub errorcode {
    69 => 'PDF conversion failed',
    70 => 'parser error',
    71 => 'non-UTF8 characters in metadata',
-
-   80 => 'Categosizer failed',
-   81 => 'philosophy detector failed',
 
    92 => 'database error',
    99 => 'unknown error',
