@@ -99,7 +99,7 @@ sub next_pages {
     my $min_age = time() - 24*60*60;
     my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources WHERE last_checked < $min_age "
-        ."ORDER BY last_checked LIMIT $NUM_URLS";
+        ."OR last_checked IS NULL ORDER BY last_checked LIMIT $NUM_URLS";
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
     if (!@$pages) {
         print "nothing to do; resting 1 h.\n" if $verbosity;
@@ -192,7 +192,7 @@ sub process {
         $db_insert_link->execute($page_id, $loc_id, $text);
         push @old_urls, $url;
     }
-    return unless $opts{p};
+    return if $opts{p};
     # remove disappeared links:
     foreach my $old_url (@old_urls) {
         remove_link($old_url, $page_id)
