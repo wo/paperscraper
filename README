@@ -52,10 +52,12 @@ need to install gcc and openssl first.)
   sudo cpan -i XML::RSS
   sudo cpan -i Text::Capitalize
   sudo cpan -i Text::Names
+  sudo cpan -i Text::Aspell
   sudo cpan -i String::Approx
   sudo cpan -i Algorithm::NaiveBayes
   sudo cpan -i AI::Categorizer
   sudo cpan -i Statistics::Lite
+  sudo cpan -i Biblio::Citation::Compare
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call
