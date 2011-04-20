@@ -13,7 +13,6 @@ use util::Functools 'allof';
 use util::Io;
 use util::String;
 use util::Estimator 'makeLabeler';
-use rules::Authors 'extract_names';
 use rules::Keywords;
 
 my $path = dirname(abs_path(__FILE__));
