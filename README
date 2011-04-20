@@ -1,6 +1,6 @@
 
-opp-tools is a collection of tools to track academic papers uploaded
-to (or linked from) certain web pages.
+opp-tools is a collection of tools to track academic papers linked on
+certain web pages.
 
 ---------------------------------------------------------------------
 INSTALLATION AND SETUP
@@ -63,14 +63,14 @@ create the tables, call
   mysql -u dbuser -p dbname < setup.sql 
 
 Then rename config-example.pl to config.pl and adjust the values for
-the database connection and the installation path.
+the database connection.
 
 At this point there aren't any pages in the database yet. To test the
 setup, you might run
 
   ./update_sources add "http://consc.net/papers.html"
-  ./process_pages -v1
-  ./process_links -v1
+  ./process_pages
+  ./process_links
 
 
 ---------------------------------------------------------------------

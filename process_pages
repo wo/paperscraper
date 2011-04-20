@@ -18,7 +18,7 @@ my %cfg = do 'config.pl';
 my $path = dirname(abs_path(__FILE__));
 
 my %opts;
-getopts("v:p:nh", \%opts);
+getopts("v:p:sh", \%opts);
 if ($opts{h}) {
     print <<EOF;
 
@@ -26,10 +26,11 @@ Fetches source pages from the database, stores new links on them in
 the database. Run as a cronjob without arguments, or with arguments
 for testing and debugging:
 
-Usage: $0 [-h] [-p url] [-v verbosity]
+Usage: $0 [-sh] [-p url] [-v verbosity]
 
 -p        : url that will be processed (result not written to DB)
 -v        : verbosity level (0-10), default: 1
+-s        : process only one page, then exit
 -h        : this message
 
 EOF
@@ -65,9 +66,11 @@ $dbh->{'mysql_auto_reconnect'} = 1;
 my $pg_update = $dbh->prepare(
     "UPDATE sources SET last_checked = NOW(), status = ? "
     ."WHERE source_id = ?");
+
 my $db_insert_location = $dbh->prepare(
     "INSERT IGNORE INTO locations (url, status) VALUES (?,0)")
     or die "Couldn't connect to database: " . DBI->errstr;
+
 my $db_insert_link = $dbh->prepare(
     "INSERT IGNORE INTO links (source_id, location_id, anchortext) "
     ."VALUES (?,?,?)");
@@ -84,7 +87,7 @@ while (1) {
         system("touch '$lockfile'");
         process($loc);
     }
-    push @queue, @{next_pages()} unless $opts{p};
+    push @queue, @{next_pages()} unless $opts{p} || $opts{s};
     unless (@queue) {
         $SIG{INT}->();
         last;
@@ -95,13 +98,14 @@ sub next_pages {
     if ($opts{p}) {
         return [{ source_id => 0, url => $opts{p}, last_checked => 0 }];
     }
-    my $NUM_URLS = 5;
+    my $NUM_URLS = $opts{s} ? 1 : 5;
     my $min_age = time() - 24*60*60;
     my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources WHERE last_checked < $min_age "
-        ."OR last_checked IS NULL ORDER BY last_checked LIMIT $NUM_URLS";
+        ."OR last_checked IS NULL ORDER BY last_checked "
+        ."LIMIT $NUM_URLS";
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
-    if (!@$pages) {
+    if (!@$pages && !$opts{s}) {
         print "nothing to do; resting 1 h.\n" if $verbosity;
         sleep(3600);
     }
