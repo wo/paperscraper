@@ -69,8 +69,8 @@ At this point there aren't any pages in the database yet. To test the
 setup, you might run
 
   ./update_sources add "http://consc.net/papers.html"
-  ./process_pages -v1
-  ./process_links -v1
+  ./process_pages
+  ./process_links
 
 
 ---------------------------------------------------------------------
