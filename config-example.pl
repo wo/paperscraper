@@ -4,9 +4,6 @@ MYSQL_DB    => 'database',
 MYSQL_USER  => 'user',
 MYSQL_PASS  => 'pass',
 
-# Installation root (typically where this file lives):
-PATH        => '/home/wo/projects/opp-tools/',
-
 # Process papers with these filetypes:
 FILETYPES   => ['pdf', 'ps', 'doc', 'rtf', 'html', 'txt'],
 
