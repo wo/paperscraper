@@ -197,6 +197,9 @@ sub process {
     binmode STDOUT, ":utf8";
     print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
 
+    # If we crash during processing, that should be marked in the DB:
+    $db_err->execute(30, $loc_id);
+
     # fetch document:
     my $res = fetch_document($loc) or return;
     $loc->{filesize} = $res->{filesize};
