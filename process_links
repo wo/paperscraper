@@ -26,7 +26,7 @@ my %cfg = do 'config.pl';
 my $path = dirname(abs_path(__FILE__));
 
 my %opts;
-getopts("v:p:nh", \%opts);
+getopts("v:p:nsh", \%opts);
 if ($opts{h}) {
     print <<EOF;
 
@@ -34,11 +34,12 @@ Fetches documents and tries to guess author, title, abstract, etc.,
 and whether they are a suitable paper at all. Run as a cronjob without
 arguments, or with arguments for testing and debugging:
 
-Usage: $0 [-hn] [-p url or location id] [-v verbosity]
+Usage: $0 [-hns] [-p url or location id] [-v verbosity]
 
 -p        : url or id that will be processed
 -v        : verbosity level (0-10, default: 1)
 -n        : dry run, do not write result to DB
+-s        : process only one document, then exit
 -h        : this message
 
 EOF
@@ -82,20 +83,25 @@ my $dbh = DBI->connect(
 $dbh->{'mysql_auto_reconnect'} = 1;
 
 my $really = $opts{n} ? "AND 1 = 0" : "";
+
 my $db_verify = $dbh->prepare(
     "UPDATE locations SET last_checked = NOW()"
     ." WHERE location_id = ? $really");
+
 my $db_err = $dbh->prepare(
     "UPDATE locations SET status = ?, last_checked = NOW() "
     ."WHERE location_id = ? $really");
+
 my $db_saveloc = $dbh->prepare(
     "UPDATE locations SET status = 1, filetype = ?, filesize = ?, "
     ."spamminess = ?, document_id = ?, last_checked = NOW() "
     ."WHERE location_id = ? $really");
+
 my $db_savedoc = $dbh->prepare(
     "UPDATE documents SET authors = ?, title = ?, abstract = ?, "
     ."length = ?, meta_confidence = ? WHERE document_id = ? "
     ."$really");
+
 my $db_adddoc = $dbh->prepare(
     "INSERT IGNORE INTO documents "
     ."(found_date, authors, title, abstract, length, "
@@ -114,7 +120,7 @@ while (1) {
         system("touch '$lockfile'");
         process($loc);
     }
-    push @queue, @{next_locations()} unless $opts{p};
+    push @queue, @{next_locations()} unless $opts{p} || $opts{s};
     unless (@queue) {
         $SIG{INT}->();
         last;
@@ -142,7 +148,7 @@ sub next_locations {
     }
     else {
         # get documents from database:
-        my $NUM_LOCS = 10;
+        my $NUM_LOCS = $opts{s} ? 1 : 10;
         my $fetch = sub {
             my $where = shift;
             my $qu = "SELECT *, UNIX_TIMESTAMP(last_checked)"
@@ -175,7 +181,7 @@ sub next_locations {
                     ." (status BETWEEN 2 AND 99))";
             }
             @locations = @{$fetch->($where)};
-            if (!@locations) {
+            if (!@locations && !$opts{s}) {
                 print "nothing to do; resting 5 min.\n" if $verbosity;
                 sleep(300);
             }
