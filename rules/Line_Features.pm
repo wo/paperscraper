@@ -237,7 +237,7 @@ $f{'narrowish'} = sub {
 };
 
 $f{'several words'} = memoize(sub { 
-     $_[0]->{plaintext} =~ /\p{IsAlpha}+\s+\p{IsAlpha}/o;
+     $_[0]->{plaintext} =~ /\p{IsAlpha}.*\s.*\p{IsAlpha}/o;
 });
 
 $f{'long'} = memoize(sub {
@@ -708,33 +708,37 @@ sub largest_text {
     my $count_allequal = shift;
     return sub {
         my $ch = $_[0];
+        my $tolerance = $ch->{doc}->{fromOCR} ? 1 : 0;
         my $anything_smaller = 0;
         while (($ch = $ch->{$dir}) && $ch->{page} == $_[0]->{page}) {
             next if (length($ch->{plaintext}) < 5);
-            return 0 if $ch->{fsize} > $_[0]->{fsize};
+            return 0 if $ch->{fsize} > $_[0]->{fsize}+$tolerance;
             $anything_smaller = 1 if $ch->{fsize} < $_[0]->{fsize};
         }
         return $count_allequal ? $anything_smaller : 1;
     }
 }
 
-$f{'largest text on rest of page'} = memoize(largest_text('next'));
+$f{'largest text on rest of page'} = largest_text('next');
 
 $f{'largest text on page'} = memoize(allof(largest_text('next', 1),
                                             largest_text('prev', 1)));
 
 $f{'rest of page has same font size'} = sub {
     my $ch = $_[0];
+    my $tolerance = $ch->{doc}->{fromOCR} ? 1 : 0;
     while (($ch = $ch->{next}) && $ch->{page} == $_[0]->{page}) {
         next if (length($ch->{plaintext}) < 5);
-        return 0 if $ch->{fsize} != $_[0]->{fsize};
+        return 0 if $ch->{fsize} > $_[0]->{fsize}+$tolerance
+            || $ch->{fsize} < $_[0]->{fsize}-$tolerance; 
     }
     return 1;
 };
 
 $f{'previous line has larger font'} = sub {
+    my $tolerance = $_[0]->{doc}->{fromOCR} ? 1 : 0;
     if ($_[0]->{prev} && $_[0]->{page} == $_[0]->{prev}->{page}
-        && $_[0]->{prev}->{fsize} > $_[0]->{fsize}) {
+        && $_[0]->{prev}->{fsize} > $_[0]->{fsize}+$tolerance) {
         return 1;
     }
     return 0;
