@@ -104,13 +104,16 @@ sub init {
 
     say(3, "collecting text chunks");
 
-    my %fontsizes = $xml =~/<fontspec id="(\d+)" size="(\d+)"/og;
+    my %fontsizes;
     my @pages = split /<page number=/, $xml;
     my @chunks;
     my $pageno = 0; # first element of @pages isn't a page
     my $charno = 1;
     my $lineno = 0;
     for my $page (@pages) {
+        while ($page =~/<fontspec id="(\d+)" size="(\d+)"/og) {
+            $fontsizes{$1} = $2;
+        }
         my @pagechunks;
         while ($page =~ /(<text.*?>.*?<\/text>)/isgo) {
             my $chunk = xml2chunk($1);
@@ -211,15 +214,15 @@ sub fontinfo {
     while (my ($fs, $freq) = each(%fs_freq)) {
         $default_fs = $fs if $freq > $fs_freq{$default_fs};
     }
-    $self->{fontsize} = $default_fs;
-    say(3, "default font size $default_fs");
+    $self->{fontsize} = $default_fs || 1;
+    say(3, "default font size $self->{fontsize}");
 
     my ($default_sp,) = each(%sp_freq);
     while (my ($sp, $freq) = each(%sp_freq)) {
         $default_sp = $sp if $freq > $sp_freq{$default_sp};
     }
-    $self->{linespacing} = $default_sp;
-    say(3, "default line spacing $default_sp");
+    $self->{linespacing} = $default_sp || 1;
+    say(3, "default line spacing $self->{linespacing}");
 }
 
 sub relativize_fsize {
@@ -231,11 +234,9 @@ sub relativize_fsize {
     my $def = $self->{fontsize};
     foreach my $ch (@{$self->{chunks}}) {
         #print "relativising $ch->{text}: ($ch->{fsize} - $def) * 10/$def";
-        $ch->{fsize} = sprintf "%.0f\n", (($ch->{fsize} - $def) * 10/$def);
+        #$ch->{fsize} = sprintf "%.0f\n", (($ch->{fsize} - $def) * 10/$def);
+        $ch->{fsize} = ($ch->{fsize} - $def) * 10/$def;
         #print " = $ch->{fsize}\n";
-        #if ($self->{fromOCR}) {
-        #    $ch->{fsize} = int(0.5 + $ch->{fsize}/2) * 2;
-        #}
     }
 }
 
@@ -977,15 +978,13 @@ sub tidy_text {
     $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})||g;
     # merge HTML elements split at linebreak:
     $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
-    # replace other linebreaks by single space:
-    $txt =~ s|\n| |g;
     if ($thorough) {
         # chop whitespace at beginning and end of lines:
-        $txt =~ s|^\s*(.+?)\s*$|$1|gsm;
+        $txt =~ s|^\s*(.+?)\s*$|$1|gm;
         # and footnote marks:
         $txt =~ s|<sup>\W?.\W?<.sup>$||;
         # and surrounding tags:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gsm;
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gm;
         # and surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?$|$1|s;
         # chop footnote star *:
@@ -997,7 +996,9 @@ sub tidy_text {
         # and odd trailing punctuations:
         $txt =~ s|[\.,:;]$||;
         # strip surrounding tags again:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gsm;
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gm;
+        # replace linebreaks by single space:
+        $txt =~ s|\s*\n\s*| |g;
         # replace allcaps:
         $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
     }
