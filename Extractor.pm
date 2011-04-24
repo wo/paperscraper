@@ -4,7 +4,6 @@ use warnings;
 use Memoize;
 use List::Util qw/min max reduce/;
 use Statistics::Lite 'stddev';
-use Text::Capitalize;
 use Text::Names 'samePerson';
 use Cwd 'abs_path';
 use File::Basename;
@@ -747,7 +746,7 @@ sub extract_abstract {
             do {
                 $chunk = $ch;
             } while (($ch = $ch->{prev})
-                     && $ch->{p}->('ABSTRACTCONTENT') > 0.5);
+                     && $ch->{p}->('ABSTRACTCONTENT') > 0.6);
             last;
         }
         $maxlen = 800;
@@ -755,23 +754,36 @@ sub extract_abstract {
 
     my $abstract = '';
     while ($chunk) {
-        say(5, $chunk->{text});
-        if ($chunk->{p}->('ABSTRACTCONTENT') > 0.5) {
+        my $p = $chunk->{p}->('ABSTRACTCONTENT');
+        say(5, " ($p): ", $chunk->{text});
+        if ($abstract && $p < 0.6) {
+            if ($abstract && $chunk->{prev}->{plaintext} =~ /[\.!?]$/) {
+                say(5, "abstract has ended ($p): ", $chunk->{text});
+                last;
+            }
+            elsif ($p < 0.5) {
+                say(5, "aborting abstract ($p): ", $chunk->{text});
+                $self->{confidence} *= 0.95;
+                $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
+                last;
+            }
+            # else: fall through
+        }
+        if ($p > 0.5) {
+            say(5, "abstract continues ($p): ", $chunk->{text});
             $abstract .= $chunk->{text}."\n";
-            if (length($self->{abstract}) > $maxlen) {
+            if (length($abstract) > $maxlen) {
                 say(5, 'abstract is getting too long');
                 $self->{confidence} *= 0.95;
                 $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
                 last;
             }
         }
-        elsif ($abstract && $chunk->{p}->('HEADING') > 0.5) {
-            last;
-        }
         $chunk = $chunk->{next};
     };
 
     $self->{abstract} = tidy_text($abstract);
+    $self->{abstract} .= '.' unless $self->{abstract} =~ /[!?]$/;
 
     say(1, "abstract: '", $self->{abstract}, "'");
 }
