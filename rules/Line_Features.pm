@@ -59,7 +59,7 @@ $features{TITLE} = [
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.25, 0], 2],
     [$or->('best title', 'may continue title'), [0.1, -0.4], 3],
-    ['probable HEADING', [-0.2, 0.1], 3],
+    ['probable HEADING', [-0.3, 0.1], 3],
     ['probable AUTHOR', [-0.2, 0.05], 3],
     ];
 
@@ -79,7 +79,7 @@ $features{AUTHOR} = [
     ['gap below', [0.15, -0.15], 2],
     ['occurs in marginals', [0.2, 0], 2],
     [$and->('best title', 'other good authors'), [-0.3, 0.05], 3],
-    ['probable HEADING', [-0.3, 0.1], 3],
+    ['probable HEADING', [-0.5, 0.1], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     ['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],

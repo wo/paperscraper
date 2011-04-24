@@ -24,7 +24,7 @@ our @parsing_features = (
     ['author parts have high score', [1, -0.9]],
     ['title parts have high score', [1, -0.9]],
     ['good author block missed', [-0.5, 0.5]],
-    ['first author near title', [0.1, -0.2]],
+    ['first author near title', [0.1, -0.3]],
     );
 
 my %f;
