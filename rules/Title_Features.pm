@@ -12,9 +12,6 @@ our %block_features;
 
 $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
-    #['chunks are consecutive', [0.1, -1]],
-    #['chunks have same font size', [0.3, -0.3]],
-    #['chunks have same alignment', [0.3, -0.6]],
     ['adjacent chunks probable title', [-0.5, 0.2]],
     ];
 
@@ -27,7 +24,7 @@ our @parsing_features = (
     ['author parts have high score', [1, -0.9]],
     ['title parts have high score', [1, -0.9]],
     ['good author block missed', [-0.5, 0.5]],
-#    ['author parts resemble each other', [0.2, -0.4]],
+    ['first author near title', [0.1, -0.2]],
     );
 
 my %f;
@@ -93,6 +90,21 @@ $f{'good author block missed'} = sub {
             return max(0, ($ch->{p}->(AUTHOR)-0.2)*1.25);
         }
     }
+};
+
+$f{'first author near title'} = sub {
+    my ($author, $title);
+    foreach (@{$_[0]->{blocks}}) {
+        $author = $_ if $_->{label}->{AUTHOR};
+        $title = $_ if $_->{label}->{TITLE};
+    }
+    return 0.5 unless $author && $title;
+    $author = $author->{chunks}->[0];
+    return 0 if $author->{page} != $title->{chunks}->[0]->{page};
+    my $dist = $author->{top} < $title->{chunks}->[0]->{top} ?
+        $title->{chunks}->[0]->{top} - $author->{bottom} :
+        $author->{top} - $title->{chunks}->[-1]->{bottom};
+    return min(1, max(0, 1.1 - $dist/100));
 };
 
 compile(\%block_features, \%f);

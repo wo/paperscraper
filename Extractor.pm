@@ -36,6 +36,7 @@ sub new {
         abstract => '',
         bibliography => [],
         text => '',
+        confidence => 1,
     };
     bless $self, $class;
     $self->init($xmlfile) if $xmlfile;
@@ -138,6 +139,7 @@ sub init {
     $self->strip_marginals();
     $self->strip_footnotes();
     $self->get_text();
+    $self->adjust_confidence();
 
 }
 
@@ -317,6 +319,15 @@ sub get_text {
     foreach my $ch (@{$self->{chunks}} ) {
         $self->{text} .= $ch->{plaintext};
     }
+}
+
+sub adjust_confidence {
+    my $self = shift;
+    $self->{confidence} *= 0.8 if $self->{fromOCR};
+    # TODO: check if original is HTML (all 1 page?)
+    $self->{confidence} *= 0.98 if $self->{pages} < 5;
+    $self->{confidence} *= 0.95 if $self->{pages} > 80;
+    $self->{confidence} *= 0.95 if $self->{pages} > 150;
 }
 
 ##### metadata extraction #####
@@ -692,7 +703,6 @@ sub extract_authors_and_title {
     my $parsing = shift @parsings;
     say(3, "best parsing", $parsing->{text});
 
-    $self->{confidence} = $parsing->{quality};
     foreach my $block (@{$parsing->{blocks}}) {
         if ($block->{label}->{TITLE}) {
             $self->{title} = tidy_text($block->{text}, 1);
@@ -713,8 +723,13 @@ sub extract_authors_and_title {
         }
     }
 
+    $self->{confidence} *= $parsing->{quality};
+    $self->{confidence} *= 0.9 unless @{$self->{authors}};
+    $self->{confidence} *= 0.95 if scalar @{$self->{authors}} > 1;
+
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
     say(1, "title: '", $self->{title}, "'");
+    say(2, "confidence: ", $self->{confidence});
 }
 
 sub extract_abstract {
@@ -969,7 +984,7 @@ sub parsebib {
 sub tidy_text {
     my $txt = shift;
     my $thorough = shift;
-    # put closing tags before space:
+    # put closing tags before space ("<i>foo </i>" => "<i>foo</i> "):
     $txt =~ s| </([^>]+)>|</$1> |g;
     # merge consecutive HTML elements:
     $txt =~ s|</([^>]+)>(\s*)<\1>|$2|g;
@@ -977,28 +992,28 @@ sub tidy_text {
     $txt =~ s|\b-\n\s*(?=\p{Lower})||g;
     $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})||g;
     # merge HTML elements split at linebreak:
-    $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
+    $txt =~ s|</([^>]+)>\n\s*<\1>| |g;
+    # replace other linebreaks by space:
+    $txt =~ s|\s*\n\s*| |g;
     if ($thorough) {
-        # chop whitespace at beginning and end of lines:
-        $txt =~ s|^\s*(.+?)\s*$|$1|gm;
-        # and footnote marks:
-        $txt =~ s|<sup>\W?.\W?<.sup>$||;
-        # and surrounding tags:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gm;
-        # and surrounding quotes:
-        $txt =~ s|^$re_lquote(.+)$re_rquote.?$|$1|s;
-        # chop footnote star *:
-        $txt =~ s/(\*|\x{2217})$//;
-        # chop non-<sup>'ed footnote symbols in brackets:
-        $txt =~ s|[\(\[] . [\)\]]$||x;
-        # chop non-<sup>'ed number right after last word:
-        $txt =~ s|([\pL\?!])\d$|$1|;
-        # and odd trailing punctuations:
-        $txt =~ s|[\.,:;]$||;
-        # strip surrounding tags again:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gm;
-        # replace linebreaks by single space:
-        $txt =~ s|\s*\n\s*| |g;
+        for (1 .. 2) {
+            # chop whitespace at beginning and end:
+            $txt =~ s|^\s*(.+?)\s*$|$1|;
+            # and surrounding tags:
+            $txt =~ s|^<([^>]+)>(.+)</\1>\s*$|$2|;
+            # and surrounding quotes:
+            $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
+            # chop odd trailing punctuations:
+            $txt =~ s|[\.,:;]$||;
+            # and footnote marks:
+            $txt =~ s|<sup>\W?.\W?<.sup>$||;
+            # and footnote star *:
+            $txt =~ s/(\*|\x{2217})\s*$//;
+            # and non-<sup>'ed footnote symbols in brackets:
+            $txt =~ s|\[ . \]$||x;
+            # and non-<sup>'ed number right after last word:
+            $txt =~ s|([\pL\?!])\d$|$1|;
+        }
         # replace allcaps:
         $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
     }
