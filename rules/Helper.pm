@@ -3,15 +3,15 @@ use strict;
 use warnings;
 use Exporter;
 use List::Util qw/max min/;
-use Text::Aspell;
 use Cwd 'abs_path';
 use File::Basename;
 use lib '..';
 use util::Io;
 use util::Functools qw/someof allof/;
+use util::String;
 use rules::Keywords;
 our @ISA = ('Exporter');
-our @EXPORT = qw(&in_dict &english &extract_names &compile $or $and $not);
+our @EXPORT = qw(&in_dict &extract_names &compile $or $and $not);
 
 my $path = dirname(abs_path(__FILE__));
 
@@ -94,21 +94,6 @@ sub in_dict {
     return $dicts{$dict}->{$str} ? 1 : 0;
 }
 
-my $speller;
-sub speller {
-    unless ($speller) {
-        $speller = Text::Aspell->new;
-        $speller->set_option('lang', 'en_US');
-        $speller->set_option('sug-mode', 'fast');
-    }
-    return $speller;
-}
-
-sub english {
-    my $sp = speller();
-    return $sp && $sp->check($_[0]);
-}
-
 sub extract_names {
     my $str = shift;
     my %res; # name => probability
@@ -138,7 +123,7 @@ sub extract_names {
             elsif (in_dict($w, 'commonwords')) {
                 $p -= 0.2
             }
-            elsif (speller()->check($w)) {
+            elsif (is_word($w)) {
                 $p -= 0.1;
             }
         }

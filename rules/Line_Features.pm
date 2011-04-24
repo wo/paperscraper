@@ -8,6 +8,7 @@ use Memoize;
 use Text::Names;
 use List::Util qw/min max/;
 use util::Functools qw/someof allof/;
+use util::String;
 use rules::Helper;
 use rules::Keywords;
 use Exporter;
@@ -642,7 +643,7 @@ $f{'begins with possible name'} = memoize(sub {
 $f{'begins with dictionary word'} = memoize(sub {
     my $w = $_[0]->{plaintext};
     $w =~ s/^(\p{Letter}+)/$1/;
-    return ($w && english($w)) ? 1 : 0;
+    return ($w && is_word($w)) ? 1 : 0;
 });
 
 $f{'begins with possible bib name'} = 
@@ -662,7 +663,7 @@ $f{'contains actual name'} = memoize(sub {
 $f{'contains several English words'} = memoize(sub {
     my $c = 0;
     foreach my $w (split ' ', $_[0]->{plaintext}) {
-        $c++ if english($w);
+        $c++ if is_word($w);
         return 1 if $c > 3;
     }
     return $c/4;

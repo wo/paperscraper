@@ -4,6 +4,7 @@ use warnings;
 use List::Util qw/min max reduce/;
 use Statistics::Lite qw/mean/;
 use Memoize;
+use util::String;
 use rules::Helper;
 use rules::Keywords;
 use rules::KnownWork 'known_work';
@@ -367,7 +368,7 @@ $f{'mostly dictionary words'} = memoize(sub {
     my $str = $_[0]->{text};
     my ($dict, $all) = (0, 0);
     while ($str =~ /\pL{2,}/g) {
-        $dict++ if english($&);
+        $dict++ if is_word($&);
         $all++;
     }
     return 0.5 unless $all;
