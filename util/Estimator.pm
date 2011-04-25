@@ -103,7 +103,7 @@ sub test {
     while (my ($fname, $fvals) = each %{$self->{features}}) {
 	my ($attrib, $w1, $w0) = @$fvals;
         print "$fname? " if $verbose;
-        my $is = $attrib->($ob);
+        my $is = $attrib->($ob) || 0;
 	my $score = $is * $w1 + (1-$is) * $w0;
 	if ($score >= 0) {
 	    $pos += (1-$pos) * $score;

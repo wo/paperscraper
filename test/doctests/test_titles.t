@@ -23,9 +23,9 @@ my %tests = (
    title => "David Hume, David Lewis, and Decision Theory",
  },
 
- '/home/wo/programming/opp-tools/test/doctests/11-Avigad-Understanding.pdf' => {
+ '/home/wo/programming/opp-tools/test/doctests/12-Avigad-Understanding.pdf' => {
    authors => ["Jeremy Avigad"],
-   title => "Understanding, formal verification, and\nthe philosophy of mathematics",
+   title => "Understanding, formal verification, and the philosophy of mathematics",
  },
 
  '/home/wo/programming/opp-tools/test/doctests/11-Rayo-Generality.pdf' => {
@@ -35,7 +35,7 @@ my %tests = (
 
  '/home/wo/programming/opp-tools/test/doctests/11-Skyrms-Game.pdf' => {
    authors => ["Brian Skyrms"],
-   title => "Game Theory, Rationality and\nEvolution of the Social Contract",
+   title => "Game Theory, Rationality and Evolution of the Social Contract",
  },
 
  '/home/wo/programming/opp-tools/test/doctests/11-Incurvati-Smith-Rejection.pdf' => {
@@ -77,6 +77,22 @@ my %tests = (
    authors => ["Joseph B. Kadane", "Mark J. Schervish", "Teddy Seidenfeld"],
    title => "Preference for equivalent random variables: A price for unbounded utilities",
  },
+
+ '/home/wo/programming/opp-tools/test/doctests/22-Fricker-Understanding.pdf' => {
+   authors => ["Elizabeth Fricker"],
+   title => "Understanding and Knowledge of What is Said",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/B22-Fox-Lappin-Foundations.pdf' => {
+   authors => ["Chris Fox", "Shalom Lappin"],
+   title => "Foundations of Intensional Semantics",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/31-Davies-Stoljar-Introduction.pdf' => {
+   authors => ["Daniel Stoljar", "Martin Davies"],
+   title => "Introduction",
+ },
+
 
 );
 

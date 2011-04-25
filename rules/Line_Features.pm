@@ -8,6 +8,7 @@ use Memoize;
 use Text::Names;
 use List::Util qw/min max/;
 use util::Functools qw/someof allof/;
+use util::String;
 use rules::Helper;
 use rules::Keywords;
 use Exporter;
@@ -59,7 +60,7 @@ $features{TITLE} = [
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.25, 0], 2],
     [$or->('best title', 'may continue title'), [0.1, -0.4], 3],
-    ['probable HEADING', [-0.2, 0.1], 3],
+    ['probable HEADING', [-0.3, 0.1], 3],
     ['probable AUTHOR', [-0.2, 0.05], 3],
     ];
 
@@ -79,7 +80,7 @@ $features{AUTHOR} = [
     ['gap below', [0.15, -0.15], 2],
     ['occurs in marginals', [0.2, 0], 2],
     [$and->('best title', 'other good authors'), [-0.3, 0.05], 3],
-    ['probable HEADING', [-0.3, 0.1], 3],
+    ['probable HEADING', [-0.5, 0.1], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     ['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
@@ -642,7 +643,7 @@ $f{'begins with possible name'} = memoize(sub {
 $f{'begins with dictionary word'} = memoize(sub {
     my $w = $_[0]->{plaintext};
     $w =~ s/^(\p{Letter}+)/$1/;
-    return ($w && english($w)) ? 1 : 0;
+    return ($w && is_word($w)) ? 1 : 0;
 });
 
 $f{'begins with possible bib name'} = 
@@ -662,7 +663,7 @@ $f{'contains actual name'} = memoize(sub {
 $f{'contains several English words'} = memoize(sub {
     my $c = 0;
     foreach my $w (split ' ', $_[0]->{plaintext}) {
-        $c++ if english($w);
+        $c++ if is_word($w);
         return 1 if $c > 3;
     }
     return $c/4;

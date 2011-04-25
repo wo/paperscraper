@@ -3,9 +3,13 @@ use strict;
 use warnings;
 use utf8;
 use HTML::Strip;
+use Text::Capitalize;
+use Text::Aspell;
+use lib '..';
+use rules::Keywords;
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw(&strip_tags);
+our @EXPORT = qw/&strip_tags &tidy_text &is_word/;
 
 sub strip_tags_new {
     my $str = shift;
@@ -77,3 +81,71 @@ sub strip_tags {
     $str =~ s/^\s*(.+?)\s*$/$1/s;
     return $str;
 }
+
+sub tidy_text {
+    my $txt = shift;
+    # put closing tags before space ("<i>foo </i>" => "<i>foo</i> "):
+    $txt =~ s| </([^>]+)>|</$1> |g;
+    # merge consecutive HTML elements:
+    $txt =~ s|</([^>]+)>(\s*)<\1>|$2|g;
+    $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})|\n|g;
+    # combine word-parts that are split at linebreak:
+    while ($txt =~ /(\pL\pL+)-\n\s*(\p{Lower}\pL+)/g) {
+        my ($combined, $w1, $w2) = ($&, $1, $2);
+        if (one_word($w1, $w2)) {
+            $txt =~ s/$combined/$w1$w2/;
+        }
+        else {
+            $txt =~ s/$combined/$w1-$w2/;
+        }
+    }
+    # merge HTML elements split at linebreak:
+    $txt =~ s|</([^>]+)>\n\s*<\1>| |g;
+    # replace other linebreaks by space:
+    $txt =~ s|\s*\n\s*| |g;
+    for (1 .. 2) {
+        # chop whitespace at beginning and end:
+        $txt =~ s|^\s*(.+?)\s*$|$1|;
+        # and surrounding tags:
+        $txt =~ s|^<([^>]+)>(.+)</\1>\s*$|$2|;
+        # and surrounding quotes:
+        $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
+        # chop odd trailing punctuations:
+        $txt =~ s|[\.,:;]$||;
+        # and footnote marks:
+        $txt =~ s|<sup>\W?.\W?<.sup>$||;
+        # and footnote star *:
+        $txt =~ s/(\*|\x{2217})\s*$//;
+        # and non-<sup>'ed footnote symbols in brackets:
+        $txt =~ s|\[ . \]$||x;
+        # and non-<sup>'ed number right after last word:
+        $txt =~ s|([\pL\?!])\d$|$1|;
+    }
+    # replace allcaps:
+    $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
+    return $txt;
+}
+
+sub one_word {
+    my ($w1, $w2) = @_;
+    return 1 if is_word($w1.$w2);
+    return 0 if is_word($w2); # e.g. "decision-theoretic"
+    return 1;
+}
+
+my $speller;
+sub speller {
+    unless ($speller) {
+        $speller = Text::Aspell->new;
+        $speller->set_option('lang', 'en_US');
+        $speller->set_option('sug-mode', 'fast');
+    }
+    return $speller;
+}
+
+sub is_word {
+    my $sp = speller();
+    return $sp && $sp->check($_[0]);
+}
+
+1;

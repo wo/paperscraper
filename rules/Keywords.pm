@@ -160,7 +160,7 @@ our $re_content = qr/
 # begins with section number, e.g. '1' or '1.2':
 our $re_sec_number = qr/^\s*
    [\divx\.]+
-   \b/x;
+   \b/ix;
 
 our $re_bib_heading = qr/\s*.{0,4}\s*\b
     (?:references?|bibliography|

@@ -4,7 +4,6 @@ use warnings;
 use Memoize;
 use List::Util qw/min max reduce/;
 use Statistics::Lite 'stddev';
-use Text::Capitalize;
 use Text::Names 'samePerson';
 use Cwd 'abs_path';
 use File::Basename;
@@ -36,6 +35,7 @@ sub new {
         abstract => '',
         bibliography => [],
         text => '',
+        confidence => 1,
     };
     bless $self, $class;
     $self->init($xmlfile) if $xmlfile;
@@ -138,6 +138,7 @@ sub init {
     $self->strip_marginals();
     $self->strip_footnotes();
     $self->get_text();
+    $self->adjust_confidence();
 
 }
 
@@ -317,6 +318,15 @@ sub get_text {
     foreach my $ch (@{$self->{chunks}} ) {
         $self->{text} .= $ch->{plaintext};
     }
+}
+
+sub adjust_confidence {
+    my $self = shift;
+    $self->{confidence} *= 0.8 if $self->{fromOCR};
+    # TODO: check if original is HTML (all 1 page?)
+    $self->{confidence} *= 0.98 if $self->{pages} < 5;
+    $self->{confidence} *= 0.95 if $self->{pages} > 80;
+    $self->{confidence} *= 0.95 if $self->{pages} > 150;
 }
 
 ##### metadata extraction #####
@@ -692,17 +702,16 @@ sub extract_authors_and_title {
     my $parsing = shift @parsings;
     say(3, "best parsing", $parsing->{text});
 
-    $self->{confidence} = $parsing->{quality};
     foreach my $block (@{$parsing->{blocks}}) {
         if ($block->{label}->{TITLE}) {
-            $self->{title} = tidy_text($block->{text}, 1);
+            $self->{title} = tidy_text($block->{text});
             # TODO: remove authors from title if block is also title
         }
         if ($block->{label}->{AUTHOR}) {
             foreach my $chunk (@{$block->{chunks}}) {
                 foreach my $name (keys %{$chunk->{names}}) {
                     # normalise and remove duplicates:
-                    $name = tidy_text($name, 1);
+                    $name = tidy_text($name);
                     my $ok = 1;
                     foreach my $old (@{$self->{authors}}) {
                         $ok = 0 if Text::Names::samePerson($name, $old);
@@ -713,8 +722,13 @@ sub extract_authors_and_title {
         }
     }
 
+    $self->{confidence} *= $parsing->{quality};
+    $self->{confidence} *= 0.9 unless @{$self->{authors}};
+    $self->{confidence} *= 0.95 if scalar @{$self->{authors}} > 1;
+
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
     say(1, "title: '", $self->{title}, "'");
+    say(2, "confidence: ", $self->{confidence});
 }
 
 sub extract_abstract {
@@ -725,33 +739,51 @@ sub extract_abstract {
     my $maxlen = 1400;
     unless ($chunk) {
         say(3, "no designated abstract");
+        $self->{confidence} *= 0.95;
         # use first ABSTRACTCONTENT chunk:
         foreach my $ch (@{$self->{chunks}}) {
             next if $ch->{p}->('ABSTRACTCONTENT') < 0.7;
             do {
                 $chunk = $ch;
             } while (($ch = $ch->{prev})
-                     && $ch->{p}->('ABSTRACTCONTENT') > 0.5);
+                     && $ch->{p}->('ABSTRACTCONTENT') > 0.6);
             last;
         }
         $maxlen = 800;
     }
 
+    my $abstract = '';
     while ($chunk) {
-        say(5, $chunk->{text});
-        if ($chunk->{p}->('ABSTRACTCONTENT') > 0.5) {
-            $self->{abstract} .= $chunk->{text}."\n";
-            if (length($self->{abstract}) > $maxlen) {
+        my $p = $chunk->{p}->('ABSTRACTCONTENT');
+        say(5, " ($p): ", $chunk->{text});
+        if ($abstract && $p < 0.6) {
+            if ($abstract && $chunk->{prev}->{plaintext} =~ /[\.!?]$/) {
+                say(5, "abstract has ended ($p): ", $chunk->{text});
+                last;
+            }
+            elsif ($p < 0.5) {
+                say(5, "aborting abstract ($p): ", $chunk->{text});
+                $self->{confidence} *= 0.95;
+                $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
+                last;
+            }
+            # else: fall through
+        }
+        if ($p > 0.5) {
+            say(5, "abstract continues ($p): ", $chunk->{text});
+            $abstract .= $chunk->{text}."\n";
+            if (length($abstract) > $maxlen) {
                 say(5, 'abstract is getting too long');
-                $self->{abstract} =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
+                $self->{confidence} *= 0.95;
+                $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
                 last;
             }
         }
-        elsif ($self->{abstract} && $chunk->{p}->('HEADING') > 0.5) {
-            last;
-        }
         $chunk = $chunk->{next};
     };
+
+    $self->{abstract} = tidy_text($abstract);
+    $self->{abstract} .= '.' unless $self->{abstract} =~ /[!?]$/;
 
     say(1, "abstract: '", $self->{abstract}, "'");
 }
@@ -942,7 +974,7 @@ sub parsebib {
         say(3, "best parsing", $parsing->{text});
         foreach my $block (@{$parsing->{blocks}}) {
             if ($block->{label}->{TITLE}) {
-                $res->{title} = tidy_text($block->{text}, 1);
+                $res->{title} = tidy_text($block->{text});
                 say(3, "title: $res->{title}");
             }
             elsif ($block->{label}->{AUTHORDASH}) {
@@ -964,45 +996,6 @@ sub parsebib {
     }
 
     return $res;
-}
-
-sub tidy_text {
-    my $txt = shift;
-    my $thorough = shift;
-    # put closing tags before space:
-    $txt =~ s| </([^>]+)>|</$1> |g;
-    # merge consecutive HTML elements:
-    $txt =~ s|</([^>]+)>(\s*)<\1>|$2|g;
-    # combine word-parts that are split at linebreak:
-    $txt =~ s|\b-\n\s*(?=\p{Lower})||g;
-    $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})||g;
-    # merge HTML elements split at linebreak:
-    $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
-    if ($thorough) {
-        # chop whitespace at beginning and end of lines:
-        $txt =~ s|^\s*(.+?)\s*$|$1|gm;
-        # and footnote marks:
-        $txt =~ s|<sup>\W?.\W?<.sup>$||;
-        # and surrounding tags:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gm;
-        # and surrounding quotes:
-        $txt =~ s|^$re_lquote(.+)$re_rquote.?$|$1|s;
-        # chop footnote star *:
-        $txt =~ s/(\*|\x{2217})$//;
-        # chop non-<sup>'ed footnote symbols in brackets:
-        $txt =~ s|[\(\[] . [\)\]]$||x;
-        # chop non-<sup>'ed number right after last word:
-        $txt =~ s|([\pL\?!])\d$|$1|;
-        # and odd trailing punctuations:
-        $txt =~ s|[\.,:;]$||;
-        # strip surrounding tags again:
-        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|gm;
-        # replace linebreaks by single space:
-        $txt =~ s|\s*\n\s*| |g;
-        # replace allcaps:
-        $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
-    }
-    return $txt;
 }
 
 1;
