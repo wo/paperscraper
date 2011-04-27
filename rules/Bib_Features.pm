@@ -53,9 +53,10 @@ $fragment_features{TITLE} = [
     ['in parentheses', [-0.3, 0]],
     ['early in entry', [0.2, -0.6]],
     ['after year string', [0.2, -0.1]],
-    ['after "in"', [-0.3, 0]], 
+    ['after "in"', [-0.4, 0]], 
     ['after italics', [-0.4, 0]], 
     ['after quote', [-0.4, 0.05]],
+    ['contains editor string', [-0.5, 0]],
     ['probable AUTHOR', [-0.2, 0.05], 2], 
     ['part of best author sequence', [-0.3, 0.3], 2],
     ['contains journal or publisher word', [-0.2, 0], 2],
@@ -93,8 +94,8 @@ our %block_features;
 $block_features{TITLE} = [
     ['maybe TITLE', [1, -1]],
     ['begins with uppercase letter', [0.1, -0.3]],
-    ['ends with punctuation', [0.15, -0.4]],
-    ['surrounded by quotes or italics', [0.4, -0.15]],
+    ['ends with punctuation', [0.25, -0.4]],
+    ['surrounded by quotes or italics', [0.5, -0.15]],
     ['contains unclosed opening construct', [-0.3, 0.05]],
     ['contains dot and follows comma', [-0.15, 0]],
     ['followed by OTHER block', [0.05, -0.15]],
@@ -203,8 +204,11 @@ $f{'long'} = sub {
 $f{'continues title'} = sub {
     my $w = $_[0]->{prev};
     return 0.5 unless $w;
-    if ($w->{text} =~ /[^\pL\pN]$/) {
-        return $w->{p}->('TITLE') / (($& eq '.') ? 4 : 2); 
+    if ($w->{text} =~ /(\S+)[^\pL\pN]$/) {
+        my $punishment = ($& eq '.' && length($1) < 4) ? 2 :
+            ($& eq ':') ? 0.2 : 0.5;
+        $punishment /= 2 if $_[0]->{text} =~ /^\p{Lower}/;
+        return $w->{p}->('TITLE') / (1+$punishment);
     }
     return $w->{p}->('TITLE');
 };
@@ -259,25 +263,19 @@ $f{'followed by number'} = sub {
 sub enclosed {
     my ($start, $end) = @_;
     return sub {
-	my $w = $_[0];
-	my $closed = 0;
-	while ($w && $w->{text} !~ /$start/) {
-	    $closed++ if $w->{text} =~ /$end/;
-	    $w = $w->{prev};
-	}
-	return 0 unless $w;
-	$w = $_[0];
-	my $opened = 0;
-	while ($w && $w->{text} !~ /$end/) {
-	    $opened++ if $w->{text} =~ /$start/;
-	    $w = $w->{next};
-	}
-	if ($closed || $opened) {
-	    # this most often happens when an apostrophe is mistaken
-	    # for a closing quote; thus:
-	    return 0.5;
-	}
-	return $w ? 1 : 0;
+        my $w = $_[0];
+	my $str = substr($w->{text}, 0, length($w->{text})/2);
+	while (($w = $w->{prev})) {
+            $str = $w->{text}.' '.$str;
+        }
+        return 0 unless $str =~ /.*$start(.*?)$/ && $1 !~ /$end/;
+        $w = $_[0];
+	$str = substr($w->{text}, length($w->{text})/2);
+	while (($w = $w->{next})) {
+            $str .= $w->{text};
+        }
+        return 0 unless $str =~ /^(.*?)$end/ && $1 !~ /$start/;
+        return 1;
     };
 }
 
@@ -289,10 +287,12 @@ $f{'in parentheses'} = memoize(enclosed('[\(\[]', '[\)\]]'));
 
 $f{'after quote'} = memoize(sub {
     my $w = $_[0];
-    my $in;
-    while ($w = $w->{prev}) {
-	return 1 if ($in && $w->{text} =~ /$re_lquote/);
-	$in = 1 if ($w->{text} =~ /$re_rquote/);
+    my $str = '';
+    while (($w = $w->{prev})) {
+        $str = $w->{text}.' '.$str;
+    }
+    if ($str =~ /.*$re_lquote(.*?)$/ && $1 =~ /$re_rquote/) {
+        return 1;
     }
     return 0;
 });
@@ -338,7 +338,7 @@ $f{'after "in"'} = memoize(sub {
     my $w = $_[0];
     while ($w) {
         my $prev = $w->{prev};
-	return 1 if ($w->{text} =~ /^in$/i && $prev && $prev->{text} !~ /\pL$/);
+	return 1 if ($w->{text} =~ /^in/i && $prev && $prev->{text} !~ /\pL$/);
         $w = $prev;
     };
     return 0;
@@ -384,7 +384,11 @@ sub p {
     return sub {
 	if (exists $_[0]->{chunks}) {
 	    my @probs = map { $_->{p}->($label) } @{$_[0]->{chunks}};
-	    return (min(@probs) + mean(@probs))/2;
+            if (scalar @probs > 1) {
+                return (min(@probs) + mean(@probs))/2;
+            }
+            # don't reward single-chunk blocks too much:
+            return $probs[0] * 0.9;
 	}
 	return $_[0]->{p}->($label);
     };
@@ -402,7 +406,12 @@ foreach my $lab (qw/CITLABEL TITLE AUTHOR AUTHORDASH YEAR OTHER/) {
 
 # used for blocks:
 
-$f{'ends with punctuation'} = memoize(matches('[\.,;\?!](?:<[^>]+>)?.?$'));
+$f{'ends with punctuation'} = sub {
+    if ($_[0]->{text} =~ /([\.,;\?!])(?:<[^>]+>)?.?$/) {
+        return $1 eq '.' ? 1 : 0.75;
+    }
+    return 0;
+};
 
 $f{'surrounded by quotes or italics'} = 
     memoize(matches("^(?:<i>.+</i>|$re_lquote.+$re_rquote).?\$"));
