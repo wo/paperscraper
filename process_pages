@@ -1,5 +1,6 @@
 #! /usr/bin/perl -w
 use strict;
+use Carp;
 use DBI;
 use URI::URL;
 use HTML::LinkExtractor;
@@ -78,6 +79,8 @@ my $db_insert_link = $dbh->prepare(
 $SIG{INT} = sub {
     system("rm -f '$lockfile'");
     $dbh->disconnect() if $dbh;
+    # output stack trace if crashed:
+    Carp::confess(@_) if @_;
     exit;
 };
 

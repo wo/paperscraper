@@ -1,6 +1,7 @@
 #! /usr/bin/perl -w
 use strict;
 use warnings;
+use Carp;
 use utf8;
 use Encode;
 use FindBin qw($Bin);
@@ -111,6 +112,8 @@ $SIG{INT} = sub {
     system('rm -f "$TEMPDIR*"') unless $verbosity;
     system("rm -f '$lockfile'");
     $dbh->disconnect() if $dbh;
+    # output stack trace if crashed:
+    Carp::confess(@_) if @_;
     exit;
 };
 
