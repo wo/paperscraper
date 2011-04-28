@@ -31,12 +31,9 @@ least 0.9. For Debian-based systems, you can get a recent version from
 http://notesalexp.org/.
 
 For wkhtmltopdf, I recommend a recent static binary from
-http://code.google.com/p/wkhtmltopdf/, which you can install by
-calling something like
-
-  wget http://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.9.9-static-i386.tar.bz2
-  tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
-  sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
+http://code.google.com/p/wkhtmltopdf/. Simply download, unpack, and
+copy the relevant binary, e.g. wkhtmltopdf-i386, to
+/usr/bin/wkhtmltopdf.
 
 Finally, make sure you have the following CPAN Perl modules. (You may
 need to install gcc and openssl first.)
