@@ -219,6 +219,10 @@ sub process {
         return;
     }
 
+    if ($loc->{filetype} eq 'html') {
+        $loc->{text} = strip_tags($loc->{content});
+    }
+
     # check if this is a subpage with further links to papers:
     if (is_subpage($loc)) {
         # is_supage stores the subpage in the 'sources' table, so
@@ -272,9 +276,6 @@ sub process {
     # Except for html documents, we don't have the text content
     # yet, but we nevertheless do a preliminary spam test now,
     # so that we can stop processing if something is clear spam:
-    if ($loc->{filetype} eq 'html') {
-        $loc->{text} = strip_tags($loc->{content});
-    }
     my $spamminess = 0;
     Spamfilter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
     eval {
@@ -477,18 +478,26 @@ sub fetch_document {
 
 sub is_subpage {
     my $loc = shift;
-    return 0 unless $loc->{location_id} && $loc->{filetype} eq 'html';
+    return unless $loc->{location_id} && $loc->{filetype} eq 'html';
+
+    print "checking: subpage with further links?\n" if $verbosity > 1; 
 
     # subpage must have high link density:
     my $numlinks = 0;
-    $numlinks++ while ($loc->{content} =~ /<a href/gi);
-    return 0 unless 
-        ($numlinks > 4 && ($numlinks/$loc->{filesize} > 0.002));
+    $numlinks++ while ($loc->{content} =~ /<a\s+href/gi);
+    my $textlen = length($loc->{text});
+    unless ($numlinks > 4 && $numlinks/$textlen > 0.005) {
+        print "no: link density $numlinks/$textlen\n" if $verbosity > 1;
+        return 0;
+    }
 
     # subpage must have at least three links of paper filetypes:
     $numlinks = 0;
     $numlinks++ while ($loc->{content} =~ /\.pdf|\.doc/gi);
-    return 0 unless $numlinks > 2;
+    unless ($numlinks > 2) {
+        print "no: $numlinks links to paper files\n" if $verbosity > 1;
+        return 0;
+    }
 
     # fetch potential parent pages:
     my $qu = "SELECT sources.* FROM links "
@@ -505,7 +514,10 @@ sub is_subpage {
         next if $source->{crawl_depth} == 0;
         push @parents, $source;
     }
-    return 0 unless @parents;
+    unless (@parents) {
+        print "no: no suitable parent page\n" if $verbosity > 1;
+        return 0;
+    }
     # We can't properly handle subpages with multiple parents:
     if (scalar @parents > 1) {
         print "Oops, more than one candidate parent page!\n";
@@ -514,6 +526,8 @@ sub is_subpage {
 
     # Store page as new source:
     my $parent = pop @parents;
+    print "yes: adding as subpage of $parent->{source_id}\n"
+        if $verbosity > 1;
     my $db_addsub = $dbh->prepare(
         "INSERT IGNORE into sources "
         ."(url, status, parent_id, crawl_depth, default_author) "
