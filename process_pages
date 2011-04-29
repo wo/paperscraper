@@ -22,9 +22,8 @@ getopts("v:p:sh", \%opts);
 if ($opts{h}) {
     print <<EOF;
 
-Fetches source pages from the database, stores new links on them in
-the database. Run as a cronjob without arguments, or with arguments
-for testing and debugging:
+Fetches source pages and stores new links found there in the
+database.
 
 Usage: $0 [-sh] [-p url] [-v verbosity]
 
@@ -185,7 +184,7 @@ sub process {
         }
         $url =~ s/\s/%20/g; # fix links with whitespace
         print "new link: $url ($text)\n" if $verbosity;
-        next LINKS unless $opts{p};
+        next LINKS if $opts{p};
         my $res = $db_insert_location->execute($url)
             or print DBI->errstr;
         if ($res eq '0E0') {
