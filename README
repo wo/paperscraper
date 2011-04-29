@@ -30,13 +30,10 @@ The cuneiform version in the standard repositories too old: we need at
 least 0.9. For Debian-based systems, you can get a recent version from
 http://notesalexp.org/.
 
-For wkhtmltopdf, I recommend a recent static binary from
-http://code.google.com/p/wkhtmltopdf/, which you can install by
-calling something like
-
-  wget http://wkhtmltopdf.googlecode.com/files/wkhtmltopdf-0.9.9-static-i386.tar.bz2
-  tar xvjf wkhtmltopdf-0.9.9-static-i386.tar.bz2
-  sudo mv wkhtmltopdf-i386 /usr/bin/wkhtmltopdf
+For wkhtmltopdf, I recommend a recent static binary (e.g. version 9.9)
+from http://code.google.com/p/wkhtmltopdf/. Simply download, unpack,
+and copy the relevant binary, e.g. wkhtmltopdf-i386, to
+/usr/bin/wkhtmltopdf.
 
 Finally, make sure you have the following CPAN Perl modules. (You may
 need to install gcc and openssl first.)
@@ -79,11 +76,11 @@ setup, you might run
 USAGE
 ---------------------------------------------------------------------
 
-At the core of opp-tools lie two Perl modules, Converter and
+At the core of opp-tools are two Perl modules, Converter and
 Extractor. The Converter module converts documents from PDF, Word,
-HTML and some other formats to XML. The Extractor module extracts
-metadata from such XML documents. These two modules can be used on
-their own, without any database or internet connection:
+HTML and other formats to XML. The Extractor module extracts metadata
+from such XML documents. These two modules can be used on their own,
+without any database or internet connection:
 
   #! /usr/bin/perl
   use Converter;
@@ -112,10 +109,11 @@ The two main scripts for retrieving document information from the
 source pages are process_pages and process_links. The first checks for
 links on the source pages and stores them in the "locations" table in
 the database. The second fetches the linked documents, extracts
-metadata and stores the result in the "documents" table. The two
-scripts are meant to be called regularly, e.g. every 5 minutes, by a
-cron job, so that the database is always up-to-date with the source
-pages. 
+metadata and stores the result in the "documents" table. By default,
+both scripts run forever, but you might nevertheless want to set up a
+cron job to (re-)start them regularly, because they can easily
+crash. When starting, the scripts check if another instance is running
+or has crashed.
 
 Often a source page will not only contain links to papers but also to
 irrelevant stuff like a department home page or a CV. To filter these
@@ -151,10 +149,26 @@ RSS feed of the most recently found documents.
 
 
 ---------------------------------------------------------------------
+Customisation
+---------------------------------------------------------------------
+
+opp-tools is fine-tuned for handling papers in English-speaking
+academic philosophy retrieved from personal pages. This is reflected
+in the "ham" and "spam" corpus, but also e.g. in the heuristics used
+to extract metadata from documents. These heuristics can be found in
+the /rules directory, and should be relatively easy to adjust. The
+file rules/Keywords.pm also contains regular expressions for URLs from
+which papers shouldn't be retrieved.
+
+A high-level explanation of how these rules are applied can be found
+at the end of Extractor.pm.
+
+
+---------------------------------------------------------------------
 SMALL PRINT 
 ---------------------------------------------------------------------
 
-The development of this software is supported by the University of
+The development of this software was supported by the University of
 London and the UK Joint Information Systems Committee as part of the
 PhilPapers 2.0 project (Information Environment programme).
 

@@ -96,10 +96,10 @@ $features{HEADING} = [
     ['contains letters', [0, -0.5]],
     ['centered', [0.2, -0.05]],
     ['justified', [-0.4, 0]],
-    ['gap above', [0.3, -0.4]],
+    ['gap above', [0.3, -0.5]],
     ['gap below', [0.2, -0.2]],
     ['high uppercase frequency', [0.1, -0.2]],
-    ['begins with section number', [0.4, -0.1]],
+    ['begins with section number', [0.3, -0.15]],
     ['probable CONTENT', [-0.5, 0.05], 3],
     ['preceeds CONTENT', [0.3, -0.3], 3],
     ['follows CONTENT', [0.4, -0.2], 3],
@@ -148,13 +148,14 @@ $features{BIB} = [
     ['high punctuation frequency', [0.1, -0.2]],
     ['near other BIBs', [0.3, -0.2], 2],
     ['resembles best BIB', [0.3, -0.6], 3],
+    ['previous line BIBSTART', [0.2, 0], 3],
     ];
 
 $features{BIBSTART} = [
     ['probable BIB', [0.2, -0.8], 2],
     ['greater gap above than below', [0.3, -0.05], 2],
     ['next line indented', [0.3, -0.1], 2],
-    ['indented relative to previous line', [-0.4, 0.05], 2],
+    ['indented relative to previous line', [-0.5, 0.05], 2],
     ['long', [0.2, -0.2], 2],
     ['begins with citation label', [0.3, -0.05], 2],
     ['begins with possible bib name', [0.3, -0.05], 2],
@@ -527,15 +528,18 @@ sub in_section {
         }
         $_[0]->{_headings} = [];
         my $res = 0;
+        my $inbetween = 1;
         foreach my $chunk (@chunks) {
             my $p = $chunk->{p}->('HEADING');
-            #print "** heading $p: $chunk->{text}\n";
             next unless $p > $min_heading + @{$_[0]->{_headings}}/20;
+            #print "** heading $p: $chunk->{text}\n";
             push @{$_[0]->{_headings}}, $chunk;
             if ($chunk->{plaintext} =~ /$re_title/ && !$res) {
-                $res = $p * 1/@{$_[0]->{_headings}};            
+                #print "** matches regexp, * 1/$inbetween\n";
+                $res = $p * 1/$inbetween;
             }
             last if @{$_[0]->{_headings}} == 5;
+            $inbetween += ($p-0.2)*1.25;
         }
         #print "** result: $res\n";
         return $res;
@@ -754,9 +758,13 @@ $f{'previous line short'} = memoize(sub {
 $f{'previous line ends with terminator'} = memoize(sub {
     my $prev = $_[0]->{prev};
     return 0.5 unless $prev;
-    return $prev->{plaintext} =~ /
-       [\.!\?]\s*(?:<[^>]+>)?(?:$re_rquote)?\s*$
-       /xo;
+    if ($prev->{plaintext} =~
+        /(\S+)([\.!\?])\s*(?:$re_rquote)?\s*$/o) {
+        # discount endings like "ed." or "Vol." or "J.A.":
+        return 0.75 if $1 && length($1) < 4 && $2 eq '.';
+        return 1;
+    }
+    return 0;
 });
 
 $f{'previous line BIBSTART'} = sub {

@@ -862,7 +862,7 @@ sub extract_bibliography {
     foreach my $block (@{$parsing->{blocks}}) {
         my $entry = parsebib($block);
         if ($entry) {
-            if ($entry->{authors} && $entry->{authors}->[0] eq '-'
+            if (@{$entry->{authors}} && $entry->{authors}->[0] eq '-'
                 && @{$self->{bibliography}}) {
                 $entry->{authors} = $self->{bibliography}->[-1]->{authors};
             }
@@ -882,7 +882,7 @@ sub parsebib {
     my $separator = qr/(?:
          [^\pL\pN]\s |           # split 'Kamp. Formal', '71) 12'
          \s(?=[^\pL\pN]) |       # split 'Kamp (1971'
-         [\PL\PN^]$re_dash |     # split '--1971', '--Kamp'
+         [^\pN\pL]$re_dash |     # split '--1971', '--Kamp'
          \pL\s*(?=\d{4})         # split 'Kamp 1971', 'Kamp1971'
          )\K                     # keep the separator
          /ox;
@@ -965,7 +965,7 @@ sub parsebib {
       }
   }
 
-    my $res;
+    my $res = { authors => [] };
 
     if (@parsings) {
         @parsings = sort { $b->{quality} <=> $a->{quality} } @parsings;
