@@ -93,6 +93,10 @@ my %tests = (
    title => "Introduction",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Block-Functional.pdf' => {
+   authors => ["Ned Block"],
+   title => "Functional Reduction",
+ },
 
 );
 

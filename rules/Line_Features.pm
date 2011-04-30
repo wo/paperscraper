@@ -27,9 +27,11 @@ $features{HEADER} = [
 
 $features{FOOTER} = [
     ['gap above', [0.2, -0.3]],
-    ['small font', [0.2, -0.2]],
+    ['small font', [0.2, -0.1]],
+    ['normal font', [-0.1, 0.1]],
     ['is digit', [0.3, -0.1]],
-    ['resembles other FOOTERs', [0.2, -0.3], 2]
+    ['previous line FOOTER', [0.4, 0], 2],
+    ['resembles other FOOTERs', [0.25, -0.35], 3]
     ];
 
 $features{FOOTNOTESTART} = [
@@ -54,6 +56,7 @@ $features{TITLE} = [
     ['centered', [0.3, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
+    ['style appears on several pages', [-0.3, 0], 2],
     ['matches title pattern', [0.1, -0.5], 2],
     ['several words', [0.1, -0.3], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
@@ -100,6 +103,7 @@ $features{HEADING} = [
     ['gap below', [0.2, -0.2]],
     ['high uppercase frequency', [0.1, -0.2]],
     ['begins with section number', [0.3, -0.15]],
+    ['style appears on several pages', [0.2, -0.4], 2],
     ['probable CONTENT', [-0.5, 0.05], 3],
     ['preceeds CONTENT', [0.3, -0.3], 3],
     ['follows CONTENT', [0.4, -0.2], 3],
@@ -216,6 +220,12 @@ $f{'resembles other FOOTERs'} = sub {
     return min(1, $count / $num*3);
 };
 
+$f{'previous line FOOTER'} = sub {
+    my $prev = $_[0]->{prev};
+    return 0 unless $prev && $prev->{p};
+    return $prev->{p}->('FOOTER');
+};
+ 
 $f{'resembles best FOOTNOTESTART'} = sub {
     return 0.5 if scalar @{$_[0]->{best}->{FOOTNOTESTART}} <= 1;
     my $best = $_[0]->{best}->{FOOTNOTESTART}->[0];
@@ -408,6 +418,20 @@ $f{'occurs in marginals'} = memoize(sub {
     return 0;
 });
 
+$f{'style appears on several pages'} = memoize(sub {
+    my $chunk = $_[0]->{doc}->{chunks}->[0];
+    my $ret = 0;
+    while (($chunk = $chunk->{next})) {
+        next if $chunk->{page} == $_[0]->{page};
+        if ($chunk->{fsize} == $_[0]->{fsize}
+            && $f{bold}->($chunk) == $f{bold}->($_[0])
+            && alignment($chunk) eq alignment($_[0])) {
+            $ret += 0.5;
+            return 1 if $ret >= 1;
+        }
+    }
+    return $ret;
+});
 
 $f{'may continue title'} = sub {
     # errs on the side of 'yes'
@@ -482,7 +506,7 @@ $f{'resembles best BIBSTART'} = sub {
     return 1 if $_[0] == $best;
     my $ret = 1;
     $ret *= 0.3 if $_[0]->{fsize} != $best->{fsize};
-    $ret *= 0.3 if abs($_[0]->{left} - $best->{left}) > 10;
+    $ret *= 0.4 if abs($_[0]->{left} - $best->{left}) > 5;
     $ret *= 1 - abs($_[0]->{page}->{number} - $best->{page}->{number})/10;
     my $inbib = $f{'in bibliography section'};
     $ret *= 0.2 if $inbib->($best) && !$inbib->($_[0]);
@@ -796,6 +820,8 @@ compile(\%features, \%f);
 
 =HEAD
 
+possible categories to add:
+
    - title
    - subtitle
    - author (name)
@@ -806,7 +832,7 @@ compile(\%features, \%f);
      - date
    - abstract
    - keywords
-   - motto
+   - epigraph
    - tableofcontents
    - header1
    - header2

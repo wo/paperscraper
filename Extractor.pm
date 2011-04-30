@@ -266,10 +266,18 @@ sub strip_marginals {
         ],
         features => \%rules::Line_Features::features,
         labels => ['FOOTER'],
+        min_p => 0.3,
         );
 
-    foreach my $ch (@{$headers->{HEADER}}, @{$footers->{FOOTER}}) {
-        say(5, "marginal: $ch->{text}");
+    foreach my $ch (@{$headers->{HEADER}}) {
+        say(5, "header: $ch->{text}");
+        push @{$self->{marginals}}, $ch;
+        removelink($ch);
+    }
+
+    foreach my $ch (@{$footers->{FOOTER}}) {
+        next if $ch->{p}->('FOOTER') < 0.5;
+        say(5, "footer: $ch->{text}");
         push @{$self->{marginals}}, $ch;
         removelink($ch);
     }
@@ -1013,12 +1021,14 @@ entry from the bibliography, and now want to identify the parts
 designating authors, title, and year of the cited work. We proceed in
 three stages.
 
-1. Split the entry by whitespace and assign to each part a probability
-   for belonging to an authors string, a title, a year, or junk.
+1. Split the entry by punctuation symbols and assign to each part a
+   probability for belonging to an authors string, a title, a year, or
+   something else.
 
 2. Turn the result into various "parsing hypotheses". A parsing
    hypothesis is a segmentation of the bib entry into authors, title,
-   year, junk parts. Except for junk, the parts have to be contiguous.
+   year, and other parts. Except for "other", the parts have to be
+   contiguous.
 
 3. Evaluate each hypothesis for its probability, by considering the
    probability of its authors part being a complete authors string,

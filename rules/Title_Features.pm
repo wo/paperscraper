@@ -25,6 +25,7 @@ our @parsing_features = (
     ['title parts have high score', [1, -0.9]],
     ['good author block missed', [-0.5, 0.5]],
     ['first author near title', [0.1, -0.3]],
+    ['author=title and further authors', [-0.3, 0]],
     );
 
 my %f;
@@ -105,6 +106,14 @@ $f{'first author near title'} = sub {
         $title->{chunks}->[0]->{top} - $author->{bottom} :
         $author->{top} - $title->{chunks}->[-1]->{bottom};
     return min(1, max(0, 1.1 - $dist/100));
+};
+
+$f{'author=title and further authors'} = sub {
+    my $author_is_title = 0;
+    my $further = 0;
+    my @authors = grep { $_->{label}->{AUTHOR} } @{$_[0]->{blocks}};
+    return 0 unless grep { $_->{label}->{TITLE} } @authors;
+    return scalar @authors > 1 ? 1 : 0;
 };
 
 compile(\%block_features, \%f);
