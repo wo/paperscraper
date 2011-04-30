@@ -109,12 +109,12 @@ my $db_adddoc = $dbh->prepare(
     ."meta_confidence) VALUES (NOW(),?,?,?,?,?)");
 
 $SIG{INT} = sub {
-    system('rm -f "$TEMPDIR*"') unless $verbosity;
+    system("rm -f '$TEMPDIR*'") unless $verbosity;
     system("rm -f '$lockfile'");
     $dbh->disconnect() if $dbh;
     # output stack trace if crashed:
     Carp::confess(@_) if @_;
-    exit;
+    die "exiting";
 };
 
 my @queue = @{next_locations()};
@@ -136,17 +136,16 @@ sub next_locations {
         my ($url, $id);
         if ($opts{p} =~ /^\d+$/) {
             $id = $opts{p};
-            ($url) = $dbh->selectrow_array("SELECT url FROM locations"
-                ." WHERE location_id = $opts{p}");
-            die "ID $opts{p} not in database" unless $url;
+            my $qu = "SELECT *, UNIX_TIMESTAMP(last_checked)"
+                ." AS last_checked FROM locations"
+                ." WHERE location_id = $opts{p}";
+            return $dbh->selectall_arrayref($qu, { Slice => {} });
         }
-        else {
-            $url = $opts{p};
-            ($id) = $dbh->selectrow_array("SELECT location_id"
-                 ." FROM locations WHERE url = '$opts{p}'");
-            $id = 0;
-            $opts{n} = 1;
-        }
+        $url = $opts{p};
+        ($id) = $dbh->selectrow_array("SELECT location_id"
+                ." FROM locations WHERE url = '$opts{p}'");
+        $id = 0;
+        $opts{n} = 1;
         return [{ location_id => $id, url => $url }];
     }
     else {
@@ -204,7 +203,8 @@ sub process {
     $db_err->execute(30, $loc_id);
 
     # fetch document:
-    my $res = fetch_document($loc) or return;
+    my $check_304 = $opts{s} ? 0 : 1; 
+    my $res = fetch_document($loc, $check_304) or return;
     $loc->{filesize} = $res->{filesize};
     $loc->{filetype} = $res->{filetype};
     $loc->{content} = $res->{content};
@@ -428,9 +428,10 @@ EOD
 
 sub fetch_document {
     my $loc = shift;
+    my $check_304 = shift;
     my $loc_id = $loc->{location_id};
 
-    my $mtime = (defined $loc->{last_checked}) ? 
+    my $mtime = ($check_304 && defined $loc->{last_checked}) ? 
         $loc->{last_checked} : 0;
     my $res = fetch_url($loc->{url}, $mtime);
 
@@ -442,6 +443,7 @@ sub fetch_document {
 
     if (!$res || !$res->is_success) {
         my $status = $res ? $res->code : 900;
+        print "status $status\n" if $verbosity == 1;
         $db_err->execute($status, $loc_id) or print DBI->errstr;
         return;
     }
@@ -459,7 +461,7 @@ sub fetch_document {
     # be trusted on this. So we also check for changes in
     # filesize:
     my $old_filesize = defined $loc->{filesize} ? $loc->{filesize} : 0;
-    if ($old_filesize && 
+    if (!$opts{s} && $old_filesize && 
         abs($old_filesize-$res->{filesize}) / $res->{filesize} < 0.2) {
         print "no substantial change in filesize.\n" if $verbosity;
         $db_verify->execute($loc_id) or print DBI->errstr;
