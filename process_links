@@ -109,12 +109,12 @@ my $db_adddoc = $dbh->prepare(
     ."meta_confidence) VALUES (NOW(),?,?,?,?,?)");
 
 $SIG{INT} = sub {
-    system('rm -f "$TEMPDIR*"') unless $verbosity;
+    system("rm -f '$TEMPDIR*'") unless $verbosity;
     system("rm -f '$lockfile'");
     $dbh->disconnect() if $dbh;
     # output stack trace if crashed:
     Carp::confess(@_) if @_;
-    exit;
+    die "exiting";
 };
 
 my @queue = @{next_locations()};
@@ -136,17 +136,16 @@ sub next_locations {
         my ($url, $id);
         if ($opts{p} =~ /^\d+$/) {
             $id = $opts{p};
-            ($url) = $dbh->selectrow_array("SELECT url FROM locations"
-                ." WHERE location_id = $opts{p}");
-            die "ID $opts{p} not in database" unless $url;
+            my $qu = "SELECT *, UNIX_TIMESTAMP(last_checked)"
+                ." AS last_checked FROM locations"
+                ." WHERE location_id = $opts{p}";
+            return $dbh->selectall_arrayref($qu, { Slice => {} });
         }
-        else {
-            $url = $opts{p};
-            ($id) = $dbh->selectrow_array("SELECT location_id"
-                 ." FROM locations WHERE url = '$opts{p}'");
-            $id = 0;
-            $opts{n} = 1;
-        }
+        $url = $opts{p};
+        ($id) = $dbh->selectrow_array("SELECT location_id"
+                ." FROM locations WHERE url = '$opts{p}'");
+        $id = 0;
+        $opts{n} = 1;
         return [{ location_id => $id, url => $url }];
     }
     else {
@@ -204,7 +203,8 @@ sub process {
     $db_err->execute(30, $loc_id);
 
     # fetch document:
-    my $res = fetch_document($loc) or return;
+    my $check_304 = $opts{s} ? 0 : 1; 
+    my $res = fetch_document($loc, $check_304) or return;
     $loc->{filesize} = $res->{filesize};
     $loc->{filetype} = $res->{filetype};
     $loc->{content} = $res->{content};
@@ -217,6 +217,10 @@ sub process {
         error("cannot save local file");
         $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
         return;
+    }
+
+    if ($loc->{filetype} eq 'html') {
+        $loc->{text} = strip_tags($loc->{content});
     }
 
     # check if this is a subpage with further links to papers:
@@ -272,9 +276,6 @@ sub process {
     # Except for html documents, we don't have the text content
     # yet, but we nevertheless do a preliminary spam test now,
     # so that we can stop processing if something is clear spam:
-    if ($loc->{filetype} eq 'html') {
-        $loc->{text} = strip_tags($loc->{content});
-    }
     my $spamminess = 0;
     Spamfilter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
     eval {
@@ -427,9 +428,10 @@ EOD
 
 sub fetch_document {
     my $loc = shift;
+    my $check_304 = shift;
     my $loc_id = $loc->{location_id};
 
-    my $mtime = (defined $loc->{last_checked}) ? 
+    my $mtime = ($check_304 && defined $loc->{last_checked}) ? 
         $loc->{last_checked} : 0;
     my $res = fetch_url($loc->{url}, $mtime);
 
@@ -441,6 +443,7 @@ sub fetch_document {
 
     if (!$res || !$res->is_success) {
         my $status = $res ? $res->code : 900;
+        print "status $status\n" if $verbosity == 1;
         $db_err->execute($status, $loc_id) or print DBI->errstr;
         return;
     }
@@ -458,7 +461,7 @@ sub fetch_document {
     # be trusted on this. So we also check for changes in
     # filesize:
     my $old_filesize = defined $loc->{filesize} ? $loc->{filesize} : 0;
-    if ($old_filesize && 
+    if (!$opts{s} && $old_filesize && 
         abs($old_filesize-$res->{filesize}) / $res->{filesize} < 0.2) {
         print "no substantial change in filesize.\n" if $verbosity;
         $db_verify->execute($loc_id) or print DBI->errstr;
@@ -477,18 +480,26 @@ sub fetch_document {
 
 sub is_subpage {
     my $loc = shift;
-    return 0 unless $loc->{location_id} && $loc->{filetype} eq 'html';
+    return unless $loc->{location_id} && $loc->{filetype} eq 'html';
+
+    print "checking: subpage with further links?\n" if $verbosity > 1; 
 
     # subpage must have high link density:
     my $numlinks = 0;
-    $numlinks++ while ($loc->{content} =~ /<a href/gi);
-    return 0 unless 
-        ($numlinks > 4 && ($numlinks/$loc->{filesize} > 0.002));
+    $numlinks++ while ($loc->{content} =~ /<a\s+href/gi);
+    my $textlen = length($loc->{text});
+    unless ($numlinks > 4 && $numlinks/$textlen > 0.005) {
+        print "no: link density $numlinks/$textlen\n" if $verbosity > 1;
+        return 0;
+    }
 
     # subpage must have at least three links of paper filetypes:
     $numlinks = 0;
     $numlinks++ while ($loc->{content} =~ /\.pdf|\.doc/gi);
-    return 0 unless $numlinks > 2;
+    unless ($numlinks > 2) {
+        print "no: $numlinks links to paper files\n" if $verbosity > 1;
+        return 0;
+    }
 
     # fetch potential parent pages:
     my $qu = "SELECT sources.* FROM links "
@@ -505,7 +516,10 @@ sub is_subpage {
         next if $source->{crawl_depth} == 0;
         push @parents, $source;
     }
-    return 0 unless @parents;
+    unless (@parents) {
+        print "no: no suitable parent page\n" if $verbosity > 1;
+        return 0;
+    }
     # We can't properly handle subpages with multiple parents:
     if (scalar @parents > 1) {
         print "Oops, more than one candidate parent page!\n";
@@ -514,6 +528,8 @@ sub is_subpage {
 
     # Store page as new source:
     my $parent = pop @parents;
+    print "yes: adding as subpage of $parent->{source_id}\n"
+        if $verbosity > 1;
     my $db_addsub = $dbh->prepare(
         "INSERT IGNORE into sources "
         ."(url, status, parent_id, crawl_depth, default_author) "

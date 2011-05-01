@@ -394,8 +394,7 @@ $f{'matches content pattern'} = memoize(sub {
 $f{'resembles anchor text'} = memoize(sub {
     my $ret = 0;
     for my $str (@{$_[0]->{doc}->{anchortexts}}) {
-        if ($str !~ /\w\w/ ||
-            $str =~ /$_[0]->{doc}->{filetype}|version/i) {
+        if (length($str) < 5 || $str =~ /version/i) {
             $ret = 0.5;
             next;
         }
