@@ -314,7 +314,7 @@ sub process {
         error("$@");
         error("parser error") if errorcode() == 99;
         $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-        next;
+        return;
     }
     add_meta("$file.xml", 'anchortext', $loc->{anchortext});
     add_meta("$file.xml", 'sourceauthor', $loc->{default_author});

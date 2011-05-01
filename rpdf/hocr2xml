@@ -69,19 +69,21 @@ binmode(OUT, ":utf8");
 my $prev;
 while (<IN>) {
     chomp;
-    $_ = Encode::decode_utf8($_);
-    if ($prev && $prev =~ /<(\w+)/ && /<\/$1/) {
-        $prev .= $_;
-        next;
+    my $line = Encode::decode_utf8($_);
+    if ($prev) {
+        if ($prev =~ /<(\w+)/ && /<\/$1/) {
+            $prev .= $line;
+            next;
+        }
+        if ($line =~ /^(>| \/>)/) {
+            $prev .= $1;
+            $line =~ s/^$1//;
+        }
+        print OUT "$prev\n";
     }
-    if ($prev && /^(>| \/>)/) {
-        $prev .= $1;
-        $_ =~ s/^$1//;
-    }
-    print OUT "$prev\n";
-    $prev = $_;
+    $prev = $line;
 }
-print OUT "$prev\n";
+print OUT "$prev\n" if $prev;
 close IN;
 close OUT;
 rename "$outfile.fix", "$outfile";
