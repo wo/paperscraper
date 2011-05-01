@@ -437,7 +437,10 @@ $f{'style appears on several pages'} = memoize(sub {
 $f{'may continue title'} = sub {
     # errs on the side of 'yes'
     my $prev = $_[0]->{prev};
-    return 0 unless $prev && $prev->{page} == $_[0]->{page};
+    unless ($prev && $prev->{page} == $_[0]->{page}
+            && $prev->{bottom} < $_[0]->{top}) {
+        return 0;
+    }
     my $score = 0.5;
     $score += $prev->{p}->('TITLE') - 0.8;
     $score += 0.2 if ($prev->{plaintext} =~ /([\:\;\-\,])$/);
