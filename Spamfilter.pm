@@ -105,10 +105,10 @@ sub classify {
 	}
  	else {
 	    if ($loc->{content} =~ /<script/i) {
-		$is_spam = _score($is_spam, 0.5, 0.2, 'javascript tags');
+		$is_spam = _score($is_spam, 0.5, 0.3, 'javascript tags');
 	    }
 	    if ($loc->{content} =~ /<form/i) {
-		$is_spam = _score($is_spam, 0.5, 0.2, 'form tags');
+		$is_spam = _score($is_spam, 0.5, 0.3, 'form tags');
 	    }
 	    my $longest_text = 0; # longest pure text passage without links
 	    foreach my $txt (split(/<a /i, $loc->{content})) {
