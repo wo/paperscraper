@@ -587,10 +587,10 @@ sub add_meta {
     binmode(OUT, ":utf8");
     while (<IN>) {
         # $_ = Encode::decode_utf8($_);
+        print OUT $_;
         if (/^<pdf2xml/) { 
             print OUT "<$element>$content</$element>\n";
         }
-        print OUT $_;
     }
     close IN;
     close OUT;

@@ -80,7 +80,7 @@ $SIG{INT} = sub {
     $dbh->disconnect() if $dbh;
     # output stack trace if crashed:
     Carp::confess(@_) if @_;
-    exit;
+    die 'exiting';
 };
 
 my @queue = @{next_pages()};

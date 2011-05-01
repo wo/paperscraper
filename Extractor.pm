@@ -730,8 +730,15 @@ sub extract_authors_and_title {
         }
     }
 
-    $self->{confidence} *= $parsing->{quality};
-    $self->{confidence} *= 0.9 unless @{$self->{authors}};
+    unless (@{$self->{authors}}) {
+        $self->{confidence} *= 0.9;
+        if ($self->{sourceauthors}) {
+            say(2, "no author -- using source author(s)");
+            $self->{authors} = $self->{sourceauthors};
+        }
+    }
+
+    $self->{confidence} *= ($parsing->{quality} - 0.3) * 1.4;
     $self->{confidence} *= 0.95 if scalar @{$self->{authors}} > 1;
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");

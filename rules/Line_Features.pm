@@ -195,6 +195,7 @@ $f{'begins or ends with digit'} = matches('^\d|\d$');
 $f{'is digit'} = matches('^\d+$');
 
 $f{'resembles other HEADERs'} = sub {
+    return 0 unless $_[0]->{best}->{HEADER};
     my $num = scalar @{$_[0]->{best}->{HEADER}} || 1;
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{HEADER}}) {
@@ -208,6 +209,7 @@ $f{'resembles other HEADERs'} = sub {
 };
 
 $f{'resembles other FOOTERs'} = sub {
+    return 0 unless $_[0]->{best}->{FOOTER};
     my $num = scalar @{$_[0]->{best}->{FOOTER}} || 1;
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{FOOTER}}) {
