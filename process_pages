@@ -75,25 +75,33 @@ my $db_insert_link = $dbh->prepare(
     "INSERT IGNORE INTO links (source_id, location_id, anchortext) "
     ."VALUES (?,?,?)");
 
+my $abort = 0;
 $SIG{INT} = sub {
-    system("rm -f '$lockfile'");
-    $dbh->disconnect() if $dbh;
-    # output stack trace if crashed:
-    Carp::confess(@_) if @_;
-    die 'exiting';
+    $abort = @_;
 };
 
 my @queue = @{next_pages()};
 while (1) {
     while (my $loc = shift @queue) {
+        if ($abort) {
+            abort($abort);
+            last;
+        }
         system("touch '$lockfile'");
         process($loc);
     }
     push @queue, @{next_pages()} unless $opts{p} || $opts{s};
     unless (@queue) {
-        $SIG{INT}->();
+        abort();
         last;
     }
+}
+
+sub abort {
+    Carp::confess(@_) if $_[0] && $_[0] ne '1';
+    system("rm -f '$lockfile'");
+    $dbh->disconnect() if $dbh;
+    exit(0);
 }
 
 sub next_pages {
