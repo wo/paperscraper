@@ -56,14 +56,14 @@ $features{TITLE} = [
     ['centered', [0.3, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
-    ['style appears on several pages', [-0.3, 0], 2],
+    ['style appears on several pages', [-0.5, 0], 2],
     ['matches title pattern', [0.1, -0.5], 2],
-    ['several words', [0.1, -0.3], 2],
+    [$or->('several words', 'may continue title'), [0.1, -0.3], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.25, 0], 2],
-    [$or->('best title', 'may continue title'), [0.1, -0.4], 3],
-    ['probable HEADING', [-0.3, 0.1], 3],
+    [$or->('best title', 'may continue title'), [0.3, -0.7], 3],
+    ['probable HEADING', [-0.4, 0.2], 3],
     ['probable AUTHOR', [-0.2, 0.05], 3],
     ];
 
@@ -83,7 +83,7 @@ $features{AUTHOR} = [
     ['gap below', [0.15, -0.15], 2],
     ['occurs in marginals', [0.2, 0], 2],
     [$and->('best title', 'other good authors'), [-0.3, 0.05], 3],
-    ['probable HEADING', [-0.5, 0.1], 3],
+    ['probable HEADING', [-0.8, 0.2], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     ['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
@@ -103,7 +103,7 @@ $features{HEADING} = [
     ['gap below', [0.2, -0.2]],
     ['high uppercase frequency', [0.1, -0.2]],
     ['begins with section number', [0.3, -0.15]],
-    ['style appears on several pages', [0.2, -0.4], 2],
+    ['style appears on several pages', [0.3, -0.4], 2],
     ['probable CONTENT', [-0.5, 0.05], 3],
     ['preceeds CONTENT', [0.3, -0.3], 3],
     ['follows CONTENT', [0.4, -0.2], 3],
@@ -118,7 +118,7 @@ $features{ABSTRACTSTART} = [
 
 $features{CONTENT} = [
     ['bold', [-0.3, 0.05]],
-    ['centered', [-0.5, 0.1]],
+    ['centered', [-0.3, 0.1]],
     ['justified', [0.3, -0.1]],
     [$or->('gap above', 'gap below'), [-0.2, 0.1]],
     [$and->('gap above', 'gap below'), [-0.6, 0.1]],
@@ -130,7 +130,7 @@ $features{CONTENT} = [
 
 $features{ABSTRACTCONTENT} = [
     [$or->('normal font', 'small font'), [0.3, -0.6]],
-    ['centered', [-0.2, 0.1]],
+    ['centered', [-0.1, 0.1]],
     ['justified', [0.2, -0.1]],
     [$or->('gap above', 'gap below'), [-0.2, 0.1]],
     [$and->('gap above', 'gap below'), [-0.6, 0.1]],
@@ -356,9 +356,9 @@ sub gap {
             # large fonts often include large gaps:
             my $fsize = max($chunk->{fsize}, $sibling->{fsize});
             #print "** fsize: $fsize, sp: $sp => ";
-            $sp *= 1 + $fsize/10;
+            $sp *= 1 + min(0.5, $fsize/10);
             my $height = min($chunk->{height}, $sibling->{height});
-            #print "$sp, $height: $height, gap: ($sp/$height) / $default\n";
+            #print "$sp, height: $height, gap: ($sp/$height) / $default\n";
             return ($sp/$height) / $default;
         }
         $sibling = $sibling->{$dir};
@@ -420,10 +420,19 @@ $f{'occurs in marginals'} = memoize(sub {
 });
 
 $f{'style appears on several pages'} = memoize(sub {
-    my $chunk = $_[0]->{doc}->{chunks}->[0];
+    if ($_[0]->{fsize} == 0 && !$f{'bold'}->($_[0])) {
+        # test is meaningless if $_[0] is normal:
+        return 0.5;
+    }
+    my $chunk = $_[0]->{doc}->{chunks}->[-1];
     my $ret = 0;
-    while (($chunk = $chunk->{next})) {
+    while (($chunk = $chunk->{prev})) {
         next if $chunk->{page} == $_[0]->{page};
+        # skip intro bits of books:
+        if ($chunk->{doc}->{pages} - $chunk->{page}->{number} > 80
+            || $chunk->{page}->{number} < 3) {
+            last;
+        }
         if ($chunk->{fsize} == $_[0]->{fsize}
             && $f{bold}->($chunk) == $f{bold}->($_[0])
             && alignment($chunk) eq alignment($_[0])) {
@@ -438,13 +447,14 @@ $f{'may continue title'} = sub {
     # errs on the side of 'yes'
     my $prev = $_[0]->{prev};
     unless ($prev && $prev->{page} == $_[0]->{page}
-            && $prev->{bottom} < $_[0]->{top}) {
+            && $prev->{top} < $_[0]->{top}) {
         return 0;
     }
     my $score = 0.5;
-    $score += $prev->{p}->('TITLE') - 0.8;
+    $score += $prev->{p}->('TITLE') - 0.75;
     $score += 0.2 if ($prev->{plaintext} =~ /([\:\;\-\,])$/);
     $score += ($_[0]->{fsize} == $prev->{fsize}) ? 0.1 : -0.1;
+    $score += $f{'bold'}->($_[0]) == $f{'bold'}->($prev) ? 0.1 : -0.1;
     $score -= (gap($_[0], 'prev')-1.5) / 10;
     my $align1 = alignment($_[0]);
     my $align2 = alignment($prev);

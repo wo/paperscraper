@@ -98,6 +98,11 @@ my %tests = (
    title => "Functional Reduction",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Anon-Aposteriori.pdf' => {
+   authors => [""],
+   title => "A Posteriori Identities and the Requirements of Rationality",
+ },
+
 );
 
 sub proc {

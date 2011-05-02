@@ -179,6 +179,7 @@ sub add_pageinfo {
 
     my %page;
     $page{number} = $pageno;
+    $page{firstchunk} = $chunks->[0];
     $page{left} = min(map { $_->{left} } @$chunks);
     $page{right} = max(map { $_->{right} } @$chunks);
     $page{width} = $page{right} - $page{left};
@@ -738,8 +739,12 @@ sub extract_authors_and_title {
         }
     }
 
-    $self->{confidence} *= ($parsing->{quality} - 0.3) * 1.4;
     $self->{confidence} *= 0.95 if scalar @{$self->{authors}} > 1;
+    $self->{confidence} *= ($parsing->{quality} - 0.3) * 1.4;
+    if ($parsings[0]) {
+        my $lead = $parsing->{quality} - $parsings[0]->{quality};
+        $self->{confidence} *= 1 + min(0.1, $lead-0.2)*2;
+    }
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
     say(1, "title: '", $self->{title}, "'");

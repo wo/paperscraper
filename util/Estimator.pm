@@ -85,7 +85,7 @@ sub test {
     # independent than if only one of them supports the hypothesis. So
     # I consider "positive" and "negative" features separately. In
     # each case, I start with 0.5 and then move, for each feature,
-    # $score * the remakining distance towards 1 (or 0). Afterwards, I
+    # $score * the remaining distance towards 1 (or 0). Afterwards, I
     # mix the probabilities from the positive and negative features,
     # assigning higher weights to the probability with more extreme
     # components.
