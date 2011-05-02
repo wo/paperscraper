@@ -81,7 +81,7 @@ sub classify {
     }
 
     if ($loc->{url} && $loc->{url} =~ m/$bad_filetype_re/) {
-	$is_spam = _score($is_spam, 0.2, 0.01, 'bad filetype: '.$loc->{url});
+	$is_spam = _score($is_spam, 0.2, 0.02, 'bad filetype: '.$loc->{url});
     }
     if ($loc->{url} && $loc->{url} =~ m/$bad_path_re/ && $loc->{url} !~ /plato.stanford/) {
 	$is_spam = _score($is_spam, 0.2, 0.03, 'bad url: '.$loc->{url});
@@ -129,7 +129,7 @@ sub classify {
 	$is_spam = _score($is_spam, 0.3, 0.65, 'long');
     }
     my $num_verbs = 1; $num_verbs++ while $text =~ /\bis\b/g;
-    if (length($text)/$num_verbs > 500) {
+    if (length($text)/$num_verbs > 600) {
 	$is_spam = _score($is_spam, 0.4, 0.2, 'few verbs '.length($text)."/".$num_verbs); # e.g. bibliographies and other lists
 	if (length($text)/$num_verbs > 1000) {
 	    $is_spam = _score($is_spam, 0.4, 0.1, 'very few even');
