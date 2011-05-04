@@ -5,7 +5,11 @@ use DBI;
 use CGI;
 use XML::RSS;
 use POSIX;
-my %cfg = do 'config.pl';
+use Cwd 'abs_path';
+use File::Basename;
+
+my $path = dirname(abs_path(__FILE__));
+my %cfg = do "$path/config.pl";
 
 # set datetime range from when documents should be listed; can be
 # specified by CGI parameters 'since' and 'until'. If only 'since' is

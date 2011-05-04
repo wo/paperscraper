@@ -594,7 +594,7 @@ sub add_meta {
     open OUT, ">$file.new" or die $!;
     binmode(OUT, ":utf8");
     while (<IN>) {
-        # $_ = Encode::decode_utf8($_);
+        $_ = Encode::decode_utf8($_);
         print OUT $_;
         if (/^<pdf2xml/) { 
             print OUT "<$element>$content</$element>\n";
