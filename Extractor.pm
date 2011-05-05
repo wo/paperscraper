@@ -179,7 +179,6 @@ sub add_pageinfo {
 
     my %page;
     $page{number} = $pageno;
-    $page{firstchunk} = $chunks->[0];
     $page{left} = min(map { $_->{left} } @$chunks);
     $page{right} = max(map { $_->{right} } @$chunks);
     $page{width} = $page{right} - $page{left};

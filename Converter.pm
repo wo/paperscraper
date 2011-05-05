@@ -157,7 +157,7 @@ sub convert2xml {
       # convert other formats to PDF:
       if (convert2pdf($filename, "$filename.pdf")) {
 	  my $out = convert2xml("$filename.pdf", "$filename.xml");
-          #system("rm \"$filename.pdf\"");
+          system("rm \"$filename.pdf\"");
           return $out;
       }
       die "PDF conversion failed";
