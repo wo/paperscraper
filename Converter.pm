@@ -37,6 +37,7 @@ sub convert2pdf {
 	  push @converters_used, 'wkhtmltopdf';
           $source = File::Spec->rel2abs($source);
 	  my $command = $cfg{'WKHTMLTOPDF'}
+              ." --encoding utf-8"
               ." file://$source"
               ." $target"
 	      .' 2>&1';
@@ -156,7 +157,7 @@ sub convert2xml {
       # convert other formats to PDF:
       if (convert2pdf($filename, "$filename.pdf")) {
 	  my $out = convert2xml("$filename.pdf", "$filename.xml");
-          system("rm \"$filename.pdf\"");
+          #system("rm \"$filename.pdf\"");
           return $out;
       }
       die "PDF conversion failed";

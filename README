@@ -11,12 +11,12 @@ various formats. (You may omit packages for formats you don't need.)
 
 pdftohtml, the Poppler version   (all formats)
 pdftk                            (all formats)
-cuneiform 0.9                    (PDF/OCR, Postscript)
+cuneiform >= 0.9                 (PDF/OCR, Postscript)
 convert, from ImageMagick        (PDF/OCR, Postscript)
 ps2pdf                           (Postscript)
 openoffice.org                   (Word, RTF)
 unoconv                          (Word, RTF)
-wkhtmltopdf                      (HTML)
+wkhtmltopdf >= 0.9.9.2           (HTML)
 aspell-en                        (all formats)
 libaspell-dev                    (all formats)
 
@@ -30,10 +30,9 @@ The cuneiform version in the standard repositories too old: we need at
 least 0.9. For Debian-based systems, you can get a recent version from
 http://notesalexp.org/.
 
-For wkhtmltopdf, I recommend a recent static binary (e.g. version 9.9)
-from http://code.google.com/p/wkhtmltopdf/. Simply download, unpack,
-and copy the relevant binary, e.g. wkhtmltopdf-i386, to
-/usr/bin/wkhtmltopdf.
+For wkhtmltopdf, I recommend a recent static binary from
+http://code.google.com/p/wkhtmltopdf/. Simply download, unpack, and
+move the binary, e.g. wkhtmltopdf-i386, to /usr/bin/wkhtmltopdf.
 
 Finally, make sure you have the following CPAN Perl modules. (You may
 need to install gcc and openssl first.)
