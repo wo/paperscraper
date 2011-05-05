@@ -37,6 +37,7 @@ sub convert2pdf {
 	  push @converters_used, 'wkhtmltopdf';
           $source = File::Spec->rel2abs($source);
 	  my $command = $cfg{'WKHTMLTOPDF'}
+              ." --encoding utf-8"
               ." file://$source"
               ." $target"
 	      .' 2>&1';

@@ -1,11 +1,10 @@
 package util::Io;
 use strict;
-use utf8;
-use Encode;
 use Data::Dumper;
 use LWP;
+use Encode;
+use Encode 'is_utf8';
 use HTTP::Date;
-use HTML::Encoding 'encoding_from_http_message';
 use Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw(&fetch_url &save &readfile);
@@ -21,7 +20,9 @@ sub fetch_url {
    my $if_modified_since = shift || 0;
    my $ua = _get_ua();
    print "fetching document $url.\n" if $verbosity > 1;
-   my %headers = ( 'If-Modified-Since' => HTTP::Date::time2str($if_modified_since) );
+   my %headers = (
+       'If-Modified-Since' => HTTP::Date::time2str($if_modified_since)
+       );
    my $response = _ua_get($ua, $url, \%headers);
    $response->{url} = $url;
    # Follow redirects, but don't loop.
@@ -45,14 +46,18 @@ sub fetch_url {
    print "ok, file retrieved\n" if $verbosity > 1;
    $response->{filesize} = length($response->content);
    $response->{filetype} = _get_filetype($response);
-   # convert to utf8:
-   $response->{content} = $response->decoded_content if ($response->decoded_content);
-   # sometimes when a server wrongly sends "Partial Content", ->{content} is empty and
-   # ->{_content} has all the content; so we copy it over:
-   if (!$response->{content} and defined($response->{_content})) {
-       $response->{content} = $response->{_content};
+   my $content;
+   eval {
+       $content = $response->decoded_content(raise_error => 1);
+   };
+   if ($@ || !$content || !is_utf8($content)) {
+       print "decode failed: $@\n" if $verbosity > 1;
+       if (defined($response->{_content})) {
+           $content = $response->{_content};
+       }
    }
-   print Dumper $response if $verbosity >= 7;
+   $response->{content} = $content;
+   print Dumper $response if $verbosity > 7;
    return $response;
 }
 
@@ -93,7 +98,8 @@ sub _get_filetype {
    if ($response->header('content-type') =~ /(pdf|rtf|msword|html?)/i) {
       $filetype = lc($1);
    }
-   # for others, file-ending is more reliable (at least if it is a 2-4 character string):
+   # for others, file-ending is more reliable (at least if it is a 2-4
+   # character string):
    elsif ($response->{url} =~ /\/.+\/.+\.([a-z]{2,4})$/) {
       $filetype = lc($1);
    }
@@ -110,16 +116,16 @@ sub _get_filetype {
 }
 
 sub save {
-   my $filename = shift or die 'save requires filename parameter';
-   my $content = shift; # or die 'save requires content parameter'; disabled for empty files
+   my $filename = shift;
+   my $content = shift;
    my $textmode = shift;
    print "saving $filename\n" if $verbosity > 1;
    if (!open FH, '>'.$filename) {
        print "Error: cannot save local file $filename: $!\n" if $verbosity;
        return 0;
    }
-   if ($textmode) { 
-       binmode(FH, ":utf8");
+   if ($textmode) {
+       binmode(FH, ":encoding(UTF-8)");
    }
    else {
        binmode(FH, ":raw");
@@ -132,7 +138,7 @@ sub save {
 sub readfile {
     my $filename = shift or die "readfile requires filename parameter";
     my $content = '';
-    open INPUT, '<:encoding(utf8)', $filename or die $!;
+    open INPUT, '<:encoding(UTF-8)', $filename or die $!;
     while (<INPUT>) { $content .= $_; }
     close INPUT;
     return $content;

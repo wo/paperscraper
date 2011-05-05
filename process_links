@@ -220,15 +220,17 @@ sub process {
     # save local copy:
     my $hashname = Digest::MD5::md5_hex(''.$loc->{url});
     my $file = $TEMPDIR.$hashname.'.'.$loc->{filetype};
-    my $is_text = $loc->{filetype} eq 'html' ? 1 : 0;
+    my $is_text = 0;
+    if ($loc->{filetype} eq 'html') {
+        $is_text = 1;
+        # we save as UTF-8, so remove original encoding tags:
+        $loc->{content} =~ s/<meta[^>]+content-type[^>]+>//gi;
+        $loc->{text} = strip_tags($loc->{content});
+    }
     if (!save($file, $loc->{content}, $is_text)) {
         error("cannot save local file");
         $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
         return;
-    }
-
-    if ($loc->{filetype} eq 'html') {
-        $loc->{text} = strip_tags($loc->{content});
     }
 
     # check if this is a subpage with further links to papers:
