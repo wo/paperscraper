@@ -138,6 +138,7 @@ $features{ABSTRACTCONTENT} = [
     ['long', [0.1, -0.2]],
     ['matches content pattern', [0.2, -0.3]],
     ['not far into content', [0.2, -0.8], 2],
+    ['probable HEADING', [-0.5, 0.1], 3],
     ['near other ABSTRACTCONTENT', [0.3, -0.3], 3],
     ];
 
