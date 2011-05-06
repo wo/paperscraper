@@ -27,7 +27,7 @@ my %cfg = do 'config.pl';
 my $path = dirname(abs_path(__FILE__));
 
 my %opts;
-getopts("v:p:nsh", \%opts);
+getopts("v:p:nsrh", \%opts);
 if ($opts{h}) {
     print <<EOF;
 
@@ -39,8 +39,9 @@ Usage: $0 [-hns] [-p url or location id] [-v verbosity]
 
 -p        : url or id that will be processed
 -v        : verbosity level (0-10, default: 1)
--n        : dry run, do not write result to DB
 -s        : process only one document, then exit
+-r        : force re-processing of previously processed documents
+-n        : dry run, do not write result to DB
 -h        : this message
 
 EOF
@@ -129,16 +130,14 @@ while (1) {
 }
 
 sub abort {
-    Carp::confess(@abort) if @abort;
     system("rm -f '$TEMPDIR*'") unless $verbosity;
     system("rm -f '$lockfile'");
     $dbh->disconnect() if $dbh;
+    Carp::confess(@abort) if @abort;
     exit(0);
 }
 
 sub next_locations {
-    # If you've adjusted the parser or spam filter, run "UPDATE
-    # locations SET status = 0" for faster re-processing.
     if ($opts{p}) {
         # document specified on command-line
         my ($url, $id);
@@ -169,7 +168,8 @@ sub next_locations {
             return $dbh->selectall_arrayref($qu, { Slice => {} });
         };
         # Do we have unprocessed locations?
-        my @locations = @{$fetch->("status = 0")};
+        my $where = $opts{r} ? "0 = 0" : "status = 0";
+        my @locations = @{$fetch->($where)};
         if (!@locations) {
             print "no new locations.\n" if $verbosity;
             my $where;
@@ -207,7 +207,7 @@ sub process {
     $db_err->execute(30, $loc_id);
 
     # fetch document:
-    my $check_304 = $opts{s} ? 0 : 1; 
+    my $check_304 = $opts{r} ? 0 : 1;
     my $res = fetch_document($loc, $check_304) or return;
     $loc->{filesize} = $res->{filesize};
     $loc->{filetype} = $res->{filetype};
@@ -374,6 +374,7 @@ $loc->{abstract}
 ==============================
 EOD
 
+    # store result in database:
     my $doc_id = $loc->{document_id};
     if ($doc_id) {
         print "updating records for document $doc_id.\n" if $verbosity;
@@ -461,7 +462,7 @@ sub fetch_document {
     # be trusted on this. So we also check for changes in
     # filesize:
     my $old_filesize = defined $loc->{filesize} ? $loc->{filesize} : 0;
-    if (!$opts{s} && $old_filesize && 
+    if (!$opts{r} && $old_filesize && 
         abs($old_filesize-$res->{filesize}) / $res->{filesize} < 0.2) {
         print "no substantial change in filesize.\n" if $verbosity;
         $db_verify->execute($loc_id) or print DBI->errstr;
