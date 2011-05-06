@@ -202,9 +202,6 @@ sub append {
     my ($line, $chunk) = @_;
 
     my $ex = $chunk->{width} / $chunk->{length};
-    $line->{top} = min($line->{top}, $chunk->{top});
-    my $bottom = max($line->{bottom}, $chunk->{top} + $chunk->{height});
-    $line->{height} = $bottom - $line->{top};
     if ($chunk->{length} > $line->{length}) {
         $line->{font} = $chunk->{font};
     }
@@ -236,6 +233,9 @@ sub append {
     else {
         $line->{text} .= $chunk->{text};
     }
+    $line->{top} = min($line->{top}, $chunk->{top});
+    $line->{bottom} = max($line->{bottom}, $chunk->{bottom});
+    $line->{height} = $line->{bottom} - $line->{top};
     $line->{width} = $chunk->{right} - $line->{left};
     $line->{right} = $chunk->{right};
     $line->{length} += $chunk->{length}
@@ -278,6 +278,7 @@ sub sortlines {
         next unless ($lines[$i+1]
                      && $lines[$i]->{length} > 5
                      && $lines[$i+1]->{length} > 5
+                     && $lines[$i+1]->{top} <= $lines[$i]->{bottom}-5
                      && $lines[$i+1]->{left} > $lines[$i]->{right}
                      && $lines[$i+1]->{col} <= $lines[$i]->{col});
 
@@ -336,7 +337,7 @@ sub sortlines {
             # Merge chunks that are on the same line and not in
             # different columns, unless they are really far apart:
             my $ex = $lines[$i]->{width} / $lines[$i]->{length};
-            if ($lines[$i]->{right} + 10*$ex < $lines[$i+1]->{left}) {
+            if ($lines[$i]->{right} + 10*$ex > $lines[$i+1]->{left}) {
                 print "appending\n" if $verbose;
                 append($lines[$i], $lines[$i+1]);
                 $i++;

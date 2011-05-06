@@ -17,6 +17,8 @@ my $verbosity = exists($opts{v}) ? $opts{v} : 0;
 my $file = shift @ARGV;
 $file = abs_path($file);
 convert2xml($file);
+system("cat $file.xml") if $verbosity > 5;
+Doctidy::verbose($verbosity > 5 ? 1 : 0);
 doctidy("$file.xml");
 
 my $start = time;

@@ -777,11 +777,11 @@ sub extract_abstract {
         say(5, " ($p): ", $chunk->{text});
         if ($abstract && $p < 0.6) {
             if ($abstract && $chunk->{prev}->{plaintext} =~ /[\.!?]$/) {
-                say(5, "abstract has ended ($p): ", $chunk->{text});
+                say(5, "abstract has ended: ", $chunk->{text});
                 last;
             }
             elsif ($p < 0.5) {
-                say(5, "aborting abstract ($p): ", $chunk->{text});
+                say(5, "aborting abstract: ", $chunk->{text});
                 $self->{confidence} *= 0.95;
                 $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
                 last;
@@ -789,7 +789,7 @@ sub extract_abstract {
             # else: fall through
         }
         if ($p > 0.5) {
-            say(5, "abstract continues ($p): ", $chunk->{text});
+            say(5, "abstract continues: ", $chunk->{text});
             $abstract .= $chunk->{text}."\n";
             if (length($abstract) > $maxlen) {
                 say(5, 'abstract is getting too long');
