@@ -84,6 +84,7 @@ sub strip_tags {
 
 sub tidy_text {
     my $txt = shift;
+    my $opts = shift;
     # put closing tags before space ("<i>foo </i>" => "<i>foo</i> "):
     $txt =~ s| </([^>]+)>|</$1> |g;
     # merge consecutive HTML elements:
@@ -123,7 +124,7 @@ sub tidy_text {
     }
     # replace allcaps:
     $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
-    return $txt;
+    return fix_html($txt);
 }
 
 sub one_word {
@@ -146,6 +147,32 @@ sub speller {
 sub is_word {
     my $sp = speller();
     return $sp && $sp->check($_[0]);
+}
+
+sub fix_html {
+    my $str = shift;
+    my %open = ('i', 0, 'b', 0, 'sub', 0, 'sup', 0);
+    my $res = $str;
+    while ($str =~ /<(\/?)(i|b|su.)>/g) {
+        if ($1) {
+            if ($open{$2}) {
+                $open{$2}--;
+            }
+            else {
+                $res = "<$2>$res";
+            }
+        }
+        else {
+            $open{$2}++;
+        }
+    }
+    foreach ('i', 'b', 'sub', 'sup') {
+        while ($open{$_}) {
+            $res .= "</$_>";
+            $open{$_}--;
+        }
+    }
+    return $res;
 }
 
 1;

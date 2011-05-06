@@ -137,6 +137,8 @@ sub abort {
 }
 
 sub next_locations {
+    # If you've adjusted the parser or spam filter, run "UPDATE
+    # locations SET status = 0" for faster re-processing.
     if ($opts{p}) {
         # document specified on command-line
         my ($url, $id);
