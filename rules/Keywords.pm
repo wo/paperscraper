@@ -119,7 +119,7 @@ our $re_name_inverted = qr/
 # stuff that may come before a name in an author line:
 our $re_name_before = qr/
     \s*(?:copyright|\(c\))[\s\d]*|     # "(c) 2009 H. Kamp" ..
-    \s*\w*\s*by\s+|                    # "reviewed by Hans Kamp"
+    \s*\w*\s*by\s+|                    # "Commentary by Hans Kamp"
     \s*\d[\d\-\s]+                     # "2009 Hans Kamp"
     /ix;
 
