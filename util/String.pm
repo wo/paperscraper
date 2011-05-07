@@ -84,7 +84,6 @@ sub strip_tags {
 
 sub tidy_text {
     my $txt = shift;
-    my $opts = shift;
     # put closing tags before space ("<i>foo </i>" => "<i>foo</i> "):
     $txt =~ s| </([^>]+)>|</$1> |g;
     # merge consecutive HTML elements:
@@ -102,29 +101,31 @@ sub tidy_text {
     }
     # merge HTML elements split at linebreak:
     $txt =~ s|</([^>]+)>\n\s*<\1>| |g;
-    # replace other linebreaks by space:
+    # remove linebreaks:
     $txt =~ s|\s*\n\s*| |g;
     for (1 .. 2) {
         # chop whitespace at beginning and end:
         $txt =~ s|^\s*(.+?)\s*$|$1|;
-        # and surrounding tags:
+        # chop surrounding tags:
         $txt =~ s|^<([^>]+)>(.+)</\1>\s*$|$2|;
-        # and surrounding quotes:
+        # chop surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
         # chop odd trailing punctuations:
         $txt =~ s|[\.,:;]$||;
-        # and footnote marks:
-        $txt =~ s|<sup>\W?.\W?<.sup>$||;
-        # and footnote star *:
+        # remove footnote marks:
+        $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>||g;
+        # and trailing footnote star *:
         $txt =~ s/(\*|\x{2217})\s*$//;
         # and non-<sup>'ed footnote symbols in brackets:
-        $txt =~ s|\[ . \]$||x;
+        $txt =~ s|\[.\]$||;
         # and non-<sup>'ed number right after last word:
         $txt =~ s|([\pL\?!])\d$|$1|;
+        # fix HTML:
+        $txt = fix_html($txt);
     }
     # replace allcaps:
     $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
-    return fix_html($txt);
+    return $txt;
 }
 
 sub one_word {

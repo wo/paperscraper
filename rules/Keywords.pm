@@ -133,7 +133,7 @@ our $re_name_after = qr/
 # stuff that separates authors from one another or rest of line:
 our $re_name_separator = qr/
     \s*(?:
-        \band\b|&amp;|,|
+        ,?\s?\band\b|&amp;|,|
         :|                         # author: title
         \s[^\p{isAlpha}\d\.\s\@-]  # weird symbol
        )

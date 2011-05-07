@@ -76,7 +76,8 @@ $features{AUTHOR} = [
     ['narrowish', [0.3, -0.3]],
     ['centered', [0.3, -0.2]],
     ['small font', [-0.2, 0.2]],
-    ['begins with possible name', [0.4, -0.5]],
+    ['begins with possible name', [0.3, -0.4]],
+    ['typical list of names', [0.2, -0.2]],
     ['largest text on page', [-0.4, 0], 2],
     ['contains digit', [-0.2, 0.05], 2],
     ['gap above', [0.25, -0.3], 2],
@@ -189,7 +190,7 @@ sub matches {
     };
 }
 
-$f{'contains digit'} = matches('\d');
+$f{'contains digit'} = matches('(?<!<sup>)\d');
 
 $f{'begins or ends with digit'} = matches('^\d|\d$');
 
@@ -535,11 +536,18 @@ $f{'like pdf author'} = sub {
     return 0;
 };
 
-$f{'like source author'} = sub {
-    # TODO
-    return 0;
+$f{'typical list of names'} = sub {
+    my $separator = qr/\s*(?:,?\s?\band\b|&amp;|,)\s*/;
+    my @parts = split($separator, $_[0]->{plaintext});
+    foreach my $part (@parts) {
+        if ($part !~ /^
+            \p{IsUpper}\pL*\.?\s(?:\p{IsUpper}\.\s)*\p{IsUpper}\S+
+            $/x) {
+            return 0;
+        }
+    }
+    return 1;
 };
-
 
 sub in_section {
     my $re_title = shift;

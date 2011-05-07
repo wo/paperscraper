@@ -103,6 +103,11 @@ my %tests = (
    title => "A Posteriori Identities and the Requirements of Rationality",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/23-Byrne-et-al-See.pdf' => {
+   authors => ["Alex Byrne", "David R. Hilbert", "Susanna Siegel"],
+   title => "Do we see more than we can access?",
+ },
+
 );
 
 sub proc {
