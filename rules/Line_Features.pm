@@ -110,13 +110,6 @@ $features{HEADING} = [
     ['follows CONTENT', [0.4, -0.2], 3],
     ];
 
-$features{ABSTRACTSTART} = [
-    ['"abstract" heading', [1, -0.3]],
-    [$and->('begins with "abstract:"', 'gap above'), [0.8, -0.3], 1],
-    # recursive:
-    ['preceeds CONTENT', [0.1, -0,3], 4],
-    ];
-
 $features{CONTENT} = [
     ['bold', [-0.3, 0.05]],
     ['centered', [-0.3, 0.1]],
@@ -129,18 +122,21 @@ $features{CONTENT} = [
     ['matches content pattern', [0.2, -0.3]],
     ];
 
-$features{ABSTRACTCONTENT} = [
-    [$or->('normal font', 'small font'), [0.3, -0.6]],
+$features{ABSTRACT} = [
+    ['within first few pages', [0.2, -0.8]],
+    ['in abstract section', [0.4, 0]],
+    [$or->('normal font', 'small font'), [0.2, -0.6]],
     ['centered', [-0.1, 0.1]],
     ['justified', [0.2, -0.1]],
     [$or->('gap above', 'gap below'), [-0.2, 0.1]],
     [$and->('gap above', 'gap below'), [-0.6, 0.1]],
-    ['high punctuation frequency', [-0.2, 0.1]],
+    ['begins with "abstract:"', [0.3, 0]],
     ['long', [0.1, -0.2]],
     ['matches content pattern', [0.2, -0.3]],
-    ['not far into content', [0.2, -0.8], 2],
+    ['preceeded by many ABSTRACTs', [-0.7, 0.1], 2],
     ['probable HEADING', [-0.5, 0.1], 3],
-    ['near other ABSTRACTCONTENT', [0.3, -0.3], 3],
+    ['near other ABSTRACT', [0.3, -0.3], 3],
+    ['continues abstract', [0.4, -0.1], 3],
     ];
 
 $features{BIB} = [
@@ -178,8 +174,8 @@ $features{BIBSTART} = [
 
 1;
 
-my @labels = qw/TITLE AUTHOR CONTENT HEADING ABSTRACTSTART
-                ABSTRACTCONTENT BIB BIBSTART/;
+my @labels = qw/TITLE AUTHOR CONTENT HEADING
+                ABSTRACT BIB BIBSTART/;
 
 my %f;
 
@@ -320,6 +316,16 @@ $f{'within first few pages'} = memoize(sub {
 $f{'on last page'} = memoize(sub {
     return $_[0]->{page}->{number} == $_[0]->{doc}->{pages};
 });
+
+$f{'preceeded by many ABSTRACTs'} = sub {
+    my $ch = $_[0];
+    my $n = 1;
+    while ($ch = $ch->{prev}) {
+        $n++ if $ch->{p}->('ABSTRACT') > 0.5;
+        last if $n >= 100;
+    }
+    return $n/100;
+};
 
 sub alignment {
     # this doesn't work well for text in columns
@@ -465,6 +471,22 @@ $f{'may continue title'} = sub {
     return max(0, min(1, $score));
 };
 
+$f{'continues abstract'} = sub {
+    my $prev = $_[0]->{prev};
+    unless ($prev && $prev->{page} == $_[0]->{page}
+            && $prev->{top} < $_[0]->{top}
+            && $prev->{fsize} == $_[0]->{fsize}
+            && $f{'bold'}->($prev) == $f{'bold'}->($_[0])) {
+        return 0;
+    }
+    my $score = 0.5;
+    $score += $prev->{p}->('ABSTRACT') - 0.75;
+    $score += 0.2 if ($prev->{plaintext} =~ /([\:\;\-\,\pL])$/);
+    $score += 0.2 if ($_[0]->{plaintext} =~ /^\p{IsLower}/);
+    $score -= (gap($_[0], 'prev')-1) / 10;
+    return max(0, min(1, $score));
+};
+ 
 $f{'best title'} = sub {
     my $best = $_[0]->{best}->{TITLE}->[0];
     return 0 unless $best;
@@ -595,18 +617,14 @@ sub in_section {
 
 $f{'in bibliography section'} = in_section("^$re_bib_heading\$");
 
+$f{'in abstract section'} = in_section("^$re_abstract\$");
+
 $f{'previous line is bibliography heading'} = sub {
     if ($_[0]->{prev} &&
         $_[0]->{prev}->{plaintext} =~ /^$re_bib_heading$/) {
         return 1;
     }
     return 0;
-};
-
-$f{'"abstract" heading'} = sub {
-    return 0 unless $_[0]->{plaintext} =~ /^$re_abstract$/;
-    return 1 if $_[0]->{p}->('HEADING') > 0.5;
-    return 0.5;
 };
 
 sub neighbours {
@@ -628,19 +646,8 @@ $f{'follows CONTENT'} = neighbours('prev', 'CONTENT');
 $f{'preceeds CONTENT'} = neighbours('next', 'CONTENT');
 $f{'near other BIBs'} = someof(neighbours('prev', 'BIB'), 
                                         neighbours('next', 'BIB'));
-$f{'near other ABSTRACTCONTENT'} = 
-    someof(neighbours('prev', 'ABSTRACTCONTENT'), 
-           neighbours('next', 'ABSTRACTCONTENT'));
-
-$f{'not far into content'} = sub {
-    my $ch = $_[0];
-    my $n = 1;
-    while ($ch = $ch->{prev}) {
-        $n++ if $ch->{p}->('CONTENT') > 0.5;
-        last if $n >= 100;
-    }
-    return 1 - $n/100;
-};
+$f{'near other ABSTRACT'} = someof(neighbours('prev', 'ABSTRACT'), 
+                                   neighbours('next', 'ABSTRACT'));
 
 sub mk_begins {
     my $field = shift;
