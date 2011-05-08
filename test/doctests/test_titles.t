@@ -108,6 +108,16 @@ my %tests = (
    title => "Do we see more than we can access?",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Block-Anna.pdf' => {
+   authors => ["Ned Block"],
+   title => "The Anna Karenina Theory of the Unconscious",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/21-Anon-Qualia.pdf' => {
+   authors => [""],
+   title => "Qualia",
+ },
+
 );
 
 sub proc {

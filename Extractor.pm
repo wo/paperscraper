@@ -353,7 +353,7 @@ sub extract {
     my %labels = (
         'authors'      => ['AUTHOR', 'TITLE'],
         'title'        => ['AUTHOR', 'TITLE'],
-        'abstract'     => ['ABSTRACT'],
+        'abstract'     => ['ABSTRACT', 'ABSTRACTSTART', 'ABSTRACTEND'],
         'bibliography' => ['BIB', 'BIBSTART'],
         );
     my @labels = merge(map { $labels{$_} } @fields);
@@ -731,7 +731,7 @@ sub extract_authors_and_title {
     }
 
     unless (@{$self->{authors}}) {
-        $self->{confidence} *= 0.9;
+        $self->{confidence} *= 0.8;
         if ($self->{sourceauthors}) {
             say(2, "no author -- using source author(s)");
             $self->{authors} = $self->{sourceauthors};
@@ -757,7 +757,7 @@ sub extract_abstract {
     # generate candidate abstracts:
     my @chunks = @{$self->{best_chunks}->{ABSTRACT}};
     my %candidates;
-    foreach my $threshold (0.7, 0.6) {
+    foreach my $threshold (0.8, 0.7, 0.6) {
         my %done;
         foreach my $chunk (@chunks) {
             next if $done{$chunk};
@@ -766,9 +766,8 @@ sub extract_abstract {
             my $start = $chunk;
             while ($start = $start->{prev}) {
                 my $min = $threshold;
-                $min += (scalar @current)/200;
-                $min -= 0.2 unless
-                    $current[0]->{plaintext} =~ /^\s*\p{IsUpper}/;
+                $min += (scalar @current)/400;
+                $min += ($current[0]->{p}->('ABSTRACTSTART')-0.5);
                 my $p = $start->{p}->('ABSTRACT');
                 if ($p < $min) {
                     say(5, "stopping at: $start->{text} ($p < $min)");
@@ -782,8 +781,7 @@ sub extract_abstract {
             while ($end = $end->{next}) {
                 my $min = $threshold;
                 $min += (scalar @current)/200;
-                $min -= 0.1 unless
-                    $current[-1]->{plaintext} =~ /[.\?\!]$/;
+                $min += ($current[-1]->{p}->('ABSTRACTEND')-0.5);
                 my $p = $end->{p}->('ABSTRACT');
                 if ($p < $min) {
                     say(5, "stopping at: $end->{text} ($p < $min)");
@@ -810,8 +808,8 @@ sub extract_abstract {
     my $best = [];
     my $best_score = 0;
     foreach my $candidate (values %candidates) {
-        if ($verbosity > 5) {
-            say(6, "\ntesting: ",
+        if ($verbosity > 4) {
+            say(5, "\ntesting: ",
                 reduce { $a .' '. $b->{text} } '', @$candidate);
         }
         my $score = $estim->test($candidate);

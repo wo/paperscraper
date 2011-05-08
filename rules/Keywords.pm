@@ -24,6 +24,7 @@ $re_cit_label
 $re_journal
 $re_publisher
 $re_publication_word
+$re_legalese
 $re_year_words
 $re_lquote
 $re_rquote
@@ -57,7 +58,7 @@ my $re_address_word = qr/\b(?:
 # stuff that commonly occurs in publication info:
 our $re_publication_word = qr/\b(?:
     forthcoming|editors?|edited|publish\w*|press|volume
-    to appear in|draft|editor\w*|\d{4}|reprints?|excerpt|
+    to appear in|draft|editor\w*|reprints?|excerpt|
     circulation|cite
     )\b/ix;
 
@@ -71,6 +72,11 @@ our $re_publisher = qr/\b(?:
     )\b/ix;
 
 our $re_editor = qr/^\(?ed(?:itor)?s?[\.\)].?$/ix;
+
+our $re_legalese = qr/\b(?:
+    copyright|\(c\)|©|trademarks?|registered|
+    terms\sand\sconditions|http|permission
+    )\b/ix;
 
 # stuff that disqualifies something from being a name:
 our $re_noname = qr/
@@ -118,7 +124,7 @@ our $re_name_inverted = qr/
 
 # stuff that may come before a name in an author line:
 our $re_name_before = qr/
-    \s*(?:copyright|\(c\))[\s\d]*|     # "(c) 2009 H. Kamp" ..
+    \s*(?:copyright|\(c\)|©)[\s\d]*|   # "(c) 2009 H. Kamp" ..
     \s*\w*\s*by\s+|                    # "Commentary by Hans Kamp"
     \s*\d[\d\-\s]+                     # "2009 Hans Kamp"
     /ix;
@@ -148,13 +154,13 @@ our $re_title = qr/
 
 # may be ordinary text content:
 our $re_content = qr/
-    (?!.*$re_nocontent.*)
+    # (?!.*$re_nocontent.*)
     \b(?:
        the|to|a|in|is|it|you|that|he|was|for|on|are|with|
        as|I|his|they|be|at|one|have|this|from|or|had|by|
        but|what|some|we|can|out|other|were|all|there|when|
        up|use|your|how|said|an|each|she
-    )
+    )\b
     /x;
 
 # begins with section number, e.g. '1' or '1.2':
