@@ -7,7 +7,7 @@ use Encode 'is_utf8';
 use HTTP::Date;
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw(&fetch_url &save &readfile);
+our @EXPORT = qw(&fetch_url &save &readfile &add_meta);
 
 our $verbosity = 0;
 sub verbosity {
@@ -142,6 +142,28 @@ sub readfile {
     while (<INPUT>) { $content .= $_; }
     close INPUT;
     return $content;
+}
+
+sub add_meta {
+    # add metadata elements to XML file.
+    my ($file, $element, $content) = @_;
+    $content ||= '';
+
+    open IN, $file or die $!;
+    open OUT, ">$file.new" or die $!;
+    binmode(OUT, ":utf8");
+    my $done = 0;
+    while (<IN>) {
+        $_ = Encode::decode_utf8($_);
+        print OUT $_;
+        if (/^<\w/ && !$done) { 
+            print OUT "<$element>$content</$element>\n";
+            $done = 1;
+        }
+    }
+    close IN;
+    close OUT;
+    rename "$file.new", $file;
 }
 
 1;

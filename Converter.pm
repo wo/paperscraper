@@ -151,12 +151,16 @@ sub convert2xml {
               ." $target"
 	      .' 2>&1';
 	  my $out = sysexec($command, 60, $verbosity) || '';
+          add_meta($target, "converter", "rpdf");
 	  die "pdf conversion failed: $out" unless -e "$target";
 	  return 1;
       };
       # convert other formats to PDF:
       if (convert2pdf($filename, "$filename.pdf")) {
 	  my $out = convert2xml("$filename.pdf", "$filename.xml");
+          foreach my $con (@converters_used) {
+              add_meta("$filename.xml", "converter", $con);
+          }
           system("rm \"$filename.pdf\"");
           return $out;
       }
