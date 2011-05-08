@@ -747,7 +747,6 @@ $f{'contains possible name'} = memoize(sub {
 $f{'contains actual name'} = memoize(sub {
     unless (exists $_[0]->{names}) {
         $_[0]->{names} = extract_names($_[0]->{plaintext});
-        print "** setting names: ", keys %{$_[0]->{names}},"\n";
     }
     return max(values %{$_[0]->{names}}) || 0; 
 });
