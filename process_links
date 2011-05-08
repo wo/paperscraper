@@ -27,7 +27,7 @@ my %cfg = do 'config.pl';
 my $path = dirname(abs_path(__FILE__));
 
 my %opts;
-getopts("v:p:nsh", \%opts);
+getopts("v:p:nsrh", \%opts);
 if ($opts{h}) {
     print <<EOF;
 
@@ -39,8 +39,9 @@ Usage: $0 [-hns] [-p url or location id] [-v verbosity]
 
 -p        : url or id that will be processed
 -v        : verbosity level (0-10, default: 1)
--n        : dry run, do not write result to DB
 -s        : process only one document, then exit
+-r        : force re-processing of previously processed documents
+-n        : dry run, do not write result to DB
 -h        : this message
 
 EOF
@@ -48,7 +49,7 @@ EOF
 }
 
 my $TEMPDIR = "$path/temp/";
-my $CERT_SPAM = 0.8; # don't score documents with higher spam score
+my $CERT_SPAM = 0.8; # don't store documents with higher spam score
 
 my $verbosity = $opts{v} || 1;
 util::Errors::verbosity($verbosity);
@@ -108,33 +109,31 @@ my $db_adddoc = $dbh->prepare(
     ."(found_date, authors, title, abstract, length, "
     ."meta_confidence) VALUES (NOW(),?,?,?,?,?)");
 
-my $abort = 0;
+my @abort;
 $SIG{INT} = sub {
-    $abort = @_;
+    @abort = @_;
 };
 
 my @queue = @{next_locations()};
 while (1) {
+    unless (@queue) {
+        print "nothing to do; resting 5 min.\n" if $verbosity;
+        sleep(300);
+    }
     while (my $loc = shift @queue) {
-        if ($abort) {
-            abort($abort);
-            last;
-        }
+        abort() if (@abort);
         system("touch '$lockfile'");
         process($loc);
     }
-    push @queue, @{next_locations()} unless $opts{p} || $opts{s};
-    unless (@queue) {
-        abort();
-        last;
-    }
+    abort() if $opts{p} || $opts{s} || @abort;
+    push @queue, @{next_locations()};
 }
 
 sub abort {
-    Carp::confess(@_) if $_[0] && $_[0] ne '1';
     system("rm -f '$TEMPDIR*'") unless $verbosity;
     system("rm -f '$lockfile'");
     $dbh->disconnect() if $dbh;
+    Carp::confess(@abort) if @abort;
     exit(0);
 }
 
@@ -169,7 +168,8 @@ sub next_locations {
             return $dbh->selectall_arrayref($qu, { Slice => {} });
         };
         # Do we have unprocessed locations?
-        my @locations = @{$fetch->("status = 0")};
+        my $where = $opts{r} ? "0 = 0" : "status = 0";
+        my @locations = @{$fetch->($where)};
         if (!@locations) {
             print "no new locations.\n" if $verbosity;
             my $where;
@@ -191,10 +191,6 @@ sub next_locations {
                     ." (status BETWEEN 2 AND 99))";
             }
             @locations = @{$fetch->($where)};
-            if (!@locations && !$opts{s}) {
-                print "nothing to do; resting 5 min.\n" if $verbosity;
-                sleep(300);
-            }
         }
         return [@locations];
     }
@@ -211,7 +207,7 @@ sub process {
     $db_err->execute(30, $loc_id);
 
     # fetch document:
-    my $check_304 = $opts{s} ? 0 : 1; 
+    my $check_304 = $opts{r} ? 0 : 1;
     my $res = fetch_document($loc, $check_304) or return;
     $loc->{filesize} = $res->{filesize};
     $loc->{filetype} = $res->{filetype};
@@ -378,62 +374,57 @@ $loc->{abstract}
 ==============================
 EOD
 
-    if ($loc->{document_id}) {
-        # location already links to a document; update the document:
-        my ($old_confidence) = $dbh->selectrow_array(
-            "SELECT meta_confidence FROM documents "
-            ."WHERE document_id != $loc->{document_id} ");
-        if ($loc->{confidence} <= $old_confidence) {
-            print "results aren't more confident, "
-                ."nothing to update.\n" if $verbosity;
-            return;
-        }
-        print "new confidence exceeds old, updating.\n" if $verbosity;
+    # store result in database:
+    my $doc_id = $loc->{document_id};
+    if ($doc_id) {
+        print "updating records for document $doc_id.\n" if $verbosity;
         $db_savedoc->execute(
             $loc->{authors}, $loc->{title}, $loc->{abstract}, 
-            $loc->{length}, $loc->{confidence}, $loc_id)
+            $loc->{length}, $loc->{confidence}, $doc_id)
             or print DBI->errstr;
-        $db_saveloc->execute(
-            $loc->{filetype}, $loc->{filesize},
-            $loc->{spamminess}, $loc->{document_id}, $loc_id)
-            or print DBI->errstr;
-        return;
     }
-
-    # check whether we already have this paper:
-    my ($orig_id, $orig_url) = $dbh->selectrow_array(
-        "SELECT documents.document_id, locations.url FROM documents "
-        ."INNER JOIN locations ON "
-        ."documents.document_id = locations.document_id "
-        ."WHERE status = 1 AND location_id != $loc_id "
-        ."AND authors = ".$dbh->quote($loc->{authors})." "
-        ."AND title = ".$dbh->quote($loc->{title})." "
-        ."LIMIT 1");
-    # better, with  the MySQL levenshtein UDF from joshdrew.com:
-    #    ."AND levenshtein(authors,".$dbh->quote($loc->{authors}).") < 4 "
-    #    ."AND levenshtein(title,".$dbh->quote($loc->{title}).") < 4 "
-    #    ."AND levenshtein(abstract,".$dbh->quote($loc->{abstract}).") < 15 "
-    if ($orig_id) {
-        print "document already known at $orig_url.\n" if $verbosity;
-        $db_saveloc->execute(
-            $loc->{filetype}, $loc->{filesize}, 
-            $loc->{spamminess}, $orig_id, $loc_id)
-            or print DBI->errstr;
-        return;
+    else {
+        # check if we already have this paper:
+        my ($o_id, $o_url, $o_confidence) = $dbh->selectrow_array(
+            "SELECT documents.document_id, url, meta_confidence "
+            ."FROM documents INNER JOIN locations "
+            ."ON documents.document_id = locations.document_id "
+            ."WHERE status = 1 AND location_id != $loc_id "
+            ."AND authors = ".$dbh->quote($loc->{authors})." "
+            ."AND title = ".$dbh->quote($loc->{title})." "
+            ."LIMIT 1");
+        # better, with  the MySQL levenshtein UDF from joshdrew.com:
+        # ."AND levenshtein(authors,".$dbh->quote($loc->{authors}).") < 4 "
+        # ."AND levenshtein(title,".$dbh->quote($loc->{title}).") < 4 "
+        # ."AND levenshtein(abstract,".$dbh->quote($loc->{abstract}).") < 15 "
+        if ($o_id) {
+            print "document already known as $o_id, $o_url.\n"
+                if $verbosity;
+            if ($loc->{confidence} > $o_confidence) {
+                print "new confidence exceeds old: $o_confidence.\n"
+                    if $verbosity;
+                $db_savedoc->execute(
+                    $loc->{authors}, $loc->{title}, $loc->{abstract}, 
+                    $loc->{length}, $loc->{confidence}, $o_id)
+                    or print DBI->errstr;
+            }
+            $doc_id = $o_id;
+        }
+        elsif (!$opts{n}) {
+            # add document to database:
+            $db_adddoc->execute(
+                $loc->{authors}, $loc->{title}, $loc->{abstract}, 
+                $loc->{length}, $loc->{confidence})
+                or print DBI->errstr;
+            $doc_id = $db_adddoc->{mysql_insertid};
+            print "document added as id $doc_id\n" if $verbosity;
+        }
     }
-
-    # add document to database:
-    return if $opts{n};
-    $db_adddoc->execute(
-        $loc->{authors}, $loc->{title}, $loc->{abstract}, 
-        $loc->{length}, $loc->{confidence})
-        or print DBI->errstr;
-    my $doc_id = $db_adddoc->{mysql_insertid};
-    print "document added as id $doc_id\n" if $verbosity;
     $db_saveloc->execute(
         $loc->{filetype}, $loc->{filesize},
         $loc->{spamminess}, $doc_id, $loc_id)
         or print DBI->errstr;
+    return;
 }
 
 sub fetch_document {
@@ -471,7 +462,7 @@ sub fetch_document {
     # be trusted on this. So we also check for changes in
     # filesize:
     my $old_filesize = defined $loc->{filesize} ? $loc->{filesize} : 0;
-    if (!$opts{s} && $old_filesize && 
+    if (!$opts{r} && $old_filesize && 
         abs($old_filesize-$res->{filesize}) / $res->{filesize} < 0.2) {
         print "no substantial change in filesize.\n" if $verbosity;
         $db_verify->execute($loc_id) or print DBI->errstr;

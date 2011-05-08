@@ -99,12 +99,13 @@ sub extract_names {
     my %res; # name => probability
     my @parts = split($re_name_separator, $str);
     foreach my $part (@parts) {
-        if ($part =~ /$re_noname/ 
-            || $part !~ /(?:$re_name_before)?$re_name(?:$re_name_after)?/) {
+        if ($part =~ /$re_noname/ || $part !~ /^
+            (?:$re_name_before)($re_name)(?:$re_name_after)?
+            $/x) {
             next;
-        } 
+        }
         my $p = 0.5;
-        my ($name, $first, $last) = ($&, $1, $2);
+        my ($name, $first, $last) = ($1, $2, $3);
         foreach my $w (split /\s+/, $first) {
             if ($w =~ /^\p{IsUpper}\.?$/) {
                 $p += 0.1;

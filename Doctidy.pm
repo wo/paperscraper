@@ -212,13 +212,9 @@ sub append {
     }
     if ($chunk->{bottom} < $line->{bottom}
         && $chunk->{top} < $line->{top}) {
-        print "chunk is sup (or line sub)\n" if $verbose;
-        if ($chunk->{width} <= $line->{width}) {
-            $line->{text} .= "<sup>".$chunk->{text}."</sup>";
-        }
-        else {
-            $line->{text} = "<sub>".$line->{text}."</sub>".$chunk->{text};
-        }
+        print "chunk is sup\n" if $verbose;
+        # Assumption: lines never start with subscripted text.
+        $line->{text} .= "<sup>".$chunk->{text}."</sup>";
     }
     elsif ($chunk->{bottom} > $line->{bottom}
            && $chunk->{top} > $line->{top}) {
@@ -227,15 +223,19 @@ sub append {
             $line->{text} .= "<sub>".$chunk->{text}."</sub>";
         }
         else {
+            # Footnotes often start with supscripted text.
             $line->{text} = "<sup>".$line->{text}."</sup>".$chunk->{text};
         }
     }
     else {
         $line->{text} .= $chunk->{text};
+        # vertical line dimensions do not include subs and sups,
+        # otherwise we wouldn't detect further subs and sups on the
+        # same line.
+        $line->{top} = min($line->{top}, $chunk->{top});
+        $line->{bottom} = max($line->{bottom}, $chunk->{bottom});
+        $line->{height} = $line->{bottom} - $line->{top};
     }
-    $line->{top} = min($line->{top}, $chunk->{top});
-    $line->{bottom} = max($line->{bottom}, $chunk->{bottom});
-    $line->{height} = $line->{bottom} - $line->{top};
     $line->{width} = $chunk->{right} - $line->{left};
     $line->{right} = $chunk->{right};
     $line->{length} += $chunk->{length}

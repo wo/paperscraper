@@ -353,7 +353,7 @@ sub extract {
     my %labels = (
         'authors'      => ['AUTHOR', 'TITLE'],
         'title'        => ['AUTHOR', 'TITLE'],
-        'abstract'     => ['ABSTRACTSTART', 'ABSTRACTCONTENT'],
+        'abstract'     => ['ABSTRACT', 'ABSTRACTSTART', 'ABSTRACTEND'],
         'bibliography' => ['BIB', 'BIBSTART'],
         );
     my @labels = merge(map { $labels{$_} } @fields);
@@ -731,7 +731,7 @@ sub extract_authors_and_title {
     }
 
     unless (@{$self->{authors}}) {
-        $self->{confidence} *= 0.9;
+        $self->{confidence} *= 0.8;
         if ($self->{sourceauthors}) {
             say(2, "no author -- using source author(s)");
             $self->{authors} = $self->{sourceauthors};
@@ -754,53 +754,78 @@ sub extract_abstract {
     my $self = shift;
     say(2, "\nextracting abstract");
 
-    my $chunk = shift @{$self->{best_chunks}->{ABSTRACTSTART}};
-    my $maxlen = 1400;
-    unless ($chunk) {
-        say(3, "no designated abstract");
-        $self->{confidence} *= 0.95;
-        # use first ABSTRACTCONTENT chunk:
-        foreach my $ch (@{$self->{chunks}}) {
-            next if $ch->{p}->('ABSTRACTCONTENT') < 0.7;
-            do {
-                $chunk = $ch;
-            } while (($ch = $ch->{prev})
-                     && $ch->{p}->('ABSTRACTCONTENT') > 0.6);
-            last;
+    # generate candidate abstracts:
+    my @chunks = @{$self->{best_chunks}->{ABSTRACT}};
+    my %candidates;
+    foreach my $threshold (0.8, 0.7, 0.6) {
+        my %done;
+        foreach my $chunk (@chunks) {
+            next if $done{$chunk};
+            say(5, "\nstarting with: $chunk->{text} ($threshold)");
+            my @current = ($chunk);
+            my $start = $chunk;
+            while ($start = $start->{prev}) {
+                my $min = $threshold;
+                $min += (scalar @current)/400;
+                $min += ($current[0]->{p}->('ABSTRACTSTART')-0.5);
+                my $p = $start->{p}->('ABSTRACT');
+                if ($p < $min) {
+                    say(5, "stopping at: $start->{text} ($p < $min)");
+                    last;
+                }
+                say(5, "prepending: $start->{text} ($p > $min)");
+                unshift @current, $start;
+                $done{$start} = 1;
+            }
+            my $end = $chunk;
+            while ($end = $end->{next}) {
+                my $min = $threshold;
+                $min += (scalar @current)/200;
+                $min += ($current[-1]->{p}->('ABSTRACTEND')-0.5);
+                my $p = $end->{p}->('ABSTRACT');
+                if ($p < $min) {
+                    say(5, "stopping at: $end->{text} ($p < $min)");
+                    last;
+                }
+                say(5, "appending: $end->{text} ($p > $min)");
+                push @current, $end;
+                $done{$end} = 1;
+            }
+            if (scalar @current > 1) {
+                my $id = $current[0]->{id}.'-'.$current[-1]->{id};
+                $candidates{$id} = \@current;
+            }
         }
-        $maxlen = 800;
     }
 
-    my $abstract = '';
-    while ($chunk) {
-        my $p = $chunk->{p}->('ABSTRACTCONTENT');
-        say(5, " ($p): ", $chunk->{text});
-        if ($abstract && $p < 0.6) {
-            if ($abstract && $chunk->{prev}->{plaintext} =~ /[\.!?]$/) {
-                say(5, "abstract has ended: ", $chunk->{text});
-                last;
-            }
-            elsif ($p < 0.5) {
-                say(5, "aborting abstract: ", $chunk->{text});
-                $self->{confidence} *= 0.95;
-                $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
-                last;
-            }
-            # else: fall through
-        }
-        if ($p > 0.5) {
-            say(5, "abstract continues: ", $chunk->{text});
-            $abstract .= $chunk->{text}."\n";
-            if (length($abstract) > $maxlen) {
-                say(5, 'abstract is getting too long');
-                $self->{confidence} *= 0.95;
-                $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
-                last;
-            }
-        }
-        $chunk = $chunk->{next};
-    };
+    my $estim = util::Estimator->new();
+    $estim->verbose(1) if $verbosity > 5;
+    use rules::Abstract_Features;
+    foreach (@rules::Abstract_Features::block_features) {
+        $estim->add_feature(@$_);
+    }
 
+    my $best = [];
+    my $best_score = 0;
+    foreach my $candidate (values %candidates) {
+        if ($verbosity > 4) {
+            say(5, "\ntesting: ",
+                reduce { $a .' '. $b->{text} } '', @$candidate);
+        }
+        my $score = $estim->test($candidate);
+        if ($score > $best_score) {
+            $best = $candidate;
+            $best_score = $score;
+        }
+    }
+
+    my $abstract = reduce { $a ."\n". $b->{text} } '', @$best;
+    $self->{confidence} *= $best_score/2 + 0.5;
+    if (length($abstract) > 2000) {
+        say(5, 'abstract is too long');
+        $self->{confidence} *= 0.95;
+        $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
+    }
     $self->{abstract} = tidy_text($abstract);
     $self->{abstract} .= '.' unless $self->{abstract} =~ /[!?]$/;
 

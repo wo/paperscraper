@@ -101,25 +101,27 @@ sub tidy_text {
     }
     # merge HTML elements split at linebreak:
     $txt =~ s|</([^>]+)>\n\s*<\1>| |g;
-    # replace other linebreaks by space:
+    # remove linebreaks:
     $txt =~ s|\s*\n\s*| |g;
     for (1 .. 2) {
         # chop whitespace at beginning and end:
         $txt =~ s|^\s*(.+?)\s*$|$1|;
-        # and surrounding tags:
+        # chop surrounding tags:
         $txt =~ s|^<([^>]+)>(.+)</\1>\s*$|$2|;
-        # and surrounding quotes:
+        # chop surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
         # chop odd trailing punctuations:
         $txt =~ s|[\.,:;]$||;
-        # and footnote marks:
-        $txt =~ s|<sup>\W?.\W?<.sup>$||;
-        # and footnote star *:
+        # remove footnote marks:
+        $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>||g;
+        # and trailing footnote star *:
         $txt =~ s/(\*|\x{2217})\s*$//;
         # and non-<sup>'ed footnote symbols in brackets:
-        $txt =~ s|\[ . \]$||x;
+        $txt =~ s|\[.\]$||;
         # and non-<sup>'ed number right after last word:
         $txt =~ s|([\pL\?!])\d$|$1|;
+        # fix HTML:
+        $txt = fix_html($txt);
     }
     # replace allcaps:
     $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
@@ -146,6 +148,32 @@ sub speller {
 sub is_word {
     my $sp = speller();
     return $sp && $sp->check($_[0]);
+}
+
+sub fix_html {
+    my $str = shift;
+    my %open = ('i', 0, 'b', 0, 'sub', 0, 'sup', 0);
+    my $res = $str;
+    while ($str =~ /<(\/?)(i|b|su.)>/g) {
+        if ($1) {
+            if ($open{$2}) {
+                $open{$2}--;
+            }
+            else {
+                $res = "<$2>$res";
+            }
+        }
+        else {
+            $open{$2}++;
+        }
+    }
+    foreach ('i', 'b', 'sub', 'sup') {
+        while ($open{$_}) {
+            $res .= "</$_>";
+            $open{$_}--;
+        }
+    }
+    return $res;
 }
 
 1;
