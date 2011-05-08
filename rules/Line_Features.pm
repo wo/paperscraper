@@ -124,19 +124,40 @@ $features{CONTENT} = [
 
 $features{ABSTRACT} = [
     ['within first few pages', [0.2, -0.8]],
-    ['in abstract section', [0.4, 0]],
-    [$or->('normal font', 'small font'), [0.2, -0.6]],
-    ['centered', [-0.1, 0.1]],
-    ['justified', [0.2, -0.1]],
+    ['in abstract section', [0.8, -0.1]],
+    [$or->('normal font', 'small font'), [0.1, -0.6]],
     [$or->('gap above', 'gap below'), [-0.2, 0.1]],
     [$and->('gap above', 'gap below'), [-0.6, 0.1]],
     ['begins with "abstract:"', [0.3, 0]],
-    ['long', [0.1, -0.2]],
-    ['matches content pattern', [0.2, -0.3]],
-    ['preceeded by many ABSTRACTs', [-0.7, 0.1], 2],
-    ['probable HEADING', [-0.5, 0.1], 3],
+    ['long', [0.2, -0.2]],
+    ['matches content pattern', [0.1, -0.3]],
+    ['preceeded by many ABSTRACTs', [-1, 0.1], 2],
+    ['probable HEADING', [-0.6, 0.1], 3],
     ['near other ABSTRACT', [0.3, -0.3], 3],
     ['continues abstract', [0.4, -0.1], 3],
+    ];
+
+$features{ABSTRACTSTART} = [
+    ['within first few pages', [0.2, -0.8]],
+    ['probable ABSTRACT', [0.2, -0.8], 2],
+    ['long', [0.1, -0.4], 2],
+    ['previous line short', [0.2, -0.2], 2],
+    ['previous line probable HEADING', [0.4, -0.1], 2],
+    ['previous line probable ABSTRACT', [-0.4, 0.2], 2],
+    ['previous line ends with terminator', [0.1, -0.1], 2],
+    ['begins in upper case', [0.1, -0.4], 2], 
+    ['begins with "abstract:"', [0.3, 0], 2],
+    ['gap above', [0.2, -0.1]],
+    ];
+
+$features{ABSTRACTEND} = [
+    ['within first few pages', [0.2, -0.8]],
+    ['probable ABSTRACT', [0.2, -0.8], 2],
+    ['next line indented', [0.2, -0.1], 2],
+    ['long', [-0.1, 0.2], 2],
+    ['previous line short', [-0.2, 0], 2],
+    ['ends with terminator', [0.1, -0.3], 2],
+    ['gap below', [0.2, -0.2]],
     ];
 
 $features{BIB} = [
@@ -322,9 +343,9 @@ $f{'preceeded by many ABSTRACTs'} = sub {
     my $n = 1;
     while ($ch = $ch->{prev}) {
         $n++ if $ch->{p}->('ABSTRACT') > 0.5;
-        last if $n >= 100;
+        last if $n >= 80;
     }
-    return $n/100;
+    return $n/80;
 };
 
 sub alignment {
@@ -355,7 +376,7 @@ sub gap {
     # gap($chunk, 'prev') == 2 means vertical distance to previous
     # chunk is twice the default linespacing
     my ($chunk, $dir) = @_;
-    my $default = min(1.5, $chunk->{doc}->{linespacing});
+    my $default = min(2, $chunk->{doc}->{linespacing});
     my $sibling = $chunk->{$dir};
     while ($sibling && $sibling->{page} == $chunk->{page}) {
         my $sp = $dir eq 'prev' ? $chunk->{top} - $sibling->{top} :
@@ -619,6 +640,16 @@ $f{'in bibliography section'} = in_section("^$re_bib_heading\$");
 
 $f{'in abstract section'} = in_section("^$re_abstract\$");
 
+$f{'previous line probable HEADING'} = sub {
+    return 0.5 unless $_[0]->{prev};
+    return $f{'probable HEADING'}->($_[0]->{prev});
+};
+
+$f{'previous line probable ABSTRACT'} = sub {
+    return 0.5 unless $_[0]->{prev};
+    return $f{'probable ABSTRACT'}->($_[0]->{prev});
+};
+
 $f{'previous line is bibliography heading'} = sub {
     if ($_[0]->{prev} &&
         $_[0]->{prev}->{plaintext} =~ /^$re_bib_heading$/) {
@@ -669,6 +700,8 @@ sub mk_begins {
 $f{'begins with section number'} = begins_plain($re_sec_number);
  
 $f{'begins in italic'} = begins('\s*<i>');
+
+$f{'begins in upper case'} = begins_plain('\p{IsUpper}');
 
 $f{'begins with footnote label'} = begins($re_footnote_label);
 
@@ -809,16 +842,21 @@ $f{'previous line short'} = memoize(sub {
     return max(min(2 - length($prev->{plaintext})/40, 1), 0);
 });
 
-$f{'previous line ends with terminator'} = memoize(sub {
-    my $prev = $_[0]->{prev};
-    return 0.5 unless $prev;
-    if ($prev->{plaintext} =~
-        /(\S+)([\.!\?])\s*(?:$re_rquote)?\s*$/o) {
+$f{'ends with terminator'} = memoize(sub {
+    if ($_[0]->{plaintext} =~
+        /(\S+)([\.!\?])\s*(?:$re_rquote)?(.?)\s*$/o) {
         # discount endings like "ed." or "Vol." or "J.A.":
         return 0.75 if $1 && length($1) < 4 && $2 eq '.';
+        # character after terminator (footnote symbol?):
+        return 0.75 if $2;
         return 1;
     }
     return 0;
+});
+
+$f{'previous line ends with terminator'} = memoize(sub {
+    return 0.5 unless $_[0]->{prev};
+    return $f{'ends with terminator'}->($_[0]->{prev});
 });
 
 $f{'previous line BIBSTART'} = sub {

@@ -33,6 +33,10 @@ my %tests = (
 
  '/home/wo/programming/opp-tools/test/doctests/22-Block-Anna.pdf' => "The Anna Karenina theory says: all conscious states are alike; each unconscious state is unconscious in its own way. This paper argues that many components have to function properly to produce consciousness, but failure in any one of many different ones can yield an unconscious state in different ways. In that sense the Anna Karenina theory is true. But in another respect it is false: kinds of unconsciousness depend on kinds of consciousness.",
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Block-Functional.pdf' => "A critique of the functional reduction picture of reductive explanation, a picture shared by proponents such as Lewis and opponents such as Kim, Chalmers and Jackson.",
+
+
+ '/home/wo/programming/opp-tools/test/doctests/21-Anon-Qualia.pdf' => "Qualia include the ways things look, sound and smell, the way it feels to have a pain; more generally, what it's like to have mental states.  Qualia are experiential properties of sensations, feelings, perceptions and, in my view, thoughts and desires as well.  But, so defined, who could deny that qualia exist?  Yet, the existence of qualia is controversial.  Here is what is controversial: whether qualia, so defined, can be characterized in intentional, functional or purely cognitive terms. Opponents of qualia think that the content of experience is intentional content (like the content of thought), or that experiences are functionally definable, or that to have a qualitative state is to have a state that is monitored in a certain way or accompanied by a thought to the effect that I have that state.  If we include the idea that experiential properties are not intentional or functional or purely cognitive in the definition of `qualia', then it is controversial whether there are qualia.",
 
 
 );
