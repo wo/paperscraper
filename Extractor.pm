@@ -22,6 +22,7 @@ sub new {
         xmlfile => $xmlfile,
         converters => [],
         fromOCR => 0,
+        fromHTML => 0,
         anchortexts => [],
         sourceauthors => [],
         chunks => [],
@@ -97,6 +98,7 @@ sub init {
     my @converters = $xml =~ /<converter>(.+?)<\/converter>/g;
     $self->{converters} = \@converters;
     $self->{fromOCR} = 1 if grep 'OCR', @converters;
+    $self->{fromHTML} = 1 if grep 'wkhtmltopdf', @converters;
     my @anchortexts = $xml =~ /<anchortext>(.+?)<\/anchortext>/g;
     $self->{anchortexts} = \@anchortexts;
     my @sourceauthors = $xml =~ /<sourceauthor>(.+?)<\/sourceauthor>/g;
@@ -331,7 +333,7 @@ sub get_text {
 sub adjust_confidence {
     my $self = shift;
     $self->{confidence} *= 0.8 if $self->{fromOCR};
-    # TODO: check if original is HTML (all 1 page?)
+    $self->{confidence} *= 0.9 if $self->{fromHTML};
     $self->{confidence} *= 0.98 if $self->{pages} < 5;
     $self->{confidence} *= 0.95 if $self->{pages} > 80;
     $self->{confidence} *= 0.95 if $self->{pages} > 150;

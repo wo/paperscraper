@@ -580,26 +580,6 @@ sub check_steppingstone {
     return $target if length($target) < 256;
 }
 
-sub add_meta {
-    # add metadata elements to XML file.
-    my ($file, $element, $content) = @_;
-    $content ||= '';
-
-    open IN, $file or die $!;
-    open OUT, ">$file.new" or die $!;
-    binmode(OUT, ":utf8");
-    while (<IN>) {
-        $_ = Encode::decode_utf8($_);
-        print OUT $_;
-        if (/^<pdf2xml/) { 
-            print OUT "<$element>$content</$element>\n";
-        }
-    }
-    close IN;
-    close OUT;
-    rename "$file.new", $file;
-}
-
 sub force_utf8 {
     # when parsing PDFs, we sometimes get mess that is not valid
     # UTF-8, which can make the HTML/RSS invalid.
