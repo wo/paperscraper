@@ -385,6 +385,7 @@ EOD
     }
     else {
         # check if we already have this paper:
+        my $abstract_piece = substr($loc->{abstract}, 20, 20);
         my ($o_id, $o_url, $o_confidence) = $dbh->selectrow_array(
             "SELECT documents.document_id, url, meta_confidence "
             ."FROM documents INNER JOIN locations "
@@ -392,6 +393,7 @@ EOD
             ."WHERE status = 1 AND location_id != $loc_id "
             ."AND authors = ".$dbh->quote($loc->{authors})." "
             ."AND title = ".$dbh->quote($loc->{title})." "
+            ."AND abstract LIKE ".$dbh->quote("%$abstract_piece%")." "
             ."LIMIT 1");
         # better, with  the MySQL levenshtein UDF from joshdrew.com:
         # ."AND levenshtein(authors,".$dbh->quote($loc->{authors}).") < 4 "
