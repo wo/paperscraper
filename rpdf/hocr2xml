@@ -2,7 +2,7 @@
 
 #
 # A simple converter from hOCR files as produced by cuneiform to XML
-# "document" files. Ignores most of the hOCR specification. 
+# files. Ignores most of the hOCR specification.
 #
 # (c) wo@umsu.de
 #
@@ -41,7 +41,7 @@ my $xml = new XML::Writer(
     ENCODING => 'utf-8',
     UNSAFE => 1);
 $xml->xmlDecl();
-$xml->startTag("document");
+$xml->startTag("pdf2xml");
 $xml->startTag("converter");
 $xml->characters("OCR");
 $xml->endTag("converter");
@@ -58,7 +58,7 @@ foreach my $page (@pages) {
     add_page($page);
 }
 $xml->endTag("content");
-$xml->endTag("document");
+$xml->endTag("pdf2xml");
 $xml->end();
 $output->close();
 

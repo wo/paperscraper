@@ -100,7 +100,7 @@ sub extract_names {
     my @parts = split($re_name_separator, $str);
     foreach my $part (@parts) {
         if ($part =~ /$re_noname/ || $part !~ /^
-            (?:$re_name_before)($re_name)(?:$re_name_after)?
+            (?:$re_name_before)?($re_name)(?:$re_name_after)?
             $/x) {
             next;
         }
