@@ -95,8 +95,9 @@ our $re_noname = qr/
 
 # stuff that disqualifies something from being a title:
 my $re_notitle = qr/(?:
-    $re_address_word |
-    $re_publication_word |
+    $re_address_word|
+    $re_publication_word|
+    \d{4}|
     \bthanks?\b|@|
     abstract
     )/ix;
@@ -131,9 +132,10 @@ our $re_name_before = qr/
 
 # stuff that may come after a name in an author line:
 our $re_name_after = qr/
-    \s*\d[\d\-\.\s]+|                  # "Hans Kamp 12.12.2009"
-    \s*\S+@\S+|                        # "Hans Kamp hans@kamp.de"
-    \.                                 # "Hans, Peter, and Fred."
+    \s+\d.+|                           # "Hans Kamp 12.12.2009"
+    \s+\S+@\S+|                        # "Hans Kamp hans@kamp.de"
+    \.|                                # "Hans, Peter, and Fred."
+    \d|\*                              # "Hans Kamp1"
     /ix;
 
 # stuff that separates authors from one another or rest of line:

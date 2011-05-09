@@ -23,9 +23,10 @@ our @parsing_features = (
     ['has title', [0.2, -0.6]],
     ['author parts have high score', [1, -0.9]],
     ['title parts have high score', [1, -0.9]],
-    ['good author block missed', [-0.5, 0.5]],
+    ['good author block missed', [-0.5, 0.3]],
     ['first author near title', [0.1, -0.3]],
-    ['author=title and further authors', [-0.3, 0]],
+    ['author=title and further authors', [-0.5, 0]],
+    ['author=title only has author part', [-0.5, 0]],
     );
 
 my %f;
@@ -114,6 +115,19 @@ $f{'author=title and further authors'} = sub {
     my @authors = grep { $_->{label}->{AUTHOR} } @{$_[0]->{blocks}};
     return 0 unless grep { $_->{label}->{TITLE} } @authors;
     return scalar @authors > 1 ? 1 : 0;
+};
+
+$f{'author=title only has author part'} = sub {
+    my @blocks = grep {
+           $_->{label}->{TITLE} && $_->{label}->{AUTHOR}
+        } @{$_[0]->{blocks}};
+    return 0 unless @blocks;
+    my $text = $blocks[0]->{text};
+    #return 0 unless $blocks[0]->{chunks}->[0]->{names};
+    foreach my $name (keys %{$blocks[0]->{chunks}->[0]->{names}}) {
+        $text =~ s/$name//;
+    }
+    return length($text) < 5 ? 1 : 0;
 };
 
 compile(\%block_features, \%f);
