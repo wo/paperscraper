@@ -171,7 +171,7 @@ sub xml2chunk {
     };
     $chunk->{right} = $chunk->{left} + $chunk->{width};
     $chunk->{bottom} = $chunk->{top} + $chunk->{height};
-    $chunk->{plaintext} = strip_tags($chunk->{text});
+    $chunk->{plaintext} = strip_tags(tidy_text($chunk->{text}));
     return $chunk;
 }
 
@@ -422,6 +422,7 @@ sub label_chunks {
 
         # cache probability values, and don't use advanced stage
         # computations if previous probability very low:
+        my $recurse = 0;
         my $make_p = sub {
             my $chunk = shift;
             my %cache;
@@ -430,18 +431,29 @@ sub label_chunks {
             my $threshold = 0.2;
             return sub {
                 my $label = shift;
+                my $arg = shift;
                 return $cache{$label} if exists($cache{$label});
-                #print "**computing p $label for $chunk->{text}\n";
+                # don't calculate oldp if there's no cached value of it:
+                return 1 if $arg{cache_only};
+                my $rec = exists ($arg{recurse}) ?
+                    $arg{recurse} : $recurse;
                 if ($oldp) {
-                    my $val = $oldp->($label);
-                    #if ($val < $threshold || !grep /$label/, @labels) {
+                    my $val = $oldp->($label, {cache_only=>1});
                     if ($val < $threshold) {
                         #print "**using oldp $val\n";
                         return $cache{$label} = $val;
                     }
-                    #print "**not using oldp\n";
+                    #print "**not using oldp $val\n";
                 }
-                return $cache{$label} = $newp->($label);
+                say(5, "\n>>calculating p ($stage,$rec) $label");
+                # use previous stage for recursive calls:
+                my $usep = $rec ? $oldp : $newp;
+                $recurse++;
+                my $ret = $usep->($label, $rec);
+                $recurse--;
+                $cache{$label} = $ret unless $rec;
+                say(5, "<<calculated p ($stage,$rec) $label");
+                return $ret;
             };
         };
 

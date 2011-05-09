@@ -118,6 +118,11 @@ my %tests = (
    title => "Qualia",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Cole-Nativism.doc' => {
+   authors => ["David Cole"],
+   title => "Cheap Nativism",
+ },
+
 );
 
 sub proc {

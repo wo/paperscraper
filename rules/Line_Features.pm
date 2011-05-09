@@ -50,20 +50,22 @@ $features{FOOTNOTESTART} = [
 $features{TITLE} = [
     ['among first few lines', [0.4, -0.3]],
     ['within first few pages', [0.1, -1]],
+    ['long', [-0.1, 0.1]],
     [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
     ['largest text on rest of page', [0.2, 0], 2],
     ['bold', [0.3, -0.05], 2],
     ['centered', [0.3, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
-    ['style appears on several pages', [-0.5, 0], 2],
+    ['style appears on several pages', [-0.4, 0], 2],
     ['matches title pattern', [0.1, -0.5], 2],
     [$or->('several words', 'may continue title'), [0.1, -0.3], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.25, 0], 2],
-    [$or->('best title', 'may continue title'), [0.3, -0.7], 3],
+    ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
+    [$or->('best title', 'may continue title'), [0.3, -0.7], 3],
     ['probable AUTHOR', [-0.2, 0.05], 3],
     ];
 
@@ -79,17 +81,17 @@ $features{AUTHOR} = [
     ['begins with possible name', [0.3, -0.4]],
     ['typical list of names', [0.2, -0.2]],
     ['largest text on page', [-0.4, 0], 2],
-    ['contains digit', [-0.2, 0.05], 2],
+    ['contains digit', [-0.1, 0.05], 2],
     ['gap above', [0.25, -0.3], 2],
     ['gap below', [0.15, -0.15], 2],
     ['occurs in marginals', [0.2, 0], 2],
-    [$and->('best title', 'other good authors'), [-0.3, 0.05], 3],
+    [$and->('best title', 'other good authors'), [-0.4, 0.05], 3],
     ['probable HEADING', [-0.8, 0.2], 3],
     ['contains publication keywords', [-0.4, 0], 3],
-    ['contains year', [-0.1, 0], 3],
+    #['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
-    ['contains actual name', [0.2, -0.4], 3],
-    ['contains several English words', [-0.4, 0.1], 3],
+    ['contains actual name', [0.3, -0.5], 3],
+    ['contains several English words', [-0.2, 0.1], 3],
     ['resembles source author', [0.1, -0.1], 3],
     ['resembles best author', [0.1, -0.5], 4],
     ];
@@ -105,14 +107,14 @@ $features{HEADING} = [
     ['high uppercase frequency', [0.1, -0.2]],
     ['begins with section number', [0.3, -0.15]],
     ['style appears on several pages', [0.3, -0.4], 2],
-    ['probable CONTENT', [-0.5, 0.05], 3],
+    ['probable CONTENT', [-0.5, 0.05], 2],
     ['preceeds CONTENT', [0.3, -0.3], 3],
     ['follows CONTENT', [0.4, -0.2], 3],
     ];
 
 $features{CONTENT} = [
     ['bold', [-0.3, 0.05]],
-    ['centered', [-0.3, 0.1]],
+    ['centered', [-0.2, 0.1]],
     ['justified', [0.3, -0.1]],
     [$or->('gap above', 'gap below'), [-0.2, 0.1]],
     [$and->('gap above', 'gap below'), [-0.6, 0.1]],
@@ -120,6 +122,9 @@ $features{CONTENT} = [
     ['long', [0.1, -0.2]],
     ['normal font', [0.3, -0.6]],
     ['matches content pattern', [0.2, -0.3]],
+    ['begins in upper case', [-0.1, 0.3]], 
+    ['preceeds CONTENT', [0.3, -0.3], 2],
+    ['follows CONTENT', [0.3, -0.3], 2],
     ];
 
 $features{ABSTRACT} = [
@@ -260,7 +265,7 @@ $f{'resembles best FOOTNOTESTART'} = sub {
 
 foreach my $label (@labels) {
     $f{"probable $label"} = sub {
-        return $_[0]->{p}->($label);
+        return max(0, $_[0]->{p}->($label)-0.2) * 1.25;
     };
 }
 
@@ -450,8 +455,7 @@ $f{'occurs in marginals'} = memoize(sub {
 
 $f{'style appears on several pages'} = memoize(sub {
     if ($_[0]->{fsize} == 0 && !$f{'bold'}->($_[0])) {
-        # test is meaningless if $_[0] is normal:
-        return 0.5;
+        return 1;
     }
     my $chunk = $_[0]->{doc}->{chunks}->[-1];
     my $ret = 0;
@@ -510,7 +514,7 @@ $f{'continues abstract'} = sub {
  
 $f{'best title'} = sub {
     my $best = $_[0]->{best}->{TITLE}->[0];
-    return 0 unless $best;
+    return 0 unless $best && $best->{p};
     return 1 if $_[0] == $best;
     my $dist = $best->{p}->('TITLE') - $_[0]->{p}->('TITLE');
     return max(1 - $dist*10, 0); 
@@ -532,7 +536,7 @@ $f{'resembles best author'} = sub {
     return 1 if $_[0] == $best;
     return 0 if $_[0]->{page} != $best->{page};
     # is on other side of title?
-    my $title = $_[0]->{best}->{TITLE}->[0]->{id};
+    my $title = $_[0]->{best}->{TITLE}->[0]->{id} || 0;
     return 0 if ($_[0]->{id} < $title) != ($best->{id} < $title);
     # smaller flaws:
     my $ret = 1;
@@ -726,8 +730,10 @@ $f{'begins with dash'} = begins_plain($re_dash);
 
 $f{'begins with possible name'} = memoize(sub {
     my @parts = split($re_name_separator, $_[0]->{plaintext}, 2);
-    return 0 if ($parts[0] =~ /$re_noname/);
-    return 1 if ($parts[0] =~ /(?:$re_name_before)?$re_name(?:$re_name_after)?/);
+    if (@parts && $parts[0] =~
+        /(?:$re_name_before)?($re_name)(?:$re_name_after)?/) {
+        return 1 if $1 !~ /$re_noname/;
+    }
     return 0;
 });
 
