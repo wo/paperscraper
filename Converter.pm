@@ -55,10 +55,13 @@ sub convert2pdf {
               .' 2>&1';
 	  my $content = sysexec($command, 10, $verbosity) || '';
           unless ($content && $content =~ /%PDF/) {
-              # unovonv often fails on first run, so we try again:
+              # unoconv often fails on first run, so we try again:
               $content = sysexec($command, 10, $verbosity) || '';
           }
-	  die "unoconv failed: $content" unless ($content && $content =~ /%PDF/);
+          # shut down listener daemon (hack):
+          system('killall soffice.bin');
+	  die "unoconv failed: $content"
+              unless ($content && $content =~ /%PDF/);
 	  return save($target, $content);
       };
       /rtf/ && do {
@@ -151,8 +154,8 @@ sub convert2xml {
               ." $target"
 	      .' 2>&1';
 	  my $out = sysexec($command, 60, $verbosity) || '';
-          add_meta($target, "converter", "rpdf");
 	  die "pdf conversion failed: $out" unless -e "$target";
+          add_meta($target, "converter", "rpdf");
 	  return 1;
       };
       # convert other formats to PDF:

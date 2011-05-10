@@ -447,7 +447,7 @@ sub label_chunks {
                 }
                 say(5, "\n>>calculating p ($stage,$rec) $label");
                 # use previous stage for recursive calls:
-                my $usep = $rec ? $oldp : $newp;
+                my $usep = $rec && $oldp ? $oldp : $newp;
                 $recurse++;
                 my $ret = $usep->($label, $rec);
                 $recurse--;

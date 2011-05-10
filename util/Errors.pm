@@ -52,6 +52,7 @@ sub errorcode {
 
    42 => 'cannot read local file',
    43 => 'cannot save local file',
+   49 => 'Fork failed: Cannot allocate memory',
 
    50 => 'unknown parser failure',
    51 => 'unsupported filetype',
@@ -67,7 +68,7 @@ sub errorcode {
    66 => 'wkhtmltopdf failed',
    67 => 'ps2pdf failed',
    68 => 'html2xml failed',
-   69 => 'PDF conversion failed',
+   69 => 'pdf conversion failed',
    70 => 'parser error',
    71 => 'non-UTF8 characters in metadata',
 

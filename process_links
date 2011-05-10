@@ -113,6 +113,9 @@ my @abort;
 $SIG{INT} = sub {
     @abort = @_;
 };
+$SIG{ALRM} = sub {
+    1;
+};
 
 my @queue = @{next_locations()};
 while (1) {
@@ -247,7 +250,7 @@ sub process {
         if ($is_dupe) {
             error("steppingstone to already known location");
             $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-            next;
+            return;
         }
         print "adding target link to queue: $target.\n" if $verbosity;
         $loc->{url} = $target;
@@ -336,7 +339,7 @@ sub process {
         error("$@");
         error("parser error") if errorcode() == 99;
         $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-        next;
+        return;
     }
 
     $loc->{authors} = force_utf8(join ', ', @{$result->{authors}});
@@ -358,7 +361,7 @@ sub process {
         $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
                              $loc->{spamminess}, undef, $loc_id)
             or print DBI->errstr;
-        next;
+        return;
     }
     
     binmode STDOUT, ":utf8";
@@ -426,7 +429,6 @@ EOD
         $loc->{filetype}, $loc->{filesize},
         $loc->{spamminess}, $doc_id, $loc_id)
         or print DBI->errstr;
-    return;
 }
 
 sub fetch_document {
