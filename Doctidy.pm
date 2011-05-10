@@ -77,7 +77,7 @@ sub doctidy {
 sub pagetidy {
     my $page = shift;
     print "== tidying page ==\n" if $verbose;
-    $page =~ s/<br .>//g;
+    $page =~ s/<br \/>//g;
     my @texts = split /\n/, $page;
     my @chunks = map { xml2chunk($_) } @texts;
     my $lines = reduce(\&mergechunks, [], @chunks);
@@ -101,6 +101,7 @@ sub elem {
 
 sub xml2chunk {
     my $str = shift;
+    print "$str\n";
     my $el = elem($str);
     my $chunk = {
         'top'       => $el->('top'),
@@ -354,9 +355,7 @@ sub sortlines {
 sub tidy_text {
     my $str = shift;
     # strip empty tags:
-    while ($str =~ /<([^>\s]+)[^>]*>\s*<\/\1>/) {
-        $str =~ s/$&//;
-    }
+    $str =~ s/<([^>\s]+)[^>]*>\s*<\/\1>//g;
     return fixchars($str);
 }
 
