@@ -101,7 +101,6 @@ sub elem {
 
 sub xml2chunk {
     my $str = shift;
-    print "$str\n";
     my $el = elem($str);
     my $chunk = {
         'top'       => $el->('top'),
