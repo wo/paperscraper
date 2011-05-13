@@ -26,7 +26,8 @@ sub new {
         anchortexts => [],
         sourceauthors => [],
         chunks => [],
-        pages => 0,
+        pages => [],
+        numpages => 0,
         fontsize => 0,
         linespacing => 0,
         marginals => [],
@@ -127,16 +128,18 @@ sub init {
             $chunk->{doc} = $self;
             pushlink @pagechunks, $chunk if $chunk->{height};
         }
-        add_pageinfo(\@pagechunks, $pageno);
+        next unless @pagechunks;
+        pushlink @{$self->{pages}}, pageinfo(\@pagechunks, $pageno);
+        pushlink @chunks, @pagechunks;
         $pageno++;
-        pushlink @chunks, @pagechunks; 
     }
 
-    $self->{pages} = $#pages;
+    $self->{numpages} = $#pages;
     $self->{chunks} = \@chunks;
 
     $self->fontinfo();
     $self->relativize_fsize();
+    $self->strip_coverpages();
     $self->strip_marginals();
     $self->strip_footnotes();
     $self->get_text();
@@ -175,9 +178,8 @@ sub xml2chunk {
     return $chunk;
 }
 
-sub add_pageinfo {
+sub pageinfo {
     my ($chunks, $pageno) = @_;
-    return unless @$chunks;
 
     my %page;
     $page{number} = $pageno;
@@ -188,27 +190,36 @@ sub add_pageinfo {
     $page{bottom} = max(map { $_->{bottom} } @$chunks);
     $page{height} = $page{bottom} - $page{top};
     $page{lines} = $#$chunks;
+    $page{chunks} = $chunks;
+    $page{doc} = $chunks->[0]->{doc};
+    if ($verbosity > 1) {
+        $page{text} = $chunks->[0]->{text};
+    }
 
     foreach (@$chunks) {
         $_->{page} = \%page;
     }
+
+    return \%page;
 }
 
 sub fontinfo {
     my ($self) = @_;
 
-    # find most common ('default') font-size and line-spacing (as fraction):
+    # find most common ('default') font-size and line-spacing (as
+    # fraction):
     my %fs_freq;
     my %sp_freq;
     foreach my $ch (@{$self->{chunks}}) {
         next if length($ch->{plaintext}) < 10;
         next if $ch->{bottom} / $ch->{page}->{bottom} > 0.7;
-        last if $self->{pages} > 2 &&
-            $ch->{page}->{number} / $self->{pages} > 0.7;
-        $fs_freq{$ch->{fsize}} = 0 unless defined $fs_freq{$ch->{fsize}};
+        last if $self->{numpages} > 2 &&
+            $ch->{page}->{number} / $self->{numpages} > 0.7;
+        $fs_freq{$ch->{fsize}} = 0
+            unless defined $fs_freq{$ch->{fsize}};
         $fs_freq{$ch->{fsize}}++;
         next unless $ch->{prev};
-        my $spacing = ($ch->{top} - $ch->{prev}->{top}) / $ch->{height};
+        my $spacing = ($ch->{top}-$ch->{prev}->{top}) / $ch->{height};
         $spacing = int($spacing*10)/10;
         $sp_freq{$spacing}++;
     }
@@ -241,6 +252,38 @@ sub relativize_fsize {
         $ch->{fsize} = ($ch->{fsize} - $def) * 10/$def;
         #print " = $ch->{fsize}\n";
     }
+}
+
+sub strip_coverpages {
+    my $self = shift;
+
+    use rules::Page_Features;
+    util::Estimator->verbose($verbosity > 4 ? 1 : 0);
+
+    my $res = label_chunks(
+        chunks => $self->{pages},
+        features => \%rules::Page_Features::features,
+        labels => ['COVERPAGE'],
+        );
+
+    foreach my $page (@{$res->{COVERPAGE}}) {
+        say(4, "stripping cover page $page->{number}");
+        removelink($page);
+        foreach my $ch (@{$page->{chunks}}) {
+            removelink($ch);
+        }
+    }
+
+    # ignore removed chunks:
+    $self->{chunks} = [ grep { ! $_->{_REMOVED} } @{$self->{chunks}} ];
+    for my $i (0 .. $#{$self->{chunks}}) {
+        $self->{chunks}->[$i]->{id} = $i;
+    }
+    $self->{pages} = [ grep { ! $_->{_REMOVED} } @{$self->{pages}} ];
+    for my $i (0 .. $#{$self->{pages}}) {
+        $self->{pages}->[$i]->{number} = $i;
+    }
+
 }
 
 sub strip_marginals {
@@ -334,9 +377,9 @@ sub adjust_confidence {
     my $self = shift;
     $self->{confidence} *= 0.8 if $self->{fromOCR};
     $self->{confidence} *= 0.9 if $self->{fromHTML};
-    $self->{confidence} *= 0.98 if $self->{pages} < 5;
-    $self->{confidence} *= 0.95 if $self->{pages} > 80;
-    $self->{confidence} *= 0.95 if $self->{pages} > 150;
+    $self->{confidence} *= 0.98 if $self->{numpages} < 5;
+    $self->{confidence} *= 0.95 if $self->{numpages} > 80;
+    $self->{confidence} *= 0.95 if $self->{numpages} > 150;
 }
 
 ##### metadata extraction #####
@@ -506,11 +549,6 @@ sub label_chunks {
         }
         say(4, "\nresult:\n", join("\n", @res), "\n");
     }
-    # Note that if the features for label A depend on some other
-    # chunk's probability for label B, and B isn't in @labels, then
-    # the other chunks probability for B retrieved at every stage is
-    # typically the stage 1 probability for B. If the B probability is
-    # crucial, B should be added to @labels.
     return \%best;
 }
 

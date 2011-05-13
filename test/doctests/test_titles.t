@@ -123,6 +123,11 @@ my %tests = (
    title => "Cheap Nativism",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-LeMorvan-Serfishness.pdf' => {
+   authors => ["Pierre Le Morvan"],
+   title => "Selfishness, Altruism, and Our Future Selves",
+ },
+
 );
 
 sub proc {

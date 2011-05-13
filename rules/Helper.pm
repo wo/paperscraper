@@ -102,6 +102,7 @@ sub extract_names {
         if ($part !~
             /^(?:$re_name_before)?($re_name)(?:$re_name_after)?$/
             || $1 =~ /$re_noname/) {
+            #print "**skipping $part\n";
             next;
         }
         my $p = 0.5;
@@ -117,6 +118,7 @@ sub extract_names {
                 $p -= 0.2
             }
         }
+        #print "  **P $first: $p\n";
         foreach my $w (split /\s+/, $last) {
             if (in_dict($w, 'surnames')) {
                 $p += 0.3;
@@ -128,6 +130,7 @@ sub extract_names {
                 $p -= 0.1;
             }
         }
+        #print "  **P $last: $p\n";
         next if $p < 0.4;
         if ($p < 0.8) {
             my $freebase_query = 
@@ -144,6 +147,7 @@ sub extract_names {
                 }
             }
         }
+        #print "  **P: $p\n";
         $res{$name} = min($p, 1);
     }
     return \%res;

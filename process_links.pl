@@ -345,7 +345,7 @@ sub process {
     $loc->{title} = force_utf8($result->{title});
     $loc->{abstract} = force_utf8($result->{abstract});
     $loc->{confidence} = $result->{confidence};
-    $loc->{length} = $result->{pages};
+    $loc->{length} = $result->{numpages};
     $loc->{text} = $result->{text};
     # TODO: these should be added to the XML file by the extractor,
     # and used by the spam filter.

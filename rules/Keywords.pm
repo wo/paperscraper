@@ -7,6 +7,7 @@ our @ISA = ('Exporter');
 our @EXPORT = qw/
 $re_ignore_url
 $re_session_id
+$re_coverpage
 $re_name
 $re_name_inverted
 $re_noname
@@ -58,7 +59,7 @@ my $re_address_word = qr/\b(?:
 # stuff that commonly occurs in publication info:
 our $re_publication_word = qr/\b(?:
     forthcoming|editors?|edited|publish\w*|press|volume
-    to appear in|draft|editor\w*|reprints?|excerpt|
+    to\sappear\sin|draft|editor\w*|reprints?|excerpt|
     circulation|cite
     )\b/ix;
 
@@ -76,6 +77,11 @@ our $re_editor = qr/^\(?ed(?:itor)?s?[\.\)].?$/ix;
 our $re_legalese = qr/\b(?:
     copyright|\(c\)|©|trademarks?|registered|
     terms\sand\sconditions|http|permission
+    )\b/ix;
+
+our $re_coverpage = qr/\b(?:
+    Manuscript\sInformation|
+    Terms\sand\sConditions
     )\b/ix;
 
 # stuff that disqualifies something from being a name:
@@ -120,7 +126,7 @@ our $re_name = qr/
     /x;
 
 our $re_name_inverted = qr/
-    ($re_name_middle $re_name_last),\s* ($re_name_first) 
+    ($re_name_middle $re_name_last),\s*($re_name_first) 
     /x;
 
 # stuff that may come before a name in an author line:
@@ -197,12 +203,11 @@ our $re_rquote = '["¨´’’‛”′″‴⁗❜❞]';
 our $re_year_words = 
     '\b(?:forthcoming|manuscript|unpublished|typescript|draft)\b';
 
-
-
 my $re_bad_abstract = qr/(?:
     ^\s*<sup>|
-    table of contents|\bdraft\b|forthcoming|\beditor|\bpress\b|\bpublish|Vol\.|
-    terms and conditions|copyright|journal\b|jstor|permission|
+    table\sof\scontents|\bdraft\b|forthcoming|\beditor
+    |\bpress\b|\bpublish|Vol\.|
+    terms\sand\sconditions|copyright|journal\b|jstor|permission|
     @|url|http|
     \bthank
     )/ix;

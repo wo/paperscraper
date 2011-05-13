@@ -340,7 +340,7 @@ $f{'within first few pages'} = memoize(sub {
 });
 
 $f{'on last page'} = memoize(sub {
-    return $_[0]->{page}->{number} == $_[0]->{doc}->{pages};
+    return $_[0]->{page}->{number} == $_[0]->{doc}->{numpages};
 });
 
 $f{'preceeded by many ABSTRACTs'} = sub {
@@ -462,7 +462,7 @@ $f{'style appears on several pages'} = memoize(sub {
     while (($chunk = $chunk->{prev})) {
         next if $chunk->{page} == $_[0]->{page};
         # skip intro bits of books:
-        if ($chunk->{doc}->{pages} - $chunk->{page}->{number} > 80
+        if ($chunk->{doc}->{numpages} - $chunk->{page}->{number} > 80
             || $chunk->{page}->{number} < 3) {
             last;
         }
