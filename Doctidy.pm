@@ -266,11 +266,20 @@ sub sortlines {
     #  | col2 | col3     |
     #  | col4 col4 col4  |
 
-    my @lines = sort { $a->{top} <=> $b->{top} } @$lines;
+    sub comp {
+        return 1 if $a->{top} > $b->{bottom}-5;
+        return -1 if $b->{top} > $a->{bottom}-5;
+        return $a->{left} <=> $b->{left};
+    }
+    my @lines = sort comp @$lines;
 
     my @newlines;
     my $numcols = 1;
     for (my $i=0; $i<@lines; $i++) {
+
+        if ($verbose) {
+            print "line $i: ",$lines[$i]->{text},"\n";
+        }
 
         push @newlines, $lines[$i];
         $lines[$i]->{col} = $numcols unless $lines[$i]->{col};
@@ -285,7 +294,7 @@ sub sortlines {
         if ($verbose) {
             print "line $i: ",$lines[$i]->{text},"\n";
             print "line $i+1: ",$lines[$i+1]->{text},"\n";
-            print "line $i+1 is to the right of $i.\n" if $verbose;
+            print "line $i+1 is to the right of $i.\n";
         }
         # i+1 is to the right of i and not yet recognized as
         # different column. Look up and down for more lines
@@ -322,27 +331,27 @@ sub sortlines {
             }
         }
         
-        if ($#leftcol > 2 && $#rightcol > 2) {
-            $numcols++;
-            foreach my $line (@leftcol) {
-                $line->{col} = $numcols;
-            }
-            $numcols++;
-            foreach my $line (@rightcol) {
-                $line->{col} = $numcols;
-            }
+        #if ($#leftcol > 2 && $#rightcol > 2) {
+        $numcols++;
+        foreach my $line (@leftcol) {
+            $line->{col} = $numcols;
         }
-        else {
-            print "ignoring columnisation: too small\n" if $verbose;
+        $numcols++;
+        foreach my $line (@rightcol) {
+            $line->{col} = $numcols;
+        }
+        #}
+        #else {
+        #    print "ignoring columnisation: too small\n" if $verbose;
             # Merge chunks that are on the same line and not in
             # different columns, unless they are really far apart:
-            my $ex = $lines[$i]->{width} / $lines[$i]->{length};
-            if ($lines[$i]->{right} + 10*$ex > $lines[$i+1]->{left}) {
-                print "appending\n" if $verbose;
-                append($lines[$i], $lines[$i+1]);
-                $i++;
-            }
-        }
+        #    my $ex = $lines[$i]->{width} / $lines[$i]->{length};
+        #    if ($lines[$i]->{right} + 10*$ex > $lines[$i+1]->{left}) {
+        #        print "appending\n" if $verbose;
+        #        append($lines[$i], $lines[$i+1]);
+        #        $i++;
+        #    }
+        #}
     }
     if ($numcols > 1) {
         @newlines = sort { $a->{col}*1000 + $a->{top} <=>

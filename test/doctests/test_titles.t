@@ -128,6 +128,12 @@ my %tests = (
    title => "Selfishness, Altruism, and Our Future Selves",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Carson-Bribery.pdf' => {
+   authors => ["Thomas L. Carson"],
+   title => "Bribery, Extortion, and \"The Foreign Corrupt Practices Act\"",
+ },
+
+
 );
 
 sub proc {
