@@ -7,52 +7,15 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(&error &errorcode);
 
 my $error = '';
-my $errorcode = 10; # 10 means "no error", should never be returned
-my %errors;
-
-my $verbosity = 0;
-sub verbosity {
-   $verbosity = shift if @_;
-   return $verbosity;
-}
-
-sub error {
-   $_ = shift or return $error;
-   if ($_ =~ /^\d+$/) {
-      return $errors{$_} if exists($errors{$_});
-      return 'unknown error';
-   }
-   $error = $_;
-   $errorcode = errorcode($error);
-   print "Error $errorcode: $error\n" if verbosity;
-   return undef;
-}
-
-sub errorcode {
-   my $e = shift or return $errorcode;
-   if ($e !~ /^\d+$/) {
-       $e =~ s/\n/ /g;
-       $e =~ s/^\s+//g;
-       return 10 if !$e;
-       while (my ($key, $value) = each(%errors)) {
-	   return $key if ($value && $e =~ /$value/);
-           # suffices that $e BEGINS WITH $errors{key}
-       }
-       return errorcode('unknown error');
-   }
-   $errorcode = $e;
-   $error = error($e);
-   return undef;
-}
-
-%errors = (
+my $errorcode = 10;
+my %errors = (
    10 => 'no error!',
 
    30 => 'process_links terminated during processing',
 
    42 => 'cannot read local file',
    43 => 'cannot save local file',
-   49 => 'Fork failed: Cannot allocate memory',
+   49 => 'Cannot allocate memory',
 
    50 => 'unknown parser failure',
    51 => 'unsupported filetype',
@@ -73,7 +36,6 @@ sub errorcode {
    71 => 'non-UTF8 characters in metadata',
 
    92 => 'database error',
-   99 => 'unknown error',
 
    100 => 'Continue',
    101 => 'Switching Protocols',
@@ -128,5 +90,43 @@ sub errorcode {
 
    1000 => 'subpage with more links',
 );
+
+my %errorcodes = reverse %errors;
+
+my $verbosity = 0;
+sub verbosity {
+   $verbosity = shift if @_;
+   return $verbosity;
+}
+
+sub error {
+   $_ = shift or return $error;
+   if ($_ =~ /^\d+$/) {
+      return $errors{$_} if exists($errors{$_});
+      return 'unknown error';
+   }
+   $error = $_;
+   $errorcode = errorcode($error);
+   print "Error $errorcode: $error\n" if verbosity;
+   return undef;
+}
+
+sub errorcode {
+   my $e = shift or return $errorcode;
+   if ($e !~ /^\d+$/) {
+       $e =~ s/\n/ /g;
+       $e =~ s/^\s+//g;
+       return 10 if !$e;
+       return $errorcodes{$e} if $errorcodes{$e};
+       while (my ($key, $value) = each(%errors)) {
+	   return $key if ($value && $e =~ /$value/);
+       }
+       warn "no error code for $e";
+       return 99;
+   }
+   $errorcode = $e;
+   $error = error($e);
+   return undef;
+}
 
 1;

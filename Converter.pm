@@ -16,8 +16,9 @@ our @ISA = ('Exporter');
 our @EXPORT = qw(&convert2text &convert2pdf &convert2xml &converters);
 
 my $path = dirname(abs_path(__FILE__));
-my $RPDF = "$path/rpdf/rpdf";
 my %cfg = do "$path/config.pl";
+my $RPDF = "$path/rpdf/rpdf";
+my $RTF2PDF = "$path/util/rtf2pdf.sh";
 
 my $verbosity = 0;
 sub verbosity {
@@ -43,7 +44,7 @@ sub convert2pdf {
 	      .' 2>&1';
 	  my $out = sysexec($command, 10, $verbosity);
           print $out if $verbosity > 4;
-	  die "wkhtmltopdf failed: $out" unless -e $target;
+	  die "wkhtmltopdf failed" unless -e $target;
 	  return 1;
       };
       /doc/ && do {
@@ -60,19 +61,19 @@ sub convert2pdf {
           }
           # shut down listener daemon (hack):
           system('killall soffice.bin');
-	  die "unoconv failed: $content"
+	  die "unoconv failed"
               unless ($content && $content =~ /%PDF/);
 	  return save($target, $content);
       };
       /rtf/ && do {
 	  push @converters_used, 'rtf2pdf';
-	  my $command = $cfg{'RTF2PDF'}
+	  my $command = $RTF2PDF
 	      ." $source"     # source file
 	      ." $target"     # destination file
 	      .' 2>&1';       # stderr to stdout
 	  my $out = sysexec($command, 10, $verbosity);
 	  print $out if $verbosity >= 4;
-	  die "rtf2pdf failed: $out" unless -e $target;
+	  die "rtf2pdf failed" unless -e $target;
 	  return 1;
       };
       /ps/ && do {
@@ -87,7 +88,7 @@ sub convert2pdf {
 	      .' 2>&1';       # stderr to stdout
 	  my $out = sysexec($command, 10, $verbosity) || '';
 	  print $out if $verbosity >= 4;
-	  die "ps2pdf failed: $out" unless -e $target;
+	  die "ps2pdf failed" unless -e $target;
 	  return 1;
       };
       die "$source has unsupported filetype";
@@ -154,7 +155,8 @@ sub convert2xml {
               ." $target"
 	      .' 2>&1';
 	  my $out = sysexec($command, 60, $verbosity) || '';
-	  die "pdf conversion failed: $out" unless -e "$target";
+          print "$out\n" if $verbosity > 6;
+	  die "pdf conversion failed" unless -e "$target";
           add_meta($target, "converter", "rpdf");
 	  return 1;
       };
@@ -167,7 +169,7 @@ sub convert2xml {
           system("rm \"$filename.pdf\"");
           return $out;
       }
-      die "PDF conversion failed";
+      die "pdf conversion failed";
   }
 }
 

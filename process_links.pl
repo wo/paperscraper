@@ -32,14 +32,14 @@ if ($opts{h}) {
     print <<EOF;
 
 Fetches documents and tries to guess author, title, abstract, etc.,
-and whether they are a suitable paper at all. Run as a cronjob without
-arguments, or with arguments for testing and debugging:
+and whether they are a suitable paper at all.
 
 Usage: $0 [-hns] [-p url or location id] [-v verbosity]
 
--p        : url or id that will be processed
 -v        : verbosity level (0-10, default: 1)
 -s        : process only one document, then exit
+-p        : url or id that will be processed instead of next one
+            from the database
 -r        : force re-processing of previously processed documents
 -n        : dry run, do not write result to DB
 -h        : this message
@@ -51,15 +51,10 @@ EOF
 my $TEMPDIR = "$path/temp/";
 my $CERT_SPAM = 0.8; # don't store documents with higher spam score
 
-my $verbosity = $opts{v} || 1;
+my $verbosity = exists($opts{v}) ? $opts{v} : 1;
 util::Errors::verbosity($verbosity);
 util::Io::verbosity($verbosity > 1 ? $verbosity-1 : 0);
 
-# This script never stops by itself, but it can easily crash, and it
-# needs to be restarted on reboot. So it's best to add a cron job that
-# calls it every few minutes. If another instance is properly running,
-# the call is aborted. The following lock file is constantly updated
-# while things go well.
 my $lockfile = "$path/.process_links";
 if ( -e "$lockfile" ) {
     if ( -M "$lockfile" < 0.005) {
@@ -68,7 +63,7 @@ if ( -e "$lockfile" ) {
             if $verbosity;
         exit 1;
     }
-    print "killing previous run!\n";
+    warn "killing previous run!\n";
     system("rm -f '$lockfile'");
     # we are killing ourserlves here!
     system("ps -ef | grep 'process_links' | grep -v grep"
@@ -111,33 +106,37 @@ my $db_adddoc = $dbh->prepare(
 
 my @abort;
 $SIG{INT} = sub {
+    print "\nHold on: just finishing this document...\n";
     @abort = @_;
-};
-$SIG{ALRM} = sub {
-    1;
 };
 
 my @queue = @{next_locations()};
-while (1) {
-    unless (@queue) {
-        print "nothing to do; resting 5 min.\n" if $verbosity;
-        sleep(300);
-    }
-    while (my $loc = shift @queue) {
-        abort() if (@abort);
-        system("touch '$lockfile'");
-        process($loc);
-    }
-    abort() if $opts{p} || $opts{s} || @abort;
-    push @queue, @{next_locations()};
+unless (@queue) {
+    print "no unprocessed locations\n" if $verbosity;
+    leave(8);
 }
+while (my $loc = shift @queue) {
+    leave(1) if (@abort);
+    system("touch '$lockfile'");
+    my $err = process($loc);
+    system("rm -f '$TEMPDIR*'") unless $verbosity > 1;
+    leave(0) if $opts{p} || $opts{s};
+}
+leave(0);
 
-sub abort {
-    system("rm -f '$TEMPDIR*'") unless $verbosity;
-    system("rm -f '$lockfile'");
+sub leave {
+    my $status = $_[0];
+    unlink($lockfile);
     $dbh->disconnect() if $dbh;
-    Carp::confess(@abort) if @abort;
-    exit(0);
+    if (@abort) {
+        if ($abort[0] eq 'INT') {
+            $status = 9;
+        }
+        else {
+            Carp::confess(@abort);
+        }
+    }
+    exit $status;
 }
 
 sub next_locations {
@@ -211,7 +210,7 @@ sub process {
 
     # fetch document:
     my $check_304 = $opts{r} ? 0 : 1;
-    my $res = fetch_document($loc, $check_304) or return;
+    my $res = fetch_document($loc, $check_304) or return 0;
     $loc->{filesize} = $res->{filesize};
     $loc->{filetype} = $res->{filetype};
     $loc->{content} = $res->{content};
@@ -228,8 +227,8 @@ sub process {
     }
     if (!save($file, $loc->{content}, $is_text)) {
         error("cannot save local file");
-        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-        return;
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
+        return errorcode();
     }
 
     # check if this is a subpage with further links to papers:
@@ -238,8 +237,8 @@ sub process {
         # we only need to indicate in 'locations' that this isn't
         # a document URL; we use the status field for that:
         error("subpage with more links");
-        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-        return;
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
+        return 0;
     }
 
     # check if this is an intermediate page leading to the actual paper:
@@ -249,8 +248,8 @@ sub process {
             "SELECT 1 FROM locations WHERE url = ".$dbh->quote($target));
         if ($is_dupe) {
             error("steppingstone to already known location");
-            $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-            return;
+            $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
+            return 0;
         }
         print "adding target link to queue: $target.\n" if $verbosity;
         $loc->{url} = $target;
@@ -266,7 +265,7 @@ sub process {
         # (a parent of ...) a location of the document. That's
         # cumbersome, so instead I simply overwrite the current
         # location, but keep its URL.
-        return;
+        return 0;
     }
 
     # get anchor text and default author from source pages:
@@ -292,23 +291,23 @@ sub process {
     };
     if ($@) {
         error($@);
-        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-        return;
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
+        return errorcode();
     }
     if ($spamminess > 0.5) {
         if (defined $loc->{spamminess} && $loc->{spamminess} > 0.5) {
             print "was previously recognized as spam, "
                 ."still looks like that\n" if $verbosity;
             $db_verify->execute($loc_id);
-            return;
+            return 0;
         }
         if ($spamminess >= $CERT_SPAM) {
             print "spam score $spamminess, "
                 ."not checking any further\n" if $verbosity;
             $db_saveloc->execute($loc->{filetype}, $loc->{filesize}, 
                                  $spamminess, undef, $loc_id)
-                or print DBI->errstr;
-            return;
+                or warn DBI->errstr;
+            return 0;
         }
     }
     $loc->{spamminess} = $spamminess;
@@ -322,8 +321,8 @@ sub process {
     if ($@) {
         error("$@");
         error("parser error") if errorcode() == 99;
-        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-        return;
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
+        return errorcode();
     }
     add_meta("$file.xml", 'anchortext', $loc->{anchortext});
     add_meta("$file.xml", 'sourceauthor', $loc->{default_author});
@@ -335,11 +334,11 @@ sub process {
         $result->init("$file.xml");
         $result->extract(qw/authors title abstract/);
     };
-    if ($@) {
-        error("$@");
+    if ($@ || (!$result->{title})) {
+        error($@ || "document seems to have no title");
         error("parser error") if errorcode() == 99;
-        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
-        return;
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
+        return errorcode();
     }
 
     $loc->{authors} = force_utf8(join ', ', @{$result->{authors}});
@@ -360,8 +359,8 @@ sub process {
             ."not storing document\n" if $verbosity;
         $db_saveloc->execute($loc->{filetype}, $loc->{filesize},
                              $loc->{spamminess}, undef, $loc_id)
-            or print DBI->errstr;
-        return;
+            or warn DBI->errstr;
+        return 0;
     }
     
     binmode STDOUT, ":utf8";
@@ -384,11 +383,12 @@ EOD
         $db_savedoc->execute(
             $loc->{authors}, $loc->{title}, $loc->{abstract}, 
             $loc->{length}, $loc->{confidence}, $doc_id)
-            or print DBI->errstr;
+            or warn DBI->errstr;
     }
     else {
         # check if we already have this paper:
-        my $abstract_piece = substr($loc->{abstract}, 20, 20);
+        my $abstract_piece = (length($loc->{abstract}) > 40) ?
+                              substr($loc->{abstract}, 20, 20) : '';
         my ($o_id, $o_url, $o_confidence) = $dbh->selectrow_array(
             "SELECT documents.document_id, url, meta_confidence "
             ."FROM documents INNER JOIN locations "
@@ -411,7 +411,7 @@ EOD
                 $db_savedoc->execute(
                     $loc->{authors}, $loc->{title}, $loc->{abstract}, 
                     $loc->{length}, $loc->{confidence}, $o_id)
-                    or print DBI->errstr;
+                    or warn DBI->errstr;
             }
             $doc_id = $o_id;
         }
@@ -420,7 +420,7 @@ EOD
             $db_adddoc->execute(
                 $loc->{authors}, $loc->{title}, $loc->{abstract}, 
                 $loc->{length}, $loc->{confidence})
-                or print DBI->errstr;
+                or warn DBI->errstr;
             $doc_id = $db_adddoc->{mysql_insertid};
             print "document added as id $doc_id\n" if $verbosity;
         }
@@ -428,7 +428,7 @@ EOD
     $db_saveloc->execute(
         $loc->{filetype}, $loc->{filesize},
         $loc->{spamminess}, $doc_id, $loc_id)
-        or print DBI->errstr;
+        or warn DBI->errstr;
 }
 
 sub fetch_document {
@@ -442,20 +442,20 @@ sub fetch_document {
 
     if ($res && $res->code == 304 && defined $loc->{last_checked}) {
         print "not modified.\n" if $verbosity;
-        $db_verify->execute($loc_id) or print DBI->errstr;
+        $db_verify->execute($loc_id) or warn DBI->errstr;
         return;
     }
 
     if (!$res || !$res->is_success) {
         my $status = $res ? $res->code : 900;
         print "status $status\n" if $verbosity == 1;
-        $db_err->execute($status, $loc_id) or print DBI->errstr;
+        $db_err->execute($status, $loc_id) or warn DBI->errstr;
         return;
     }
 
     if (!$res->content || !$res->{filesize}) {
         error("document is empty");
-        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
         return;
     }
 
@@ -469,14 +469,14 @@ sub fetch_document {
     if (!$opts{r} && $old_filesize && 
         abs($old_filesize-$res->{filesize}) / $res->{filesize} < 0.2) {
         print "no substantial change in filesize.\n" if $verbosity;
-        $db_verify->execute($loc_id) or print DBI->errstr;
+        $db_verify->execute($loc_id) or warn DBI->errstr;
         return;
     }
 
     # check if filetype is supported:
     unless (grep {$res->{filetype} eq $_ } @{$cfg{'FILETYPES'}}) {
         error("unsupported filetype ".$res->{filetype}."\n"); 
-        $db_err->execute(errorcode(), $loc_id) or print DBI->errstr;
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
         return;
     }
 
@@ -542,7 +542,7 @@ sub is_subpage {
     $db_addsub->execute(
         $loc->{url}, $parent->{source_id}, $parent->{crawl_depth}-1, 
         $parent->{default_author})
-        or print DBI->errstr;
+        or warn DBI->errstr;
     return 1;
 }
 

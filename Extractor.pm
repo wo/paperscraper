@@ -125,7 +125,7 @@ sub init {
             $chunk->{textpos} = $charno;
             $charno += length $chunk->{plaintext};
             $chunk->{doc} = $self;
-            pushlink @pagechunks, $chunk;
+            pushlink @pagechunks, $chunk if $chunk->{height};
         }
         add_pageinfo(\@pagechunks, $pageno);
         $pageno++;

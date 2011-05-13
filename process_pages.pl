@@ -28,19 +28,17 @@ database.
 
 Usage: $0 [-sh] [-p url] [-v verbosity]
 
--p        : url that will be processed (result not written to DB)
 -v        : verbosity level (0-10), default: 1
--s        : process only one page, then exit
+-p        : url that will be processed (result not written to DB)
 -h        : this message
 
 EOF
     exit;
 }
 
-our $verbosity = $opts{v} || 1;
+our $verbosity = exists($opts{v}) ? $opts{v} : 1;
 util::Io::verbosity($verbosity ? $verbosity-1 : 0);
 
-# Like process_links, this script never stops by itself.
 my $lockfile = "$path/.process_pages";
 if (-e "$lockfile") {
     if (-M "$lockfile" < 0.005) {
@@ -75,50 +73,50 @@ my $db_insert_link = $dbh->prepare(
     "INSERT IGNORE INTO links (source_id, location_id, anchortext) "
     ."VALUES (?,?,?)");
 
-my $abort = 0;
+my @abort;
 $SIG{INT} = sub {
-    $abort = @_;
+    @abort = @_;
 };
 
 my @queue = @{next_pages()};
-while (1) {
-    while (my $loc = shift @queue) {
-        if ($abort) {
-            abort($abort);
-            last;
-        }
-        system("touch '$lockfile'");
-        process($loc);
-    }
-    push @queue, @{next_pages()} unless $opts{p} || $opts{s};
-    unless (@queue) {
-        abort();
-        last;
-    }
+unless (@queue) {
+    print "everything recently checked\n" if $verbosity;
+    leave(8);
 }
+while (my $loc = shift @queue) {
+    leave(1) if (@abort);
+    system("touch '$lockfile'");
+    process($loc);
+    leave(0) if $opts{p};
+}
+leave(0);
 
-sub abort {
-    Carp::confess(@_) if $_[0] && $_[0] ne '1';
-    system("rm -f '$lockfile'");
+sub leave {
+    my $status = $_[0];
+    unlink($lockfile);
     $dbh->disconnect() if $dbh;
-    exit(0);
+    if (@abort) {
+        if ($abort[0] eq 'INT') {
+            $status = 9;
+        }
+        else {
+            Carp::confess(@abort);
+        }
+    }
+    exit $status;
 }
 
 sub next_pages {
     if ($opts{p}) {
         return [{ source_id => 0, url => $opts{p}, last_checked => 0 }];
     }
-    my $NUM_URLS = $opts{s} ? 1 : 5;
+    my $NUM_URLS = 1;
     my $min_age = time() - 24*60*60;
     my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources WHERE last_checked < $min_age "
         ."OR last_checked IS NULL ORDER BY last_checked "
         ."LIMIT $NUM_URLS";
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
-    if (!@$pages && !$opts{s}) {
-        print "nothing to do; resting 1 h.\n" if $verbosity;
-        sleep(3600);
-    }
     return $pages;
 }
 
