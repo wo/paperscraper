@@ -267,8 +267,9 @@ sub sortlines {
     #  | col4 col4 col4  |
 
     sub comp {
-        return 1 if $a->{top} > $b->{bottom}-5;
-        return -1 if $b->{top} > $a->{bottom}-5;
+        my $tolerance = ($b->{bottom} - $b->{top})/3;
+        return 1 if $a->{top} > $b->{bottom}-$tolerance;
+        return -1 if $b->{top} > $a->{bottom}-$tolerance;
         return $a->{left} <=> $b->{left};
     }
     my @lines = sort comp @$lines;

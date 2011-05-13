@@ -51,7 +51,7 @@ our $re_session_id = qr{
 
 # stuff that commonly occurs in addresses or affiliations:
 my $re_address_word = qr/\b(?:
-    university|center|centre|institute|sciences?|college|research|
+    universit\pL+|center|centre|institute?|sciences?|college|research|
     avenue|street|philosophy|professor|address|department|
     umass
     )\b/ix;

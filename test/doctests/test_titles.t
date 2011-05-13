@@ -133,6 +133,10 @@ my %tests = (
    title => "Bribery, Extortion, and \"The Foreign Corrupt Practices Act\"",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/11-Heath-Ideology.pdf' => {
+   authors => ["Joseph Heath"],
+   title => "Ideology, Irrationality and Collectively Self-defeating Behavior",
+ },
 
 );
 

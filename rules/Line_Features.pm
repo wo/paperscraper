@@ -477,23 +477,27 @@ $f{'style appears on several pages'} = memoize(sub {
 });
 
 $f{'may continue title'} = sub {
-    # errs on the side of 'yes'
-    my $prev = $_[0]->{prev};
-    unless ($prev && $prev->{page} == $_[0]->{page}
-            && $prev->{top} < $_[0]->{top}) {
-        return 0;
-    }
-    my $score = 0.5;
-    $score += $prev->{p}->('TITLE') - 0.75;
-    $score += 0.2 if ($prev->{plaintext} =~ /([\:\;\-\,])$/);
-    $score += ($_[0]->{fsize} == $prev->{fsize}) ? 0.1 : -0.1;
-    $score += $f{'bold'}->($_[0]) == $f{'bold'}->($prev) ? 0.1 : -0.1;
-    $score -= (gap($_[0], 'prev')-1.5) / 10;
+    my @score = (0.5, 0.5);
     my $align1 = alignment($_[0]);
-    my $align2 = alignment($prev);
-    $score -= 0.2 if ($align1 ne 'justify' && $align2 ne 'justify'
-                 && $align1 ne $align2);
-    return max(0, min(1, $score));
+    foreach my $i (0, 1) {
+        my $sib = $_[0]->{($i ? 'next' : 'prev')};
+        unless ($sib && $sib->{page} == $_[0]->{page}) {
+            $score[$i] -= 1;
+            next;
+        }
+        $score[$i] += $sib->{p}->('TITLE') - 0.75;
+        $score[$i] += 0.2 if ($sib->{plaintext} =~ /([\:\;\-\,])$/);
+        $score[$i] += ($_[0]->{fsize} == $sib->{fsize}) ? 0.1 : -0.1;
+        $score[$i] += 
+            $f{'bold'}->($_[0]) == $f{'bold'}->($sib) ? 0.1 : -0.1;
+        my $gap = gap($_[0], $i ? 'next' : 'prev');
+        $score[$i] -= ($gap-1.5) / 10 if $gap;
+        my $align2 = alignment($sib);
+        $score[$i] -= 0.2
+            if ($align1 ne 'justify' && $align2 ne 'justify'
+                && $align1 ne $align2);
+    }
+    return min(1, max(0, $score[0], $score[1]));
 };
 
 $f{'continues abstract'} = sub {
