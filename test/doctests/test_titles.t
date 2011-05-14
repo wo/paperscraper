@@ -138,6 +138,12 @@ my %tests = (
    title => "Ideology, Irrationality and Collectively Self-defeating Behavior",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Bittner-Hale-Remarks.pdf' => {
+   authors => ["Maria  Bittner", "Ken  Hale"],
+   title => "Remarks on Definiteness in Warlpiri",
+ },
+
+
 );
 
 sub proc {
