@@ -67,7 +67,7 @@ $features{TITLE} = [
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
     [$or->('best title', 'may continue title'), [0.3, -0.7], 3],
-    ['probable AUTHOR', [-0.2, 0.05], 3],
+    ['probable AUTHOR', [-0.3, 0.1], 3],
     ];
 
 $features{AUTHOR} = [
@@ -110,8 +110,8 @@ $features{HEADING} = [
     ['begins with section number', [0.3, -0.15]],
     ['style appears on several pages', [0.3, -0.4], 2],
     ['probable CONTENT', [-0.5, 0.05], 2],
-    ['preceeds CONTENT', [0.3, -0.3], 3],
-    ['follows CONTENT', [0.4, -0.2], 3],
+    ['preceeds CONTENT', [0.3, -0.3], 2],
+    ['follows CONTENT', [0.4, -0.2], 2],
     ];
 
 $features{CONTENT} = [
@@ -474,6 +474,7 @@ $f{'style appears on several pages'} = memoize(sub {
             last;
         }
         if ($chunk->{fsize} == $_[0]->{fsize}
+            && length($chunk->{plaintext}) > 5
             && $f{'bold'}->($chunk) == $bold
             && $f{'all caps'}->($chunk) == $caps
             && alignment($chunk) eq alignment($_[0])) {

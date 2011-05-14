@@ -25,8 +25,9 @@ our @parsing_features = (
     ['title parts have high score', [1, -0.9]],
     ['good author block missed', [-0.5, 0.3]],
     ['first author near title', [0.1, -0.3]],
-    ['author=title and further authors', [-0.5, 0]],
-    ['author=title only has author part', [-0.5, 0]],
+    ['author=title', [-0.1, 0]],
+    ['author=title and further authors', [-0.4, 0]],
+    ['author=title only has author part', [-0.4, 0]],
     );
 
 my %f;
@@ -109,9 +110,14 @@ $f{'first author near title'} = sub {
     return min(1, max(0, 1.1 - $dist/100));
 };
 
+$f{'author=title'} = sub {
+    return 1 if grep {
+        $_->{label}->{TITLE} && $_->{label}->{AUTHOR}
+    } @{$_[0]->{blocks}};
+    return 0;
+};
+
 $f{'author=title and further authors'} = sub {
-    my $author_is_title = 0;
-    my $further = 0;
     my @authors = grep { $_->{label}->{AUTHOR} } @{$_[0]->{blocks}};
     return 0 unless grep { $_->{label}->{TITLE} } @authors;
     return scalar @authors > 1 ? 1 : 0;
@@ -127,6 +133,7 @@ $f{'author=title only has author part'} = sub {
     foreach my $name (keys %{$blocks[0]->{chunks}->[0]->{names}}) {
         $text =~ s/$name//;
     }
+    $text =~ s/$re_name_separator//g;
     return length($text) < 5 ? 1 : 0;
 };
 

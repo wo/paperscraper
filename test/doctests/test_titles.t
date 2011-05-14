@@ -143,6 +143,10 @@ my %tests = (
    title => "Remarks on Definiteness in Warlpiri",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Stampe-Reingold-Influence.pdf' => {
+   authors => ["Dave M. Stampe", "Eyal M. Reingold"],
+   title => "Inhuence of stimulus characteristics on the latency of saccadic inhibition",
+ },
 
 );
 
