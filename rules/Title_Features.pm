@@ -97,7 +97,7 @@ $f{'good author block missed'} = sub {
 $f{'first author near title'} = sub {
     my ($author, $title);
     foreach (@{$_[0]->{blocks}}) {
-        $author = $_ if $_->{label}->{AUTHOR};
+        $author = $_ if $_->{label}->{AUTHOR} && !$author;
         $title = $_ if $_->{label}->{TITLE};
     }
     return 0.5 unless $author && $title;

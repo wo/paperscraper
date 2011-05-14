@@ -54,6 +54,7 @@ $features{TITLE} = [
     [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
     ['largest text on rest of page', [0.2, 0], 2],
     ['bold', [0.3, -0.05], 2],
+    ['all caps', [0.2, 0], 2],
     ['centered', [0.3, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
@@ -99,6 +100,7 @@ $features{AUTHOR} = [
 $features{HEADING} = [
     ['large font', [0.5, -0.3]],
     ['bold', [0.3, -0.2]],
+    ['all caps', [0.2, 0]],
     ['contains letters', [0, -0.5]],
     ['centered', [0.2, -0.05]],
     ['justified', [-0.4, 0]],
@@ -300,9 +302,11 @@ $f{'bold'} = in_tag('b');
 
 $f{'italic'} = in_tag('i');
 
-$f{'all caps'} = memoize(sub {
-    $_[0]->{plaintext} =~ /(?!\p{IsLower})\p{IsUpper}/;
-});
+$f{'all caps'} = sub {
+    return 0 if $_[0]->{plaintext} =~ /\p{IsLower}/;
+    return 1 if $_[0]->{plaintext} =~ /\p{IsUpper}/;
+    return 0;
+};
 
 $f{'large font'} = memoize(sub {
     .5 + max(min($_[0]->{fsize}-2, 5), -5) / 10;
@@ -454,7 +458,10 @@ $f{'occurs in marginals'} = memoize(sub {
 });
 
 $f{'style appears on several pages'} = memoize(sub {
-    if ($_[0]->{fsize} == 0 && !$f{'bold'}->($_[0])) {
+    my $bold = $f{'bold'}->($_[0]);
+    my $caps = $f{'all caps'}->($_[0]);
+    if ($_[0]->{fsize} == 0 && !$bold && !$caps) {
+        #print "** style is too boring too check";
         return 1;
     }
     my $chunk = $_[0]->{doc}->{chunks}->[-1];
@@ -467,8 +474,10 @@ $f{'style appears on several pages'} = memoize(sub {
             last;
         }
         if ($chunk->{fsize} == $_[0]->{fsize}
-            && $f{bold}->($chunk) == $f{bold}->($_[0])
+            && $f{'bold'}->($chunk) == $bold
+            && $f{'all caps'}->($chunk) == $caps
             && alignment($chunk) eq alignment($_[0])) {
+            #print "** $chunk->{text} has same style";
             $ret += 0.5;
             return 1 if $ret >= 1;
         }

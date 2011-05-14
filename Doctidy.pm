@@ -202,7 +202,9 @@ sub append {
     my ($line, $chunk) = @_;
 
     my $ex = $chunk->{width} / $chunk->{length};
-    if ($chunk->{length} > $line->{length}) {
+    if ($chunk->{length} > $line->{length}
+        # don't count smallcaps as very small font:  
+        && $chunk->{text} =~ /[j-z]/) {
         $line->{font} = $chunk->{font};
     }
     if ($chunk->{left} - $line->{right} > $ex/4) {
@@ -210,8 +212,9 @@ sub append {
         $line->{text} .= ' ';
         $line->{length}++;
     }
-    if ($chunk->{bottom} < $line->{bottom}
-        && $chunk->{top} < $line->{top}) {
+    if ($chunk->{bottom} < $line->{bottom}-1
+        && ($chunk->{top} < $line->{top}-1
+            || $chunk->{height} < $line->{height}*0.7)) {
         print "chunk is sup\n" if $verbose;
         # Assumption: lines never start with subscripted text.
         $line->{text} .= "<sup>".$chunk->{text}."</sup>";
