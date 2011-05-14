@@ -794,7 +794,7 @@ sub extract_authors_and_title {
     $self->{confidence} *= ($parsing->{quality} - 0.3) * 1.4;
     if ($parsings[0]) {
         my $lead = $parsing->{quality} - $parsings[0]->{quality};
-        $self->{confidence} *= 1 + min(0.1, $lead-0.2)*2;
+        $self->{confidence} *= 1 + min(0.2, $lead-0.2);
     }
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
