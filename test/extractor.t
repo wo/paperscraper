@@ -36,7 +36,7 @@ sub get_meta {
     return $extractor;
 }
 
-my $result = get_meta('testdocs/testdoc.pdf');
+my $result = get_meta('doctests/testdoc.pdf');
 ok(defined($result), "extractor can process testdoc.pdf");
 is(join('', @{$result->{authors}}), 'David J. Chalmers',
      "extractor recognises author of testdoc.pdf");
@@ -47,18 +47,7 @@ like($result->{abstract}, qr/^The basic question.*and others.$/s,
 like($result->{text}, qr/Is this ontological pluralism/,
      "extractor returns plain text of testdoc.pdf");
 
-$result = get_meta('testdocs/testdoc2.pdf');
-ok(defined($result), "extractor can process testdoc2.pdf");
-is(join(',', @{$result->{authors}}), 'David J. Chalmers,Alan Hájek',
-     "extractor recognises both authors of testdoc2.pdf");
-is($result->{title}, 'Ramsey + Moore = God',
-     "extractor recognises title of testdoc2.pdf");
-like($result->{abstract}, qr/^Frank Ramsey.*of a god.$/s,
-     "extractor recognises abstract of testdoc2.pdf");
-like($result->{text}, qr/So rationality requires that/,
-     "extractor returns plain text of testdoc2.pdf");
-
-$result = get_meta('testdocs/testdoc3.doc');
+$result = get_meta('doctests/testdoc3.doc');
 ok(defined($result), "extractor can process testdoc3.doc");
 is(join(',', @{$result->{authors}}), 'Wolfgang Schwarz',
      "extractor recognises author of testdoc3.doc");
@@ -69,7 +58,7 @@ like($result->{abstract}, qr/^Compare the following.*irrational.$/s,
 like($result->{text}, qr/suppose you apply the Bad method/,
      "extractor returns plain text of testdoc3.doc");
 
-$result = get_meta('testdocs/testdoc3.ps');
+$result = get_meta('doctests/testdoc3.ps');
 ok(defined($result), "extractor can process testdoc3.ps");
 is(join(',', @{$result->{authors}}), 'Wolfgang Schwarz',
      "extractor recognises author of testdoc3.ps");
@@ -80,7 +69,7 @@ like($result->{abstract}, qr/^Compare the following.*irrational.$/s,
 like($result->{text}, qr/suppose you apply the Bad method/,
      "extractor returns plain text of testdoc3.ps");
 
-$result = get_meta('testdocs/testdoc4.pdf');
+$result = get_meta('doctests/testdoc4.pdf');
 ok(defined($result), "extractor can process scanned file testdoc4.pdf");
 is(join(',', @{$result->{authors}}), 'Wolfgang Schwarz',
      "extractor recognises author of testdoc4.pdf");
