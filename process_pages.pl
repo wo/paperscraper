@@ -154,15 +154,19 @@ sub process {
     my @old_urls =  $opts{p} ? () : @{$old_urls};
     
     # extract links from page and add them to DB if new:
-    my $link_ex = new HTML::LinkExtractor(undef, $res->base, 1);
+    my @links;
     eval {
+        my $link_ex = new HTML::LinkExtractor(undef, $res->base, 1);
         $link_ex->parse(\$res->{content});
+        # ignore links with rel="nopapers":
+        @links = grep { 
+            $_->{href} && (!$_->{rel} || $_->{rel} ne 'nopapers') }
+            @{$link_ex->links};
     };
-    my @urls = map($$_{href} ? "$$_{href}" : "",
-                   @{$link_ex->links});
+    my @urls = map $_->{href}, @links;
+
   LINKS:
-    foreach my $new_link (@{$link_ex->links}) {
-        next unless $$new_link{tag} eq 'a'; 
+    foreach my $new_link (@links) {
         my $url = $$new_link{href};
         my $text = $$new_link{_TEXT};
         binmode STDOUT, ":utf8"; # why oh why?
