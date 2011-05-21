@@ -10,44 +10,33 @@ use Doctidy 'doctidy';
 use Extractor;
 my %cfg = do 'config.pl';
 
-$cfg{'TEMPDIR'}       = $cfg{'PATH'}.'temp/';
-$cfg{'RPDF'}          = $cfg{'PATH'}.'rpdf/rpdf';
-
 use Time::HiRes 'time';
 sub profile {
-  my ($func) = @_;
-  return sub {
-    my $start = time;
-    my $return = $func->(@_);
-    my $end = time;
-    print $end - $start;
-    return $return;
-  };
+    my ($func) = @_;
+    return sub {
+        my $start = time;
+        my $return = $func->(@_);
+        my $end = time;
+        print $end - $start;
+        return $return;
+    };
 }
 
 sub get_meta {
     my $file = shift;
     $file = abs_path($file);
-    Converter::cfg(\%cfg);
+    Converter::verbosity(0);
     convert2xml($file);
     doctidy("$file.xml");
     my $extractor = Extractor->new();
-    $extractor->verbosity(5);
+    $extractor->verbosity(0);
     $extractor->init("$file.xml");
-    $extractor->extract();
+    $extractor->extract('authors', 'title', 'abstract');
     system("rm $file.xml");
     return $extractor;
 }
 
-my $result = get_meta('test.pdf');
-ok(defined($result), "extractor can process test.pdf");
-is(join('', @{$result->{authors}}), 'Wolfgang Schwarz',
-     "extractor recognises author of test.pdf");
-is($result->{title}, 'A Test Document for Metadata Extraction',
-     "extractor recognises title of test.pdf");
-
-
-$result = get_meta('testdocs/testdoc.pdf');
+my $result = get_meta('testdocs/testdoc.pdf');
 ok(defined($result), "extractor can process testdoc.pdf");
 is(join('', @{$result->{authors}}), 'David J. Chalmers',
      "extractor recognises author of testdoc.pdf");
@@ -57,8 +46,6 @@ like($result->{abstract}, qr/^The basic question.*and others.$/s,
      "extractor recognises abstract of testdoc.pdf");
 like($result->{text}, qr/Is this ontological pluralism/,
      "extractor returns plain text of testdoc.pdf");
-
-exit;
 
 $result = get_meta('testdocs/testdoc2.pdf');
 ok(defined($result), "extractor can process testdoc2.pdf");

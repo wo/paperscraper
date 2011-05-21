@@ -956,7 +956,7 @@ sub extract_bibliography {
     say(3, "best parsing", $parsing->{text});
 
     foreach my $block (@{$parsing->{blocks}}) {
-        my $entry = parsebib($block);
+        my $entry = $self->parsebib($block);
         if ($entry) {
             if (@{$entry->{authors}} && $entry->{authors}->[0] eq '-'
                 && @{$self->{bibliography}}) {
@@ -968,6 +968,7 @@ sub extract_bibliography {
 }
 
 sub parsebib {
+    my $self = shift;
     my $entry = shift;
     say(3, "\nparsing bib entry: ", $entry->{text});
     
@@ -996,6 +997,9 @@ sub parsebib {
     }
 
     use rules::Bib_Features;
+    if ($self->{known_work}) {
+        $rules::Bib_Features::known_work = $self->{known_work};
+    }
     my @labels = keys %rules::Bib_Features::fragment_features;
     my $best = label_chunks(
         chunks => \@fragments,

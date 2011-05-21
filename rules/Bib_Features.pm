@@ -7,10 +7,10 @@ use Memoize;
 use util::String;
 use rules::Helper;
 use rules::Keywords;
-use rules::KnownWork 'known_work';
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT_OK = qw/%fragment_features %block_features @parsing_features/;
+our @EXPORT_OK =
+    qw/%fragment_features %block_features @parsing_features $known_work/;
 
 
 our %fragment_features;
@@ -534,6 +534,7 @@ $f{'lengthy OTHER block before title'} = sub {
     }
 };
 
+our $known_work = \&known_work;
 $f{'is known work'} = sub {
     my (@authors, $title, $year);
     foreach my $bl (@{$_[0]->{blocks}}) {
@@ -546,8 +547,10 @@ $f{'is known work'} = sub {
     }
     return 0 unless (@authors && $title);
     # TODO: tidy up authors and title?
-    return known_work(authors => \@authors, title => $title);
+    return $known_work->(authors => \@authors, title => $title);
 };
+
+
 
 compile(\%fragment_features, \%f);
 compile(\%block_features, \%f);
