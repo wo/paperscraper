@@ -84,13 +84,13 @@ sub pdf2xml {
 
 sub xml_ok {
     my $xml = shift;
-    return 0 unless $xml && $xml =~ /<text.+?>.*\w{5}.*</;
+    return 0 unless $xml && $xml =~ /<text.+?>.*[a-z]{5}.*</;
     # sometimes the coverpage isn't scanned, but the rest is:
     return 1 unless $xml =~ /<page number="2".+?<\/page/s;
-    return 1 if $& =~ /<text.+?>.*\w{5}.*</;
+    return 1 if $& =~ /<text.+?>.*[a-z]{5}.*</;
     # if second page has no text, third page must:
     return 0 unless $xml =~ /<page number="3".+?<\/page/s;
-    return 1 if $& =~ /<text.+?>.*\w{5}.*</;
+    return 1 if $& =~ /<text.+?>.*[a-z]{5}.*</;
     return 0;
 }
 
