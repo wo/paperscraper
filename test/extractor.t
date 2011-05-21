@@ -24,6 +24,7 @@ sub profile {
 
 sub get_meta {
     my $file = shift;
+    my $bib = shift;
     $file = abs_path($file);
     Converter::verbosity(0);
     convert2xml($file);
@@ -31,7 +32,8 @@ sub get_meta {
     my $extractor = Extractor->new();
     $extractor->verbosity(0);
     $extractor->init("$file.xml");
-    $extractor->extract('authors', 'title', 'abstract');
+    my @fields = $bib ? ('bibliography') : ('authors', 'title', 'abstract');
+    $extractor->extract(@fields);
     system("rm $file.xml");
     return $extractor;
 }
@@ -80,3 +82,22 @@ like($result->{abstract}, qr/^Suppose we want.*to trouble.$/s,
 like($result->{text}, qr/But we could also accept this/,
      "extractor returns plain text of testdoc4.pdf");
 
+$result = get_meta('doctests/testdoc.pdf', 1);
+ok(scalar @{$result->{bibliography}},
+     "extractor can parse bibliography from testdoc.pdf");
+
+my $file = 'doctests/testdoc.pdf';
+$file = abs_path($file);
+convert2xml($file);
+doctidy("$file.xml");
+my $extractor = Extractor->new();
+my $called = 0;
+$extractor->{known_work} = sub {
+    $called++;
+    return 1;
+};
+$extractor->verbosity(0);
+$extractor->init("$file.xml");
+$extractor->extract('bibliography');
+system("rm $file.xml");
+ok($called, "Extractor uses passed known_work");
