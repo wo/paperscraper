@@ -1093,6 +1093,7 @@ sub parsebib {
                 say(3, "year: $res->{year}");
             }
         }
+        $res->{id} = $parsing->{known_id};
     }
 
     return $res;

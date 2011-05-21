@@ -547,9 +547,12 @@ $f{'is known work'} = sub {
     }
     return 0 unless (@authors && $title);
     # TODO: tidy up authors and title?
-    return $known_work->(authors => \@authors, title => $title);
+    my $id = $known_work->(authors => \@authors,
+                           title => $title,
+                           year => $year);
+    $_[0]->{known_id} = $id if $id;
+    return $id;
 };
-
 
 
 compile(\%fragment_features, \%f);
