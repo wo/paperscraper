@@ -5,6 +5,7 @@ use DBI;
 use URI::URL;
 use HTML::LinkExtractor;
 use Data::Dumper;
+use Time::Piece;
 use Getopt::Std;
 use Encode;
 use FindBin qw($Bin);
@@ -12,7 +13,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 use util::Io;
 use util::Errors;
-use rules::Keywords; # qw/re_ignore_url re_session_id/;
+use rules::Keywords;
 binmode STDOUT, ":utf8";
 
 my %cfg = do 'config.pl';
@@ -111,9 +112,10 @@ sub next_pages {
         return [{ source_id => 0, url => $opts{p}, last_checked => 0 }];
     }
     my $NUM_URLS = 1;
-    my $min_age = time() - 24*60*60;
+    my $min_age = gmtime()-(24*60*60);
     my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
-        ."AS last_checked FROM sources WHERE last_checked < $min_age "
+        ."AS last_checked FROM sources "
+        ."WHERE last_checked < '".($min_age->ymd)."' "
         ."OR last_checked IS NULL ORDER BY last_checked "
         ."LIMIT $NUM_URLS";
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });

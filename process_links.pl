@@ -12,6 +12,7 @@ use Digest::MD5;
 use HTML::LinkExtractor;
 use URI;
 use Data::Dumper;
+use Time::Piece;
 use Getopt::Std;
 use util::Io;
 use util::Errors;
@@ -175,7 +176,7 @@ sub next_locations {
         if (!@locations) {
             print "no new locations.\n" if $verbosity;
             my $where;
-            my $min_age = time() - 24*60*60;
+            my $min_age = gmtime()-(24*60*60);
             # No. Toss a coin to decide whether to (a) verify old
             # papers and re-check locations with HTTP errors, or (b)
             # give old spam and parser errors a new chance. Mostly we
@@ -184,11 +185,11 @@ sub next_locations {
                 # (a) re-process old papers and HTTP errors:
                 $where = "(status NOT BETWEEN 2 AND 99) AND"
                     ." NOT spamminess > 0.5 AND"
-                    ." last_checked < $min_age";
+                    ." last_checked < '".($min_age->ymd)."'";
             }
             else {
                 # (b) give old spam and parser errors a second chance:
-                $where = "last_checked < $min_age AND"
+                $where = "last_checked < '".($min_age->ymd)."' AND"
                     ." ((status = 1 AND spamminess > 0.5) OR"
                     ." (status BETWEEN 2 AND 99))";
             }
