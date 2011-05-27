@@ -83,8 +83,8 @@ $dbh->{'mysql_auto_reconnect'} = 1;
 my $really = $opts{n} ? "AND 1 = 0" : "";
 
 my $db_verify = $dbh->prepare(
-    "UPDATE locations SET last_checked = NOW()"
-    ." WHERE location_id = ? $really");
+    "UPDATE locations SET last_checked = NOW(), status = 1 "
+    ."WHERE location_id = ? $really");
 
 my $db_err = $dbh->prepare(
     "UPDATE locations SET status = ?, last_checked = NOW() "
