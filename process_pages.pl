@@ -81,7 +81,7 @@ $SIG{INT} = sub {
 
 my @queue = @{next_pages()};
 unless (@queue) {
-    print "everything recently checked\n" if $verbosity;
+    print "all pages recently checked\n" if $verbosity;
     leave(8);
 }
 while (my $loc = shift @queue) {

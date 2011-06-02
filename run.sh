@@ -1,5 +1,9 @@
 #!/bin/bash
-cd $(dirname "$0")
+if [ "$(pidof -x -o $$ $(basename $0))" != "" ]; then
+    echo "script already running"
+    exit
+fi
+
 trap '' ERR
 while true
 do
