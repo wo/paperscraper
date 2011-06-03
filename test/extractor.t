@@ -94,10 +94,13 @@ my $extractor = Extractor->new();
 my $called = 0;
 $extractor->{known_work} = sub {
     $called++;
-    return 1;
+    return 123;
 };
 $extractor->verbosity(0);
 $extractor->init("$file.xml");
 $extractor->extract('bibliography');
 system("rm $file.xml");
 ok($called, "Extractor uses passed known_work");
+my $bib1 = shift @{$extractor->{bibliography}};
+is($bib1->{id}, 123, "Extractor returns ID of known bib entry");
+
