@@ -7,7 +7,6 @@ use utf8;
 use lib '../..';
 use Cwd 'abs_path';
 use Converter;
-use Doctidy 'doctidy';
 use Extractor;
 my %cfg = do 'config.pl';
 
@@ -153,7 +152,6 @@ my %tests = (
 sub proc {
     my $file = shift;
     convert2xml($file);
-    doctidy("$file.xml");
     my $extractor = Extractor->new("$file.xml");
     $extractor->extract(qw/authors title/);
     system("rm $file.xml");
