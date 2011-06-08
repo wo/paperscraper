@@ -6,7 +6,6 @@ binmode STDOUT, ":utf8";
 use lib '..';
 use Cwd 'abs_path';
 use Converter;
-use Doctidy 'doctidy';
 use Extractor;
 my %cfg = do 'config.pl';
 
@@ -28,7 +27,6 @@ sub get_meta {
     $file = abs_path($file);
     Converter::verbosity(0);
     convert2xml($file);
-    doctidy("$file.xml");
     my $extractor = Extractor->new();
     $extractor->verbosity(0);
     $extractor->init("$file.xml");
@@ -89,15 +87,17 @@ ok(scalar @{$result->{bibliography}},
 my $file = 'doctests/testdoc.pdf';
 $file = abs_path($file);
 convert2xml($file);
-doctidy("$file.xml");
 my $extractor = Extractor->new();
 my $called = 0;
 $extractor->{known_work} = sub {
     $called++;
-    return 1;
+    return 123;
 };
 $extractor->verbosity(0);
 $extractor->init("$file.xml");
 $extractor->extract('bibliography');
 system("rm $file.xml");
 ok($called, "Extractor uses passed known_work");
+my $bib1 = shift @{$extractor->{bibliography}};
+is($bib1->{id}, 123, "Extractor returns ID of known bib entry");
+

@@ -7,7 +7,6 @@ binmode STDOUT, ":utf8";
 use lib '../..';
 use Cwd 'abs_path';
 use Converter;
-use Doctidy 'doctidy';
 use Extractor;
 
 my %opts;
@@ -18,8 +17,6 @@ my $file = shift @ARGV;
 $file = abs_path($file);
 convert2xml($file);
 system("cat $file.xml") if $verbosity > 5;
-Doctidy::verbose($verbosity > 5 ? 1 : 0);
-doctidy("$file.xml");
 
 my $start = time;
 

@@ -8,6 +8,7 @@ use FindBin qw($Bin);
 use Cwd 'abs_path';
 use File::Basename;
 use Exporter;
+use Doctidy 'doctidy';
 use util::Sysexec;
 use util::String;
 use util::Io;
@@ -158,6 +159,8 @@ sub convert2xml {
           print "$out\n" if $verbosity > 6;
 	  die "pdf conversion failed" unless -e "$target";
           add_meta($target, "converter", "rpdf");
+          Doctidy::verbose(1) if $verbosity > 4;
+          doctidy($target);
 	  return 1;
       };
       # convert other formats to PDF:

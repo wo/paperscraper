@@ -17,7 +17,6 @@ use Getopt::Std;
 use util::Io;
 use util::Errors;
 use util::String;
-use Doctidy 'doctidy';
 use Spamfilter;
 use Converter;
 use Extractor;
@@ -318,7 +317,6 @@ sub process {
     Converter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
     eval {
         convert2xml($file);
-        doctidy("$file.xml");
     };
     if ($@) {
         error("$@");

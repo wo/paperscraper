@@ -13,6 +13,7 @@ our %block_features;
 $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
     ['adjacent chunks probable title', [-0.5, 0.2]],
+    ['chunks are adjacent', [0, -1]],
     ];
 
 $block_features{AUTHOR} = [
@@ -52,6 +53,11 @@ $f{'adjacent chunks probable title'} = sub {
     $ch = $_[0]->{chunks}->[-1]->{next};
     $p = max($p, $ch ? $ch->{p}->('TITLE') : 0);
     return $p;
+};
+
+$f{'chunks are adjacent'} = sub {
+    my $d = $_[0]->{chunks}->[-1]->{id} - $_[0]->{chunks}->[0]->{id};
+    return $d == $#{$_[0]->{chunks}} ? 1 : 0;
 };
 
 $f{'has title'} = sub {

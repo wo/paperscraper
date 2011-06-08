@@ -7,7 +7,6 @@ use utf8;
 use lib '../..';
 use Cwd 'abs_path';
 use Converter;
-use Doctidy 'doctidy';
 use Extractor;
 my %cfg = do 'config.pl';
 
@@ -148,12 +147,15 @@ my %tests = (
    title => "Inhuence of stimulus characteristics on the latency of saccadic inhibition",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/21-Chaitin-Information.pdf' => {
+   authors => ["Gregory J. Chaitin"],
+   title => "Information- Theoretic Limitations of Formal Systems",
+ },
 );
 
 sub proc {
     my $file = shift;
     convert2xml($file);
-    doctidy("$file.xml");
     my $extractor = Extractor->new("$file.xml");
     $extractor->extract(qw/authors title/);
     system("rm $file.xml");
