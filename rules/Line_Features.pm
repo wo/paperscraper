@@ -59,7 +59,7 @@ $features{TITLE} = [
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
     ['style appears on several pages', [-0.4, 0], 2],
-    ['matches title pattern', [0.1, -0.5], 2],
+    ['matches title pattern', [0.1, -0.6], 2],
     [$or->('several words', 'may continue title'), [0.1, -0.3], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
@@ -498,7 +498,9 @@ $f{'may continue title'} = sub {
         $score[$i] += $sib->{p}->('TITLE') - 0.75;
         $score[$i] += 0.2 if ($sib->{plaintext} =~ /([\:\;\-\,])$/);
         $score[$i] += ($_[0]->{fsize} == $sib->{fsize}) ? 0.1 : -0.1;
-        $score[$i] += 
+        $score[$i] -= 0.3
+            if $f{'all caps'}->($_[0]) != $f{'all caps'}->($sib);
+        $score[$i] +=
             $f{'bold'}->($_[0]) == $f{'bold'}->($sib) ? 0.1 : -0.1;
         my $gap = gap($_[0], $i ? 'next' : 'prev');
         $score[$i] -= ($gap-1.5) / 10 if $gap;
@@ -549,13 +551,15 @@ $f{'resembles best author'} = sub {
     return 0 unless $best;
     return 1 if $_[0] == $best;
     return 0 if $_[0]->{page} != $best->{page};
+    return 0 if $f{'all caps'}->($_[0]) != $f{'all caps'}->($best);
+    return 0 if ($_[0]->{text} =~ /,/) != ($best->{text} =~ /,/);
     # is on other side of title?
     my $title = $_[0]->{best}->{TITLE}->[0]->{id} || 0;
     return 0 if ($_[0]->{id} < $title) != ($best->{id} < $title);
     # smaller flaws:
     my $ret = 1;
     $ret -= 0.3 if alignment($_[0]) ne alignment($best);
-    $ret -= 0.3 if $_[0]->{fsize} != $best->{fsize};
+    $ret -= abs($_[0]->{fsize} - $best->{fsize}) * 0.3;
     foreach my $feat ('bold', 'italic') {
         $ret -= 0.7 if $f{$feat}->($_[0]) != $f{$feat}->($best);
     }
