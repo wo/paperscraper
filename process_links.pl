@@ -211,6 +211,7 @@ sub process {
 
     # fetch document:
     my $check_304 = $opts{r} ? 0 : 1;
+    $check_304 = 0 unless $loc->{status} && $loc->{status} == 1;
     my $res = fetch_document($loc, $check_304) or return 0;
     $loc->{filesize} = $res->{filesize};
     $loc->{filetype} = $res->{filetype};
