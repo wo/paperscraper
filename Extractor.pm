@@ -787,6 +787,9 @@ sub extract_authors_and_title {
         if ($self->{sourceauthors}) {
             say(2, "no author -- using source author(s)");
             $self->{authors} = $self->{sourceauthors};
+            foreach my $au (@{$self->{authors}}) {
+                $self->{title} =~ s/[,:\s]*$au[,:\s]*(and)?//;
+            }
         }
     }
 

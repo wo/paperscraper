@@ -66,7 +66,7 @@ $features{TITLE} = [
     ['occurs in marginals', [0.25, 0], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
-    [$or->('best title', 'may continue title'), [0.3, -0.7], 3],
+    [$or->('best title', 'may continue title'), [0.3, -0.8], 3],
     ['probable AUTHOR', [-0.3, 0.1], 3],
     ];
 

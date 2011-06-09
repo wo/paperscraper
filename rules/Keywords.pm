@@ -15,6 +15,7 @@ $re_name_before
 $re_name_after
 $re_name_separator
 $re_title
+$re_bad_ending
 $re_content
 $re_bib_heading
 $re_sec_number
@@ -103,7 +104,7 @@ our $re_noname = qr/
 my $re_notitle = qr/(?:
     $re_address_word|
     $re_publication_word|
-    \d{4}|
+    [12]\d{3}|
     \bthanks?\b|@|
     abstract
     )/ix;
@@ -155,10 +156,17 @@ our $re_name_separator = qr/
     /ix;
 
 # may be a title:
-our $re_title = qr/
+our $re_title = qr/^
     (?!.*$re_notitle.*)
     \p{IsAlpha}                        # At least one word character
     /x;
+
+# words that suggest title continues on next line:
+our $re_bad_ending = qr/
+    \b(?:
+       of|and|or
+    )\b
+    /ix;
 
 # may be ordinary text content:
 our $re_content = qr/

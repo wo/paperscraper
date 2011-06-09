@@ -12,8 +12,9 @@ our %block_features;
 
 $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
-    ['adjacent chunks probable title', [-0.5, 0.2]],
+    ['adjacent chunks probable title', [-0.6, 0.2]],
     ['chunks are adjacent', [0, -1]],
+    ['implausible ending', [-0.5, 0.1]],
     ];
 
 $block_features{AUTHOR} = [
@@ -58,6 +59,11 @@ $f{'adjacent chunks probable title'} = sub {
 $f{'chunks are adjacent'} = sub {
     my $d = $_[0]->{chunks}->[-1]->{id} - $_[0]->{chunks}->[0]->{id};
     return $d == $#{$_[0]->{chunks}} ? 1 : 0;
+};
+
+$f{'implausible ending'} = sub {
+    my $txt = $_[0]->{chunks}->[-1]->{text};
+    return $txt =~ /$re_bad_ending$/i;
 };
 
 $f{'has title'} = sub {
