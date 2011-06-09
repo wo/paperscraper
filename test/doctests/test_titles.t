@@ -151,6 +151,14 @@ my %tests = (
    authors => ["Gregory J. Chaitin"],
    title => "Information- Theoretic Limitations of Formal Systems",
  },
+
+ '/home/wo/programming/opp-tools/test/doctests/31-Pollock-Logic.pdf' => {
+   authors => ["John L. Pollock"],
+   title => "LOGIC: <i>An</i> INTRODUCTION <i>to the</i> FORMAL STUDY <i>of</i> REASONING",
+ },
+
+
+
 );
 
 sub proc {
