@@ -78,6 +78,7 @@ $f{'implausible beginning'} = sub {
 $f{'coincides with marginal'} = sub {
     my $txt = reduce { "$a $b->{plaintext}" } '', @{$_[0]->{chunks}};
     for my $ch (@{$_[0]->{chunks}->[0]->{doc}->{marginals}}) {
+        next if $ch->{plaintext} =~ /^[\divx]+$/;
         return 1 if distance($txt, $ch->{plaintext}) < 3;
     }
     return 0;
