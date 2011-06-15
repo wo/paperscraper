@@ -129,7 +129,7 @@ sub save {
     my $content = shift;
     my $textmode = shift;
     print "saving $filename\n" if $verbosity > 1;
-    if (!open FH, '>'.$filename) {
+    if (!open FH, '>', $filename) {
         die "Error: cannot save local file $filename: $!\n";
     }
     if ($textmode) {
@@ -158,7 +158,7 @@ sub add_meta {
     $content ||= '';
     
     open IN, $file or die $!;
-    open OUT, ">$file.new" or die $!;
+    open OUT, '>', "$file.new" or die $!;
     binmode(OUT, ":utf8");
     my $done = 0;
     while (<IN>) {
@@ -171,7 +171,7 @@ sub add_meta {
     }
     close IN;
     close OUT;
-    rename "$file.new", $file;
+    rename "$file.new", "$file";
 }
 
 1;

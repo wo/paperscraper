@@ -5,7 +5,7 @@
 # Dependencies: 
 # convert (ImageMagick), pdftk, cuneiform
 #
-# 2010-05-31 Wolfgang Schwarz <wo@umsu.de>
+# Wolfgang Schwarz <wo@umsu.de>
 #
 
 set -e
@@ -54,7 +54,7 @@ if test "$INFILE" = ""; then
     exit 1
 fi
 
-if test ! -e $INFILE; then
+if test ! -e "$INFILE"; then
     echo "Input file $INFILE does not exist."
     exit 1
 fi

@@ -30,18 +30,20 @@ sub verbosity {
 my @converters_used;
 
 sub convert2pdf {
-    my $source = shift or die "convert2pdf requires source filename parameter";
-    my $target = shift or die "convert2pdf requires target filename parameter";
+    my $source = shift;
+    my $target = shift;
     my ($basename, $filetype) = ($source =~ /^(.*?)\.?([^\.]+)$/);
     print "converting $source to pdf\n" if $verbosity;
   SWITCH: for ($filetype) {
       /html|txt/ && do {
 	  push @converters_used, 'wkhtmltopdf';
           $source = File::Spec->rel2abs($source);
+          # url-encode:
+          $source =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 	  my $command = $cfg{'WKHTMLTOPDF'}
               ." --encoding utf-8"
               ." file://$source"
-              ." $target"
+              ." \"$target\""
 	      .' 2>&1';
 	  my $out = sysexec($command, 10, $verbosity);
           print $out if $verbosity > 4;
@@ -53,14 +55,14 @@ sub convert2pdf {
 	  my $command = $cfg{'UNOCONV'}
 	      .' -f pdf'
               .' --stdout'
-	      ." $source"
+	      ." \"$source\""
               .' 2>&1';
 	  my $content = sysexec($command, 10, $verbosity) || '';
           unless ($content && $content =~ /%PDF/) {
               # unoconv often fails on first run, so we try again:
               $content = sysexec($command, 10, $verbosity) || '';
           }
-          # shut down listener daemon (hack):
+          # shut down listener daemon (hack!):
           system('killall soffice.bin');
 	  die "unoconv failed"
               unless ($content && $content =~ /%PDF/);
@@ -69,9 +71,9 @@ sub convert2pdf {
       /rtf/ && do {
 	  push @converters_used, 'rtf2pdf';
 	  my $command = $RTF2PDF
-	      ." $source"     # source file
-	      ." $target"     # destination file
-	      .' 2>&1';       # stderr to stdout
+	      ." \"$source\"" 
+	      ." \"$target\""
+	      .' 2>&1'; 
 	  my $out = sysexec($command, 10, $verbosity);
 	  print $out if $verbosity >= 4;
 	  die "rtf2pdf failed" unless -e $target;
@@ -84,9 +86,9 @@ sub convert2pdf {
           # (pstopdf has the same problem.)
 	  push @converters_used, 'ps2pdf';
 	  my $command = $cfg{'PS2PDF'}
-	      ." $source"     # source file
-	      ." $target"     # destination file
-	      .' 2>&1';       # stderr to stdout
+	      ." \"$source\""
+	      ." \"$target\""
+	      .' 2>&1';
 	  my $out = sysexec($command, 10, $verbosity) || '';
 	  print $out if $verbosity >= 4;
 	  die "ps2pdf failed" unless -e $target;
@@ -97,11 +99,11 @@ sub convert2pdf {
 }
 
 sub convert2text {
-    my $filename = shift or die "convert2text requires filename parameter";
+    my $filename = shift;
     my ($basename, $filetype) = ($filename =~ /^(.*?)\.?([^\.]+)$/);
     my $text;
     print "getting plain text from $filename\n" if $verbosity;
-    if (!(-e $filename)) {
+    if (!(-e "$filename")) {
 	die "$filename does not exist";
     }
   SWITCH: for ($filetype) {
@@ -125,7 +127,7 @@ sub convert2text {
 	  my $command = $cfg{'UNOCONV'}
 	      .' -f html'
               .' --stdout'
-	      ." $filename";
+	      ." \"$filename\"";
 	  my $html = sysexec($command, 10, $verbosity) || '';
 	  die "unoconv failed" unless $html;
           $text = strip_tags($html);
@@ -152,10 +154,11 @@ sub convert2xml {
       /pdf/ && do {
 	  my $command = $RPDF
               ." -d$verbosity"
-	      ." $filename"
-              ." $target"
+	      ." \"$filename\""
+              ." \"$target\""
 	      .' 2>&1';
 	  my $out = sysexec($command, 60, $verbosity) || '';
+          print $command;
           print "$out\n" if $verbosity > 6;
 	  die "pdf conversion failed" unless -e "$target";
           add_meta($target, "converter", "rpdf");

@@ -42,7 +42,7 @@ sub init() {
 
 init();
 my $out = pdf2xml($source);
-open FH, '>'.$target or die "Error: cannot save $target: $!";
+open FH, '>', $target or die "Error: cannot save $target: $!";
 binmode(FH, ":utf8");
 print FH $out;
 close FH;
@@ -55,7 +55,7 @@ sub pdf2xml {
         .' -xml'          # xml output
         .' -enc \'UTF-8\''
         .' -stdout'       # output to stdout
-        .' '.$source      # source file
+        ." \"$source\""   # source file
         .' 2>&1';         # stderr to stdout
     my $xml = sysexec($command, 10, $opt{'d'}) || '';
     $xml = Encode::decode_utf8($xml);
@@ -66,7 +66,8 @@ sub pdf2xml {
     print "pdftohtml failed on parsing. Using OCR.\n" if $opt{'d'};
     $xml = '';
     my $tmp = TEMPDIR;
-    $command = "$path/pdfocr $source $tmp/out.hocr";
+    $command = "$path/pdfocr \"$source\" $tmp/out.hocr";
+    print $command if $opt{'d'} > 1;
     my $res = sysexec($command, TIMEOUT, $opt{'d'});
     print $res if $opt{'d'} > 1;
     $command = "$path/hocr2xml $tmp/out.hocr $tmp/out.xml";
