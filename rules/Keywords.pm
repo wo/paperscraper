@@ -16,6 +16,7 @@ $re_name_after
 $re_name_separator
 $re_title
 $re_bad_ending
+$re_bad_beginning
 $re_content
 $re_bib_heading
 $re_sec_number
@@ -163,6 +164,13 @@ our $re_title = qr/^
 
 # words that suggest title continues on next line:
 our $re_bad_ending = qr/
+    \b(?:
+       of|and|or
+    )\b
+    /ix;
+
+# words that suggest title is continued from previous line:
+our $re_bad_beginning = qr/
     \b(?:
        of|and|or
     )\b

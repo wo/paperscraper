@@ -21,7 +21,7 @@ our %features;
 $features{HEADER} = [
     ['gap below', [0.2, -0.3]],
     ['small font', [0.2, -0.2]],
-    ['begins or ends with digit', [0.2, -0.1]],
+    ['line begins or ends with digit', [0.2, -0.1]],
     ['resembles other HEADERs', [0.2, -0.3], 2]
     ];
 
@@ -216,22 +216,30 @@ sub matches {
 
 $f{'contains digit'} = matches('(?<!<sup>)\d');
 
-$f{'begins or ends with digit'} = matches('^\d|\d$');
+$f{'line begins or ends with digit'} = sub {
+    return 1 if $_[0]->{plaintext} =~ /^\d|\d$/;
+    return 1 if ($_[0]->{prev} &&
+                 abs($_[0]->{prev}->{top} - $_[0]->{top}) < 5 &&
+                 $_[0]->{prev}->{plaintext} =~ /^\d/);
+    return 1 if ($_[0]->{next} &&
+                 abs($_[0]->{next}->{top} - $_[0]->{top}) < 5 &&
+                 $_[0]->{next}->{plaintext} =~ /^\d/);
+    return 0;
+};
 
 $f{'is digit'} = matches('^\d+$');
 
 $f{'resembles other HEADERs'} = sub {
     return 0 unless $_[0]->{best}->{HEADER};
-    my $num = scalar @{$_[0]->{best}->{HEADER}} || 1;
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{HEADER}}) {
         next if $_[0] == $h;
-        next if $_[0]->{top} != $h->{top};
-        next if $_[0]->{fsize} != $h->{fsize};
+        next if abs($_[0]->{top} - $h->{top}) > 5;
+        next if abs($_[0]->{fsize} - $h->{fsize}) > 1;
         next if length($_[0]->{text}) != length($h->{text});
         $count++;
     }
-    return min(1, $count / $num*2);
+    return $count/4;
 };
 
 $f{'resembles other FOOTERs'} = sub {
@@ -390,7 +398,7 @@ sub gap {
     while ($sibling && $sibling->{page} == $chunk->{page}) {
         my $sp = $dir eq 'prev' ? $chunk->{top} - $sibling->{top} :
             $sibling->{top} - $chunk->{top};
-        if ($sp > 0) {
+        if ($sp > 5) {
             # large fonts often include large gaps:
             my $fsize = max($chunk->{fsize}, $sibling->{fsize});
             #print "** fsize: $fsize, sp: $sp => ";
