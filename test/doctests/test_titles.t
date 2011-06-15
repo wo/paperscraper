@@ -122,7 +122,7 @@ my %tests = (
    title => "Cheap Nativism",
  },
 
- '/home/wo/programming/opp-tools/test/doctests/22-LeMorvan-Serfishness.pdf' => {
+ '/home/wo/programming/opp-tools/test/doctests/22-LeMorvan-Selfishness.pdf' => {
    authors => ["Pierre Le Morvan"],
    title => "Selfishness, Altruism, and Our Future Selves",
  },
@@ -157,6 +157,10 @@ my %tests = (
    title => "LOGIC: <i>An</i> INTRODUCTION <i>to the</i> FORMAL STUDY <i>of</i> REASONING",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/222-Schollmeier-Ancient.pdf' => {
+   authors => [""],
+   title => "Ancient Tragedy and Other Selves",
+ },
 
 
 );

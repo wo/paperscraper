@@ -459,8 +459,8 @@ $f{'resembles source author'} = memoize(sub {
 });
 
 $f{'occurs in marginals'} = memoize(sub {
-    for my $str (@{$_[0]->{doc}->{marginals}}) {
-       return 1 if (amatch($str, ['i 10%'], $_[0]->{plaintext}));
+    for my $ch (@{$_[0]->{doc}->{marginals}}) {
+        return 1 if (amatch($_[0]->{plaintext}, ['i 20%'], $ch->{plaintext}));
     }
     return 0;
 });

@@ -1,6 +1,7 @@
 package rules::Title_Features;
 use warnings;
 use List::Util qw/min max reduce/;
+use Text::LevenshteinXS qw/distance/;
 use Statistics::Lite qw/mean/;
 use rules::Helper;
 use rules::Keywords;
@@ -14,11 +15,14 @@ $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
     ['adjacent chunks probable title', [-0.6, 0.2]],
     ['chunks are adjacent', [0, -1]],
-    ['implausible ending', [-0.5, 0.1]],
+    ['coincides with marginal', [0.4, 0]],
+    ['implausible beginning', [-0.7, 0.1]],
+    ['implausible ending', [-0.7, 0.1]],
     ];
 
 $block_features{AUTHOR} = [
     ['probable AUTHOR', [1, -1]],
+    ['coincides with marginal', [0.4, 0]],
     ];
 
 our @parsing_features = (
@@ -64,6 +68,19 @@ $f{'chunks are adjacent'} = sub {
 $f{'implausible ending'} = sub {
     my $txt = $_[0]->{chunks}->[-1]->{text};
     return $txt =~ /$re_bad_ending$/i;
+};
+
+$f{'implausible beginning'} = sub {
+    my $txt = $_[0]->{chunks}->[0]->{text};
+    return $txt =~ /^$re_bad_beginning/i;
+};
+
+$f{'coincides with marginal'} = sub {
+    my $txt = reduce { "$a $b->{plaintext}" } '', @{$_[0]->{chunks}};
+    for my $ch (@{$_[0]->{chunks}->[0]->{doc}->{marginals}}) {
+        return 1 if distance($txt, $ch->{plaintext}) < 3;
+    }
+    return 0;
 };
 
 $f{'has title'} = sub {

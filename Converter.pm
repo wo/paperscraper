@@ -158,7 +158,6 @@ sub convert2xml {
               ." \"$target\""
 	      .' 2>&1';
 	  my $out = sysexec($command, 60, $verbosity) || '';
-          print $command;
           print "$out\n" if $verbosity > 6;
 	  die "pdf conversion failed" unless -e "$target";
           add_meta($target, "converter", "rpdf");
