@@ -794,10 +794,12 @@ sub extract_authors_and_title {
     }
 
     $self->{confidence} *= 0.95 if scalar @{$self->{authors}} > 1;
-    $self->{confidence} *= ($parsing->{quality} - 0.3) * 1.4;
+    $self->{confidence} *= 0.5 + ($parsing->{quality} - 0.3) * 0.7;
+    say(4, "confidence from parsing: $self->{confidence}");
     if ($parsings[0]) {
         my $lead = $parsing->{quality} - $parsings[0]->{quality};
         $self->{confidence} *= 1 + min(0.2, $lead-0.2);
+        say(4, "confidence from alternatives: $self->{confidence}");
     }
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
