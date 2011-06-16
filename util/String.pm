@@ -124,7 +124,7 @@ sub tidy_text {
         $txt = fix_html($txt);
     }
     # replace allcaps:
-    $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}/);
+    $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}{2}/);
     return $txt;
 }
 

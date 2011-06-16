@@ -30,6 +30,7 @@ sub new {
         numpages => 0,
         fontsize => 0,
         linespacing => 0,
+        geometry => {},
         marginals => [],
         footnotes => [],
         authors => [],
@@ -139,6 +140,7 @@ sub init {
 
     $self->fontinfo();
     $self->relativize_fsize();
+    $self->geometry();
     $self->strip_coverpages();
     $self->strip_marginals();
     $self->strip_footnotes();
@@ -204,7 +206,7 @@ sub pageinfo {
 }
 
 sub fontinfo {
-    my ($self) = @_;
+    my $self = shift;
 
     # find most common ('default') font-size and line-spacing (as
     # fraction):
@@ -237,6 +239,26 @@ sub fontinfo {
     }
     $self->{linespacing} = $default_sp || 1;
     say(3, "default line spacing $self->{linespacing}");
+}
+
+sub geometry {
+    my $self = shift;
+
+    # find average page dimensions:
+    my @pars = ('top', 'right', 'bottom', 'left');
+    $self->{geometry} = {};
+    foreach my $par (@pars) {
+        $self->{geometry}->{$par} = 0;
+    }
+    foreach my $page (@{$self->{pages}}) {
+        foreach my $par (@pars) {
+            $self->{geometry}->{$par} += $page->{$par};
+        }
+    }
+    foreach my $par (@pars) {
+        $self->{geometry}->{$par} /= @{$self->{pages}};
+        say(3, "default page $par: ", $self->{geometry}->{$par});
+    }
 }
 
 sub relativize_fsize {
@@ -294,20 +316,19 @@ sub strip_marginals {
     use rules::Line_Features;
     util::Estimator->verbose($verbosity > 4 ? 1 : 0);
 
+    my $max_y = $self->{geometry}->{top} + 5;
     my $headers = label_chunks(
         chunks => [ 
-            grep { $_->{top} <= $_->{page}->{top} + 5 }
-                 @{$self->{chunks}}
+            grep { $_->{top} <= $max_y } @{$self->{chunks}}
         ],
         features => \%rules::Line_Features::features,
         labels => ['HEADER'],
         );
 
+    my $min_y = $self->{geometry}->{bottom} - 20;
     my $footers = label_chunks(
         chunks => [
-            grep {
-                $_->{bottom} >= $_->{page}->{bottom} - $_->{height}*1.5
-            } @{$self->{chunks}}
+            grep { $_->{bottom} >= $min_y } @{$self->{chunks}}
         ],
         features => \%rules::Line_Features::features,
         labels => ['FOOTER'],

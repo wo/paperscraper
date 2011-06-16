@@ -22,6 +22,7 @@ $features{HEADER} = [
     ['gap below', [0.2, -0.3]],
     ['small font', [0.2, -0.2]],
     ['line begins or ends with digit', [0.2, -0.1]],
+    ['outside normal page dimensions', [0.2, -0]],
     ['resembles other HEADERs', [0.2, -0.3], 2]
     ];
 
@@ -30,6 +31,7 @@ $features{FOOTER} = [
     ['small font', [0.2, -0.1]],
     ['normal font', [-0.1, 0.1]],
     ['is digit', [0.3, -0.1]],
+    ['outside normal page dimensions', [0.2, -0]],
     ['previous line FOOTER', [0.4, 0], 2],
     ['resembles other FOOTERs', [0.25, -0.35], 3]
     ];
@@ -227,7 +229,9 @@ $f{'line begins or ends with digit'} = sub {
     return 0;
 };
 
-$f{'is digit'} = matches('^\d+$');
+$f{'is digit'} = sub {
+    return $_[0]->{plaintext} =~ /^\d+$/;
+};
 
 $f{'resembles other HEADERs'} = sub {
     return 0 unless $_[0]->{best}->{HEADER};
@@ -236,7 +240,7 @@ $f{'resembles other HEADERs'} = sub {
         next if $_[0] == $h;
         next if abs($_[0]->{top} - $h->{top}) > 5;
         next if abs($_[0]->{fsize} - $h->{fsize}) > 1;
-        next if length($_[0]->{text}) != length($h->{text});
+        next if length($_[0]->{plaintext}) != length($h->{plaintext});
         $count++;
     }
     return $count/4;
@@ -248,12 +252,19 @@ $f{'resembles other FOOTERs'} = sub {
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{FOOTER}}) {
         next if $_[0] == $h;
-        next if $_[0]->{bottom} != $h->{bottom};
-        next if $_[0]->{fsize} != $h->{fsize};
-        next if length($_[0]->{text}) != length($h->{text});
+        next if abs($_[0]->{bottom} - $h->{bottom}) > 5;
+        next if abs($_[0]->{fsize} - $h->{fsize}) > 
+            $_[0]->{doc}->{fromOCR} ? 1 : 0;
+        next if length($_[0]->{plaintext}) != length($h->{plaintext});
         $count++;
     }
     return min(1, $count / $num*3);
+};
+
+$f{'outside normal page dimensions'} = sub {
+    return 1 if $_[0]->{bottom} < $_[0]->{doc}->{geometry}->{top};
+    return 1 if $_[0]->{top} > $_[0]->{doc}->{geometry}->{bottom};
+    return 0;
 };
 
 $f{'previous line FOOTER'} = sub {

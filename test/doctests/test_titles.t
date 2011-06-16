@@ -162,6 +162,10 @@ my %tests = (
    title => "Ancient Tragedy and Other Selves",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/33-Thomson-Philosophical.pdf' => {
+   authors => ["Iain Thomson"],
+   title => "The Philosophical Fugue: Understanding the Structure and Goal of Heidegger's <I>Beitr4ge</I>",
+ },
 
 );
 
