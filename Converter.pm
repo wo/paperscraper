@@ -37,9 +37,9 @@ sub convert2pdf {
   SWITCH: for ($filetype) {
       /html|txt/ && do {
 	  push @converters_used, 'wkhtmltopdf';
+          $source =~ s/([^A-Za-z0-9\/])/sprintf("%%%02X", ord($1))/seg;
           $source = File::Spec->rel2abs($source);
           # url-encode:
-          $source =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 	  my $command = $cfg{'WKHTMLTOPDF'}
               ." --encoding utf-8"
               ." file://$source"
