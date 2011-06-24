@@ -171,6 +171,7 @@ sub process {
     foreach my $new_link (@links) {
         my $url = $$new_link{href};
         my $text = $$new_link{_TEXT};
+        next unless $text;
         binmode STDOUT, ":utf8"; # why oh why?
         print "checking link: $url ($text)\n" if ($verbosity > 1);
         next if ($url eq $page->{url});
