@@ -119,7 +119,7 @@ while (my $loc = shift @queue) {
     leave(1) if (@abort);
     system("touch '$lockfile'");
     my $err = process($loc);
-    system("rm -f '$TEMPDIR*'") unless $verbosity > 1;
+    system("rm -f \"$TEMPDIR\"*") unless $verbosity > 1;
     leave(0) if $opts{p} || $opts{s};
 }
 leave(0);
