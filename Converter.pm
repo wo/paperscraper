@@ -35,7 +35,7 @@ sub convert2pdf {
     my ($basename, $filetype) = ($source =~ /^(.*?)\.?([^\.]+)$/);
     print "converting $source to pdf\n" if $verbosity;
   SWITCH: for ($filetype) {
-      /html|txt/ && do {
+      /html|txt/i && do {
 	  push @converters_used, 'wkhtmltopdf';
           $source =~ s/([^A-Za-z0-9\/])/sprintf("%%%02X", ord($1))/seg;
           $source = File::Spec->rel2abs($source);
@@ -50,7 +50,7 @@ sub convert2pdf {
 	  die "wkhtmltopdf failed" unless -e $target;
 	  return 1;
       };
-      /doc/ && do {
+      /doc/i && do {
 	  push @converters_used, 'unoconv';
 	  my $command = $cfg{'UNOCONV'}
 	      .' -f pdf'
@@ -68,7 +68,7 @@ sub convert2pdf {
               unless ($content && $content =~ /%PDF/);
 	  return save($target, $content);
       };
-      /rtf/ && do {
+      /rtf/i && do {
 	  push @converters_used, 'rtf2pdf';
 	  my $command = $RTF2PDF
 	      ." \"$source\"" 
@@ -79,7 +79,7 @@ sub convert2pdf {
 	  die "rtf2pdf failed" unless -e $target;
 	  return 1;
       };
-      /ps/ && do {
+      /ps/i && do {
           # ps2pdf uses a made-up character map for the generated pdf,
           # so pdftohtml won't be able to extract any text info, and we
           # have to resort to OCR. Should look for a better converter.
@@ -107,23 +107,23 @@ sub convert2text {
 	die "$filename does not exist";
     }
   SWITCH: for ($filetype) {
-      /html/ && do {
+      /html/i && do {
 	  $text = readfile($filename);
           $text = strip_tags($text);
 	  last;
       };
-      /pdf/ && do {
+      /pdf/i && do {
 	  convert2xml($filename, "$filename.xml") or return undef;
           $text = readfile("$filename.xml");
           $text = strip_tags($text);
 	  last;
       };
-      /ps/ && do {
+      /ps/i && do {
 	  convert2pdf($filename, "$filename.pdf") or return undef;
 	  $text = convert2text("$filename.pdf");
 	  last;
       };
-      /doc|rtf/ && do {
+      /doc|rtf/i && do {
 	  my $command = $cfg{'UNOCONV'}
 	      .' -f html'
               .' --stdout'
@@ -133,7 +133,7 @@ sub convert2text {
           $text = strip_tags($html);
 	  last;
       };
-      /txt/ && do {
+      /txt/i && do {
 	  $text = readfile($filename);
 	  last;
       };
@@ -151,7 +151,7 @@ sub convert2xml {
     my ($basename, $filetype) = ($filename =~ /^(.*?)\.?([^\.]+)$/);
     print "getting XML from $filename\n" if $verbosity;
   SWITCH: for ($filetype) {
-      /pdf/ && do {
+      /pdf/i && do {
 	  my $command = $RPDF
               ." -d$verbosity"
 	      ." \"$filename\""
