@@ -551,7 +551,7 @@ $f{'is known work'} = sub {
                            title => $title,
                            year => $year);
     $_[0]->{known_id} = $id if $id;
-    return $id;
+    return 1;
 };
 
 

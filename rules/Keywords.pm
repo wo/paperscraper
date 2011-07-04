@@ -165,7 +165,7 @@ our $re_title = qr/^
 # words that suggest title continues on next line:
 our $re_bad_ending = qr/
     \b(?:
-       of|and|or
+       of|and|or|the
     )\b
     /ix;
 
