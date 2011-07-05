@@ -121,13 +121,14 @@ sub init {
         my @pagechunks;
         while ($page =~ /(<text.*?>.*?<\/text>)/isgo) {
             my $chunk = xml2chunk($1);
+            next unless $chunk->{height};
             $chunk->{fsize} = $fontsizes{$chunk->{font}} || 1;
             # yes, sometimes blocks have unspec'd font: 49803
             $chunk->{id} = $lineno++;
             $chunk->{textpos} = $charno;
             $charno += length $chunk->{plaintext};
             $chunk->{doc} = $self;
-            pushlink @pagechunks, $chunk if $chunk->{height};
+            pushlink @pagechunks, $chunk;
         }
         next unless @pagechunks;
         pushlink @{$self->{pages}}, pageinfo(\@pagechunks, $pageno);
@@ -191,7 +192,6 @@ sub pageinfo {
     $page{top} = min(map { $_->{top} } @$chunks);
     $page{bottom} = max(map { $_->{bottom} } @$chunks);
     $page{height} = $page{bottom} - $page{top};
-    $page{lines} = $#$chunks;
     $page{chunks} = $chunks;
     $page{doc} = $chunks->[0]->{doc};
     if ($verbosity > 1) {
@@ -290,22 +290,8 @@ sub strip_coverpages {
 
     foreach my $page (@{$res->{COVERPAGE}}) {
         say(4, "stripping cover page $page->{number}");
-        removelink($page);
-        foreach my $ch (@{$page->{chunks}}) {
-            removelink($ch);
-        }
+        remove_page($page);
     }
-
-    # ignore removed chunks:
-    $self->{chunks} = [ grep { ! $_->{_REMOVED} } @{$self->{chunks}} ];
-    for my $i (0 .. $#{$self->{chunks}}) {
-        $self->{chunks}->[$i]->{id} = $i;
-    }
-    $self->{pages} = [ grep { ! $_->{_REMOVED} } @{$self->{pages}} ];
-    for my $i (0 .. $#{$self->{pages}}) {
-        $self->{pages}->[$i]->{number} = $i;
-    }
-
 }
 
 sub strip_marginals {
@@ -338,20 +324,14 @@ sub strip_marginals {
     foreach my $ch (@{$headers->{HEADER}}) {
         say(5, "header: $ch->{text}");
         push @{$self->{marginals}}, $ch;
-        removelink($ch);
+        remove_chunk($ch);
     }
 
     foreach my $ch (@{$footers->{FOOTER}}) {
         next if $ch->{p}->('FOOTER') < 0.5;
         say(5, "footer: $ch->{text}");
         push @{$self->{marginals}}, $ch;
-        removelink($ch);
-    }
-
-    # ignore removed chunks:
-    $self->{chunks} = [ grep { ! $_->{_REMOVED} } @{$self->{chunks}} ];
-    for my $i (0 .. $#{$self->{chunks}}) {
-        $self->{chunks}->[$i]->{id} = $i;
+        remove_chunk($ch);
     }
 }
 
@@ -373,17 +353,50 @@ sub strip_footnotes {
         say(4, "footnote: $ch->{text}...");
         while (1) {
             push @{$self->{footnotes}}, $ch;
-            removelink($ch);
+            remove_chunk($ch);
             $note_lines{$ch} = 1;
             last unless $ch->{next} && $ch->{page} == $ch->{next}->{page};
             $ch = $ch->{next};
         }
     }
+}
 
-    # ignore removed chunks:
-    $self->{chunks} = [ grep { ! $_->{_REMOVED} } @{$self->{chunks}} ];
-    for my $i (0 .. $#{$self->{chunks}}) {
-        $self->{chunks}->[$i]->{id} = $i;
+sub remove_chunk {
+    my $chunk = shift;
+    removelink($chunk);
+
+    my $doc = $chunk->{doc};
+    my $rem = splice @{$doc->{chunks}}, $chunk->{id}, 1;
+    for my $i ($chunk->{id} .. $#{$doc->{chunks}}) {
+        $doc->{chunks}->[$i]->{id} = $i;
+    }
+
+    my $page = $chunk->{page};
+    $page->{chunks} = [ grep { ! $_->{_REMOVED} } @{$page->{chunks}} ];
+    $page->{left} = min(map { $_->{left} } @{$page->{chunks}});
+    $page->{right} = max(map { $_->{right} } @{$page->{chunks}});
+    $page->{width} = $page->{right} - $page->{left};
+    $page->{top} = min(map { $_->{top} } @{$page->{chunks}});
+    $page->{bottom} = max(map { $_->{bottom} } @{$page->{chunks}});
+    $page->{height} = $page->{bottom} - $page->{top};
+}
+
+sub remove_page {
+    my $page = shift;
+    removelink($page);
+
+    my $doc = $page->{doc};
+    my $rem = splice @{$doc->{pages}}, $page->{number}-1, 1;
+    for my $i ($page->{number}-1 .. $#{$doc->{pages}}) {
+        $doc->{chunks}->[$i]->{number} = $i+1;
+    }
+
+    for my $chunk (@{$page->{chunks}}) {
+        removelink($chunk);
+        splice @{$doc->{chunks}}, $chunk->{id}, 1;
+        for my $i ($chunk->{id} .. $#{$doc->{chunks}}) {
+            $doc->{chunks}->[$i]->{id} = $i;
+        }
     }
 }
 
