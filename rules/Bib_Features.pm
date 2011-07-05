@@ -291,7 +291,7 @@ $f{'after quote'} = memoize(sub {
     while (($w = $w->{prev})) {
         $str = $w->{text}.' '.$str;
     }
-    if ($str =~ /.*$re_lquote(.*?)$/ && $1 =~ /$re_rquote/) {
+    if ($str =~ /$re_lquote(.*)$/ && $1 =~ /$re_rquote/) {
         return 1;
     }
     return 0;

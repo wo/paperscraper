@@ -884,6 +884,84 @@ my %tests = (
  ],
 
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Silby-Zombies.pdf' => [
+   {
+    authors => ["D. Armstrong"],
+    title => "What is Consciousness",
+    year => "1981",
+   },
+   {
+    authors => ["N. Block"],
+    title => "On a Confusion about a Function of Consciousness",
+    year => "1995",
+   },
+   {
+    authors => ["D. Chalmers"],
+    title => "The Conscious Mind",
+    year => "1996",
+   },
+   {
+    authors => ["A. Cottrell"],
+    title => "On the conceivability of zombies: Chalmers v. Dennett",
+    year => "1996",
+   },
+   {
+    authors => ["D. Dennett"],
+    title => "Quining Qualia",
+    year => "1988",
+   },
+   {
+    authors => ["D. Dennett"],
+    title => "Consciousness Explained",
+    year => "1993",
+   },
+   {
+    authors => ["D. Dennett"],
+    title => "The Unimagined Preposterousness of Zombies",
+    year => "1995",
+   },
+   {
+    authors => ["D. Dennett"],
+    title => "The Path Not Taken",
+    year => "1995",
+   },
+   {
+    authors => ["F. Dretske"],
+    title => "Conscious Experience",
+    year => "1993",
+   },
+   {
+    authors => ["G. Guzeldere"],
+    title => "Introduction: The Many Faces of Consciousness: A Field Guide",
+    year => "1997",
+   },
+   {
+    authors => ["T. Horgan"],
+    title => "Supervenient Qualia",
+    year => "1987",
+   },
+   {
+    authors => ["J. Levine"],
+    title => "On Leaving Out What It's Like",
+    year => "1993",
+   },
+   {
+    authors => ["G. Rey"],
+    title => "Contemporary Philosophy of Mind",
+    year => "1997",
+   },
+   {
+    authors => ["S. Shoemaker"],
+    title => "Functionalism and Qualia",
+    year => "1975",
+   },
+   {
+    authors => ["G. Vision"],
+    title => "Blindsight and Philosophy",
+    year => "1998",
+   },
+ ],
+
 );
 
 

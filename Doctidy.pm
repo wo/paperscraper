@@ -405,6 +405,9 @@ sub fixchars {
         $str =~ s/$key/$esc/g;
     }
 
+    # replace &quot; by ":
+    $str =~ s/&quot;/"/g;
+
     # strip newline characters within text chunks:
     $str =~ s/\n//g;
 

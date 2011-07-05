@@ -200,6 +200,7 @@ $features{BIBSTART} = [
     ['previous line BIBSTART', [-0.2, 0.1], 3],
     ['near other BIBs', [0.3, -0.3], 2],
     ['resembles best BIBSTART', [0.3, -0.7], 3],
+    ['continues bib item', [-0.4, 0.4], 3],
     ];
 
 1;
@@ -243,7 +244,7 @@ $f{'resembles other HEADERs'} = sub {
         next if length($_[0]->{plaintext}) != length($h->{plaintext});
         $count++;
     }
-    return $count/4;
+    return min(1, $count/4);
 };
 
 $f{'resembles other FOOTERs'} = sub {
@@ -547,6 +548,17 @@ $f{'continues abstract'} = sub {
     $score -= (gap($_[0], 'prev')-1) / 10;
     return max(0, min(1, $score));
 };
+
+$f{'continues bib item'} = sub {
+    my $prev = $_[0]->{prev};
+    return 0 unless $prev && $prev->{p}->('BIB') > 0.5;
+    my $score = 0.6;
+    $score += 0.2 if ($prev->{plaintext} =~ /([\:\;\-\,\pL])$/);
+    $score -= 0.2 if ($prev->{plaintext} =~ /\.$/);
+    my $gap = gap($_[0], 'prev');
+    $score -= ($gap-1) / 10 if $gap;
+    return max(0, min(1, $score));
+};
  
 $f{'best title'} = sub {
     my $best = $_[0]->{best}->{TITLE}->[0];
@@ -594,10 +606,10 @@ $f{'resembles best BIB'} = sub {
     return 0 unless $best;
     return 1 if $_[0] == $best;
     my $ret = 1;
-    $ret -= 0.6 if $_[0]->{fsize} != $best->{fsize};
+    $ret -= abs($_[0]->{fsize} - $best->{fsize})/5;
     $ret -= abs($_[0]->{page}->{number} - $best->{page}->{number})/10;
     my $inbib = $f{'in bibliography section'};
-    $ret -= 0.8 if $inbib->($best) && !$inbib->($_[0]);
+    $ret -= abs($inbib->($best) - $inbib->($_[0]));
     return max($ret, 0);
 };
 
@@ -610,7 +622,7 @@ $f{'resembles best BIBSTART'} = sub {
     $ret *= 0.4 if abs($_[0]->{left} - $best->{left}) > 5;
     $ret *= 1 - abs($_[0]->{page}->{number} - $best->{page}->{number})/10;
     my $inbib = $f{'in bibliography section'};
-    $ret *= 0.2 if $inbib->($best) && !$inbib->($_[0]);
+    $ret *= 1 - abs($inbib->($best) - $inbib->($_[0]));
     my $citlab = $f{'begins with citation label'};
     $ret *= 0.3 if $citlab->($best) && !$citlab->($_[0]);
     return max($ret, 0);
