@@ -373,40 +373,47 @@ sub tidy_text {
 
 sub fixchars {
     my $str = shift;
+    my %trans;
 
-    # Certain characters and character combinations may be extracted
+    # Some characters and character combinations are often extracted
     # incorrectly, depending on the program that generated the PDF
-    # file. For example, ligatures such as "fi", "fl", "ff" and "ffl"
-    # are often rendered using a special glyph rather than as
-    # individual characters, and this information may be lost in the
-    # textual representation. Also, some PDF generating programs may
-    # not correctly encode accented characters. For example, to draw a
-    # lowercase "u" with an umlaut accent, LaTeX draws a "u" and then
-    # draws an umlaut accent over it. This means that pdftohtml will
-    # extract two separate characters '..' and 'u'.
+    # file. For example, to draw a lowercase "u" with an umlaut
+    # accent, LaTeX sometimes draws a "u" and then an umlaut accent
+    # over it. This means that pdftohtml will extract two separate
+    # characters '¨' and 'u'.
 
-    $str =~ s/\x{a8}([AOUaou])/&$1uml;/g; # e.g. in 56544
+    $trans{"\x{a8}a"} = "\x{e4}"; # ä
+    $trans{"\x{a8}o"} = "\x{f6}"; # ö
+    $trans{"\x{a8}u"} = "\x{fc}"; # ü
+    $trans{"\x{a8}A"} = "\x{c4}"; # Ä
+    $trans{"\x{a8}O"} = "\x{d6}"; # Ö
+    $trans{"\x{a8}U"} = "\x{dc}"; # Ü
+    $trans{"\x{a8}\x{131}"} = "\x{ef}"; # ¨ı
+    $trans{"\x{a8}I"} = "\x{ff}"; # ¨I
 
-    my %transl = (
-                  "\x{fb00}" => "ff",
-                  "\x{fb01}" => "fi",
-                  "\x{fb02}" => "fl",
-                  "\x{fb03}" => "ffi",
-                  "\x{fb04}" => "ffl",
-                  "\x{fb05}" => "st",
-                  "\x10|\x11" => '"',
-                  "\x1b" => 'ff',
-                  "\x1d" => 'fl',
-                  "\x10" => '"',
-                  "\x10" => '"',
-                  "¤"    => 'ff'
-                 );
-    while (my ($key,$esc) = each(%transl)) {
+    # We also break apart ligatures:
+    
+    $trans{"\x{fb00}"} = "ff";
+    $trans{"\x{fb01}"} = "fi";
+    $trans{"\x{fb02}"} = "fl";
+    $trans{"\x{fb03}"} = "ffi";
+    $trans{"\x{fb04}"} = "ffl";
+    $trans{"\x{fb05}"} = "st";
+    $trans{"\x1b"} = "ff";
+    $trans{"\x1d"} = "fl";
+
+    # Some odd mistakes I have noticed:
+
+    $trans{"\x10|\x11"} = "\"";
+    $trans{"\x{a4}"} = "ff"; # ¤
+
+    # Replace HTML escape codes:
+    
+    $trans{"&quot;"} = "\"";
+
+    while (my ($key,$esc) = each(%trans)) {
         $str =~ s/$key/$esc/g;
     }
-
-    # replace &quot; by ":
-    $str =~ s/&quot;/"/g;
 
     # strip newline characters within text chunks:
     $str =~ s/\n//g;
