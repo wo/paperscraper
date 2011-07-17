@@ -167,6 +167,16 @@ my %tests = (
    title => "The Philosophical Fugue: Understanding the Structure and Goal of Heidegger's <I>Beitr4ge</I>",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/11-Bacon-Naive.pdf' => {
+   authors => ["Andrew Bacon"],
+   title => "A new conditional for naïve truth theory",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/22-Latham-Token.doc' => {
+   authors => ["Noa Latham"],
+   title => "What is Token Physicalism?",
+ },
+
 );
 
 sub proc {

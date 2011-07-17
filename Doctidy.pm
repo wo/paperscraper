@@ -405,6 +405,7 @@ sub fixchars {
     # Some odd mistakes I have noticed:
 
     $trans{"\x10|\x11"} = "\"";
+    $trans{"\x{a0}"} = " "; #  
     $trans{"\x{a4}"} = "ff"; # ¤
 
     # Replace HTML escape codes:
