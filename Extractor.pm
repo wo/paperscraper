@@ -799,6 +799,8 @@ sub extract_authors_and_title {
     foreach my $block (@{$parsing->{blocks}}) {
         if ($block->{label}->{TITLE}) {
             $self->{title} = tidy_text($block->{text});
+            # chop odd trailing punctuations:
+            $self->{title} =~ s|[\.,:;]$||;
             # TODO: remove authors from title if block is also title
         }
         if ($block->{label}->{AUTHOR}) {

@@ -110,8 +110,6 @@ sub tidy_text {
         $txt =~ s|^<([^>]+)>(.+)</\1>\s*$|$2|;
         # chop surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
-        # chop odd trailing punctuations:
-        $txt =~ s|[\.,:;]$||;
         # remove footnote marks:
         $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>||g;
         # and trailing footnote star *:
