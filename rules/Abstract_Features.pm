@@ -50,8 +50,8 @@ $f{'reasonably long'} = sub {
     if (length($str) > 1000) {
         return max(0, 1 - (length($str)-1000)/1000);
     }
-    if (length($str) < 300) {
-        return max(0, 1 - (300-length($str))/100);
+    if (length($str) < 250) {
+        return max(0, 1 - (250-length($str))/100);
     }
     return 1;
 };

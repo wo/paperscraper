@@ -137,31 +137,31 @@ $features{ABSTRACT} = [
     [$or->('normal font', 'small font'), [0.1, -0.6]],
     [$or->('gap above', 'gap below'), [-0.2, 0.1]],
     [$and->('gap above', 'gap below'), [-0.6, 0.1]],
-    ['begins with "abstract:"', [0.3, 0]],
+    ['begins with "abstract:"', [0.7, 0]],
     ['long', [0.2, -0.2]],
     ['matches content pattern', [0.1, -0.3]],
     ['preceeded by many ABSTRACTs', [-1, 0.1], 2],
-    ['probable HEADING', [-0.6, 0.1], 3],
+    ['probable HEADING', [-0.6, 0.2], 3],
     ['near other ABSTRACT', [0.3, -0.3], 3],
     ['continues abstract', [0.4, -0.1], 3],
     ];
 
 $features{ABSTRACTSTART} = [
     ['within first few pages', [0.2, -0.8]],
-    ['probable ABSTRACT', [0.2, -0.8], 2],
+    ['probable ABSTRACT', [0.3, -0.5], 2],
     ['long', [0.1, -0.4], 2],
     ['previous line short', [0.2, -0.2], 2],
     ['previous line probable HEADING', [0.4, -0.1], 2],
     ['previous line probable ABSTRACT', [-0.4, 0.2], 2],
     ['previous line ends with terminator', [0.1, -0.1], 2],
     ['begins in upper case', [0.1, -0.4], 2], 
-    ['begins with "abstract:"', [0.3, 0], 2],
+    ['begins with "abstract:"', [0.7, 0], 2],
     ['gap above', [0.2, -0.1]],
     ];
 
 $features{ABSTRACTEND} = [
     ['within first few pages', [0.2, -0.8]],
-    ['probable ABSTRACT', [0.2, -0.8], 2],
+    ['probable ABSTRACT', [0.3, -0.5], 2],
     ['next line indented', [0.2, -0.1], 2],
     ['long', [-0.1, 0.2], 2],
     ['previous line short', [-0.2, 0], 2],
@@ -337,7 +337,7 @@ $f{'normal font'} = memoize(sub {
 });
 
 $f{'small font'} = memoize(sub {
-    .5 + max(min(-1*$_[0]->{fsize}-1, 3), -3) / 6;
+    .5 + max(min(-1*$_[0]->{fsize}-1, 2), -2) / 4;
 });
 
 $f{'among first few lines'} = memoize(sub { 
@@ -903,8 +903,6 @@ $f{'ends with terminator'} = memoize(sub {
         /(\S+)([\.!\?])\s*(?:$re_rquote)?(.?)\s*$/o) {
         # discount endings like "ed." or "Vol." or "J.A.":
         return 0.75 if $1 && length($1) < 4 && $2 eq '.';
-        # character after terminator (footnote symbol?):
-        return 0.75 if $2;
         return 1;
     }
     return 0;

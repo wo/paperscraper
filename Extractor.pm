@@ -919,8 +919,9 @@ sub extract_abstract {
         $self->{confidence} *= 0.95;
         $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
     }
+    # strip "Abstract:" beginning:
+    $abstract =~ s/^\s*(<.>)*$re_abstract(<\/.>)*[\.:\n]\s*//i;
     $self->{abstract} = tidy_text($abstract);
-    $self->{abstract} .= '.' unless $self->{abstract} =~ /[!?]$/;
 
     say(1, "abstract: '", $self->{abstract}, "'");
 }
