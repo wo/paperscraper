@@ -216,8 +216,9 @@ our $re_lquote = '["“`‘¨‘‛‟„‵‶‷❛❝]';
 
 our $re_rquote = '["¨´’’‛”′″‴⁗❜❞]';
 
-our $re_year_words = 
-    '\b(?:forthcoming|manuscript|unpublished|typescript|draft)\b';
+our $re_year_words = qr/\b(?:
+    forthcoming|manuscript|unpublished|typescript|draft
+    )/ix;
 
 my $re_bad_abstract = qr/(?:
     ^\s*<sup>|

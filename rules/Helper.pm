@@ -208,7 +208,7 @@ sub known_work {
         my $work = {
             authors => [ split(/, /, $authors) ], 
             title => $title,
-            date => undef
+            date => ''
         };
         if (sameWork(\%args, $work)) {
             return $id;

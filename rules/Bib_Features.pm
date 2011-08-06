@@ -31,6 +31,7 @@ $fragment_features{AUTHOR} = [
     ['early in entry', [0.2, -0.4]],
     ['in quotes', [-0.7, 0.05]],
     ['italic', [-0.4, 0.05]],
+    ['publication status', [-0.7, 0]],
     ['after year string', [-0.4, 0.1]],
     ['after parenthesis', [-0.3, 0.05]],
     ['continues author', [0.6, -0.6], 2], 
@@ -57,6 +58,7 @@ $fragment_features{TITLE} = [
     ['after italics', [-0.4, 0]], 
     ['after quote', [-0.4, 0.05]],
     ['contains editor string', [-0.5, 0]],
+    ['publication status', [-0.7, 0]],
     ['probable AUTHOR', [-0.2, 0.05], 2], 
     ['part of best author sequence', [-0.3, 0.3], 2],
     ['contains journal or publisher word', [-0.2, 0], 2],
@@ -68,8 +70,8 @@ $fragment_features{TITLE} = [
     ];
  
 $fragment_features{YEAR} = [
-    ['year', [0.9, -0.8]],
-    ['publication status', [0.9, -0.1]],
+    [$or->('year', 'publication status'), [0.8, -0.8]],
+    ['year', [0.9, -0.1]],
     ];
 
 $fragment_features{OTHER} = [
@@ -164,14 +166,14 @@ my $re_year = '(?<!\d)[1-2]\d{3}(?!\d)';
 $f{'after year string'} = memoize(sub {
     my $w = $_[0];
     while ($w = $w->{prev}) {
-	return 1 if ($w->{text} =~ /$re_year|$re_year_words/);
+	return 1 if ($w->{text} =~ /$re_year|$re_year_words/i);
     }
     return 0;
 });
 
 $f{'follows year'} = sub {
     if ($_[0]->{prev} && 
-        $_[0]->{text} =~ /$re_year|$re_year_words/) {
+        $_[0]->{text} =~ /$re_year|$re_year_words/i) {
         return 1;
     }
     return 0;
@@ -536,22 +538,13 @@ $f{'lengthy OTHER block before title'} = sub {
 
 our $known_work = \&known_work;
 $f{'is known work'} = sub {
-    my (@authors, $title, $year);
-    foreach my $bl (@{$_[0]->{blocks}}) {
-        if ($bl->{label}->{TITLE}) {
-            $title = $bl->{text};
-        }
-        elsif ($bl->{label}->{AUTHOR}) {
-            push @authors, $bl->{text};
-        }
-    }
-    return 0 unless (@authors && $title);
-    # TODO: tidy up authors and title?
-    my $id = $known_work->(authors => \@authors,
-                           title => $title,
-                           year => $year);
-    $_[0]->{known_id} = $id if $id;
-    return 1;
+    my $bib = $_[0]->{bib};
+    return 0 unless (@{$bib->{authors}} && $bib->{title});
+    my $id = $known_work->(authors => $bib->{authors},
+                           title => $bib->{title},
+                           year => $bib->{year});
+    $bib->{known_id} = $id if $id;
+    return $id ? 1 : 0;
 };
 
 

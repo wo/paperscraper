@@ -5,7 +5,6 @@ use File::Basename;
 use Cwd 'abs_path';
 use String::Approx 'amatch';
 use Memoize;
-use Text::Names;
 use List::Util qw/min max/;
 use util::Functools qw/someof allof/;
 use util::String;

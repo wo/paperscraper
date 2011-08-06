@@ -2,9 +2,9 @@ package Extractor;
 use strict;
 use warnings;
 use Memoize;
-use List::Util qw/min max reduce/;
+use List::Util qw/min max reduce first/;
 use Statistics::Lite 'stddev';
-use Text::Names 'samePerson';
+use Text::Names qw/samePerson parseNames reverseName/;
 use Cwd 'abs_path';
 use File::Basename;
 use Encode;
@@ -990,7 +990,6 @@ sub extract_bibliography {
       say(5, "Quality: ", $parsing->{quality});
       push @parsings, $parsing;
   }
-    say(5, "end of parsings");
 
     @parsings = sort { $b->{quality} <=> $a->{quality} } @parsings;
 
@@ -998,20 +997,18 @@ sub extract_bibliography {
     say(3, "best parsing", $parsing->{text});
 
     foreach my $block (@{$parsing->{blocks}}) {
-        my $entry = $self->parsebib($block);
-        if ($entry) {
-            if (@{$entry->{authors}} && $entry->{authors}->[0] eq '-'
-                && @{$self->{bibliography}}) {
-                $entry->{authors} = $self->{bibliography}->[-1]->{authors};
-            }
-            push @{$self->{bibliography}}, $entry;
-        }
+        # need to pass previous authors in case author field is '--':
+        my @last_authors = @{$self->{bibliography}} ?
+            @{$self->{bibliography}->[-1]->{authors}} : ();
+        my $entry = $self->parsebib($block, @last_authors);
+        push(@{$self->{bibliography}}, $entry) if $entry;
     }
 }
 
 sub parsebib {
     my $self = shift;
     my $entry = shift;
+    my @last_authors = @_;
     say(3, "\nparsing bib entry: ", $entry->{text});
     
     $entry->{text} = tidy_text($entry->{text});
@@ -1070,21 +1067,15 @@ sub parsebib {
       say(5, "evaluating parsing $counter (sat $satisfaction)");
       my @blocks;
       my $mkblock = make_block(' ');
-      my ($author, $title);
+      my %fields;
       for (my $i=0; $i < @$chunks; $i++) {
           my $chunk = $chunks->[$i];
           my $is = $chunk->{label};
-          say(5, "  $i: ",($is->{TITLE} ? 'TITLE ' : ''),
-              ($is->{AUTHOR} ? 'AUTHOR ' : ''),
-              ($is->{YEAR} ? 'YEAR ' : ''),
-              '| ', $chunk->{text});
-          if ($is->{TITLE} && $title || $is->{AUTHOR} && $author) {
+          my $label = first { $is->{$_} } @labels;
+          say(5, "  $i: $label | ", $chunk->{text});
+          if (grep($label, ('AUTHOR', 'TITLE')) && $fields{$label}) {
               say(5, "double title or author");
               next PARSING;
-          }
-          my $label = '';
-          foreach (@labels) {
-              $label = $_ if $is->{$_};
           }
           my @block_chunks = ($chunk);
           while ($chunks->[$i+1]
@@ -1094,10 +1085,13 @@ sub parsebib {
           my $block = $mkblock->(@block_chunks);
           $block->{id} = scalar @blocks;
           pushlink @blocks, $block;
-          $title = $block if $is->{TITLE};
-          $author = $block if $is->{AUTHOR};
+          $fields{$label} = $block;
       }
       my $parsing = parsing(\@blocks);
+      if ($fields{'AUTHORDASH'}) {
+          $parsing->{dash_authors} = \@last_authors;
+      }
+      $parsing->{bib} = bib_from_parsing($parsing);
       my $quality = $evaluator->($parsing);
       say(5, "Quality: $quality");
       if ($quality > 0.5) {
@@ -1107,37 +1101,47 @@ sub parsebib {
       }
   }
 
-    my $res = { authors => [] };
+    return { authors => [] } unless @parsings;
 
-    if (@parsings) {
-        @parsings = sort { $b->{quality} <=> $a->{quality} } @parsings;
+    @parsings = sort { $b->{quality} <=> $a->{quality} } @parsings;
 
-        my $parsing = shift @parsings;
-        say(3, "best parsing", $parsing->{text});
-        foreach my $block (@{$parsing->{blocks}}) {
-            if ($block->{label}->{TITLE}) {
-                $res->{title} = tidy_text($block->{text});
-                say(3, "title: $res->{title}");
-            }
-            elsif ($block->{label}->{AUTHORDASH}) {
-                $res->{authors} = ['-'];
-                say(3, 'authors: -');
-            }
-            elsif ($block->{label}->{AUTHOR}) {
-                my @authors = Text::Names::parseNames($block->{text});
-                @authors = map { Text::Names::reverseName($_) } @authors;
-                $res->{authors} = \@authors;
-                say(3, 'authors: '.join('; ', @authors));
-            }
-            elsif ($block->{label}->{YEAR} && !$res->{year}) {
-                $res->{year} = $block->{text};
-                $res->{year} =~ s/.*(\d{4}(?:$re_dash\d{2,4})?).*/$1/;
-                say(3, "year: $res->{year}");
-            }
+    my $parsing = shift @parsings;
+    say(3, "best parsing", $parsing->{text});
+    my $res = $parsing->{bib};
+    say(3, "authors: ", @{$res->{authors}}, "; ",
+           "title: $res->{title}; year: $res->{year}; ",
+           "known id: $res->{known_id}");
+    return $res;
+
+}
+
+sub bib_from_parsing {
+    my $parsing = shift;
+    my %fields;
+    foreach my $bl (@{$parsing->{blocks}}) {
+        foreach my $label (keys %{$bl->{label}}) {
+            $fields{$label} ||= $bl->{text};
         }
-        $res->{id} = $parsing->{known_id};
     }
-
+    my $res;
+    $res->{title} = tidy_text($fields{TITLE} || '');
+    $res->{title} =~ s/[\.,]$//;
+    $res->{year} = $fields{YEAR} || '';
+    $res->{year} =~ s/.*(\d{4}(?:$re_dash\d{2,4})?).*/$1/;
+    $res->{authors} = [];
+    if ($fields{AUTHOR}) {
+        my @authors = Text::Names::parseNames($fields{AUTHOR});
+        @authors = map { Text::Names::reverseName($_) } @authors;
+        $res->{authors} = \@authors;
+    }
+    if ($parsing->{dash_authors}) {
+        $res->{authors} = [@{$parsing->{dash_authors}}, @{$res->{authors}}];
+    }
+    if ($verbosity > 4) {
+        say(5, 'tidied-up bib:');
+        use Data::Dumper;
+        print Dumper $res;
+    }
     return $res;
 }
 
