@@ -1124,8 +1124,9 @@ sub bib_from_parsing {
         }
     }
     my $res;
-    $res->{title} = tidy_text($fields{TITLE} || '');
+    $res->{title} = $fields{TITLE} || '';
     $res->{title} =~ s/[\.,]$//;
+    $res->{title} = tidy_text($res->{title});
     $res->{year} = $fields{YEAR} || '';
     $res->{year} =~ s/.*(\d{4}(?:$re_dash\d{2,4})?).*/$1/;
     $res->{authors} = [];
