@@ -143,39 +143,36 @@ sub convert2text {
     return $text;
 }
 
-
 sub convert2xml {
     my $filename = shift or die "convert2xml requires filename parameter";
     my $target = shift;
     $target = "$filename.xml" unless $target;
     my ($basename, $filetype) = ($filename =~ /^(.*?)\.?([^\.]+)$/);
     print "getting XML from $filename\n" if $verbosity;
-  SWITCH: for ($filetype) {
-      /pdf/i && do {
-	  my $command = $RPDF
-              ." -d$verbosity"
-	      ." \"$filename\""
-              ." \"$target\""
-	      .' 2>&1';
-	  my $out = sysexec($command, 60, $verbosity) || '';
-          print "$out\n" if $verbosity > 6;
-	  die "pdf conversion failed" unless -e "$target";
-          add_meta($target, "converter", "rpdf");
-          Doctidy::verbose(1) if $verbosity > 4;
-          doctidy($target);
-	  return 1;
-      };
-      # convert other formats to PDF:
-      if (convert2pdf($filename, "$filename.pdf")) {
-	  my $out = convert2xml("$filename.pdf", "$filename.xml");
-          foreach my $con (@converters_used) {
-              add_meta("$filename.xml", "converter", $con);
-          }
-          system("rm \"$filename.pdf\"");
-          return $out;
-      }
-      die "pdf conversion failed";
-  }
+    if ($filetype =~ /pdf/i) {
+        my $command = $RPDF
+            ." -d$verbosity"
+            ." \"$filename\""
+            ." \"$target\""
+            .' 2>&1';
+        my $out = sysexec($command, 60, $verbosity) || '';
+        print "$out\n" if $verbosity > 6;
+        die "pdf conversion failed" unless -e "$target";
+        add_meta($target, "converter", "rpdf");
+        Doctidy::verbose(1) if $verbosity > 4;
+        doctidy($target);
+        return 1;
+    }
+    # convert other formats to PDF:
+    if (convert2pdf($filename, "$filename.pdf")) {
+        my $out = convert2xml("$filename.pdf", $target);
+        foreach my $con (@converters_used) {
+            add_meta($target, "converter", $con);
+        }
+        system("rm \"$filename.pdf\"");
+        return $out;
+    }
+    die "pdf conversion failed";
 }
 
 1;
