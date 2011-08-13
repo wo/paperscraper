@@ -47,7 +47,7 @@ my $is_cgi = $cgi->param('action');
 sub ret {
     my ($status, $msg) = @_;
     if ($is_cgi) {
-        print "{ status:'$status', msg:'$msg' }\n";
+        print "{ \"status\":\"$status\", \"msg\":\"$msg\" }\n";
         exit;
     }
     print "".($status ? "OK" : "Error").": $msg\n";
