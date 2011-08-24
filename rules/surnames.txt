@@ -2194,7 +2194,6 @@ shah
 mcmillian
 baggett
 torrez
-laws
 hirsch
 dent
 corey
@@ -2208,7 +2207,6 @@ trimble
 france
 dupre
 albrecht
-sample
 lawler
 crisp
 conroy
@@ -2337,7 +2335,6 @@ schuster
 radford
 monk
 mattingly
-main
 lamar
 harp
 girard

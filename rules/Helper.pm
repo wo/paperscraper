@@ -107,16 +107,17 @@ sub extract_names {
             #print "**skipping $part\n";
             next;
         }
-        my $p = 0.5;
+        my $p = 0.4;
         my ($name, $first, $last) = ($1, $2, $3);
         foreach my $w (split /\s+/, $first) {
             if ($w =~ /^\p{IsUpper}\.?$/) {
                 $p += 0.1;
+                next;
             }
-            elsif (in_dict($w, 'firstnames')) {
-                $p += 0.2;
+            if (in_dict($w, 'firstnames')) {
+                $p += 0.3;
             }
-            elsif (in_dict($w, 'commonwords')) {
+            if (in_dict($w, 'commonwords')) {
                 $p -= 0.2
             }
         }
@@ -125,7 +126,7 @@ sub extract_names {
             if (in_dict($w, 'surnames')) {
                 $p += 0.3;
             }
-            elsif (in_dict($w, 'commonwords')) {
+            if (in_dict($w, 'commonwords')) {
                 $p -= 0.2
             }
             elsif (is_word($w)) {

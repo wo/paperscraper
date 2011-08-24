@@ -177,6 +177,11 @@ my %tests = (
    title => "What is Token Physicalism?",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Anon-Interpretive.doc' => {
+   authors => [""],
+   title => "Hard Problems, Interpretive Concepts, and Humean Laws",
+ },
+
 );
 
 sub proc {
