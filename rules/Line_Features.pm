@@ -773,7 +773,7 @@ $f{'begins inside quote'} = sub {
 
 $f{'begins with citation label'} = begins_plain($re_cit_label);
 
-$f{'begins with "abstract:"'} = begins_plain($re_abstract);
+$f{'begins with "abstract:"'} = begins_plain("$re_abstract.*\\w+");
 
 $f{'begins with dash'} = begins_plain($re_dash);
 

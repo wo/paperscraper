@@ -14,7 +14,7 @@ our @block_features = (
     ['begins and ends neatly', [0.1, -0.3]],
     ['first chunk probable ABSTRACTSTART', [0.2, -0.3]],
     ['last chunk probable ABSTRACTEND', [0.2, -0.3]],
-    ['contains legalese or publication info', [-0.4, 0]],
+    ['contains legalese, publication or acknowledgment words', [-0.4, 0]],
     );
 
 my %f;
@@ -61,10 +61,10 @@ $f{'begins and ends neatly'} = sub {
     return 0 unless $_[0]->[-1]->{plaintext} =~ /[\.\?!]\d?$/;
 };
 
-$f{'contains legalese or publication info'} = sub {
+$f{'contains legalese, publication or acknowledgment words'} = sub {
     my $count = 0;
     my $badwords = qr/$re_legalese|$re_publication_word|
-                     $re_publisher|$re_journal/x;
+                     $re_publisher|$re_journal|$re_thanks/x;
     foreach my $chunk (@{$_[0]}) {
         $count++ while ($chunk->{plaintext} =~ /$badwords/g);
         return 1 if $count > 3;

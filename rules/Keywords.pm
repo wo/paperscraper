@@ -28,6 +28,7 @@ $re_journal
 $re_publisher
 $re_publication_word
 $re_legalese
+$re_thanks
 $re_year_words
 $re_lquote
 $re_rquote
@@ -79,6 +80,10 @@ our $re_editor = qr/^\(?ed(?:itor)?s?[\.\)].?$/ix;
 our $re_legalese = qr/\b(?:
     copyright|\(c\)|©|trademarks?|registered|
     terms\sand\sconditions|http|permission
+    )\b/ix;
+
+our $re_thanks = qr/\b(?:
+    thank|comments|suggestions|helpful|grateful
     )\b/ix;
 
 our $re_coverpage = qr/\b(?:
@@ -218,15 +223,6 @@ our $re_rquote = '["¨´’’‛”′″‴⁗❜❞]';
 
 our $re_year_words = qr/\b(?:
     forthcoming|manuscript|unpublished|typescript|draft
-    )/ix;
-
-my $re_bad_abstract = qr/(?:
-    ^\s*<sup>|
-    table\sof\scontents|\bdraft\b|forthcoming|\beditor
-    |\bpress\b|\bpublish|Vol\.|
-    terms\sand\sconditions|copyright|journal\b|jstor|permission|
-    @|url|http|
-    \bthank
     )/ix;
 
 
