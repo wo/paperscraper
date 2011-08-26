@@ -23,12 +23,12 @@ libaspell-dev                    (all formats)
 On recent Ubuntu versions, the following installs everything except
 cuneiform and wkhtmltopdf:
 
-  sudo aptitude install poppler-utils pdftk imagemagick ghostscript \
+  sudo apt-get install poppler-utils pdftk imagemagick ghostscript \
   openoffice.org unoconv aspell-en libaspell-dev
 
 The cuneiform version in the standard repositories too old: we need at
 least 0.9. For Debian-based systems, you can get a recent version from
-http://notesalexp.org/.
+http://notesalexp.org.
 
 For wkhtmltopdf, I recommend a recent static binary from
 http://code.google.com/p/wkhtmltopdf/. Simply download, unpack, and
@@ -37,7 +37,7 @@ move the binary, e.g. wkhtmltopdf-i386, to /usr/bin/wkhtmltopdf.
 Finally, make sure you have the following CPAN Perl modules. (You may
 need to install gcc and openssl first.)
 
-  sudo aptitude install gcc openssl libssl-dev
+  sudo apt-get install gcc openssl libssl-dev
 
   sudo cpan -i HTML::LinkExtractor
   sudo cpan -i HTML::Encoding
