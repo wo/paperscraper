@@ -63,7 +63,7 @@ sub convert2pdf {
               $content = sysexec($command, 10, $verbosity) || '';
           }
           # shut down listener daemon (hack!):
-          system('killall soffice.bin');
+          # system('killall soffice.bin');
 	  die "unoconv failed"
               unless ($content && $content =~ /%PDF/);
 	  return save($target, $content);
