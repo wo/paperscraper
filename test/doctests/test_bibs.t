@@ -967,7 +967,12 @@ my %tests = (
 
 sub proc {
     my $file = shift;
-    convert2xml($file);
+    eval {
+        convert2xml($file);
+    };
+    if ($@) {
+        return '';
+    }
     my $extractor = Extractor->new("$file.xml");
     $extractor->extract(qw/bibliography/);
     system("rm $file.xml");
@@ -975,6 +980,7 @@ sub proc {
 }
 
 while (my ($file, $res) = each(%tests)) {
+    print substr($file, length('/home/wo/programming/opp-tools/test/doctests/')), "\n";
     my $bib = proc($file);
     print "\n",("=" x 70),"\n== $file\n", ("=" x 70), "\n\n";
     if (scalar @$bib != scalar @$res) {

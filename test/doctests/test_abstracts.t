@@ -44,7 +44,12 @@ my %tests = (
 
 sub proc {
     my $file = shift;
-    convert2xml($file);
+    eval {
+        convert2xml($file);
+    };
+    if ($@) {
+        return '';
+    }
     my $extractor = Extractor->new("$file.xml");
     $extractor->extract('abstract');
     system("rm $file.xml");
@@ -52,5 +57,6 @@ sub proc {
 }
 
 while (my ($file, $res) = each(%tests)) {
+    print substr($file, length('/home/wo/programming/opp-tools/test/doctests/')), "\n";
     is(proc($file), $res);
 }
