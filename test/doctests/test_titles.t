@@ -195,7 +195,7 @@ sub proc {
         convert2xml($file);
     };
     if ($@) {
-        return ('', '');
+        return ([], '');
     }
     my $extractor = Extractor->new("$file.xml");
     $extractor->extract(qw/authors title/);
