@@ -182,6 +182,11 @@ my %tests = (
    title => "Hard Problems, Interpretive Concepts, and Humean Laws",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Galileo-Sopra.pdf' => {
+   authors => [""],
+   title => "Sopra le Scoperte Dei Dadi",
+ },
+
 );
 
 sub proc {
