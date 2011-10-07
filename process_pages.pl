@@ -205,6 +205,7 @@ sub process {
             or print DBI->errstr;
         if ($res eq '0E0') {
             # insert ignored due to duplicate url
+            print "(location already in database)\n" if $verbosity;
             next LINKS;
         }
         my $loc_id = $db_insert_location->{mysql_insertid};
