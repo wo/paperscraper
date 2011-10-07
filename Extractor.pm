@@ -801,19 +801,30 @@ sub extract_authors_and_title {
             $self->{title} = tidy_text($block->{text});
             # chop odd trailing punctuations:
             $self->{title} =~ s|[\.,:;]$||;
-            # TODO: remove authors from title if block is also title
+            if ($block->{label}->{AUTHOR}) {
+                foreach my $name (keys %{$block->{chunks}->[0]->{names}}) {
+                    $self->{title} =~ s/$name//i;
+                    $self->{title} =~ s/$re_name_separator//;
+                }
+            }
         }
         if ($block->{label}->{AUTHOR}) {
             foreach my $chunk (@{$block->{chunks}}) {
-                foreach my $name (keys %{$chunk->{names}}) {
+                my @chunk_authors;
+              NAME: foreach my $name (keys %{$chunk->{names}}) {
                     # normalise and remove duplicates:
                     $name = tidy_text($name);
-                    my $ok = 1;
                     foreach my $old (@{$self->{authors}}) {
-                        $ok = 0 if Text::Names::samePerson($name, $old);
+                        next NAME if Text::Names::samePerson($name, $old);
                     }
-                    push @{$self->{authors}}, $name if $ok;
+                    push @chunk_authors, $name;
                 }
+                # restore correct order:
+                @chunk_authors = sort {
+                    return -1 if $chunk->{text} =~ /$a.*$b/i;
+                    return 1;
+                } @chunk_authors;
+                push @{$self->{authors}}, @chunk_authors;
             }
         }
     }
