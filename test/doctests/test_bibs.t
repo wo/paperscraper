@@ -975,7 +975,12 @@ sub proc {
 }
 
 while (my ($file, $res) = each(%tests)) {
-    my $bib = proc($file);
+    print substr($file, length('/home/wo/programming/opp-tools/test/doctests/')), "\n";
+    my $bib;
+    eval {
+        $bib = proc($file);
+    };
+    next if ($@);
     print "\n",("=" x 70),"\n== $file\n", ("=" x 70), "\n\n";
     if (scalar @$bib != scalar @$res) {
         print "\n\n\n!! Document has ",scalar @$res," references, ",

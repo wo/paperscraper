@@ -5,6 +5,8 @@ use Text::LevenshteinXS qw/distance/;
 use Statistics::Lite qw/mean/;
 use rules::Helper;
 use rules::Keywords;
+use lib '../';
+use util::String;
 use Exporter;
 our @ISA = ('Exporter');
 our @EXPORT_OK = qw/%block_features @parsing_features/;
@@ -33,7 +35,7 @@ our @parsing_features = (
     ['first author near title', [0.1, -0.3]],
     ['author=title', [-0.1, 0]],
     ['author=title and further authors', [-0.4, 0]],
-    ['author=title only has author part', [-0.4, 0]],
+    ['author=title only has author part', [-0.6, 0]],
     );
 
 my %f;
@@ -141,7 +143,7 @@ $f{'first author near title'} = sub {
 };
 
 $f{'author=title'} = sub {
-    return 1 if grep {
+   return 1 if grep {
         $_->{label}->{TITLE} && $_->{label}->{AUTHOR}
     } @{$_[0]->{blocks}};
     return 0;
@@ -159,11 +161,11 @@ $f{'author=title only has author part'} = sub {
         } @{$_[0]->{blocks}};
     return 0 unless @blocks;
     my $text = $blocks[0]->{text};
-    #return 0 unless $blocks[0]->{chunks}->[0]->{names};
+    $text = tidy_text($text);
     foreach my $name (keys %{$blocks[0]->{chunks}->[0]->{names}}) {
-        $text =~ s/$name//;
+        $text =~ s/$name//i;
+        $text =~ s/$re_name_separator//;
     }
-    $text =~ s/$re_name_separator//g;
     return length($text) < 5 ? 1 : 0;
 };
 

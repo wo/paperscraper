@@ -73,7 +73,7 @@ my %tests = (
  },
 
  '/home/wo/programming/opp-tools/test/doctests/31-Seidenfeld-et-al-Preference.pdf' => {
-   authors => ["Joseph B. Kadane", "Mark J. Schervish", "Teddy Seidenfeld"],
+   authors => ["Teddy Seidenfeld", "Mark J. Schervish", "Joseph B. Kadane"],
    title => "Preference for equivalent random variables: A price for unbounded utilities",
  },
 
@@ -88,7 +88,7 @@ my %tests = (
  },
 
  '/home/wo/programming/opp-tools/test/doctests/31-Davies-Stoljar-Introduction.pdf' => {
-   authors => ["Daniel Stoljar", "Martin Davies"],
+   authors => ["Martin Davies", "Daniel Stoljar"],
    title => "Introduction",
  },
 
@@ -182,6 +182,11 @@ my %tests = (
    title => "Hard Problems, Interpretive Concepts, and Humean Laws",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Galileo-Sopra.pdf' => {
+   authors => [""],
+   title => "Sopra le Scoperte Dei Dadi",
+ },
+
 );
 
 sub proc {
@@ -194,7 +199,12 @@ sub proc {
 }
 
 while (my ($file, $res) = each(%tests)) {
-    my ($au, $ti) = proc($file);
+    print substr($file, length('/home/wo/programming/opp-tools/test/doctests/')), "\n";
+    my ($au, $ti); 
+    eval {
+        ($au, $ti) = proc($file);
+    };
+    next if ($@);
     is(join(", ", @$au), join(", ", @{$res->{authors}}));
     is($ti, $res->{title});
 }
