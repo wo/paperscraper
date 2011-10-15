@@ -61,7 +61,7 @@ $features{TITLE} = [
     ['gap below', [0.2, -0.2], 2],
     ['style appears on several pages', [-0.4, 0], 2],
     ['matches title pattern', [0.1, -0.6], 2],
-    [$or->('several words', 'may continue title'), [0.1, -0.3], 2],
+    [$or->('several words', 'may continue title'), [0.1, -0.4], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.25, 0], 2],
@@ -69,6 +69,7 @@ $features{TITLE} = [
     ['probable HEADING', [-0.4, 0.2], 3],
     [$or->('best title', 'may continue title'), [0.3, -0.8], 3],
     ['probable AUTHOR', [-0.3, 0.1], 3],
+    ['resembles best title', [0.1, -0.5], 4],
     ];
 
 $features{AUTHOR} = [
@@ -597,6 +598,21 @@ $f{'resembles best author'} = sub {
     # far away:
     my $dist = abs($_[0]->{textpos} - $best->{textpos});
     $ret -= $dist/1000;
+    return max($ret, 0);
+};
+
+$f{'resembles best title'} = sub {
+    my $best = $_[0]->{best}->{TITLE}->[0];
+    return 0 unless $best;
+    return 1 if $_[0] == $best;
+    return 0 if $_[0]->{page} != $best->{page};
+    my $ret = 1;
+    $ret -= 0.5 if $f{'all caps'}->($_[0]) != $f{'all caps'}->($best);
+    $ret -= 0.3 if alignment($_[0]) ne alignment($best);
+    $ret -= abs($_[0]->{fsize} - $best->{fsize}) * 0.2;
+    foreach my $feat ('bold', 'italic') {
+        $ret -= 0.3 if $f{$feat}->($_[0]) != $f{$feat}->($best);
+    }
     return max($ret, 0);
 };
 

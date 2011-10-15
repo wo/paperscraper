@@ -17,6 +17,7 @@ $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
     ['adjacent chunks probable title', [-0.4, 0.2]],
     ['chunks are adjacent', [0, -1]],
+    ['chunks are similar', [0.1, -0.3]],
     ['chunks are far apart', [-0.3, 0.1]],
     ['coincides with marginal', [0.4, 0]],
     ['implausible beginning', [-0.7, 0.1]],
@@ -66,6 +67,23 @@ $f{'adjacent chunks probable title'} = sub {
 $f{'chunks are adjacent'} = sub {
     my $d = $_[0]->{chunks}->[-1]->{id} - $_[0]->{chunks}->[0]->{id};
     return $d == $#{$_[0]->{chunks}} ? 1 : 0;
+};
+
+$f{'chunks are similar'} = sub {
+    my $ch0 = $_[0]->{chunks}->[0];
+    my $res = 1;
+    for my $ch (@{$_[0]->{chunks}}) {
+        next if $ch eq $ch0;
+        my $sim = 1;
+        $sim = 0 if $ch->{page} != $ch0->{page};
+        $sim -= 0.8 if (($ch->{plaintext} =~ /\p{IsLower}/)
+                        != ($ch0->{plaintext} =~ /\p{IsLower}/));
+        $sim -= abs($ch->{fsize} - $ch0->{fsize}) * 0.3;
+        $sim -= 0.7 if (($ch->{text} =~ /^\s*<b>.*<\/b>\s*$/)
+                        != ($ch0->{text} =~ /^\s*<b>.*<\/b>\s*$/));
+        $res = min($res, $sim);
+    }
+    return max($res, 0);
 };
 
 $f{'chunks are far apart'} = sub {
