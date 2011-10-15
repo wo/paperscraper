@@ -17,6 +17,7 @@ $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
     ['adjacent chunks probable title', [-0.6, 0.2]],
     ['chunks are adjacent', [0, -1]],
+    ['chunks are far apart', [-0.3, 0.1]],
     ['coincides with marginal', [0.4, 0]],
     ['implausible beginning', [-0.7, 0.1]],
     ['implausible ending', [-0.7, 0.1]],
@@ -65,6 +66,19 @@ $f{'adjacent chunks probable title'} = sub {
 $f{'chunks are adjacent'} = sub {
     my $d = $_[0]->{chunks}->[-1]->{id} - $_[0]->{chunks}->[0]->{id};
     return $d == $#{$_[0]->{chunks}} ? 1 : 0;
+};
+
+$f{'chunks are far apart'} = sub {
+    my $gap = 0;
+    my $prev;
+    for my $ch (@{$_[0]->{chunks}}) {
+        if ($prev) {
+            my $dist = $prev->{bottom} - $ch->{top};
+            $gap = max($gap, $dist/$ch->{height});
+        }
+        $prev = $ch;
+    }
+    return min(1, max(0, $gap-0.3));
 };
 
 $f{'implausible ending'} = sub {
