@@ -15,7 +15,7 @@ our %block_features;
 
 $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
-    ['adjacent chunks probable title', [-0.6, 0.2]],
+    ['adjacent chunks probable title', [-0.4, 0.2]],
     ['chunks are adjacent', [0, -1]],
     ['coincides with marginal', [0.4, 0]],
     ['implausible beginning', [-0.7, 0.1]],
