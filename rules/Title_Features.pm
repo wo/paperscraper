@@ -73,12 +73,12 @@ $f{'chunks are far apart'} = sub {
     my $prev;
     for my $ch (@{$_[0]->{chunks}}) {
         if ($prev) {
-            my $dist = $prev->{bottom} - $ch->{top};
+            my $dist = $ch->{top} - $prev->{bottom};
             $gap = max($gap, $dist/$ch->{height});
         }
         $prev = $ch;
     }
-    return min(1, max(0, $gap-0.3));
+    return min(1, max(0, $gap-0.5));
 };
 
 $f{'implausible ending'} = sub {
