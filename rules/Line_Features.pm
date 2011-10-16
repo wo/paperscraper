@@ -59,7 +59,7 @@ $features{TITLE} = [
     ['centered', [0.3, -0.2], 2],
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
-    ['style appears on several pages', [-0.4, 0], 2],
+    ['style appears on several pages', [-0.3, 0], 2],
     ['matches title pattern', [0.1, -0.6], 2],
     [$or->('several words', 'may continue title'), [0.1, -0.4], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
@@ -481,10 +481,7 @@ $f{'occurs in marginals'} = memoize(sub {
 $f{'style appears on several pages'} = memoize(sub {
     my $bold = $f{'bold'}->($_[0]);
     my $caps = $f{'all caps'}->($_[0]);
-    if ($_[0]->{fsize} == 0 && !$bold && !$caps) {
-        #print "** style is too boring too check";
-        return 1;
-    }
+    return 1 if !$bold && !$caps && ($_[0]->{fsize} == 0);
     my $chunk = $_[0]->{doc}->{chunks}->[-1];
     my $ret = 0;
     while (($chunk = $chunk->{prev})) {
@@ -501,7 +498,7 @@ $f{'style appears on several pages'} = memoize(sub {
             && alignment($chunk) eq alignment($_[0])) {
             #print "** $chunk->{text} has same style";
             $ret += 0.5;
-            return 1 if $ret >= 1;
+            last if $ret >= 1;
         }
     }
     return $ret;

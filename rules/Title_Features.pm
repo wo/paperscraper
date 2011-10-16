@@ -76,10 +76,10 @@ $f{'chunks are similar'} = sub {
         next if $ch eq $ch0;
         my $sim = 1;
         $sim = 0 if $ch->{page} != $ch0->{page};
-        $sim -= 0.8 if (($ch->{plaintext} =~ /\p{IsLower}/)
+        $sim -= 0.3 if (($ch->{plaintext} =~ /\p{IsLower}/)
                         != ($ch0->{plaintext} =~ /\p{IsLower}/));
         $sim -= abs($ch->{fsize} - $ch0->{fsize}) * 0.3;
-        $sim -= 0.7 if (($ch->{text} =~ /^\s*<b>.*<\/b>\s*$/)
+        $sim -= 0.5 if (($ch->{text} =~ /^\s*<b>.*<\/b>\s*$/)
                         != ($ch0->{text} =~ /^\s*<b>.*<\/b>\s*$/));
         $res = min($res, $sim);
     }
