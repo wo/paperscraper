@@ -15,7 +15,7 @@ our %block_features;
 
 $block_features{TITLE} = [
     ['probable TITLE', [0.8, -0.8]],
-    ['adjacent chunks probable title', [-0.4, 0.2]],
+    ['adjacent chunks probable title', [-0.5, 0.1]],
     ['chunks are adjacent', [0, -1]],
     ['chunks are similar', [0.1, -0.3]],
     ['chunks are far apart', [-0.3, 0.1]],
@@ -61,7 +61,8 @@ $f{'adjacent chunks probable title'} = sub {
     my $p = $ch ? $ch->{p}->('TITLE') : 0;
     $ch = $_[0]->{chunks}->[-1]->{next};
     $p = max($p, $ch ? $ch->{p}->('TITLE') : 0);
-    return $p;
+    # emphasise differences between 0.5 and 0.1:
+    return max(0, ($p-0.4)*1.65);
 };
 
 $f{'chunks are adjacent'} = sub {
