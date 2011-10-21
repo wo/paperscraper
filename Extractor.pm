@@ -148,6 +148,10 @@ sub init {
     $self->get_text();
     $self->adjust_confidence();
 
+
+    foreach (@{$self->{chunks}}) {
+        print $_->{text},"xxx\n" unless $_->{page};
+    }
 }
 
 sub elem {

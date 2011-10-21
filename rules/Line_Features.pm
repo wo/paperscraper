@@ -600,7 +600,7 @@ $f{'resembles best author'} = sub {
 
 $f{'resembles best title'} = sub {
     my $best = $_[0]->{best}->{TITLE}->[0];
-    return 0 unless $best;
+    return 0 unless $best && $best->{page};
     return 1 if $_[0] == $best;
     return 0 if $_[0]->{page} != $best->{page};
     my $ret = 1;
