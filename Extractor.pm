@@ -373,12 +373,14 @@ sub remove_chunk {
 
     my $page = $chunk->{page};
     $page->{chunks} = [ grep { ! $_->{_REMOVED} } @{$page->{chunks}} ];
-    $page->{left} = min(map { $_->{left} } @{$page->{chunks}});
-    $page->{right} = max(map { $_->{right} } @{$page->{chunks}});
-    $page->{width} = $page->{right} - $page->{left};
-    $page->{top} = min(map { $_->{top} } @{$page->{chunks}});
-    $page->{bottom} = max(map { $_->{bottom} } @{$page->{chunks}});
-    $page->{height} = $page->{bottom} - $page->{top};
+    if ($page->{chunks}) {
+        $page->{left} = min(map { $_->{left} } @{$page->{chunks}});
+        $page->{right} = max(map { $_->{right} } @{$page->{chunks}});
+        $page->{width} = $page->{right} - $page->{left};
+        $page->{top} = min(map { $_->{top} } @{$page->{chunks}});
+        $page->{bottom} = max(map { $_->{bottom} } @{$page->{chunks}});
+        $page->{height} = $page->{bottom} - $page->{top};
+    }
 }
 
 sub remove_page {

@@ -121,7 +121,7 @@ sub errorcode {
        while (my ($key, $value) = each(%errors)) {
 	   return $key if ($value && $e =~ /$value/);
        }
-       warn "no error code for $e";
+       #warn "no error code for $e";
        return 99;
    }
    $errorcode = $e;
