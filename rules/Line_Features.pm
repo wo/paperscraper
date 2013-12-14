@@ -648,6 +648,7 @@ $f{'like pdf author'} = sub {
 $f{'typical list of names'} = sub {
     my $separator = qr/\s*(?:,?\s?\band\b|&amp;|,)\s*/;
     my @parts = split($separator, $_[0]->{plaintext});
+    return 0 if @parts == 1;
     foreach my $part (@parts) {
         if ($part !~ /^
             \p{IsUpper}\pL*\.?\s(?:\p{IsUpper}\.\s)*\p{IsUpper}\S+
