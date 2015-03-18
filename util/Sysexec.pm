@@ -2,6 +2,7 @@
 package util::Sysexec;
 use strict;
 use warnings;
+use POSIX qw[ _exit ];
 use IO::Handle;
 use Exporter;
 our @ISA = ('Exporter');
@@ -48,7 +49,8 @@ sub sysexec {
 	    close(PIPE);
 	    print WRITER $res;
 	    close WRITER;
-	    exit;
+	    # exit;
+            POSIX::_exit(0);
 	}
 	alarm 0;
     };
