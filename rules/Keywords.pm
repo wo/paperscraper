@@ -54,7 +54,7 @@ our $re_session_id = qr{
 
 # stuff that commonly occurs in addresses or affiliations:
 my $re_address_word = qr/\b(?:
-    universit\pL+|center|centre|institute?|sciences?|college|research|
+    universit|center|centre|institute?|sciences?|college|research|
     avenue|street|philosophy|professor|address|department|
     umass
     )\b/ix;
@@ -107,12 +107,13 @@ our $re_noname = qr/
     /ix;
 
 # stuff that disqualifies something from being a title:
-my $re_notitle = qr/(?:
-    $re_address_word|
-    $re_publication_word|
-    [12]\d{3}|
-    \bthanks?\b|@|
-    abstract
+my $re_notitle = qr/
+    $re_address_word |
+    $re_publication_word |
+    \b(?:thanks?|
+       @|
+       [12]\d{3}|
+       abstract
     )/ix;
 
 my $re_nocontent = qr/(?:
@@ -163,7 +164,7 @@ our $re_name_separator = qr/
 
 # may be a title:
 our $re_title = qr/^
-    (?!.*$re_notitle.*)
+    (?!.*$re_notitle?.*)
     \p{IsAlpha}                        # At least one word character
     /x;
 
