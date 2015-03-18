@@ -7,6 +7,7 @@ use Encode;
 use FindBin qw($Bin);
 use Cwd 'abs_path';
 use File::Basename 'dirname';
+use POSIX qw[ _exit ];
 use DBI;
 use Digest::MD5;
 use HTML::LinkExtractor;
@@ -20,6 +21,7 @@ use util::String;
 use Spamfilter;
 use Converter;
 use Extractor;
+use POSIX qw/strftime/;
 binmode STDOUT, ":utf8";
 chdir(dirname($0));
 
@@ -78,6 +80,8 @@ my $dbh = DBI->connect(
     or die "Couldn't connect to database: " . DBI->errstr;
 
 $dbh->{'mysql_auto_reconnect'} = 1;
+$dbh->{'mysql_enable_utf8'} = 1;
+$dbh->do("SET NAMES 'utf8'");
 
 my $really = $opts{n} ? "AND 1 = 0" : "";
 
@@ -136,7 +140,8 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    exit $status;
+    POSIX::_exit($status); 
+    #exit($status);
 }
 
 sub next_locations {
