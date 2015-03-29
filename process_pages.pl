@@ -61,6 +61,8 @@ my $dbh = DBI->connect(
     or die "Couldn't connect to database: " . DBI->errstr;
 
 $dbh->{'mysql_auto_reconnect'} = 1;
+$dbh->{'mysql_enable_utf8'} = 1;
+$dbh->do("SET NAMES 'utf8'");
 
 my $pg_update = $dbh->prepare(
     "UPDATE sources SET last_checked = NOW(), status = ? "
