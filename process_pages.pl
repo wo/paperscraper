@@ -172,6 +172,8 @@ sub process {
   LINKS:
     foreach my $new_link (@links) {
         my $url = $$new_link{href};
+        # unescape tilde character in urls:
+        $url =~ s/%7e/~/i;
         my $text = $$new_link{_TEXT};
         next unless $text;
         binmode STDOUT, ":utf8"; # why oh why?
