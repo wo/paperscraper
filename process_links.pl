@@ -520,7 +520,7 @@ sub is_subpage {
     foreach my $source (@sources) {
         # subpage must be located at same host and path as parent:
         my $source_path = $source->{url};
-        $source_path =~ s/[^\/]+\.[^\/]+$//; # strip filename
+        $source_path =~ s/(?<=\w\/)[^\/]+\.[^\/]+$//; # strip filename
         next unless $loc->{url} =~ /^$source_path/;
         # parent page must allow crawling:
         next if $source->{crawl_depth} == 0;
