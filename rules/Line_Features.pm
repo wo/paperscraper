@@ -61,6 +61,7 @@ $features{TITLE} = [
     ['gap below', [0.2, -0.2], 2],
     ['style appears on several pages', [-0.3, 0], 2],
     ['matches title pattern', [0.1, -0.6], 2],
+    ['possible date', [-0.5, 0], 2],
     [$or->('several words', 'may continue title'), [0.1, -0.4], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
@@ -218,6 +219,8 @@ sub matches {
 }
 
 $f{'contains digit'} = matches('(?<!<sup>)\d');
+
+$f{'possible date'} = matches('[12]\d{3}\s*$');
 
 $f{'line begins or ends with digit'} = sub {
     return 1 if $_[0]->{plaintext} =~ /^\d|\d$/;
@@ -830,7 +833,7 @@ $f{'contains several English words'} = memoize(sub {
 });
 
 $f{'contains year'} = sub {
-    $_[0]->{plaintext} =~ /(?<!\d)\d{4}(?!\d)/;    
+    $_[0]->{plaintext} =~ /(?<!\d)[12]\d{3}(?!\d)/;    
 };
 
 $f{'contains page-range'} = sub {

@@ -106,7 +106,7 @@ our $re_noname = qr/
        )\b
     /ix;
 
-# stuff that disqualifies something from being a title:
+# stuff that tends to disqualify something from being a title:
 my $re_notitle = qr/
     $re_address_word |
     $re_publication_word |
@@ -164,7 +164,7 @@ our $re_name_separator = qr/
 
 # may be a title:
 our $re_title = qr/^
-    (?!.*$re_notitle?.*)
+    (?!.*$re_notitle.*)
     \p{IsAlpha}                        # At least one word character
     /x;
 
