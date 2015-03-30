@@ -49,6 +49,7 @@ our $re_ignore_url = qr{
 our $re_session_id = qr{
     \bs\w*id=[\w_-]+|
     halsid=[\w_-]+|
+    wpnonce=\w+|
     locale=[\w_-]+
 }xi;
 
