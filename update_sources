@@ -88,6 +88,9 @@ my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
     $cfg{'MYSQL_PASS'}, { RaiseError => 1 }) 
     or ret(0, "Could not connect to database");
 
+$dbh->{'mysql_enable_utf8'} = 1;
+$dbh->do("SET NAMES 'utf8'");
+
 my $dispatch = {};
 
 my $db_add = $dbh->prepare(<<SQL);
