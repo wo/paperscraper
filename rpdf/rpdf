@@ -53,6 +53,7 @@ sub pdf2xml {
     my $command = PDFTOHTML
         .' -i'            # ignore images
         .' -xml'          # xml output
+        .' -nodrm'        # ignore copy protection
         .' -enc \'UTF-8\''
         .' -stdout'       # output to stdout
         ." \"$source\""   # source file
