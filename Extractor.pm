@@ -99,8 +99,8 @@ sub init {
 
     my @converters = $xml =~ /<converter>(.+?)<\/converter>/g;
     $self->{converters} = \@converters;
-    $self->{fromOCR} = 1 if grep 'OCR', @converters;
-    $self->{fromHTML} = 1 if grep 'wkhtmltopdf', @converters;
+    $self->{fromOCR} = 1 if grep(/OCR/, @converters);
+    $self->{fromHTML} = 1 if grep(/wkhtmltopdf/, @converters);
     my @anchortexts = $xml =~ /<anchortext>(.+?)<\/anchortext>/g;
     $self->{anchortexts} = \@anchortexts;
     my @sourceauthors = $xml =~ /<sourceauthor>(.+?)<\/sourceauthor>/g;
@@ -146,7 +146,7 @@ sub init {
     $self->strip_marginals();
     $self->strip_footnotes();
     $self->get_text();
-    $self->adjust_confidence();
+    $self->init_confidence();
 
 }
 
@@ -409,14 +409,28 @@ sub get_text {
     }
 }
 
-sub adjust_confidence {
+sub init_confidence {
     my $self = shift;
-    $self->{confidence} *= 0.8 if $self->{fromOCR};
-    $self->{confidence} *= 0.9 if $self->{fromHTML};
-    $self->{confidence} *= 0.98 if $self->{numpages} < 5;
-    $self->{confidence} *= 0.95 if $self->{numpages} > 80;
-    $self->{confidence} *= 0.95 if $self->{numpages} > 150;
+    if ($self->{fromOCR}) {
+        $self->decr_confidence(0.8, 'from OCR');
+    }
+    elsif ($self->{fromHTML}) {
+        $self->decr_confidence(0.9, 'from HTML');
+    }
+    if ($self->{numpages} < 5) {
+        $self->decr_confidence(0.98, 'less than 5 pages');
+    }
+    if ($self->{numpages} > 80) {
+        $self->decr_confidence(0.95, 'more than 80 pages');
+    }
 }
+
+sub decr_confidence {
+    my ($self, $percent, $reason) = @_;
+    say(5, "reducing confidence by $percent because $reason");
+    $self->{confidence} *= $percent;
+}
+
 
 ##### metadata extraction #####
 
@@ -832,7 +846,7 @@ sub extract_authors_and_title {
     }
 
     unless (@{$self->{authors}}) {
-        $self->{confidence} *= 0.8;
+        $self->decr_confidence(0.8, "no authors found");
         if ($self->{sourceauthors}) {
             say(2, "no author -- using source author(s)");
             $self->{authors} = $self->{sourceauthors};
@@ -842,13 +856,14 @@ sub extract_authors_and_title {
         }
     }
 
-    $self->{confidence} *= 0.95 if scalar @{$self->{authors}} > 1;
-    $self->{confidence} *= 0.5 + ($parsing->{quality} - 0.3) * 0.7;
-    say(4, "confidence from parsing: $self->{confidence}");
+    if (scalar @{$self->{authors}} > 1) {
+        $self->decr_confidence(0.95, 'more than 1 author');
+    }
+    $self->decr_confidence(0.5 + ($parsing->{quality} - 0.3) * 0.7, 
+                           'parsing quality');
     if ($parsings[0]) {
         my $lead = $parsing->{quality} - $parsings[0]->{quality};
-        $self->{confidence} *= 1 + min(0.2, $lead-0.2);
-        say(4, "confidence from alternatives: $self->{confidence}");
+        $self->decr_confidence(1 + min(0.2, $lead-0.2), 'alternatives');
     }
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
@@ -926,10 +941,9 @@ sub extract_abstract {
     }
 
     my $abstract = reduce { $a ."\n". $b->{text} } '', @$best;
-    $self->{confidence} *= $best_score/2 + 0.5;
+    $self->decr_confidence($best_score/2 + 0.5, 'abstract score');
     if (length($abstract) > 2000) {
-        say(5, 'abstract is too long');
-        $self->{confidence} *= 0.95;
+        $self->decr_confidence(0.95, 'abstract too long');
         $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
     }
     # strip "Abstract:" beginning:
