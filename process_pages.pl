@@ -113,7 +113,7 @@ sub next_pages {
     if ($opts{p}) {
         return [{ source_id => 0, url => $opts{p}, last_checked => 0 }];
     }
-    my $NUM_URLS = 1;
+    my $NUM_URLS = 10;
     my $min_age = gmtime()-(24*60*60);
     my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources "
