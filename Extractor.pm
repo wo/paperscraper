@@ -99,8 +99,8 @@ sub init {
 
     my @converters = $xml =~ /<converter>(.+?)<\/converter>/g;
     $self->{converters} = \@converters;
-    $self->{fromOCR} = 1 if grep 'OCR', @converters;
-    $self->{fromHTML} = 1 if grep 'wkhtmltopdf', @converters;
+    $self->{fromOCR} = 1 if grep(/OCR/, @converters);
+    $self->{fromHTML} = 1 if grep(/wkhtmltopdf/, @converters);
     my @anchortexts = $xml =~ /<anchortext>(.+?)<\/anchortext>/g;
     $self->{anchortexts} = \@anchortexts;
     my @sourceauthors = $xml =~ /<sourceauthor>(.+?)<\/sourceauthor>/g;
