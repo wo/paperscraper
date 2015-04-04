@@ -53,14 +53,14 @@ our $re_session_id = qr{
     locale=[\w_-]+
 }xi;
 
-# stuff that commonly occurs in addresses or affiliations:
+# stuff that indicates addresses or affiliations:
 my $re_address_word = qr/\b(?:
-    universit|center|centre|institute?|sciences?|college|research|
+    universit\w+|center|centre|institute?|sciences?|college|research|
     avenue|street|philosophy|professor|address|department|
-    umass
+    umass|uc
     )\b/ix;
 
-# stuff that commonly occurs in publication info:
+# stuff that indicates publication info:
 our $re_publication_word = qr/\b(?:
     forthcoming|editors?|edited|publish\w*|press|volume
     to\sappear\sin|draft|editor\w*|reprints?|excerpt|

@@ -9,6 +9,7 @@ use List::Util qw/min max/;
 use util::Functools qw/someof allof/;
 use util::String;
 use rules::Helper;
+use rules::NameExtractor;
 use rules::Keywords;
 use Exporter;
 our @ISA = ('Exporter');
@@ -94,7 +95,7 @@ $features{AUTHOR} = [
     ['contains publication keywords', [-0.4, 0], 3],
     #['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
-    ['contains actual name', [0.3, -0.5], 3],
+    ['contains probable name', [0.3, -0.5], 3],
     ['contains several English words', [-0.2, 0.1], 3],
     ['resembles source author', [0.1, -0.1], 3],
     ['resembles best author', [0.1, -0.5], 4],
@@ -144,7 +145,7 @@ $features{ABSTRACT} = [
     ['preceeded by many ABSTRACTs', [-1, 0.1], 2],
     ['probable HEADING', [-0.6, 0.2], 3],
     ['near other ABSTRACT', [0.3, -0.3], 3],
-    ['continues abstract', [0.4, -0.1], 3],
+    ['continues abstract', [0.5, -0.1], 3],
     ];
 
 $features{ABSTRACTSTART} = [
@@ -816,11 +817,11 @@ $f{'contains possible name'} = memoize(sub {
     $_[0]->{plaintext} =~ /$re_name/;    
 });
 
-$f{'contains actual name'} = memoize(sub {
+$f{'contains probable name'} = memoize(sub {
     unless (exists $_[0]->{names}) {
-        $_[0]->{names} = extract_names($_[0]->{plaintext});
+        $_[0]->{names} = rules::NameExtractor::parse($_[0]->{plaintext});
     }
-    return max(values %{$_[0]->{names}}) || 0; 
+    return %{$_[0]->{names}} ? 1 : 0;
 });
 
 $f{'contains several English words'} = memoize(sub {

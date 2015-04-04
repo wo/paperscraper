@@ -186,6 +186,11 @@ my %tests = (
    authors => [""],
    title => "Sopra le Scoperte Dei Dadi",
  },
+ 
+ '/home/wo/programming/opp-tools/test/doctests/21-buchak-chance.pdf' => {
+   authors => ["Lara Buchak"],
+   title => "Free Acts and Chance: Why the Rollback Argument Fails", 
+ },
 
 );
 

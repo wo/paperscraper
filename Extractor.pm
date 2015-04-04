@@ -834,6 +834,7 @@ sub extract_authors_and_title {
                     foreach my $old (@{$self->{authors}}) {
                         next NAME if Text::Names::samePerson($name, $old);
                     }
+                    $self->decr_confidence(min(1,$prob+0.2), "author $name probability only $prob");
                     push @chunk_authors, $name;
                 }
                 # restore correct order:
@@ -857,9 +858,6 @@ sub extract_authors_and_title {
         }
     }
 
-    if (scalar @{$self->{authors}} > 1) {
-        $self->decr_confidence(0.95, 'more than 1 author');
-    }
     $self->decr_confidence(0.5 + ($parsing->{quality} - 0.3) * 0.7, 
                            'parsing quality');
     if ($parsings[0]) {

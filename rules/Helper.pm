@@ -100,15 +100,16 @@ sub extract_names {
     my $str = shift;
     my %res; # name => probability
     my @parts = split($re_name_separator, $str);
-    foreach my $part (@parts) {
+    while (my ($i, $part) = each @parts) {
         if ($part !~
             /^(?:$re_name_before)?($re_name)(?:$re_name_after)?$/
             || $1 =~ /$re_noname/) {
             #print "**skipping $part\n";
             next;
         }
-        my $p = 0.4;
         my ($name, $first, $last) = ($1, $2, $3);
+        my $p = $i==0 ? 0.4 : 0.3;
+        
         foreach my $w (split /\s+/, $first) {
             if ($w =~ /^\p{IsUpper}\.?$/) {
                 $p += 0.1;
