@@ -1,5 +1,6 @@
 package util::Io;
 use strict;
+no warnings 'utf8';
 use Data::Dumper;
 use LWP;
 use Encode;
@@ -157,9 +158,8 @@ sub add_meta {
     my ($file, $element, $content) = @_;
     $content ||= '';
     
-    open IN, $file or die $!;
-    open OUT, '>', "$file.new" or die $!;
-    binmode(OUT, ":utf8");
+    open IN, '<:utf8', $file or die $!;
+    open OUT, '>:utf8', "$file.new" or die $!;
     my $done = 0;
     while (<IN>) {
         $_ = Encode::decode_utf8($_);
