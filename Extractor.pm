@@ -827,7 +827,8 @@ sub extract_authors_and_title {
         if ($block->{label}->{AUTHOR}) {
             foreach my $chunk (@{$block->{chunks}}) {
                 my @chunk_authors;
-              NAME: foreach my $name (keys %{$chunk->{names}}) {
+              NAME: while (my ($name, $prob) = each %{$chunk->{names}}) {
+                    say(5, "name $name probability $prob");
                     # normalise and remove duplicates:
                     $name = tidy_text($name);
                     foreach my $old (@{$self->{authors}}) {
