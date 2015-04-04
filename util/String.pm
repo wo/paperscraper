@@ -103,11 +103,13 @@ sub tidy_text {
     $txt =~ s|</([^>]+)>\n\s*<\1>| |g;
     # remove linebreaks:
     $txt =~ s|\s*\n\s*| |g;
-    for (1 .. 2) {
+    my $otxt;
+    do {
+        $otxt = $txt;
         # chop whitespace at beginning and end:
         $txt =~ s|^\s*(.+?)\s*$|$1|;
         # chop surrounding tags:
-        $txt =~ s|^<([^>]+)>(.+)</\1>\s*$|$2|;
+        $txt =~ s|^<([^>]+)>(.+)</\1>$|$2|;
         # chop surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
         # remove footnote marks:
@@ -120,7 +122,7 @@ sub tidy_text {
         $txt =~ s|([\pL\?!])\d$|$1|;
         # fix HTML:
         $txt = fix_html($txt);
-    }
+    } while ($txt ne $otxt);
     # replace allcaps:
     $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}{2}/);
     return $txt;
