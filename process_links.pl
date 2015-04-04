@@ -1,6 +1,7 @@
 #! /usr/bin/perl -w
 use strict;
 use warnings;
+no warnings "utf8";
 use Carp;
 use utf8;
 use Encode;
