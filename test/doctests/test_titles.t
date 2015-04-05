@@ -138,7 +138,7 @@ my %tests = (
  },
 
  '/home/wo/programming/opp-tools/test/doctests/32-Bittner-Hale-Remarks.pdf' => {
-   authors => ["Maria  Bittner", "Ken  Hale"],
+   authors => ["Maria Bittner", "Ken Hale"],
    title => "Remarks on Definiteness in Warlpiri",
  },
 
@@ -207,6 +207,10 @@ my %tests = (
    title => "<i>Review of</i> <I><i>Decision Theory and Rationality</i> </I><i>by José Luis Bermúdez</i>",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Anonymous-Causation.pdf' => {
+   authors => [""],
+   title => "Causation and Freedom",
+ },
 
 );
 

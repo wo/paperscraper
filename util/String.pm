@@ -103,6 +103,8 @@ sub tidy_text {
     $txt =~ s|</([^>]+)>\n\s*<\1>| |g;
     # remove linebreaks:
     $txt =~ s|\s*\n\s*| |g;
+    # remove excessive whitespace:
+    $txt =~ s|\s\s+| |g;
     my $otxt;
     do {
         $otxt = $txt;

@@ -78,6 +78,7 @@ sub pagetidy {
     my $page = shift;
     print "== tidying page ==\n" if $verbose;
     $page =~ s/<br \/>//g;
+    $page =~ s/\r//g; # remove ^M carriage returns
     my @texts = split /\n/, $page;
     my @chunks = map { xml2chunk($_) } @texts;
     my $lines = reduce(\&mergechunks, [], @chunks);

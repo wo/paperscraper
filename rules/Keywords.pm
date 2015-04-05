@@ -166,7 +166,7 @@ our $re_name_separator = qr/
 # may be a title:
 our $re_title = qr/^
     (?!.*$re_notitle.*)
-    \p{IsAlpha}                        # At least one word character
+    \p{IsAlpha}{2,}                # At least two word characters
     /x;
 
 # words that suggest title continues on next line:

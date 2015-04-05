@@ -314,14 +314,10 @@ $f{'long'} = memoize(sub {
 sub in_tag {
     my $tag = shift;
     return sub {
-        $_[0]->{text} =~ /^\s*
-          (?:<.+>)?    # optional second tag: <i><b>title<.b><.i>
-          <$tag>       # start tag 
-          .+           # content
-          <\/.>        # end tag
-          \W*          # optional junk appended
-          $/ix;
-        # yes, this catches '<b>foo</b> bar <i>foo</i>'..
+        my $remainder = $_[0]->{text};
+        $remainder =~ s/<$tag>.*?<\/$tag>//gi;
+        $remainder = strip_tags($remainder);
+        return $remainder !~ /\w/;
     };
 }
 
