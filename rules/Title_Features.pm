@@ -103,7 +103,7 @@ $f{'chunks are far apart'} = sub {
 };
 
 $f{'implausible ending'} = sub {
-    my $txt = $_[0]->{chunks}->[-1]->{text};
+    my $txt = $_[0]->{chunks}->[-1]->{plaintext};
     return $txt =~ /$re_bad_ending$/i;
 };
 

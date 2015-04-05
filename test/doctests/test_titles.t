@@ -202,6 +202,11 @@ my %tests = (
    title => "Subjective Probabilities as Basis for Scientific Reasoning?",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Kotzen-Review.pdf' => {
+   authors => ["Matthew Kotzen"],
+   title => "<i>Review of</i> <I><i>Decision Theory and Rationality</i> </I><i>by José Luis Bermúdez</i>",
+ },
+
 
 );
 

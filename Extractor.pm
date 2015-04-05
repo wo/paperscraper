@@ -815,6 +815,8 @@ sub extract_authors_and_title {
     foreach my $block (@{$parsing->{blocks}}) {
         if ($block->{label}->{TITLE}) {
             $self->{title} = tidy_text($block->{text});
+            # bold in titles looks too bold:
+            $self->{title} =~ s|<(/?)b>|<$1i>|gi;
             # chop odd trailing punctuations:
             $self->{title} =~ s|[\.,:;]$||;
             if ($block->{label}->{AUTHOR}) {
