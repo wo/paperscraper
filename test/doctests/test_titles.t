@@ -192,6 +192,17 @@ my %tests = (
    title => "Free Acts and Chance: Why the Rollback Argument Fails", 
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/33-Johnson-Quantitative.pdf' => {
+   authors => ["Kent Johnson"],
+   title => "Quantitative realizations of philosophy of science: William Whewell and statistical methods",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/21-Huber-Subjective.pdf' => {
+   authors => ["Franz Huber"],
+   title => "Subjective Probabilities as Basis for Scientific Reasoning?",
+ },
+
+
 );
 
 sub proc {

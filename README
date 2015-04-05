@@ -45,6 +45,7 @@ need to install gcc and openssl first.)
   sudo cpan -i AI::Categorizer
   sudo cpan -i Statistics::Lite
   sudo cpan -i Biblio::Citation::Compare
+  sudo cpan -i Lingua::Stem::Snowball
 
 Now set up a MySQL database to store the tracked pages and papers. To
 create the tables, call

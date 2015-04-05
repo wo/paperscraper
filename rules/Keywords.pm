@@ -55,8 +55,8 @@ our $re_session_id = qr{
 
 # stuff that indicates addresses or affiliations:
 my $re_address_word = qr/\b(?:
-    universit\w+|center|centre|institute?|sciences?|college|research|
-    avenue|street|philosophy|professor|address|department|
+    universit\w+|center|centre|institute?|college|
+    avenue|street|professor|department|
     umass|uc
     )\b/ix;
 
@@ -172,7 +172,7 @@ our $re_title = qr/^
 # words that suggest title continues on next line:
 our $re_bad_ending = qr/
     \b(?:
-       of|and|or|the
+       of|and|or|the|a|an
     )\b
     /ix;
 

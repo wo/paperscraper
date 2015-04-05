@@ -21,7 +21,9 @@ $block_features{TITLE} = [
     ['chunks are far apart', [-0.3, 0.1]],
     ['coincides with marginal', [0.4, 0]],
     ['implausible beginning', [-0.7, 0.1]],
+    ['begins in lower case', [-0.3, 0.1]],
     ['implausible ending', [-0.7, 0.1]],
+    ['not too short', [0, -0.4]],
     ];
 
 $block_features{AUTHOR} = [
@@ -106,10 +108,20 @@ $f{'implausible ending'} = sub {
 };
 
 $f{'implausible beginning'} = sub {
-    my $txt = $_[0]->{chunks}->[0]->{text};
+    my $txt = $_[0]->{chunks}->[0]->{plaintext};
     return $txt =~ /^$re_bad_beginning/i;
 };
 
+$f{'begins in lower case'} = sub {
+    my $txt = $_[0]->{chunks}->[0]->{plaintext};
+    return $txt =~ /^\p{IsLower}/;
+};
+
+$f{'not too short'} = sub {
+    my $txt = reduce { "$a $b->{plaintext}" } '', @{$_[0]->{chunks}};
+    return min(1, max(0, (length($txt)-3) / 8));
+};
+    
 $f{'coincides with marginal'} = sub {
     my $txt = reduce { "$a $b->{plaintext}" } '', @{$_[0]->{chunks}};
     for my $ch (@{$_[0]->{chunks}->[0]->{doc}->{marginals}}) {

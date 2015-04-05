@@ -5,7 +5,8 @@ use File::Basename;
 use Cwd 'abs_path';
 use String::Approx 'amatch';
 use Memoize;
-use List::Util qw/min max/;
+use List::Util qw/min max reduce/;
+use Lingua::Stem::Snowball;
 use util::Functools qw/someof allof/;
 use util::String;
 use rules::Helper;
@@ -69,8 +70,10 @@ $features{TITLE} = [
     ['occurs in marginals', [0.25, 0], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
+    ['words common in CONTENT', [0.1, -0.3], 3],
     [$or->('best title', 'may continue title'), [0.3, -0.8], 3],
     ['probable AUTHOR', [-0.3, 0.1], 3],
+    ['near AUTHOR', [0.2, -0.4], 4],
     ['resembles best title', [0.1, -0.5], 4],
     ];
 
@@ -534,6 +537,27 @@ $f{'may continue title'} = sub {
     return min(1, max(0, $score[0], $score[1]));
 };
 
+$f{'words common in CONTENT'} = memoize(sub {
+    unless ($_[0]->{doc}->{content}) {
+        my @chs = grep { $_->{p}->('CONTENT') > .5 }
+                       @{$_[0]->{doc}->{chunks}};
+        $_[0]->{doc}->{content} = reduce { $a.' '.$b->{text} } '', @chs;
+    }
+    # 1 page is roughly 3000 chars, once per page is minimum for "common"
+    my $common_freq = length($_[0]->{doc}->{content})/3000;
+    my $min_freq = 1000;
+
+    my @words = ($_[0]->{plaintext} =~ /\w{4,}/ig);
+    my $stemmer = Lingua::Stem::Snowball->new( lang => 'en' );
+    $stemmer->stem_in_place( \@words );
+    for my $w (@words) {
+        my $count = () = ($_[0]->{doc}->{content} =~ /$w/ig);
+        #print "=== $w: $count\n";
+        $min_freq = min($min_freq, $count);
+    }
+    return min(1, $min_freq/$common_freq);
+});
+
 $f{'continues abstract'} = sub {
     my $prev = $_[0]->{prev};
     unless ($prev && $prev->{page} == $_[0]->{page}
@@ -729,7 +753,21 @@ $f{'previous line is bibliography heading'} = sub {
     return 0;
 };
 
-sub neighbours {
+sub neighbour {
+    my ($dir, $label) = @_;
+    return sub {
+        my $ch = $_[0]->{$dir};
+        while ($ch && length($ch->{plaintext}) < 5) {
+            $ch = $ch->{$dir};
+        }
+        return $ch ? $ch->{p}->($label) : 0;
+    }
+}    
+
+$f{'near AUTHOR'} = someof(neighbour('prev', 'AUTHOR', 0), 
+                           neighbour('next', 'AUTHOR', 0));
+
+sub neighbourhood {
     my ($dir, $label) = @_;
     return sub {
         my $ch = $_[0];
@@ -744,12 +782,12 @@ sub neighbours {
     };
 }
 
-$f{'follows CONTENT'} = neighbours('prev', 'CONTENT');
-$f{'preceeds CONTENT'} = neighbours('next', 'CONTENT');
-$f{'near other BIBs'} = someof(neighbours('prev', 'BIB'), 
-                                        neighbours('next', 'BIB'));
-$f{'near other ABSTRACT'} = someof(neighbours('prev', 'ABSTRACT'), 
-                                   neighbours('next', 'ABSTRACT'));
+$f{'follows CONTENT'} = neighbourhood('prev', 'CONTENT', 1);
+$f{'preceeds CONTENT'} = neighbourhood('next', 'CONTENT', 1);
+$f{'near other BIBs'} = someof(neighbourhood('prev', 'BIB', 1), 
+                               neighbourhood('next', 'BIB', 1));
+$f{'near other ABSTRACT'} = someof(neighbourhood('prev', 'ABSTRACT', 1), 
+                                   neighbourhood('next', 'ABSTRACT', 1));
 
 sub mk_begins {
     my $field = shift;
