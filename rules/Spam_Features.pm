@@ -22,14 +22,15 @@ our @spam_features = (
     ['bad anchortext', [0.3, -0.1]],
     ['bad path', [0.3, -0.1]],
     ['index file', [0.4, -0.1]],
-    ['Bayesian classifier thinks text is spam', [0.8, -0.3]],
+    ['Bayesian classifier thinks text is spam', [0.8, -0.5]],
     ['no long text passages between links', [0.4, -0.1]],
     ['high tag density', [0.2, -0.1]],
     ['contains words typical for course notes', [0.5, -0.1]],
+    ['contains words typical for papers', [-0.4, 0.1]],
     ['contains words typical for interviews', [0.2, 0]],
     ['few verbs', [0.5, -0.1]],
     ['short', [0.4, -0.1]],
-    ['long', [-0.2, 0.1]],
+    ['long', [-0.2, 0.2]],
     ['contains bibliography section', [-0.2, 0.2]],
     ['most lines short', [0.4, 0]],
     ['low confidence', [0.3, -0.1]],
@@ -106,6 +107,14 @@ $f{'contains words typical for interviews'} = sub {
     return undef unless defined($loc->{text});
     my $count = () = ($loc->{text} =~ /$re_interview_words/g);
     return min(1, ($count*2000)/length($loc->{text}));
+};
+
+my $re_paper_words = qr/in section|finally,/i;
+$f{'contains words typical for papers'} = sub {
+    my $loc = shift;
+    return undef unless defined($loc->{text});
+    my $count = () = ($loc->{text} =~ /$re_paper_words/g);
+    return min(1, ($count*4000)/length($loc->{text}));
 };
 
 $f{'few verbs'} = sub {
