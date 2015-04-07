@@ -579,7 +579,7 @@ sub check_steppingstone {
 
 sub spamfilter {
     my $spam_estim = util::Estimator->new();
-    $spam_estim->verbose($verbosity);
+    $spam_estim->verbose($verbosity-2) if ($verbosity > 2);
     my $f = \@rules::Spam_Features::spam_features;
     die unless $f;
     foreach (@rules::Spam_Features::spam_features) {

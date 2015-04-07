@@ -131,7 +131,7 @@ $f{'no long text passages between links'} = sub {
     foreach my $txt (split(/<a /i, $loc->{content})) {
         $longest_text = length($txt) if (length($txt) > $longest_text);
     }
-    return max(0, 1 - longest_text/2000);
+    return max(0, 1 - $longest_text/2000);
 };
 
 $f{'short'} = sub {
