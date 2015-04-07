@@ -126,7 +126,7 @@ sub init {
             # yes, sometimes blocks have unspec'd font: 49803
             $chunk->{id} = $lineno++;
             $chunk->{textpos} = $charno;
-            $charno += length $chunk->{plaintext};
+            $charno += length($chunk->{plaintext});
             $chunk->{doc} = $self;
             pushlink @pagechunks, $chunk;
         }
@@ -405,7 +405,7 @@ sub remove_page {
 sub get_text {
     my $self = shift;
     foreach my $ch (@{$self->{chunks}} ) {
-        $self->{text} .= $ch->{plaintext};
+        $self->{text} .= $ch->{plaintext}."\n";
     }
 }
 

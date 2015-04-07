@@ -345,8 +345,6 @@ sub process {
     $loc->{confidence} = $result->{confidence};
     $loc->{length} = $result->{numpages};
     $loc->{text} = $result->{text};
-    # TODO: these should be added to the XML file by the extractor,
-    # and used by the spam filter.
 
     # guess spamminess again, now that we have the text content:
     print "testing spamminess again\n";
