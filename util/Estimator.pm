@@ -92,7 +92,7 @@ sub test {
 
     my ($self, $ob) = @_;
     if ($verbose) {
-	my $obtxt = UNIVERSAL::isa($ob, "HASH")?
+	my $obtxt = UNIVERSAL::isa($ob, "HASH") && exists $ob->{text}?
 	    substr($ob->{text}, 0, 100) : $ob;
 	print "testing '$obtxt'\n";
     }
@@ -103,7 +103,12 @@ sub test {
     while (my ($fname, $fvals) = each %{$self->{features}}) {
 	my ($attrib, $w1, $w0) = @$fvals;
         print "$fname? " if $verbose;
-        my $is = $attrib->($ob) || 0;
+        my $is = $attrib->($ob);
+        unless (defined $is) {
+            print " undefined\n" if $verbose;
+            next;
+        }
+        $is = 0 if $is eq '';
 	my $score = $is * $w1 + (1-$is) * $w0;
 	if ($score >= 0) {
 	    $pos += (1-$pos) * $score;
@@ -114,7 +119,7 @@ sub test {
 	    $neg_w += exp((0.5-$score) * 5);
 	}
 	print "$is => $score\n" if $verbose;
-    };
+    }
 
     my $p = ($pos * $pos_w + $neg * $neg_w) / ($pos_w + $neg_w);
     print "  $pos*$pos_w + $neg*$neg_w => $p\n" if $verbose;

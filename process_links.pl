@@ -19,7 +19,8 @@ use Getopt::Std;
 use util::Io;
 use util::Errors;
 use util::String;
-use Spamfilter;
+use util::Estimator;
+use rules::Spam_Features;
 use Converter;
 use Extractor;
 use POSIX qw/strftime/;
@@ -204,7 +205,6 @@ sub next_locations {
     }
 }
 
-
 sub process {
     my $loc = shift;
     my $loc_id = $loc->{location_id};
@@ -291,16 +291,8 @@ sub process {
     # Except for html documents, we don't have the text content
     # yet, but we nevertheless do a preliminary spam test now,
     # so that we can stop processing if something is clear spam:
-    my $spamminess = 0;
-    Spamfilter::verbosity($verbosity > 1 ? $verbosity-1 : 0);
-    eval {
-        $spamminess = Spamfilter::classify($loc);
-    };
-    if ($@) {
-        error($@);
-        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
-        return errorcode();
-    }
+    my $spamfilter = spamfilter();
+    my $spamminess = $spamfilter->test($loc);
     if ($spamminess > 0.5) {
         if (defined $loc->{spamminess} && $loc->{spamminess} > 0.5) {
             print "was previously recognized as spam, "
@@ -357,9 +349,8 @@ sub process {
     # and used by the spam filter.
 
     # guess spamminess again, now that we have the text content:
-    eval {
-        $loc->{spamminess} = Spamfilter::classify($loc);
-    };
+    print "testing spamminess again\n";
+    $loc->{spamminess} = $spamfilter->test($loc);
     if ($loc->{spamminess} >= $CERT_SPAM) {
         print "spam score $loc->{spamminess}, "
             ."not storing document\n" if $verbosity;
@@ -586,6 +577,17 @@ sub check_steppingstone {
     $target = ${$as[0]}{href};
     $target =~ s/\s/%20/g; # fix links with whitespace
     return $target if length($target) < 256;
+}
+
+sub spamfilter {
+    my $spam_estim = util::Estimator->new();
+    $spam_estim->verbose($verbosity);
+    my $f = \@rules::Spam_Features::spam_features;
+    die unless $f;
+    foreach (@rules::Spam_Features::spam_features) {
+        $spam_estim->add_feature(@$_);
+    }
+    return $spam_estim;
 }
 
 sub force_utf8 {

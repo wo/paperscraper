@@ -15,8 +15,7 @@ our @ISA = ('Exporter');
 our @EXPORT = qw/&parse/;
 
 my $estim = util::Estimator->new();
-my $name_features = \@rules::Name_Features::name_features;
-foreach (@$name_features) {
+foreach (@rules::Name_Features::name_features) {
     $estim->add_feature(@$_);
 }
 
