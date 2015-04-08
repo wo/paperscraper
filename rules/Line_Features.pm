@@ -425,7 +425,7 @@ sub gap {
             #print "** fsize: $fsize, sp: $sp => ";
             $sp *= 1 + min(0.5, $fsize/10);
             my $height = min($chunk->{height}, $sibling->{height});
-            my $spacing = $sp/$height - 1;
+            my $spacing = $sp/$height;
             #print "** $sp, height: $height, gap: $spacing / $default\n";
             return $spacing / $default;
         }
@@ -512,7 +512,7 @@ $f{'style appears on several pages'} = memoize(sub {
     my $ret = 0;
     my $ch = $_[0]->{doc}->{chunks}->[-1];
     while (($ch = $ch->{prev})) {
-        next if length($ch->{plaintext}) > 5;
+        next if length($ch->{plaintext}) < 5;
         next if $ch->{page} eq $_[0]->{page};
         # ignore intro pages:
         last if $ch->{page}->{number} <= ($numpages/5 + 1);
@@ -538,7 +538,7 @@ $f{'in continuation with good TITLE'} = sub {
         $score[$i] *= ($sib->{p}->('TITLE')/$best_p) ** 2; 
         $score[$i] *= max(0.5, style_similarity($sib, $_[0]));
         my $gap = gap($_[0], $i ? 'next' : 'prev');
-        $score[$i] *= max(0.5, 1.2/$gap) if $gap;
+        $score[$i] *= max(0.5, min(1, 1.2/$gap)) if $gap;
         if ($i == 1) { # $sib is before $_[0]
             $score[$i] *= 1.5 if ($sib->{plaintext} =~ /([\:\;\-\,])$/);
         }

@@ -28,8 +28,8 @@ sub new {
         chunks => [],
         pages => [],
         numpages => 0,
-        fontsize => 0,
-        linespacing => 0,
+        fontsize => 1,
+        linespacing => 1,
         geometry => {},
         marginals => [],
         footnotes => [],
@@ -221,7 +221,7 @@ sub fontinfo {
             unless defined $fs_freq{$ch->{fsize}};
         $fs_freq{$ch->{fsize}}++;
         next unless $ch->{prev};
-        my $spacing = ($ch->{top} - $ch->{prev}->{top}) / $ch->{height} - 1;
+        my $spacing = ($ch->{top} - $ch->{prev}->{top}) / $ch->{height};
         $spacing = sprintf "%.1f", $spacing;
         $sp_freq{$spacing}++;
     }
@@ -237,7 +237,7 @@ sub fontinfo {
     while (my ($sp, $freq) = each(%sp_freq)) {
         $default_sp = $sp if $freq > $sp_freq{$default_sp};
     }
-    $self->{linespacing} = $default_sp || 1;
+    $self->{linespacing} = $default_sp < 1 ? 1 : $default_sp;
     say(3, "default line spacing $self->{linespacing}");
 }
 
@@ -756,7 +756,7 @@ sub extract_authors_and_title {
     my $counter = 0;
   PARSING: while (my $chunks = $parsings->()) {
       $counter++;
-      if (($counter > 10000 && @parsings) || $counter > 20000) {
+      if (($counter > 100000 && @parsings) || $counter > 500000) {
           say(2, "too many author-title parsings");
           last;
       }
