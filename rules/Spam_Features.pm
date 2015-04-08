@@ -45,21 +45,24 @@ my $bayes = AI::Categorizer::Learner::NaiveBayes->restore_state(
 #$nb->verbose($verbosity > 1 ? 3 : 0);
 
 $f{'Bayesian classifier thinks text is spam'} = sub {
-    # This mainly serves to detect philosophy vs non-philosophy; it's
-    # not good at detecting e.g. papers vs handouts or syllabi.
+    # This mainly serves to detect non-philosophy papers as well as
+    # department homepages, stat counters etc.; it's not good at
+    # detecting e.g. papers vs handouts or syllabi.
     my $loc = shift;
     return undef unless defined($loc->{text});
+    my $ret;
     eval {
         my $ai_doc = AI::Categorizer::Document->new(content => $loc->{text});
         my $ai_res = $bayes->categorize($ai_doc);
         my $ai_ham = $ai_res->{scores}->{ham};
         my $ai_spam = $ai_res->{scores}->{spam};
-        return max(0, $ai_spam - $ai_ham/2);
+        $ret = max(0, $ai_spam - $ai_ham/2);
     };
     if ($@) {
         print "spam categorization failed! $@\n";
-        return 0.5;
+        return undef;
     }
+    return $ret;
 };
 
 my $re_bad_filetype = qr/\.(jpg|gif|ttf|ppt|php|asp)$/xi;
