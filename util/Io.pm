@@ -108,8 +108,11 @@ sub _get_filetype {
     if ($ctype =~ /(pdf|rtf|msword|html?)/i) {
         $filetype = lc($1);
     }
-    # for others, file-ending is more reliable (at least if it is a 2-4
-    # character string):
+    # for others, first check if content has pdf signature:
+    elsif (defined($response->{_content}) && $response->{_content} =~ /^%PDF-/) {
+        $filetype = 'pdf';
+    }
+    # otherwise use file-ending, if it is a 2-4 character string:
     elsif ($response->{url} =~ /\/.+\/.+\.([a-z]{2,4})$/) {
         $filetype = lc($1);
     }
@@ -118,7 +121,7 @@ sub _get_filetype {
    	$filetype = ($ctype =~ /.+\/(.+)/i) ? lc($1) : 'none';
     }
     # normalize:
-    $filetype =~ s/msword/doc/;
+    $filetype =~ s/msword|docx/doc/;
     $filetype =~ s/htm$/html/;
     $filetype =~ s/text/txt/;
     print "filetype: $filetype\n" if $verbosity > 1;

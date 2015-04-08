@@ -50,7 +50,7 @@ sub convert2pdf {
 	  die "wkhtmltopdf failed" unless -e $target;
 	  return 1;
       };
-      /doc|docx/i && do {
+      /doc/i && do {
 	  push @converters_used, 'unoconv';
 	  my $command = $cfg{'UNOCONV'}
 	      .' -f pdf'
@@ -121,7 +121,7 @@ sub convert2text {
 	  $text = convert2text("$filename.pdf");
 	  last;
       };
-      /doc|docx|rtf/i && do {
+      /doc|rtf/i && do {
 	  my $command = $cfg{'UNOCONV'}
 	      .' -f html'
               .' --stdout'
