@@ -39,7 +39,7 @@ sub parse {
         }
         my %name = ('text' => $1, 'first' => $2, 'last' => $3);
         my $p = $estim->test(\%name);
-        if ($p > 0.6) {
+        if ($p > 0.5) {
             $res{$name{text}} = $p;
         }
     }

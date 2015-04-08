@@ -104,7 +104,7 @@ $features{AUTHOR} = [
     ['contains publication keywords', [-0.4, 0], 3],
     #['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
-    ['contains probable name', [0.3, -0.8], 3],
+    ['contains probable name', [0.4, -0.8], 3],
     ['contains several English words', [-0.2, 0.1], 3],
     ['resembles source author', [0.1, -0.1], 3],
     [$or->('near good TITLE', 'near other good AUTHORs'), [0.2, -0.5], 4],
@@ -919,7 +919,8 @@ $f{'contains probable name'} = memoize(sub {
     unless (exists $_[0]->{names}) {
         $_[0]->{names} = rules::NameExtractor::parse($_[0]->{plaintext});
     }
-    return %{$_[0]->{names}} ? 1 : 0;
+    return 0 unless %{$_[0]->{names}};
+    return max(values(%{$_[0]->{names}}));
 });
 
 $f{'contains several English words'} = memoize(sub {
