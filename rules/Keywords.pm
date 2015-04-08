@@ -14,7 +14,7 @@ $re_noname
 $re_name_before
 $re_name_after
 $re_name_separator
-$re_title
+$re_address_word
 $re_bad_ending
 $re_bad_beginning
 $re_content
@@ -54,7 +54,7 @@ our $re_session_id = qr{
 }xi;
 
 # stuff that indicates addresses or affiliations:
-my $re_address_word = qr/\b(?:
+our $re_address_word = qr/\b(?:
     universit\w+|center|centre|institute?|college|
     avenue|street|professor|department|
     umass|uc
@@ -107,16 +107,6 @@ our $re_noname = qr/
        )\b
     /ix;
 
-# stuff that tends to disqualify something from being a title:
-my $re_notitle = qr/
-    $re_address_word |
-    $re_publication_word |
-    \b(?:thanks?|
-       @|
-       [12]\d{3}|
-       abstract
-    )/ix;
-
 my $re_nocontent = qr/(?:
     $re_address_word |
     $re_publication_word
@@ -162,12 +152,6 @@ our $re_name_separator = qr/
        )
     \s*
     /ix;
-
-# may be a title:
-our $re_title = qr/^
-    (?!.*$re_notitle.*)
-    \p{IsAlpha}{2,}                # At least two word characters
-    /x;
 
 # words that suggest title continues on next line:
 our $re_bad_ending = qr/

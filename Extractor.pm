@@ -221,8 +221,8 @@ sub fontinfo {
             unless defined $fs_freq{$ch->{fsize}};
         $fs_freq{$ch->{fsize}}++;
         next unless $ch->{prev};
-        my $spacing = ($ch->{top}-$ch->{prev}->{top}) / $ch->{height};
-        $spacing = int($spacing*10)/10;
+        my $spacing = ($ch->{top} - $ch->{prev}->{top}) / $ch->{height} - 1;
+        $spacing = sprintf "%.1f", $spacing;
         $sp_freq{$spacing}++;
     }
 
@@ -756,7 +756,7 @@ sub extract_authors_and_title {
     my $counter = 0;
   PARSING: while (my $chunks = $parsings->()) {
       $counter++;
-      if (($counter > 1000 && @parsings) || $counter > 10000) {
+      if (($counter > 10000 && @parsings) || $counter > 20000) {
           say(2, "too many author-title parsings");
           last;
       }
@@ -850,7 +850,7 @@ sub extract_authors_and_title {
     }
 
     unless (@{$self->{authors}}) {
-        $self->decr_confidence(0.8, "no authors found");
+        $self->decr_confidence(0.9, "no authors found");
         if ($self->{sourceauthors}) {
             say(2, "no author -- using source author(s)");
             $self->{authors} = $self->{sourceauthors};

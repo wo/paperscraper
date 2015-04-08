@@ -45,6 +45,8 @@ my $bayes = AI::Categorizer::Learner::NaiveBayes->restore_state(
 #$nb->verbose($verbosity > 1 ? 3 : 0);
 
 $f{'Bayesian classifier thinks text is spam'} = sub {
+    # This mainly serves to detect philosophy vs non-philosophy; it's
+    # not good at detecting e.g. papers vs handouts or syllabi.
     my $loc = shift;
     return undef unless defined($loc->{text});
     eval {

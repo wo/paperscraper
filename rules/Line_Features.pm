@@ -51,7 +51,7 @@ $features{FOOTNOTESTART} = [
     ];
 
 $features{TITLE} = [
-    ['among first few lines', [0.4, -0.3]],
+    ['among first few lines', [0.2, -0.3]],
     ['within first few pages', [0.1, -1]],
     ['long', [-0.1, 0.1]],
     [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
@@ -62,19 +62,23 @@ $features{TITLE} = [
     ['gap above', [0.3, -0.3], 2],
     ['gap below', [0.2, -0.2], 2],
     ['style appears on several pages', [-0.3, 0], 2],
-    ['matches title pattern', [0.1, -0.6], 2],
+    ['contains letters', [0, -0.7], 2],
+    ['contains publication keywords', [-0.5, 0.1], 2],
+    ['contains address words', [-0.5, 0.1], 2],
+    ['contains other bad title words', [-0.6, 0.1], 2],
     ['possible date', [-0.5, 0], 2],
-    [$or->('several words', 'may continue title'), [0.1, -0.4], 2],
+    [$or->('several words', 'in continuation with good TITLE'), [0.1, -0.4], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.25, 0], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
     ['words common in CONTENT', [0.1, -0.3], 3],
-    [$or->('best title', 'may continue title'), [0.3, -0.8], 3],
     ['probable AUTHOR', [-0.3, 0.1], 3],
-    ['near AUTHOR', [0.2, -0.4], 4],
-    ['resembles best title', [0.1, -0.5], 4],
+    [$and->('best AUTHOR', 'other good TITLEs'), [-0.7, 0.05], 4],
+    [$or->('best TITLE', 'in continuation with good TITLE'), [0.5, -0.8], 4],
+    ['separated from AUTHOR only by TITLE', [0.3, -0.6], 4],
+    ['resembles best TITLE', [0.1, -0.5], 4],
     ];
 
 $features{AUTHOR} = [
@@ -83,25 +87,28 @@ $features{AUTHOR} = [
     # need to make sure bib entries aren't taken as authors at end of
     # a paper; so right now I'm only considering authors at the start.
     ['within first few pages', [0.05, -0.8]],
-    ['narrowish', [0.3, -0.3]],
+    ['long', [-0.2, 0.2]],
     ['centered', [0.3, -0.2]],
     ['small font', [-0.2, 0.2]],
+    ['several words', [0, -0.5]],
     ['begins with possible name', [0.3, -0.4]],
-    ['typical list of names', [0.2, -0.2]],
+    ['typical list of names', [0.2, 0]],
     ['largest text on page', [-0.4, 0], 2],
     ['contains digit', [-0.1, 0.05], 2],
     ['gap above', [0.25, -0.3], 2],
     ['gap below', [0.15, -0.15], 2],
     ['occurs in marginals', [0.2, 0], 2],
-    [$and->('best title', 'other good authors'), [-0.4, 0.05], 3],
-    ['probable HEADING', [-0.8, 0.2], 3],
+    [$and->('best TITLE', 'other good AUTHORs'), [-0.4, 0.05], 3],
+    ['probable HEADING', [-0.7, 0.2], 3],
+    ['probable ABSTRACTSTART', [-0.6, 0.1], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     #['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
-    ['contains probable name', [0.3, -0.5], 3],
+    ['contains probable name', [0.3, -0.8], 3],
     ['contains several English words', [-0.2, 0.1], 3],
     ['resembles source author', [0.1, -0.1], 3],
-    ['resembles best author', [0.1, -0.5], 4],
+    [$or->('near good TITLE', 'near other good AUTHORs'), [0.2, -0.5], 4],
+    ['resembles best AUTHOR', [0.1, -0.5], 4],
     ];
 
 $features{HEADING} = [
@@ -158,7 +165,6 @@ $features{ABSTRACTSTART} = [
     ['previous line short', [0.2, -0.2], 2],
     ['previous line probable HEADING', [0.4, -0.1], 2],
     ['previous line probable ABSTRACT', [-0.4, 0.2], 2],
-    ['previous line ends with terminator', [0.1, -0.1], 2],
     ['begins in upper case', [0.1, -0.4], 2], 
     ['begins with "abstract:"', [0.7, 0], 2],
     ['gap above', [0.2, -0.1]],
@@ -211,7 +217,7 @@ $features{BIBSTART} = [
 1;
 
 my @labels = qw/TITLE AUTHOR CONTENT HEADING
-                ABSTRACT BIB BIBSTART/;
+                ABSTRACT ABSTRACTSTART BIB BIBSTART/;
 
 my %f;
 
@@ -242,10 +248,10 @@ $f{'is digit'} = sub {
 };
 
 $f{'resembles other HEADERs'} = sub {
-    return 0 unless $_[0]->{best}->{HEADER};
+    return undef unless $_[0]->{best}->{HEADER};
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{HEADER}}) {
-        next if $_[0] == $h;
+        next if $_[0] eq $h;
         next if abs($_[0]->{top} - $h->{top}) > 5;
         next if abs($_[0]->{fsize} - $h->{fsize}) > 1;
         next if length($_[0]->{plaintext}) != length($h->{plaintext});
@@ -255,11 +261,11 @@ $f{'resembles other HEADERs'} = sub {
 };
 
 $f{'resembles other FOOTERs'} = sub {
-    return 0 unless $_[0]->{best}->{FOOTER};
+    return undef unless $_[0]->{best}->{FOOTER};
     my $num = scalar @{$_[0]->{best}->{FOOTER}} || 1;
     my $count = 0;
     foreach my $h (@{$_[0]->{best}->{FOOTER}}) {
-        next if $_[0] == $h;
+        next if $_[0] eq $h;
         next if abs($_[0]->{bottom} - $h->{bottom}) > 5;
         next if abs($_[0]->{fsize} - $h->{fsize}) > 
             $_[0]->{doc}->{fromOCR} ? 1 : 0;
@@ -282,7 +288,7 @@ $f{'previous line FOOTER'} = sub {
 };
  
 $f{'resembles best FOOTNOTESTART'} = sub {
-    return 0.5 if scalar @{$_[0]->{best}->{FOOTNOTESTART}} <= 1;
+    return undef if scalar @{$_[0]->{best}->{FOOTNOTESTART}} <= 1;
     my $best = $_[0]->{best}->{FOOTNOTESTART}->[0];
     my $ret = 1;
     $ret -= 0.6 if alignment($_[0]) ne alignment($best);
@@ -294,7 +300,7 @@ $f{'resembles best FOOTNOTESTART'} = sub {
 
 foreach my $label (@labels) {
     $f{"probable $label"} = sub {
-        return max(0, $_[0]->{p}->($label)-0.2) * 1.25;
+        return min(1, $_[0]->{p}->($label)+0.1) ** 2;
     };
 }
 
@@ -304,7 +310,7 @@ $f{'narrowish'} = sub {
 };
 
 $f{'several words'} = memoize(sub { 
-     $_[0]->{plaintext} =~ /\p{IsAlpha}.*\s.*\p{IsAlpha}/o;
+     $_[0]->{plaintext} =~ /\p{IsAlpha}{2,}.*\s.*\p{IsAlpha}{2,}/o;
 });
 
 $f{'long'} = memoize(sub {
@@ -373,7 +379,7 @@ $f{'on last page'} = memoize(sub {
 $f{'preceeded by many ABSTRACTs'} = sub {
     my $ch = $_[0];
     my $n = 1;
-    while ($ch = $ch->{prev}) {
+    while (($ch = $ch->{prev})) {
         $n++ if $ch->{p}->('ABSTRACT') > 0.5;
         last if $n >= 80;
     }
@@ -410,7 +416,7 @@ sub gap {
     my ($chunk, $dir) = @_;
     my $default = min(2, $chunk->{doc}->{linespacing});
     my $sibling = $chunk->{$dir};
-    while ($sibling && $sibling->{page} == $chunk->{page}) {
+    while ($sibling && $sibling->{page} eq $chunk->{page}) {
         my $sp = $dir eq 'prev' ? $chunk->{top} - $sibling->{top} :
             $sibling->{top} - $chunk->{top};
         if ($sp > 5) {
@@ -419,8 +425,9 @@ sub gap {
             #print "** fsize: $fsize, sp: $sp => ";
             $sp *= 1 + min(0.5, $fsize/10);
             my $height = min($chunk->{height}, $sibling->{height});
-            #print "$sp, height: $height, gap: ($sp/$height) / $default\n";
-            return ($sp/$height) / $default;
+            my $spacing = $sp/$height - 1;
+            #print "** $sp, height: $height, gap: $spacing / $default\n";
+            return $spacing / $default;
         }
         $sibling = $sibling->{$dir};
     }
@@ -446,19 +453,24 @@ $f{'greater gap above than below'} = memoize(sub {
     return $gap_above > $gap_below + 0.1;
 });
 
-$f{'matches title pattern'} = memoize(sub {
-    $_[0]->{plaintext} =~ $re_title;
-});
+$f{'contains address words'} = sub {
+    $_[0]->{plaintext} =~ $re_address_word;
+};
+
+my $re_bad_title = qr/\b(?:thanks?|@|[12]\d{3}|)/ix;
+$f{'contains other bad title words'} = sub {
+   $_[0]->{plaintext} =~ $re_address_word;
+};
 
 $f{'matches content pattern'} = memoize(sub {
     $_[0]->{plaintext} =~ $re_content;
 });
 
 $f{'resembles anchor text'} = memoize(sub {
-    my $ret = 0;
+    my $ret = undef;
     for my $str (@{$_[0]->{doc}->{anchortexts}}) {
         if (length($str) < 5 || $str =~ /version/i) {
-            $ret = 0.5;
+            $ret = undef;
             next;
         }
         return 1 if (amatch($str, ['i 20%'], $_[0]->{plaintext}));
@@ -467,6 +479,7 @@ $f{'resembles anchor text'} = memoize(sub {
 });
  
 $f{'resembles source author'} = memoize(sub {
+    return undef unless @{$_[0]->{doc}->{sourceauthors}};
     for my $str (@{$_[0]->{doc}->{sourceauthors}}) {
        return 1 if (amatch($str, ['i 30%'], $_[0]->{plaintext}));
     }
@@ -481,54 +494,54 @@ $f{'occurs in marginals'} = memoize(sub {
     return 0;
 });
 
+sub style_similarity {
+    my ($ch1, $ch2) = @_;
+    my $score = 1;
+    $score *= 0.2 if $f{'bold'}->($ch1) != $f{'bold'}->($ch2);
+    $score *= 0.2 if $f{'all caps'}->($ch1) != $f{'all caps'}->($ch2);
+    $score *= 0.2 if $ch1->{fsize} != $ch2->{fsize};
+    my $a1 = alignment($ch1);
+    my $a2 = alignment($ch2);
+    $score *= 0.2 if ($a2 ne 'justify' && $a2 ne 'justify' && $a1 ne $a2);
+    return $score;
+}
+
 $f{'style appears on several pages'} = memoize(sub {
-    my $bold = $f{'bold'}->($_[0]);
-    my $caps = $f{'all caps'}->($_[0]);
-    return 1 if !$bold && !$caps && ($_[0]->{fsize} == 0);
-    my $chunk = $_[0]->{doc}->{chunks}->[-1];
+    my $numpages = $_[0]->{doc}->{numpages};
+    return undef if $numpages < 2;
     my $ret = 0;
-    while (($chunk = $chunk->{prev})) {
-        next if $chunk->{page} == $_[0]->{page};
-        # skip intro bits of books:
-        if ($chunk->{doc}->{numpages} - $chunk->{page}->{number} > 80
-            || $chunk->{page}->{number} < 3) {
-            last;
-        }
-        if ($chunk->{fsize} == $_[0]->{fsize}
-            && length($chunk->{plaintext}) > 5
-            && $f{'bold'}->($chunk) == $bold
-            && $f{'all caps'}->($chunk) == $caps
-            && alignment($chunk) eq alignment($_[0])) {
-            #print "** $chunk->{text} has same style";
+    my $ch = $_[0]->{doc}->{chunks}->[-1];
+    while (($ch = $ch->{prev})) {
+        next if length($ch->{plaintext}) > 5;
+        next if $ch->{page} eq $_[0]->{page};
+        # ignore intro pages:
+        last if $ch->{page}->{number} <= ($numpages/5 + 1);
+        if (style_similarity($_[0], $ch) == 1) {
             $ret += 0.5;
-            last if $ret >= 1;
         }
+        return 1 if $ret >= 1;
     }
     return $ret;
 });
 
-$f{'may continue title'} = sub {
-    my @score = (0.5, 0.5);
-    my $align1 = alignment($_[0]);
+$f{'in continuation with good TITLE'} = sub {
+    my $best = $_[0]->{best}->{TITLE}->[0];
+    return undef unless $best;
+    my $best_p = $best->{p}->('TITLE');
+    my @score = (1, 1);
     foreach my $i (0, 1) {
         my $sib = $_[0]->{($i ? 'next' : 'prev')};
-        unless ($sib && $sib->{page} == $_[0]->{page}) {
-            $score[$i] -= 1;
+        unless ($sib && $sib->{page} eq $_[0]->{page}) {
+            $score[$i] = 0;
             next;
         }
-        $score[$i] += $sib->{p}->('TITLE') - 0.75;
-        $score[$i] += 0.2 if ($sib->{plaintext} =~ /([\:\;\-\,])$/);
-        $score[$i] += ($_[0]->{fsize} == $sib->{fsize}) ? 0.1 : -0.1;
-        $score[$i] -= 0.3
-            if $f{'all caps'}->($_[0]) != $f{'all caps'}->($sib);
-        $score[$i] +=
-            $f{'bold'}->($_[0]) == $f{'bold'}->($sib) ? 0.1 : -0.1;
+        $score[$i] *= ($sib->{p}->('TITLE')/$best_p) ** 2; 
+        $score[$i] *= max(0.5, style_similarity($sib, $_[0]));
         my $gap = gap($_[0], $i ? 'next' : 'prev');
-        $score[$i] -= ($gap-1.5) / 10 if $gap;
-        my $align2 = alignment($sib);
-        $score[$i] -= 0.2
-            if ($align1 ne 'justify' && $align2 ne 'justify'
-                && $align1 ne $align2);
+        $score[$i] *= max(0.5, 1.2/$gap) if $gap;
+        if ($i == 1) { # $sib is before $_[0]
+            $score[$i] *= 1.5 if ($sib->{plaintext} =~ /([\:\;\-\,])$/);
+        }
     }
     return min(1, max(0, $score[0], $score[1]));
 };
@@ -556,7 +569,7 @@ $f{'words common in CONTENT'} = memoize(sub {
 
 $f{'continues abstract'} = sub {
     my $prev = $_[0]->{prev};
-    unless ($prev && $prev->{page} == $_[0]->{page}
+    unless ($prev && $prev->{page} eq $_[0]->{page}
             && $prev->{top} < $_[0]->{top}
             && $prev->{fsize} == $_[0]->{fsize}
             && $f{'bold'}->($prev) == $f{'bold'}->($_[0])) {
@@ -580,30 +593,44 @@ $f{'continues bib item'} = sub {
     $score -= ($gap-1) / 10 if $gap;
     return max(0, min(1, $score));
 };
+
+sub is_best {
+    my $label = shift;
+    return sub {
+        my $best = $_[0]->{best}->{$label}->[0];
+        return undef unless $best && $best->{p};
+        return 1 if $_[0] eq $best;
+        my $dist = $best->{p}->($label) - $_[0]->{p}->($label);
+        return max(1 - $dist*10, 0);
+    };
+}
  
-$f{'best title'} = sub {
-    my $best = $_[0]->{best}->{TITLE}->[0];
-    return 0 unless $best && $best->{p};
-    return 1 if $_[0] == $best;
-    my $dist = $best->{p}->('TITLE') - $_[0]->{p}->('TITLE');
-    return max(1 - $dist*10, 0); 
-};
+$f{'best TITLE'} = is_best('TITLE');
 
-$f{'other good authors'} = sub {
-    my $ch = $_[0]->{best}->{AUTHOR}->[0];
-    return 0 unless $ch;
-    return 1 if $_[0] != $ch;
-    $ch = $_[0]->{best}->{AUTHOR}->[1];
-    return 0 unless $ch;
-    my $dist = $_[0]->{p}->('AUTHOR') - $ch->{p}->('AUTHOR');
-    return max(1 - $dist*4, 0); 
-};
+$f{'best AUTHOR'} = is_best('AUTHOR');
 
-$f{'resembles best author'} = sub {
+sub other_good {
+    my $label = shift;
+    return sub {
+        my $ch = $_[0]->{best}->{$label}->[0];
+        return 0 unless $ch;
+        return 1 if $_[0] ne $ch;
+        $ch = $_[0]->{best}->{$label}->[1];
+        return 0 unless $ch;
+        my $dist = $_[0]->{p}->($label) - $ch->{p}->($label);
+        return max(1 - $dist*4, 0); 
+    };
+}
+
+$f{'other good TITLEs'} = other_good('TITLE');
+
+$f{'other good AUTHORs'} = other_good('AUTHOR');
+
+$f{'resembles best AUTHOR'} = sub {
     my $best = $_[0]->{best}->{AUTHOR}->[0];
-    return 0 unless $best;
-    return 1 if $_[0] == $best;
-    return 0 if $_[0]->{page} != $best->{page};
+    return undef unless $best;
+    return 1 if $_[0] eq $best;
+    return 0 if $_[0]->{page} ne $best->{page};
     return 0 if $f{'all caps'}->($_[0]) != $f{'all caps'}->($best);
     return 0 if ($_[0]->{text} =~ /,/) != ($best->{text} =~ /,/);
     # is on other side of title?
@@ -622,11 +649,11 @@ $f{'resembles best author'} = sub {
     return max($ret, 0);
 };
 
-$f{'resembles best title'} = sub {
+$f{'resembles best TITLE'} = sub {
     my $best = $_[0]->{best}->{TITLE}->[0];
-    return 0 unless $best && $best->{page} && $_[0]->{page};
-    return 1 if $_[0] == $best;
-    return 0 if $_[0]->{page} != $best->{page};
+    return undef unless $best;
+    return 1 if $_[0] eq $best;
+    return 0 if $_[0]->{page} ne $best->{page};
     my $ret = 1;
     $ret -= 0.5 if $f{'all caps'}->($_[0]) != $f{'all caps'}->($best);
     $ret -= 0.3 if alignment($_[0]) ne alignment($best);
@@ -640,7 +667,7 @@ $f{'resembles best title'} = sub {
 $f{'resembles best BIB'} = sub {
     my $best = $_[0]->{best}->{BIB}->[0];
     return 0 unless $best;
-    return 1 if $_[0] == $best;
+    return 1 if $_[0] eq $best;
     my $ret = 1;
     $ret -= abs($_[0]->{fsize} - $best->{fsize})/5;
     $ret -= abs($_[0]->{page}->{number} - $best->{page}->{number})/10;
@@ -652,7 +679,7 @@ $f{'resembles best BIB'} = sub {
 $f{'resembles best BIBSTART'} = sub {
     my $best = $_[0]->{best}->{BIBSTART}->[0];
     return 0 unless $best;
-    return 1 if $_[0] == $best;
+    return 1 if $_[0] eq $best;
     my $ret = 1;
     $ret *= 0.3 if $_[0]->{fsize} != $best->{fsize};
     $ret *= 0.4 if abs($_[0]->{left} - $best->{left}) > 5;
@@ -749,26 +776,63 @@ $f{'previous line is bibliography heading'} = sub {
     return 0;
 };
 
-sub neighbour {
-    my ($dir, $label) = @_;
-    return sub {
-        my $ch = $_[0]->{$dir};
-        while ($ch && length($ch->{plaintext}) < 5) {
+$f{'separated from AUTHOR only by TITLE'} = sub {
+    my %au_lookup = map { $_ => 1 } @{$_[0]->{best}->{AUTHOR}};
+    my %ti_lookup = map { $_ => 1 } @{$_[0]->{best}->{TITLE}};
+    return undef unless %au_lookup;
+    my $best_au_p = 0;
+    for my $dir ('next', 'prev') {
+        my $ch = $_[0];
+        while ($ch && (exists $au_lookup{$ch} || exists $ti_lookup{$ch})) {
+            $best_au_p = max($best_au_p, $ch->{p}->('AUTHOR'));
             $ch = $ch->{$dir};
         }
-        return $ch ? $ch->{p}->($label) : 0;
     }
-}    
+    return max(0, min(1, $best_au_p-0.3)*2);
+};
 
-$f{'near AUTHOR'} = someof(neighbour('prev', 'AUTHOR', 0), 
-                           neighbour('next', 'AUTHOR', 0));
+$f{'near good TITLE'} = sub {
+    my %ti_lookup = map { $_ => 1 } @{$_[0]->{best}->{TITLE}};
+    return undef unless %ti_lookup;
+    my $best_ti_p = 0;
+    for my $dir ('next', 'prev') {
+        my $ch = $_[0];
+        for my $dist (0..3) {
+            if (exists $ti_lookup{$ch}) {
+                my $weight = ($dist < 2) ? 1 : 0.2+1/$dist;
+                $best_ti_p = max($best_ti_p, $ch->{p}->('TITLE')*$weight);
+            }
+            $ch = $ch->{$dir};
+            last unless $ch;
+        }
+    }
+    return $best_ti_p;
+};
+
+$f{'near other good AUTHORs'} = sub {
+    my %au_lookup = map { $_ => 1 } @{$_[0]->{best}->{AUTHOR}};
+    return undef unless %au_lookup;
+    my $best_au_p = 0;
+    for my $dir ('next', 'prev') {
+        my $ch = $_[0];
+        for my $dist (1..4) {
+            $ch = $ch->{$dir};
+            last unless $ch;
+            if (exists $au_lookup{$ch}) {
+                my $weight = ($dist < 2) ? 1 : 0.2+1/$dist;
+                $best_au_p = max($best_au_p, $ch->{p}->('AUTHOR')*$weight);
+            }
+        }
+    }
+    return $best_au_p;
+};
 
 sub neighbourhood {
     my ($dir, $label) = @_;
     return sub {
         my $ch = $_[0];
         my $res = 0;
-        while ($ch = $ch->{$dir}) {
+        while (($ch = $ch->{$dir})) {
             next unless length($ch->{plaintext}) > 5;
             return $res unless $ch->{p}->($label) > 0.5;
             $res += (1-$res)/2; 
@@ -909,7 +973,7 @@ sub largest_text {
         my $ch = $_[0];
         my $tolerance = $ch->{doc}->{fromOCR} ? 1 : 0;
         my $anything_smaller = 0;
-        while (($ch = $ch->{$dir}) && $ch->{page} == $_[0]->{page}) {
+        while (($ch = $ch->{$dir}) && $ch->{page} eq $_[0]->{page}) {
             next if (length($ch->{plaintext}) < 5);
             return 0 if $ch->{fsize} > $_[0]->{fsize}+$tolerance;
             $anything_smaller = 1 if $ch->{fsize} < $_[0]->{fsize};
@@ -926,7 +990,7 @@ $f{'largest text on page'} = memoize(allof(largest_text('next', 1),
 $f{'rest of page has same font size'} = sub {
     my $ch = $_[0];
     my $tolerance = $ch->{doc}->{fromOCR} ? 1 : 0;
-    while (($ch = $ch->{next}) && $ch->{page} == $_[0]->{page}) {
+    while (($ch = $ch->{next}) && $ch->{page} eq $_[0]->{page}) {
         next if (length($ch->{plaintext}) < 5);
         return 0 if $ch->{fsize} > $_[0]->{fsize}+$tolerance
             || $ch->{fsize} < $_[0]->{fsize}-$tolerance; 
@@ -936,7 +1000,7 @@ $f{'rest of page has same font size'} = sub {
 
 $f{'previous line has larger font'} = sub {
     my $tolerance = $_[0]->{doc}->{fromOCR} ? 1 : 0;
-    if ($_[0]->{prev} && $_[0]->{page} == $_[0]->{prev}->{page}
+    if ($_[0]->{prev} && $_[0]->{page} eq $_[0]->{prev}->{page}
         && $_[0]->{prev}->{fsize} > $_[0]->{fsize}+$tolerance) {
         return 1;
     }

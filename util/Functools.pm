@@ -24,7 +24,7 @@ sub someof {
 	my $res = 0;
 	foreach my $code (@codes) {
 	    next unless ref $code;
-	    $res = max($res, $code->(@_));
+	    $res = max($res, $code->(@_) || 0);
 	    return 1 if $res == 1;
 	}
 	return $res;
@@ -37,7 +37,7 @@ sub allof {
 	my $res = 1;
 	foreach my $code (@codes) {
 	    next unless ref $code;
-	    $res = min($res, $code->(@_));
+	    $res = min($res, $code->(@_) || 0);
 	    return 0 if $res == 0;
 	}
 	return $res;

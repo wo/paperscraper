@@ -212,6 +212,11 @@ my %tests = (
    title => "Causation and Freedom",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Anon-Tye.pdf' => {
+   authors => [""],
+   title => "Tye on the Phenomenal Concept Strategy",
+ },
+
 );
 
 sub proc {
