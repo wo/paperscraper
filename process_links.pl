@@ -10,6 +10,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 use POSIX qw[ _exit ];
 use DBI;
+use String::Approx 'amatch';
 use Digest::MD5;
 use HTML::LinkExtractor;
 use URI;
@@ -381,34 +382,18 @@ EOD
             or warn DBI->errstr;
     }
     else {
-        # check if we already have this paper:
-        my $abstract_piece = (length($loc->{abstract}) > 40) ?
-                              substr($loc->{abstract}, 20, 20) : '';
-        my ($o_id, $o_url, $o_confidence) = $dbh->selectrow_array(
-            "SELECT documents.document_id, url, meta_confidence "
-            ."FROM documents INNER JOIN locations "
-            ."ON documents.document_id = locations.document_id "
-            ."WHERE status = 1 AND location_id != $loc_id "
-            ."AND authors = ".$dbh->quote($loc->{authors})." "
-            ."AND title = ".$dbh->quote($loc->{title})." "
-            ."AND abstract LIKE ".$dbh->quote("%$abstract_piece%")." "
-            ."LIMIT 1");
-        # better, with  the MySQL levenshtein UDF from joshdrew.com:
-        # ."AND levenshtein(authors,".$dbh->quote($loc->{authors}).") < 4 "
-        # ."AND levenshtein(title,".$dbh->quote($loc->{title}).") < 4 "
-        # ."AND levenshtein(abstract,".$dbh->quote($loc->{abstract}).") < 15 "
-        if ($o_id) {
-            print "document already known as $o_id, $o_url.\n"
+        my $alt = find_duplicate($loc);
+        if ($alt) {
+            print "document already known as ".$alt->{'document_id'}."\n"
                 if $verbosity;
-            if ($loc->{confidence} > $o_confidence) {
-                print "new confidence exceeds old: $o_confidence.\n"
-                    if $verbosity;
+            if ($loc->{confidence} > $alt->{meta_confidence}) {
+                print "updating: greater confidence\n" if $verbosity;
                 $db_savedoc->execute(
                     $loc->{authors}, $loc->{title}, $loc->{abstract}, 
-                    $loc->{length}, $loc->{confidence}, $o_id)
+                    $loc->{length}, $loc->{confidence}, $alt->{id})
                     or warn DBI->errstr;
             }
-            $doc_id = $o_id;
+            $doc_id = $alt->{document_id};
         }
         elsif (!$opts{n}) {
             # add document to database:
@@ -575,6 +560,30 @@ sub check_steppingstone {
     $target = ${$as[0]}{href};
     $target =~ s/\s/%20/g; # fix links with whitespace
     return $target if length($target) < 256;
+}
+
+sub find_duplicate {
+    my $loc = shift;
+    # get documents with essentially same title:
+    my $ti = $loc->{title};
+    $ti =~ s/\W+$//;
+    my $qu = "SELECT documents.document_id, url, meta_confidence, "
+            ."abstract, authors "
+            ."FROM documents INNER JOIN locations "
+            ."ON documents.document_id = locations.document_id "
+            ."WHERE status = 1 AND location_id != ".$loc->{location_id}." "
+            ."AND title LIKE ".$dbh->quote("%$ti%");
+    my @alts = @{$dbh->selectall_arrayref($qu, { Slice => {} })};
+    foreach my $alt (@alts) {
+        # compare authors and abstract:
+        my $loc_au = join('', sort(split(', ', $loc->{authors})));
+        my $alt_au = join('', sort(split(', ', $alt->{authors})));
+        return undef unless (amatch($loc_au, ['i 50%'], $alt_au));
+        my $loc_ab = substr($loc->{abstract}, 0, 400);
+        my $alt_ab = substr($loc->{abstract}, 0, 400);
+        return $alt if (amatch($loc_ab, ['i 50%'], $alt_ab));
+    }
+    return undef;
 }
 
 sub spamfilter {
