@@ -344,7 +344,7 @@ sub process {
     $loc->{title} = force_utf8($result->{title});
     $loc->{abstract} = force_utf8($result->{abstract});
     $loc->{confidence} = $result->{confidence};
-    $loc->{length} = $result->{numpages};
+    $loc->{length} = $result->{numwords};
     $loc->{text} = $result->{text};
 
     # guess spamminess again, now that we have the text content:
@@ -568,17 +568,18 @@ sub find_duplicate {
     my $ti = $loc->{title};
     $ti =~ s/\W+$//;
     my $qu = "SELECT documents.document_id, url, meta_confidence, "
-            ."abstract, authors "
+            ."abstract, authors, length "
             ."FROM documents INNER JOIN locations "
             ."ON documents.document_id = locations.document_id "
             ."WHERE status = 1 AND location_id != ".$loc->{location_id}." "
             ."AND title LIKE ".$dbh->quote("%$ti%");
     my @alts = @{$dbh->selectall_arrayref($qu, { Slice => {} })};
     foreach my $alt (@alts) {
-        # compare authors and abstract:
+        # compare authors, abstract, length:
+        next if abs($alt->{length} - $loc->{length}) / $loc->{length} > 0.2;
         my $loc_au = join('', sort(split(', ', $loc->{authors})));
         my $alt_au = join('', sort(split(', ', $alt->{authors})));
-        return undef unless (amatch($loc_au, ['i 50%'], $alt_au));
+        next unless (amatch($loc_au, ['i 50%'], $alt_au));
         my $loc_ab = substr($loc->{abstract}, 0, 400);
         my $alt_ab = substr($loc->{abstract}, 0, 400);
         return $alt if (amatch($loc_ab, ['i 50%'], $alt_ab));

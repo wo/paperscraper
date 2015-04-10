@@ -28,6 +28,7 @@ sub new {
         chunks => [],
         pages => [],
         numpages => 0,
+        numwords => 0,
         fontsize => 1,
         linespacing => 1,
         geometry => {},
@@ -146,6 +147,7 @@ sub init {
     $self->strip_marginals();
     $self->strip_footnotes();
     $self->get_text();
+    $self->{numwords} = () = ($self->{text} =~ /\s\w\w/g);
     $self->init_confidence();
 
 }
