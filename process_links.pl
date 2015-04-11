@@ -345,6 +345,7 @@ sub process {
     $loc->{abstract} = force_utf8($result->{abstract});
     $loc->{confidence} = $result->{confidence};
     $loc->{length} = $result->{numwords};
+    $loc->{numpages} = $result->{numpages};
     $loc->{text} = $result->{text};
 
     # guess spamminess again, now that we have the text content:

@@ -33,6 +33,7 @@ our @spam_features = (
     ['long', [-0.2, 0.2]],
     ['contains bibliography section', [-0.2, 0.2]],
     ['most lines short', [0.4, 0]],
+    ['few words per page', [0.7, 0]],
     ['low confidence', [0.3, -0.1]],
     );
 
@@ -127,8 +128,8 @@ $f{'few verbs'} = sub {
     my $loc = shift;
     return undef unless defined($loc->{text});
     my $count = () = ($loc->{text} =~ /\bis\b/g);
-    #print "xxx $count verbs in ".length($loc->{text})." Bytes\n";
-    return max(0, 1 - ($count*2000)/length($loc->{text}));
+    # print "xxx $count verbs in ".length($loc->{text})." Bytes\n";
+    return max(0, 1 - ($count*1000)/length($loc->{text}));
 };
 
 $f{'high tag density'} = sub {
@@ -174,8 +175,17 @@ $f{'most lines short'} = sub {
     my @lengths = sort { $a <=> $b } map(length, @lines);
     return undef unless @lengths;
     my $median = $lengths[int((0+@lengths)/2)];
-    #print "median $median\n";
+    #print "xxx median $median\n";
     return max(0, min(1, 1.5 - $median/70));
+};
+
+$f{'few words per page'} = sub {
+    # indicates presentation slides
+    my $loc = shift;
+    return undef unless defined($loc->{text});
+    my $char_p_page = length($loc->{text}) / $loc->{numpages};
+    #print "xxx my char_p_page $char_p_page\n";
+    return max(0, min(1, 1.5 - $char_p_page/1000));
 };
 
 $f{'low confidence'} = sub {

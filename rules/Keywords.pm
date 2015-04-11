@@ -183,11 +183,11 @@ our $re_sec_number = qr/^\s*
    [\divx\.]+
    \b/ix;
 
-our $re_bib_heading = qr/\s*.{0,4}\s*\b
-    (?:references?|bibliography|
+our $re_bib_heading = qr/^\s*.{0,4}\s*\b
+    (?:references|bibliography|
      references\s+cited|\w+\s+cited)
     \b\s*.{0,4}\s*
-    /ix;
+    $/ix;
 
 our $re_abstract = qr/
    abstract

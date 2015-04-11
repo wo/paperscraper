@@ -206,7 +206,7 @@ $f{'first author near title'} = sub {
         $title->{chunks}->[0]->{top} - $author->{bottom} :
         $author->{top} - $title->{chunks}->[-1]->{bottom};
     my $line_height = max($author->{height}, $title->{chunks}->[0]->{height});
-    return min(1, $line_height*1.5 / $dist);
+    return $dist ? min(1, $line_height*1.5 / $dist) : 1;
 };
 
 $f{'author and title on same page'} = sub {
