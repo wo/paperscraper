@@ -92,7 +92,7 @@ $f{'index file'} = sub {
     return $loc->{url} =~ m/$re_index_path/ && $loc->{url} !~ /plato.stanford/;
 };
 
-my $re_bad_path = qr/\bcours|lecture/xi;
+my $re_bad_path = qr/\bcours|lecture|teaching/xi;
 $f{'bad path'} = sub {
     my $loc = shift;
     return undef unless defined($loc->{url});
@@ -182,7 +182,7 @@ $f{'most lines short'} = sub {
 $f{'few words per page'} = sub {
     # indicates presentation slides
     my $loc = shift;
-    return undef unless defined($loc->{text});
+    return undef unless defined($loc->{numpages});
     my $char_p_page = length($loc->{text}) / $loc->{numpages};
     #print "xxx my char_p_page $char_p_page\n";
     return max(0, min(1, 1.5 - $char_p_page/1000));
