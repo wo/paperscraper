@@ -73,7 +73,7 @@ $features{TITLE} = [
     ['occurs in marginals', [0.25, 0], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
-    ['words common in CONTENT', [0.1, -0.3], 3],
+    ['words common in content', [0.1, -0.3], 3],
     ['probable AUTHOR', [-0.3, 0.1], 3],
     [$and->('best AUTHOR', 'other good TITLEs'), [-0.7, 0.05], 4],
     [$or->('best TITLE', 'in continuation with good TITLE'), [0.5, -0.8], 4],
@@ -546,21 +546,28 @@ $f{'in continuation with good TITLE'} = sub {
     return min(1, max(0, $score[0], $score[1]));
 };
 
-$f{'words common in CONTENT'} = memoize(sub {
-    unless ($_[0]->{doc}->{content}) {
-        my @chs = grep { $_->{p}->('CONTENT') > .5 }
-                       @{$_[0]->{doc}->{chunks}};
-        $_[0]->{doc}->{content} = reduce { $a.' '.$b->{text} } '', @chs;
+$f{'words common in content'} = memoize(sub {
+    # Assigning CONTENT labels to all text chunks takes a while, so
+    # we use a simpler heuristic:
+    unless ($_[0]->{doc}->{rough_content}) {
+        my @txt;
+        for my $page (@{$_[0]->{doc}->{pages}}) {
+            for (3 .. $#{$page->{chunks}}-3) {
+                push @txt, $page->{chunks}->[$_]->{plaintext};
+            }
+        }
+        # set aside first 10% and last 20%:
+        @txt = @txt[int($#txt/10) .. int($#txt - $#txt/5)];
+        $_[0]->{doc}->{rough_content} = join("\n", @txt);
     }
     # 1 page is roughly 3000 chars, once per page is minimum for "common"
-    my $common_freq = length($_[0]->{doc}->{content})/3000;
+    my $common_freq = length($_[0]->{doc}->{rough_content})/3000;
     my $min_freq = 1000;
-
     my @words = ($_[0]->{plaintext} =~ /\w{4,}/ig);
     my $stemmer = Lingua::Stem::Snowball->new( lang => 'en' );
     $stemmer->stem_in_place( \@words );
     for my $w (@words) {
-        my $count = () = ($_[0]->{doc}->{content} =~ /$w/ig);
+        my $count = () = ($_[0]->{doc}->{rough_content} =~ /$w/ig);
         #print "=== $w: $count\n";
         $min_freq = min($min_freq, $count);
     }

@@ -511,7 +511,7 @@ sub label_chunks {
     }
 
     foreach my $stage (1 .. $iterations) {
-        say(4, "\nlabeling chunks, stage $stage");
+        say(4, "\nlabeling chunks ", @labels," stage $stage");
 
         my $labeler = makeLabeler($features, $stage);
 
@@ -563,11 +563,19 @@ sub label_chunks {
         # At this point, $chunk->{$p} is a function that calculates
         # the probability for the label given as argument; but the
         # calculation has not yet been made.
+        my @relevant_chunks;
+        my %seen;
         foreach my $label (@labels) {
             my @best;
             foreach my $chunk (@$chunks) {
-                if ($chunk->{$p}->($label) >= $min_p) {
-                    push @best, $chunk;
+                if ($chunk->{$p}->($label) >= $min_p/2) {
+                    unless ($seen{$chunk}) {
+                        push @relevant_chunks, $chunk;
+                        $seen{$chunk} = 1;
+                    }
+                    if ($chunk->{$p}->($label) >= $min_p) {
+                        push @best, $chunk;
+                    }
                 }
             }
             @best = sort { $b->{$p}->($label) <=> $a->{$p}->($label) } @best;
@@ -579,6 +587,7 @@ sub label_chunks {
             }
             $best{$label} = \@best;
         }
+        $chunks = \@relevant_chunks;
 
         foreach my $chunk (@$chunks) {
             # inform chunks about best chunks:
