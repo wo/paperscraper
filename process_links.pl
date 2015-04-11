@@ -365,6 +365,7 @@ sub process {
 authors:    $loc->{authors}
 title:      $loc->{title}
 filetype:   $loc->{filetype}
+length:     $loc->{length}
 spamminess: $loc->{spamminess}
 confidence: $loc->{confidence}
 abstract: 
