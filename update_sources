@@ -175,10 +175,12 @@ $dispatch->{delete} = sub {
     }
     # first delete all documents linked only from this page:
     unless ($keep_documents) {
+        print "deleting documents\n";
         $db_delete_docs->execute($del_id)
             or ret(0, DBI->errstr || "delete failed");
     }
     # then delete all locations and links unique to this page:
+    print "deleting locations and links\n";
     $db_delete_locs->execute($del_id)
         or ret(0, DBI->errstr || "delete failed");
     $db_delete_links->execute($del_id)
