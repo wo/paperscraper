@@ -212,10 +212,11 @@ my %tests = (
    title => "Causation and Freedom",
  },
 
- '/home/wo/programming/opp-tools/test/doctests/32-Anon-Tye.pdf' => {
-   authors => [""],
-   title => "Tye on the Phenomenal Concept Strategy",
+ '/home/wo/programming/opp-tools/test/doctests/33-Sullivan-Tense.pdf' => {
+   authors => ["Meghan Sullivan"],
+   title => "Problems for Temporary Existence in Tense Logic",
  },
+
 
 );
 

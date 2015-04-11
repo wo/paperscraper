@@ -86,7 +86,7 @@ sub in_dict {
         while (<INPUT>) {
             unless (/^#/) {
                 chomp($_);
-                $map->{$_} = 1;
+                $map->{lc($_)} = 1;
             }
         }
         close INPUT;

@@ -9,6 +9,7 @@ our @ISA = ('Exporter');
 our @EXPORT_OK = '@name_features';
 
 our @name_features = (
+    ['contains university location', [-0.8, 0.05]],
     ['first names contain initial', [0.2, 0]],
     ['first names contain common first name', [0.5, -0.1]],
     ['first names contain common word', [-0.3, 0.1]],
@@ -18,6 +19,10 @@ our @name_features = (
     );
 
 my %f;
+
+$f{'contains university location'} = sub {
+    return in_dict($_[0]->{text}, 'locations');
+};
 
 $f{'first names contain initial'} = sub {
     my $first = $_[0]->{first};

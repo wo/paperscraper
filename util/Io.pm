@@ -25,6 +25,7 @@ sub fetch_url {
         'If-Modified-Since' => HTTP::Date::time2str($if_modified_since)
         );
     my $response = _ua_get($ua, $url, \%headers);
+    print Dumper $response if $verbosity > 7;
     $response->{url} = $url;
     # Follow redirects, but don't loop.
     my @locations = ($url);
@@ -58,7 +59,6 @@ sub fetch_url {
         }
     }
     $response->{content} = $content;
-    print Dumper $response if $verbosity > 7;
     return $response;
 }
 
