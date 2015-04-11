@@ -262,6 +262,7 @@ sub process {
         print "adding target link to queue: $target.\n" if $verbosity;
         $loc->{url} = $target;
         push @queue, $loc;
+        return 0;
         # We could alternatively replace the URL in the database, but
         # then we'd constantly rediscover the steppingstone link in
         # the source page and treat it as new. Perhaps the cleanest
@@ -273,7 +274,6 @@ sub process {
         # (a parent of ...) a location of the document. That's
         # cumbersome, so instead I simply overwrite the current
         # location, but keep its URL.
-        return 0;
     }
 
     # get anchor text and default author from source pages:
@@ -349,7 +349,7 @@ sub process {
     $loc->{text} = $result->{text};
 
     # guess spamminess again, now that we have the text content:
-    print "testing spamminess again\n";
+    print "testing spamminess again\n" if $verbosity > 1;
     $loc->{spamminess} = $spamfilter->test($loc);
     if ($loc->{spamminess} >= $CERT_SPAM) {
         print "spam score $loc->{spamminess}, "
@@ -532,6 +532,9 @@ sub check_steppingstone {
     my $loc = shift;
     my $http_res = shift;
     return 0 unless $loc->{filetype} eq 'html';
+
+    print "checking: intermediate page leading to article?\n" if $verbosity > 1; 
+
     # catch intermediate pages that redirect with meta refresh
     # (e.g. http://www.princeton.edu/~graff/papers/ucsbhandout.html):
     my $target = '';
@@ -543,6 +546,24 @@ sub check_steppingstone {
         $target =~ s/\s/%20/g; # fix links with whitespace
         return $target if length($target) < 256;
     }
+
+    # also catch intermediate pages from known repositories:
+    my @redir_patterns = (
+        qr/<meta name="citation_pdf_url" content="(.+?)"/, # arxiv.org
+        qr/philpapers.org\/go.pl[^"]+u=(http.+?)"/, # philpapers.org
+        );
+    for my $pat (@redir_patterns) {
+        if ($loc->{content} =~ /$pat/) {
+            print "repository page for document $1.\n" if $verbosity;
+            $target = URI::Escape::uri_unescape($1);
+            $target =~ s/\s/%20/g; # fix links with whitespace
+            $target = URI->new($target);
+            $target = $target->abs(URI->new($loc->{url}));
+            print "$target\n";
+            return $target if length($target) < 256;
+        }
+    }
+    
     # other intermediate pages are short and have at least one link to
     # a pdf file:
     return 0 if $loc->{filesize} > 5000;
