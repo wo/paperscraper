@@ -197,6 +197,7 @@ $f{'many gaps between lines'} = sub {
     return undef unless (defined($loc->{extractor}) 
                          && $loc->{extractor}->{numpages});
     my $gaps = 1;
+    my $nogaps = 0;
     my $startpage = int($loc->{extractor}->{numpages}/10);
     foreach my $ch (@{$loc->{extractor}->{chunks}}) {
         next if $ch->{page}->{number} < $startpage;
@@ -205,11 +206,15 @@ $f{'many gaps between lines'} = sub {
         my $gap_above = ($ch->{top} - $ch->{prev}->{bottom});
         my $gap_below = ($ch->{next}->{top} - $ch->{bottom});
         if (abs($gap_above - $gap_below) > $ch->{height}/4) {
+            #print "xxx gaps $gap_above-$gap_below around ",$ch->{text},"\n";
             $gaps++;
         }
+        else {
+            $nogaps++;
+        }
     }
-    #print "xxx $gaps gaps on 3 pages\n";
-    return max(0, min(1, 1.2 - 10/$gaps));
+    #print "xxx $gaps gaps vs $nogaps inner-paragraph lines\n";
+    return max(0, min(1, 1.5 - $nogaps/($gaps*2)));
 };
 
 $f{'low confidence'} = sub {

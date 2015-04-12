@@ -550,6 +550,7 @@ sub check_steppingstone {
     my @redir_patterns = (
         qr/<meta name="citation_pdf_url" content="(.+?)"/, # arxiv.org
         qr/philpapers.org\/go.pl[^"]+u=(http.+?)"/, # philpapers.org
+        qr/(http:\/\/www.plosone.org\/article\/.+?representation=PDF)" id="downloadPdf"/, #PLOS One
         );
     for my $pat (@redir_patterns) {
         if ($loc->{content} =~ /$pat/) {
