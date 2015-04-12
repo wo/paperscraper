@@ -167,7 +167,7 @@ sub next_locations {
     }
     else {
         # get documents from database:
-        my $NUM_LOCS = $opts{s} ? 1 : 10;
+        my $NUM_LOCS = $opts{s} ? 1 : 5;
         my $fetch = sub {
             my $where = shift;
             my $qu = "SELECT *, UNIX_TIMESTAMP(last_checked)"
