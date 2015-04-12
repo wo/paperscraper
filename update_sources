@@ -1,10 +1,13 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use CGI;
+use CGI qw/:standard -utf8/;
+#use CGI;
 use DBI;
 use Getopt::Long;
 use Encode;
+use URI::Escape;
+use utf8;
 binmode STDOUT, ":utf8";
 my %cfg = do 'config.pl';
 
@@ -62,14 +65,20 @@ my $crawl;
 
 if ($is_cgi) {
     print $cgi->header('text/plain');
-    unless ($ENV{REMOTE_ADDR} =~ /$cfg{ALLOWED_IPS}/) {
-        ret(0, "unauthorised access from $ENV{REMOTE_ADDR}") 
-    }
+    #unless ($ENV{REMOTE_ADDR} =~ /$cfg{ALLOWED_IPS}/) {
+    #    ret(0, "unauthorised access from $ENV{REMOTE_ADDR}") 
+    #}
     $action = $cgi->param('action');
-    $id = $cgi->param('id');
+    $id = uri_unescape($cgi->param('id'));
+    #$author = uri_unescape($cgi->param('author')) if $cgi->param('author');
     $author = $cgi->param('author') if $cgi->param('author');
+    #print "cgi param: $author\n"; 
+    $author = uri_unescape($author);
+    #print "uri_unescape: $author\n"; 
+    #$author = Encode::encode("UTF-8", $author);
+    #$author = $cgi->param('author') if $cgi->param('author');
     $crawl = $cgi->param('crawl') if $cgi->param('crawl');
-    $url = $cgi->param('url') if $cgi->param('url');
+    $url = uri_unescape($cgi->param('url')) if $cgi->param('url');
     ret(0, "id/url parameter missing") unless $id;
 }
 else {
@@ -175,10 +184,12 @@ $dispatch->{delete} = sub {
     }
     # first delete all documents linked only from this page:
     unless ($keep_documents) {
+        print "deleting documents\n";
         $db_delete_docs->execute($del_id)
             or ret(0, DBI->errstr || "delete failed");
     }
     # then delete all locations and links unique to this page:
+     print "deleting locations\n";
     $db_delete_locs->execute($del_id)
         or ret(0, DBI->errstr || "delete failed");
     $db_delete_links->execute($del_id)
@@ -186,6 +197,7 @@ $dispatch->{delete} = sub {
     # then recursively delete all child pages:
     my $children = get_children($del_id);
     foreach my $child (@{$children}) {
+        print "deleting child page\n";
         $dispatch->{delete}($child->{source_id}, $recursion+1);
     }
     # then delete the page itself:
@@ -235,7 +247,7 @@ $dispatch->{modify} = sub {
         $db_set_url->execute($url, $id)
             or ret(0, DBI->errstr || "set failed");
     }
-    ret(1, "$id modified");
+    ret(1, "$id modified ($cur_author to $author)");
 };
 
 sub change_author {
@@ -247,6 +259,7 @@ sub change_author {
     foreach my $child (@{$children}) {
         change_author($child->{source_id}, $author);
     }
+    print "setting author to $author\n";
     $db_set_author->execute($author, $mod_id)
         or ret(0, DBI->errstr || "set failed");
 }
