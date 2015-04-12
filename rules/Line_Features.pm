@@ -487,6 +487,7 @@ $f{'resembles source author'} = memoize(sub {
 });
 
 $f{'occurs in marginals'} = memoize(sub {
+    return undef if length($_[0]->{plaintext}) < 5;
     for my $ch (@{$_[0]->{doc}->{marginals}}) {
         next if $ch->{plaintext} =~ /^[\divx]+$/;
         return 1 if (amatch($_[0]->{plaintext}, ['i 20%'], $ch->{plaintext}));
