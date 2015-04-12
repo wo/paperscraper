@@ -32,10 +32,11 @@ $block_features{AUTHOR} = [
     ];
 
 our @parsing_features = (
-    ['has title', [0.2, -0.6]],
+    ['has author', [0.1, -0.3]],
+    ['has title', [0, -1]],
     ['author parts have high score', [0.7, -0.8]],
     ['title parts have high score', [0.7, -0.8]],
-    ['good author block missed', [-0.5, 0.3]],
+    ['good author block missed', [-0.6, 0.3]],
     ['author blocks are similar', [0.2, -0.4]],
     ['first author near title', [0.2, -0.5]],
     ['author and title on same page', [0, -0.5]],
@@ -128,6 +129,13 @@ $f{'coincides with marginal'} = sub {
     for my $ch (@{$_[0]->{chunks}->[0]->{doc}->{marginals}}) {
         next if $ch->{plaintext} =~ /^[\divx]+$/;
         return 1 if distance($txt, $ch->{plaintext}) < 3;
+    }
+    return 0;
+};
+
+$f{'has author'} = sub {
+    foreach (@{$_[0]->{blocks}}) {
+        return 1 if $_->{label}->{AUTHOR};
     }
     return 0;
 };

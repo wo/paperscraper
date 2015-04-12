@@ -9,7 +9,7 @@ use lib '..';
 use rules::Keywords;
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw/&strip_tags &tidy_text &is_word/;
+our @EXPORT = qw/&strip_tags &tidy_text &plaintext &is_word/;
 
 sub strip_tags_new {
     my $str = shift;
@@ -82,13 +82,26 @@ sub strip_tags {
     return $str;
 }
 
+sub plaintext {
+    my $txt = shift;
+    # remove excessive whitespace:
+    $txt =~ s|\s\s+| |g;
+    # remove footnote marks:
+    $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>||g;
+    # and trailing footnote star *:
+    $txt =~ s/(\*|\x{2217})\s*$//;
+    # and non-<sup>'ed footnote symbols in brackets:
+    $txt =~ s|\[.\]$||;
+    # and non-<sup>'ed number right after last word:
+    $txt =~ s|([\pL\?!])\d$|$1|;
+    $txt = strip_tags($txt);
+    return $txt;
+}
+
 sub tidy_text {
     my $txt = shift;
-    # put closing tags before space ("<i>foo </i>" => "<i>foo</i> "):
-    $txt =~ s| </([^>]+)>|</$1> |g;
-    # merge consecutive HTML elements:
-    $txt =~ s|</([^>]+)>(\s*)<\1>|$2|g;
-    $txt =~ s|\b-</([^>]+)>\n\s*<\1>(?=\p{Lower})|\n|g;
+    # merge HTML elements split at linebreak:
+    $txt =~ s|</([^>]+)>\n\s*<\1>|\n|g;
     # combine word-parts that are split at linebreak:
     while ($txt =~ /(\pL\pL+)-\n\s*(\p{Lower}\pL+)/g) {
         my ($combined, $w1, $w2) = ($&, $1, $2);
@@ -99,8 +112,6 @@ sub tidy_text {
             $txt =~ s/$combined/$w1-$w2/;
         }
     }
-    # merge HTML elements split at linebreak:
-    $txt =~ s|</([^>]+)>\n\s*<\1>| |g;
     # remove linebreaks:
     $txt =~ s|\s*\n\s*| |g;
     # remove excessive whitespace:
@@ -108,6 +119,8 @@ sub tidy_text {
     my $otxt;
     do {
         $otxt = $txt;
+        # merge consecutive HTML elements:
+        $txt =~ s|</([^>]+)>(\s*)<\1>|$2|g;
         # chop whitespace at beginning and end:
         $txt =~ s|^\s*(.+?)\s*$|$1|;
         # chop surrounding tags:
@@ -116,8 +129,8 @@ sub tidy_text {
         $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
         # remove footnote marks:
         $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>||g;
-        # and trailing footnote star *:
-        $txt =~ s/(\*|\x{2217})\s*$//;
+        # and trailing footnote star or cross:
+        $txt =~ s/(\*|\x{2217}|†)\s*$//;
         # and non-<sup>'ed footnote symbols in brackets:
         $txt =~ s|\[.\]$||;
         # and non-<sup>'ed number right after last word:
@@ -125,6 +138,8 @@ sub tidy_text {
         # fix HTML:
         $txt = fix_html($txt);
     } while ($txt ne $otxt);
+    # put closing tags before space ("<i>foo </i>" => "<i>foo</i> "):
+    $txt =~ s| </([^>]+)>|</$1> |g;
     # replace allcaps:
     $txt = capitalize_title($txt) if ($txt !~ /\p{isLower}{2}/);
     return $txt;

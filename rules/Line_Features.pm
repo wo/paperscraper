@@ -54,7 +54,7 @@ $features{TITLE} = [
     ['among first few lines', [0.2, -0.3]],
     ['within first few pages', [0.1, -1]],
     ['long', [-0.1, 0.1]],
-    [$and->('large font', 'largest text on rest of page'), [0.5, -0.6], 2],
+    [$and->('large font', 'largest text on rest of page'), [0.5, -0.5], 2],
     ['largest text on rest of page', [0.2, 0], 2],
     ['bold', [0.3, -0.05], 2],
     ['all caps', [0.2, 0], 2],
@@ -117,11 +117,11 @@ $features{HEADING} = [
     ['all caps', [0.2, 0]],
     ['contains letters', [0, -0.5]],
     ['centered', [0.2, -0.05]],
-    ['justified', [-0.4, 0]],
+    ['justified', [-0.3, 0]],
     ['gap above', [0.3, -0.5]],
     ['gap below', [0.2, -0.2]],
     ['high uppercase frequency', [0.1, -0.2]],
-    ['begins with section number', [0.3, -0.15]],
+    ['begins with section number', [0.4, -0.15]],
     ['style appears on several pages', [0.3, -0.4], 2],
     ['probable CONTENT', [-0.5, 0.05], 2],
     ['preceeds CONTENT', [0.3, -0.3], 2],
@@ -331,11 +331,11 @@ $f{'bold'} = in_tag('b');
 
 $f{'italic'} = in_tag('i');
 
-$f{'all caps'} = sub {
-    return 0 if $_[0]->{plaintext} =~ /\p{IsLower}/;
-    return 1 if $_[0]->{plaintext} =~ /\p{IsUpper}/;
+$f{'all caps'} = memoize(sub {
+    return 0 if $_[0]->{plaintext} =~ /[a-z]/;
+    return 1 if $_[0]->{plaintext} =~ /[A-Z]/;
     return 0;
-};
+});
 
 $f{'large font'} = memoize(sub {
     .5 + max(min($_[0]->{fsize}-2, 5), -5) / 10;
@@ -502,7 +502,7 @@ sub style_similarity {
     $score *= 0.2 if $ch1->{fsize} != $ch2->{fsize};
     my $a1 = alignment($ch1);
     my $a2 = alignment($ch2);
-    $score *= 0.2 if ($a2 ne 'justify' && $a2 ne 'justify' && $a1 ne $a2);
+    $score *= 0.5 if ($a2 ne 'justify' && $a2 ne 'justify' && $a1 ne $a2);
     return $score;
 }
 
@@ -924,7 +924,8 @@ $f{'contains possible name'} = memoize(sub {
 
 $f{'contains probable name'} = memoize(sub {
     unless (exists $_[0]->{names}) {
-        $_[0]->{names} = rules::NameExtractor::parse($_[0]->{plaintext});
+        my $str = $_[0]->{plaintext};
+        $_[0]->{names} = rules::NameExtractor::parse($str);
     }
     return 0 unless %{$_[0]->{names}};
     return max(values(%{$_[0]->{names}}));

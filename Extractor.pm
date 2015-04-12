@@ -179,7 +179,7 @@ sub xml2chunk {
     };
     $chunk->{right} = $chunk->{left} + $chunk->{width};
     $chunk->{bottom} = $chunk->{top} + $chunk->{height};
-    $chunk->{plaintext} = strip_tags(tidy_text($chunk->{text}));
+    $chunk->{plaintext} = plaintext($chunk->{text});
     return $chunk;
 }
 
@@ -814,7 +814,7 @@ sub extract_authors_and_title {
   }
 
     unless (@parsings) {
-        say(1, "no parsing for authors and title found!");
+        $self->decr_confidence(0, "no parsing for authors and title found!");
         return 0;
     }
 
@@ -828,6 +828,7 @@ sub extract_authors_and_title {
             $self->{title} = tidy_text($block->{text});
             # bold in titles looks too bold:
             $self->{title} =~ s|<(/?)b>|<$1i>|gi;
+            $self->{title} = tidy_text($self->{title});
             # chop odd trailing punctuations:
             $self->{title} =~ s|[\.,:;]$||;
             if ($block->{label}->{AUTHOR}) {
@@ -875,7 +876,7 @@ sub extract_authors_and_title {
                            'parsing quality');
     if ($parsings[0]) {
         my $lead = $parsing->{quality} - $parsings[0]->{quality};
-        $self->decr_confidence(1 + min(0.2, $lead-0.2), 'alternatives');
+        $self->decr_confidence(1 + min(0.1, $lead-0.2), 'alternatives');
     }
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
