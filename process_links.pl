@@ -333,19 +333,18 @@ sub process {
         $result->init("$file.xml");
         $result->extract(qw/authors title abstract/);
     };
-    if ($@ || (!$result->{title})) {
-        error($@ || "document seems to have no title");
+    if ($@) {
         error("parser error") if errorcode() == 99;
         $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
         return errorcode();
     }
 
+    $loc->{extractor} = $result;
     $loc->{authors} = force_utf8(join ', ', @{$result->{authors}});
     $loc->{title} = force_utf8($result->{title});
     $loc->{abstract} = force_utf8($result->{abstract});
     $loc->{confidence} = $result->{confidence};
     $loc->{length} = $result->{numwords};
-    $loc->{numpages} = $result->{numpages};
     $loc->{text} = $result->{text};
 
     # guess spamminess again, now that we have the text content:

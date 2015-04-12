@@ -189,7 +189,7 @@ $dispatch->{delete} = sub {
             or ret(0, DBI->errstr || "delete failed");
     }
     # then delete all locations and links unique to this page:
-     print "deleting locations\n";
+    print "deleting locations and links\n";
     $db_delete_locs->execute($del_id)
         or ret(0, DBI->errstr || "delete failed");
     $db_delete_links->execute($del_id)

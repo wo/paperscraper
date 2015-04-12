@@ -217,6 +217,10 @@ my %tests = (
    title => "Problems for Temporary Existence in Tense Logic",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-black-avicienna.pdf' => {
+   authors => ["Deborah L. Black"],
+   title => "Avicenna’s “Vague Individual” and its Impact on Medieval Latin Philosophy",
+ },
 
 );
 

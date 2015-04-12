@@ -34,6 +34,7 @@ our @spam_features = (
     ['contains bibliography section', [-0.2, 0.2]],
     ['most lines short', [0.4, 0]],
     ['few words per page', [0.7, 0]],
+    ['many gaps between lines', [0.6, -0.1]],
     ['low confidence', [0.3, -0.1]],
     );
 
@@ -92,7 +93,7 @@ $f{'index file'} = sub {
     return $loc->{url} =~ m/$re_index_path/ && $loc->{url} !~ /plato.stanford/;
 };
 
-my $re_bad_path = qr/\bcours|lecture|teaching/xi;
+my $re_bad_path = qr/\bcours|\blecture|\btalk|teaching/xi;
 $f{'bad path'} = sub {
     my $loc = shift;
     return undef unless defined($loc->{url});
@@ -170,7 +171,7 @@ $f{'contains bibliography section'} = sub {
 $f{'most lines short'} = sub {
     # indicates presentation slides
     my $loc = shift;
-    return undef unless defined($loc->{text});
+    return undef unless defined($loc->{extractor});
     @lines = split('\n', $loc->{text});
     my @lengths = sort { $a <=> $b } map(length, @lines);
     return undef unless @lengths;
@@ -182,10 +183,33 @@ $f{'most lines short'} = sub {
 $f{'few words per page'} = sub {
     # indicates presentation slides
     my $loc = shift;
-    return undef unless defined($loc->{numpages});
-    my $char_p_page = length($loc->{text}) / $loc->{numpages};
+    return undef unless defined($loc->{extractor});
+    my $numpages = $loc->{extractor}->{numpages};
+    return undef unless $numpages;
+    my $char_p_page = length($loc->{text}) / $numpages;
     #print "xxx my char_p_page $char_p_page\n";
     return max(0, min(1, 1.5 - $char_p_page/1000));
+};
+
+$f{'many gaps between lines'} = sub {
+    # indicates handouts
+    my $loc = shift;
+    return undef unless (defined($loc->{extractor}) 
+                         && $loc->{extractor}->{numpages});
+    my $gaps = 1;
+    my $startpage = int($loc->{extractor}->{numpages}/10);
+    foreach my $ch (@{$loc->{extractor}->{chunks}}) {
+        next if $ch->{page}->{number} < $startpage;
+        last if $ch->{page}->{number} > $startpage + 2;
+        next unless $ch->{prev} && $ch->{next};
+        my $gap_above = ($ch->{top} - $ch->{prev}->{bottom});
+        my $gap_below = ($ch->{next}->{top} - $ch->{bottom});
+        if (abs($gap_above - $gap_below) > $ch->{height}/4) {
+            $gaps++;
+        }
+    }
+    #print "xxx $gaps gaps on 3 pages\n";
+    return max(0, min(1, 1.2 - 10/$gaps));
 };
 
 $f{'low confidence'} = sub {
