@@ -751,8 +751,15 @@ sub extract_authors_and_title {
                     \@rules::Title_Features::parsing_features);
 
     my %chunks;
-    foreach (@{$self->{best_chunks}->{AUTHOR}}, 
-             @{$self->{best_chunks}->{TITLE}}) {
+    my @author_candidates = @{$self->{best_chunks}->{AUTHOR}};
+    my @title_candidates = @{$self->{best_chunks}->{TITLE}};
+    if (scalar @author_candidates > 10) {
+        @author_candidates = @author_candidates[0 .. 9];
+    }
+    if (scalar @title_candidates > 7) {
+        @title_candidates = @title_candidates[0 .. 6];
+    } 
+    foreach (@author_candidates, @title_candidates) {
         $chunks{$_} = $_;
     }
     my @chunks = sort { $a->{id} <=> $b->{id} } values %chunks;
@@ -767,7 +774,7 @@ sub extract_authors_and_title {
     my $counter = 0;
   PARSING: while (my $chunks = $parsings->()) {
       $counter++;
-      if (($counter > 100000 && @parsings) || $counter > 500000) {
+      if (($counter > 50000 && @parsings) || $counter > 100000) {
           say(2, "too many author-title parsings");
           last;
       }
