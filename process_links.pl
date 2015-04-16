@@ -111,6 +111,12 @@ my $db_adddoc = $dbh->prepare(
     ."(found_date, authors, title, abstract, length, "
     ."meta_confidence) VALUES (NOW(),?,?,?,?,?)");
 
+my $db_add_oppweb = $dbh->prepare(
+    "INSERT IGNORE INTO docs "
+    ."(found_date, url, filetype, authors, title, abstract, "
+    ."numwords, source_url, meta_confidence, spamminess, content) "
+    ."VALUES (NOW(),?,?,?,?,?,?,?,?,?,?)");
+
 my @abort;
 $SIG{INT} = sub {
     print "\nHold on: just finishing this document...\n";
@@ -206,11 +212,13 @@ sub next_locations {
     }
 }
 
+my @processed;
 sub process {
     my $loc = shift;
     my $loc_id = $loc->{location_id};
     binmode STDOUT, ":utf8";
     print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
+    push @processed, $loc;
 
     # If we crash during processing, that should be marked in the DB:
     $db_err->execute(30, $loc_id);
@@ -259,6 +267,10 @@ sub process {
             $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
             return 0;
         }
+        if ($target ~~ @processed) {
+            error("infinite redirect");
+            return 0;
+        }
         print "adding target link to queue: $target.\n" if $verbosity;
         $loc->{url} = $target;
         push @queue, $loc;
@@ -280,11 +292,12 @@ sub process {
     # TODO: this assumes there is only one source page.
     $loc->{anchortext} = '';
     $loc->{default_author} = '';
+    $loc->{source_url} = '';
     if ($loc_id) {
-        ($loc->{anchortext}, $loc->{default_author}) =
+        ($loc->{anchortext}, $loc->{default_author}, $loc->{source_url}) =
             $dbh->selectrow_array(
-                "SELECT links.anchortext, sources.default_author "
-                ."FROM links INNER JOIN sources ON "
+                "SELECT links.anchortext, sources.default_author, "
+                ."sources.url FROM links INNER JOIN sources ON "
                 ."links.source_id = sources.source_id "
                 ."WHERE links.location_id = $loc_id LIMIT 1");
     }
@@ -404,6 +417,16 @@ EOD
                 or warn DBI->errstr;
             $doc_id = $db_adddoc->{mysql_insertid};
             print "document added as id $doc_id\n" if $verbosity;
+            if (exists $cfg{'OPP_WEB'}
+                && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
+                && $loc->{confidence} > $cfg{'CONFIDENCE_THRESHOLD'}) {
+                $db_add_oppweb->execute(
+                    $loc->{url}, $loc->{filetype}, $loc->{authors}, 
+                    $loc->{title}, $loc->{abstract}, $loc->{length}, 
+                    $loc->{source_url}, $loc->{confidence},
+                    $loc->{spamminess}, $loc->{text})
+                    or warn DBI->errstr;
+            }
         }
     }
     $db_saveloc->execute(
@@ -548,8 +571,8 @@ sub check_steppingstone {
 
     # also catch intermediate pages from known repositories:
     my @redir_patterns = (
-        qr/<meta name="citation_pdf_url" content="(.+?)"/, # arxiv.org
-        qr/philpapers.org\/go.pl[^"]+u=(http.+?)"/, # philpapers.org
+        qr/<meta name="citation_pdf_url" content="(.+?)"/, # arxiv.org, springer.com
+        qr/class='outLink' href="http:\/\/philpapers.org\/go.pl[^"]+u=(http.+?)"/, # philpapers.org
         qr/(http:\/\/www.plosone.org\/article\/.+?representation=PDF)" id="downloadPdf"/, #PLOS One
         );
     for my $pat (@redir_patterns) {
@@ -559,7 +582,6 @@ sub check_steppingstone {
             $target =~ s/\s/%20/g; # fix links with whitespace
             $target = URI->new($target);
             $target = $target->abs(URI->new($loc->{url}));
-            print "$target\n";
             return $target if length($target) < 256;
         }
     }
