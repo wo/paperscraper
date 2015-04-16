@@ -133,7 +133,7 @@ while (my $loc = shift @queue) {
     system("touch '$lockfile'");
     my $err = process($loc);
     system("rm -f \"$TEMPDIR\"*") unless $verbosity > 1;
-    leave(0) if $opts{p} || $opts{s};
+    leave(0) if $opts{s};
 }
 leave(0);
 
@@ -218,7 +218,7 @@ sub process {
     my $loc_id = $loc->{location_id};
     binmode STDOUT, ":utf8";
     print "\nchecking location $loc_id: $loc->{url}\n" if $verbosity;
-    push @processed, $loc;
+    push @processed, $loc->{url};
 
     # If we crash during processing, that should be marked in the DB:
     $db_err->execute(30, $loc_id);
@@ -267,7 +267,7 @@ sub process {
             $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
             return 0;
         }
-        if ($target ~~ @processed) {
+        if (grep { $_ eq $target } @processed) {
             error("infinite redirect");
             return 0;
         }
