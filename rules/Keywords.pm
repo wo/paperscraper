@@ -53,13 +53,6 @@ our $re_session_id = qr{
     locale=[\w_-]+
 }xi;
 
-# stuff that indicates addresses or affiliations:
-our $re_address_word = qr/\b(?:
-    universit\w+|center|centre|institute?|college|
-    avenue|street|professor|department|
-    umass|uc
-    )\b/ix;
-
 # stuff that indicates publication info:
 our $re_publication_word = qr/\b(?:
     forthcoming|editors?|edited|publish\w*|press|volume
@@ -93,6 +86,13 @@ our $re_coverpage = qr/\b(?:
     )\b/ix;
 
 # stuff that disqualifies something from being a name:
+our $re_address_word = qr/\b(?:
+    universit\w+|center|centre|institute?|college|
+    avenue|street|professor|department|program|
+    philosophy|linguistics|
+    umass|uc
+    )\b/ix;
+
 our $re_noname = qr/
     \d |
     $re_address_word |
@@ -106,11 +106,6 @@ our $re_noname = qr/
        see
        )\b
     /ix;
-
-my $re_nocontent = qr/(?:
-    $re_address_word |
-    $re_publication_word
-    )/ix;
 
 # unicode character classes like \p{IsAlpha} seem buggy, so I use POSIX:
 my $upper = '[[:upper:]]';
@@ -169,7 +164,6 @@ our $re_bad_beginning = qr/
 
 # may be ordinary text content:
 our $re_content = qr/
-    # (?!.*$re_nocontent.*)
     \b(?:
        the|to|a|in|is|it|you|that|he|was|for|on|are|with|
        as|I|his|they|be|at|one|have|this|from|or|had|by|

@@ -177,6 +177,7 @@ $f{'good author block missed'} = sub {
         my $bl = chunk2block($ch, $_[0]->{blocks});
         unless ($bl->{label}->{AUTHOR}) {
             my $r = max(0, ($ch->{p}->(AUTHOR)-0.2)*1.25);
+            #print "good author ",$ch->{text}," missed: ",$ch->{p}->(AUTHOR);
             $r /= 2 if ($bl->{label}->{TITLE});
             $ret = max($ret, $r);
         }

@@ -64,8 +64,8 @@ $features{TITLE} = [
     ['style appears on several pages', [-0.3, 0], 2],
     ['contains letters', [0, -0.7], 2],
     ['contains publication keywords', [-0.5, 0.1], 2],
-    ['contains address words', [-0.5, 0.1], 2],
-    ['contains other bad title words', [-0.6, 0.1], 2],
+    ['contains address words', [-0.3, 0.1], 2],
+    ['contains other bad title words', [-0.4, 0.1], 2],
     ['possible date', [-0.5, 0], 2],
     [$or->('several words', 'in continuation with good TITLE'), [0.1, -0.4], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
@@ -100,7 +100,7 @@ $features{AUTHOR} = [
     ['occurs in marginals', [0.2, 0], 2],
     [$and->('best TITLE', 'other good AUTHORs'), [-0.4, 0.05], 3],
     ['probable HEADING', [-0.7, 0.2], 3],
-    ['probable ABSTRACTSTART', [-0.6, 0.1], 3],
+    ['probable ABSTRACTSTART', [-0.6, 0.2], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     #['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
@@ -300,7 +300,8 @@ $f{'resembles best FOOTNOTESTART'} = sub {
 
 foreach my $label (@labels) {
     $f{"probable $label"} = sub {
-        return min(1, $_[0]->{p}->($label)+0.1) ** 2;
+        # less than 0.3 is 0, more than 0.9 is 1:
+        return min(1, max(0, ($_[0]->{p}->($label)-0.3) * 1.6))
     };
 }
 
@@ -453,14 +454,19 @@ $f{'greater gap above than below'} = memoize(sub {
     return $gap_above > $gap_below + 0.1;
 });
 
-$f{'contains address words'} = sub {
+my $re_address_word = qr/\b(?:
+    universit\w+|institute?|college|
+    avenue|street|professor|department|program|
+    umass|uc
+    )\b/ix;
+$f{'contains address words'} = memoize(sub {
     $_[0]->{plaintext} =~ $re_address_word;
-};
+});
 
 my $re_bad_title = qr/\b(?:thanks?|@|[12]\d{3}|)/ix;
-$f{'contains other bad title words'} = sub {
-   $_[0]->{plaintext} =~ $re_address_word;
-};
+$f{'contains other bad title words'} = memoize(sub {
+   $_[0]->{plaintext} =~ $re_bad_title;
+});
 
 $f{'matches content pattern'} = memoize(sub {
     $_[0]->{plaintext} =~ $re_content;
@@ -654,8 +660,8 @@ $f{'resembles best AUTHOR'} = sub {
         $ret -= 0.7 if $f{$feat}->($_[0]) != $f{$feat}->($best);
     }
     # far away:
-    my $dist = abs($_[0]->{textpos} - $best->{textpos});
-    $ret -= $dist/1000;
+    #my $dist = abs($_[0]->{textpos} - $best->{textpos});
+    #$ret -= $dist/1000;
     return max($ret, 0);
 };
 

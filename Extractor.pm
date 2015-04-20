@@ -755,8 +755,9 @@ sub extract_authors_and_title {
     my %chunks;
     my @author_candidates = @{$self->{best_chunks}->{AUTHOR}};
     my @title_candidates = @{$self->{best_chunks}->{TITLE}};
-    if (scalar @author_candidates > 10) {
-        @author_candidates = @author_candidates[0 .. 9];
+    if (scalar @author_candidates > 8) {
+        @author_candidates = grep { $_->{p}->('AUTHOR') > 0.6 }
+                             @author_candidates;
     }
     if (scalar @title_candidates > 7) {
         @title_candidates = @title_candidates[0 .. 6];
