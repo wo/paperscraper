@@ -347,6 +347,7 @@ sub process {
         $result->extract(qw/authors title abstract/);
     };
     if ($@) {
+        error("$@");
         error("parser error") if errorcode() == 99;
         $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
         return errorcode();
