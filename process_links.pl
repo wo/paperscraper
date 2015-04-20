@@ -502,14 +502,15 @@ sub is_subpage {
         print "no: link density $numlinks/$textlen\n" if $verbosity > 1;
         return 0;
     }
+    print "link density $numlinks/$textlen high enough\n" if $verbosity > 1;
 
     # subpage must have at least three links of paper filetypes:
-    $numlinks = 0;
-    $numlinks++ while ($loc->{content} =~ /\.pdf|\.doc/gi);
+    $numlinks = () = ($loc->{content} =~ /\.(pdf|\.doc)\b/ig);
     unless ($numlinks > 2) {
         print "no: $numlinks links to paper files\n" if $verbosity > 1;
         return 0;
     }
+    print "at least three links to doc/pdf files\n" if $verbosity > 1;
 
     # fetch potential parent pages:
     my $qu = "SELECT sources.* FROM links "
