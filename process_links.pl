@@ -490,7 +490,7 @@ sub fetch_document {
 
 sub is_subpage {
     my $loc = shift;
-    return unless $loc->{location_id} && $loc->{filetype} eq 'html';
+    #return unless $loc->{location_id} && $loc->{filetype} eq 'html';
 
     print "checking: subpage with further links?\n" if $verbosity > 1; 
 
@@ -511,6 +511,12 @@ sub is_subpage {
         return 0;
     }
     print "at least three links to doc/pdf files\n" if $verbosity > 1;
+
+    # URLs with query string can lead to anywhere, so we ignore them:
+    if ($loc->{url} =~ /\?\w+=/) {
+        print "ignoring 'sub'pages with query in url\n" if $verbosity > 1;
+        return 0;
+    }
 
     # fetch potential parent pages:
     my $qu = "SELECT sources.* FROM links "
@@ -536,6 +542,17 @@ sub is_subpage {
         print "Oops, more than one candidate parent page!\n";
         return 0;
     }
+
+    # No more than 10 subpages per page:
+    $qu = "SELECT COUNT(*) FROM sources "
+          ."WHERE parent_id = $parents[0]->{source_id}";
+    my $num_sub = $dbh->selectrow_array($qu, undef);
+    print "num $num_sub";
+    if ($num_sub > 10) {
+        print "too many subpages already\n" if $verbosity > 1;
+        return 0;
+    }
+    
 
     # Store page as new source:
     my $parent = pop @parents;
