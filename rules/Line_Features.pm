@@ -558,7 +558,9 @@ $f{'words common in content'} = memoize(sub {
             }
         }
         # set aside first 10% and last 20%:
-        @txt = @txt[int($#txt/10) .. int($#txt - $#txt/5)];
+        if (scalar @txt > 10) {
+            @txt = @txt[int($#txt/10) .. int($#txt - $#txt/5)];
+        }
         $_[0]->{doc}->{rough_content} = join("\n", @txt);
     }
     # 1 page is roughly 3000 chars, once per page is minimum for "common"

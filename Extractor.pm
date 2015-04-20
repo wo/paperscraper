@@ -136,6 +136,8 @@ sub init {
         pushlink @chunks, @pagechunks;
         $pageno++;
     }
+        
+    die "pdf conversion failed" unless @chunks;
 
     $self->{numpages} = $#pages;
     $self->{chunks} = \@chunks;
