@@ -37,7 +37,11 @@ sub parse {
             print "---skipping $part\n" if $verbose;
             next;
         }
-        my %name = ('text' => $1, 'first' => $2, 'last' => $3);
+        my %name = ('text' => $1,
+                    'first' => $2,
+                    'last' => $3,
+                    'prev_names' => [keys(%res)],
+                    'line' => $str);
         my $p = $estim->test(\%name);
         if ($p > 0.5) {
             $res{$name{text}} = $p;

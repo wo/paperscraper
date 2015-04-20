@@ -129,7 +129,7 @@ sub chunk2xml {
 }
 
 sub mergechunks {
-    my ($lines, $chunk) = (@_);
+    my ($lines, $chunk) = (@_); # lines up to now and next chunk
 
     # skip empty chunks:
     if (!$chunk->{text} 
@@ -214,15 +214,16 @@ sub append {
         $line->{text} .= ' ';
         $line->{length}++;
     }
-    if ($chunk->{bottom} < $line->{bottom}-1
-        && ($chunk->{top} < $line->{top}-1
+    my $subsup_threshold = $line->{height}*0.1;
+    if ($line->{bottom} - $chunk->{bottom} > $subsup_threshold
+        && ($line->{top} - $chunk->{top} > $subsup_threshold
             || $chunk->{height} < $line->{height}*0.7)) {
         print "chunk is sup\n" if $verbose;
         # Assumption: lines never start with subscripted text.
         $line->{text} .= "<sup>".$chunk->{text}."</sup>";
     }
-    elsif ($chunk->{bottom} > $line->{bottom}
-           && $chunk->{top} > $line->{top}) {
+    elsif ($chunk->{bottom} - $line->{bottom} > $subsup_threshold
+           && $chunk->{top} - $line->{top} > $subsup_threshold) {
         print "chunk is sub (or line sup)\n" if $verbose;
         if ($chunk->{width} <= $line->{width}) {
             $line->{text} .= "<sub>".$chunk->{text}."</sub>";
