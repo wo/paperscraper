@@ -489,7 +489,7 @@ sub fetch_document {
 
 sub is_subpage {
     my $loc = shift;
-    #return unless $loc->{location_id} && $loc->{filetype} eq 'html';
+    return unless $loc->{location_id} && $loc->{filetype} eq 'html';
 
     print "checking: subpage with further links?\n" if $verbosity > 1; 
 
@@ -543,14 +543,13 @@ sub is_subpage {
     }
 
     # No more than 10 subpages per page:
-    #$qu = "SELECT COUNT(*) FROM sources "
-    #      ."WHERE parent_id = $parents[0]->{source_id}";
-    #my $num_sub = $dbh->selectrow_array($qu, undef);
-    #print "num $num_sub";
-    #if ($num_sub > 10) {
-    #    print "too many subpages already\n" if $verbosity > 1;
-    #    return 0;
-    #}
+    $qu = "SELECT COUNT(*) FROM sources "
+          ."WHERE parent_id = $parents[0]->{source_id}";
+    my $num_sub = $dbh->selectrow_array($qu, undef);
+    if ($num_sub > 10) {
+        print "too many subpages already\n" if $verbosity > 1;
+        return 0;
+    }
     
 
     # Store page as new source:
