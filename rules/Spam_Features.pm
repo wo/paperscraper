@@ -25,7 +25,7 @@ our @spam_features = (
     ['Bayesian classifier thinks text is spam', [0.8, -0.5]],
     ['no long text passages between links', [0.4, -0.1]],
     ['high tag density', [0.2, -0.1]],
-    ['contains words typical for course notes', [0.5, -0.1]],
+    ['contains words typical for course notes', [0.3, -0.1]],
     ['contains words typical for papers', [-0.4, 0.1]],
     ['contains words typical for interviews', [0.2, 0]],
     ['few verbs', [0.5, -0.1]],
@@ -100,7 +100,7 @@ $f{'bad path'} = sub {
     return $loc->{url} =~ m/$re_bad_path/;
 };
 
-my $re_course_words = qr/course|seminar|schedule|readings|textbook|students|presentation|handout|essay|week|hours/i;
+my $re_course_words = qr/\bcourse|seminar|schedule|readings|textbook|students|\bpresentation|handout|essay|\bweek|hours/i;
 $f{'contains words typical for course notes'} = sub {
     my $loc = shift;
     return undef unless defined($loc->{text});
