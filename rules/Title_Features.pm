@@ -14,8 +14,9 @@ our @EXPORT_OK = qw/%block_features @parsing_features/;
 our %block_features;
 
 $block_features{TITLE} = [
-    ['chunks probable TITLE', [0.9, -0.9]],
+    ['chunks probable TITLE', [0.4, -0.2]], # worst case is prob 0.5!
     ['adjacent chunks probable title', [-0.6, 0.2]],
+    ['good title chunk missed', [-0.3, 0.3]],
     ['chunks are adjacent', [0, -1]],
     ['chunks are similar', [0.1, -0.3]],
     ['chunks are far apart', [-0.3, 0.1]],
@@ -27,7 +28,7 @@ $block_features{TITLE} = [
     ];
 
 $block_features{AUTHOR} = [
-    ['chunks probable AUTHOR', [1, -1]],
+    ['chunks probable AUTHOR', [0.5, -0.3]],
     ['coincides with marginal', [0.4, 0]],
     ];
 
@@ -56,7 +57,8 @@ foreach my $label (qw/TITLE AUTHOR/) {
         else {
             $p = $_[0]->{p}->($label);
         }
-        return min(1, $p+0.1) ** 2;
+        # emphasise differences between 0.5 and 1:
+        return max(0, 0.35 + ($p-0.5)*1.3);
     };
 }
 
@@ -65,8 +67,18 @@ $f{'adjacent chunks probable title'} = sub {
     my $p = $ch ? $ch->{p}->('TITLE') : 0;
     $ch = $_[0]->{chunks}->[-1]->{next};
     $p = max($p, $ch ? $ch->{p}->('TITLE') : 0);
-    # emphasise differences between 0.5 and 0.1:
+    # emphasise differences between 0.5 and 1:
     return max(0, 0.35 + ($p-0.5)*1.3);
+};
+
+$f{'good title chunk missed'} = sub {
+    my $ch0 = $_[0]->{chunks}->[0];
+    my $ret = 0;
+    foreach my $ch (@{$ch0->{best}->{TITLE}}) {
+        next if grep { $_ eq $ch } @{$_[0]->{chunks}};
+        $ret = max($ret, ($ch->{p}->('TITLE')-0.2)*1.25);
+    }
+    return $ret;
 };
 
 $f{'chunks are adjacent'} = sub {
@@ -176,7 +188,7 @@ $f{'good author block missed'} = sub {
     foreach my $ch (@{$ch0->{best}->{AUTHOR}}) {
         my $bl = chunk2block($ch, $_[0]->{blocks});
         unless ($bl->{label}->{AUTHOR}) {
-            my $r = max(0, ($ch->{p}->(AUTHOR)-0.2)*1.25);
+            my $r = max(0, ($ch->{p}->('AUTHOR')-0.2)*1.25);
             #print "good author ",$ch->{text}," missed: ",$ch->{p}->(AUTHOR);
             $r /= 2 if ($bl->{label}->{TITLE});
             $ret = max($ret, $r);
@@ -190,16 +202,18 @@ $f{'author blocks are similar'} = sub {
                       @{$_[0]->{blocks}};
     return undef unless scalar @blocks > 1;
     my $au1 = $blocks[0]->{chunks}->[0];
+    my $res = 1;
     for my $i (1 .. $#blocks) {
         my $au2 = $blocks[$i]->{chunks}->[0];
-        return 0 if $au1->{page} ne $au2->{page};
-        return 0 if ($au1->{plaintext} =~ /\p{IsLower}/)
-                    != ($au2->{plaintext} =~ /\p{IsLower}/);
-        return 0 if ($au1->{text} =~ /,/) != ($au2->{text} =~ /,/);
-        return 0 if ($au1->{text} =~ /<b>/i) != ($au2->{text} =~ /<b>/i);
-        return 0 if abs($au1->{fsize} - $au2->{fsize}) > 0.3;
+        $res = 0 if $au1->{page} ne $au2->{page};
+        $res = 0 if abs($au1->{fsize} - $au2->{fsize}) > 0.3;
+        $res -= 0.8 if ($au1->{text} =~ /<b>/i) != ($au2->{text} =~ /<b>/i);
+        $res -= 0.5 if ($au1->{plaintext} =~ /\p{IsLower}/)
+                       != ($au2->{plaintext} =~ /\p{IsLower}/);
+        $res -= 0.5 if ($au1->{text} =~ /,(?!\s*and)/i)
+                       != ($au2->{text} =~ /,(?!\s*and)/);
     }
-    return 1;
+    return max(0, $res);
 };
 
 $f{'first author near title'} = sub {
@@ -215,7 +229,7 @@ $f{'first author near title'} = sub {
         $title->{chunks}->[0]->{top} - $author->{bottom} :
         $author->{top} - $title->{chunks}->[-1]->{bottom};
     my $line_height = max($author->{height}, $title->{chunks}->[0]->{height});
-    return $dist ? min(1, $line_height*1.5 / $dist) : 1;
+    return ($dist > 0) ? min(1, $line_height*1.5 / $dist) : 1;
 };
 
 $f{'author and title on same page'} = sub {

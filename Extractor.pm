@@ -511,7 +511,7 @@ sub label_chunks {
     foreach (@labels) {
         $best{$_} = $chunks;
     }
-
+    
     foreach my $stage (1 .. $iterations) {
         say(4, "\nlabeling chunks ", @labels," stage $stage");
 
@@ -565,17 +565,14 @@ sub label_chunks {
         # At this point, $chunk->{$p} is a function that calculates
         # the probability for the label given as argument; but the
         # calculation has not yet been made.
-        my @relevant_chunks;
-        my %seen;
+        my %relevant;
         foreach my $label (@labels) {
             my @best;
             foreach my $chunk (@$chunks) {
-                if ($chunk->{$p}->($label) >= $min_p/2) {
-                    unless ($seen{$chunk}) {
-                        push @relevant_chunks, $chunk;
-                        $seen{$chunk} = 1;
-                    }
-                    if ($chunk->{$p}->($label) >= $min_p) {
+                my $prob = $chunk->{$p}->($label);
+                if ($prob >= $min_p/2) {
+                    $relevant{$chunk} = 1;
+                    if ($prob >= $min_p) {
                         push @best, $chunk;
                     }
                 }
@@ -583,13 +580,12 @@ sub label_chunks {
             @best = sort { $b->{$p}->($label) <=> $a->{$p}->($label) } @best;
             if ($verbosity > 3) {
                 say(4, "\n$label chunks (stage $stage):\n  ",
-                    join("\n  ", map {
-                    $_->{text}.' => '.$_->{$p}->($label) } @best));
+                    join("\n  ", map { $_->{text}.' => '.$_->{$p}->($label) } @best));
                 say(5, "\n");
             }
             $best{$label} = \@best;
         }
-        $chunks = \@relevant_chunks;
+        $chunks = [ grep { exists $relevant{$_} } @$chunks ];
 
         foreach my $chunk (@$chunks) {
             # inform chunks about best chunks:
@@ -601,12 +597,10 @@ sub label_chunks {
     }
 
     if ($verbosity > 3) {
-        say(4, "\ncomputing result");
         my @res;
         foreach my $chunk (@$chunks) {
             my @labs = grep { $chunk->{p}->($_) > $min_p }
                        sort { $chunk->{p}->($b) <=> $chunk->{p}->($a) } 
-                       #keys %$features;
                        @labels;
             push @res, join(' ', @labs)." >> ".$chunk->{text};
         }
@@ -760,7 +754,8 @@ sub extract_authors_and_title {
                              @author_candidates;
     }
     if (scalar @title_candidates > 7) {
-        @title_candidates = @title_candidates[0 .. 6];
+        @title_candidates = grep { $_->{p}->('TITLE') > 0.6 }
+                             @title_candidates;
     } 
     foreach (@author_candidates, @title_candidates) {
         $chunks{$_} = $_;
