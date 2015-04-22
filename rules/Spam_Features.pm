@@ -93,7 +93,7 @@ $f{'index file'} = sub {
     return $loc->{url} =~ m/$re_index_path/ && $loc->{url} !~ /plato.stanford/;
 };
 
-my $re_bad_path = qr/\bcours|\blecture|\btalk|teaching/xi;
+my $re_bad_path = qr/\bcours|\blecture|\btalk|handout|teaching/xi;
 $f{'bad path'} = sub {
     my $loc = shift;
     return undef unless defined($loc->{url});
