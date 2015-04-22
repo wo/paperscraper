@@ -588,15 +588,23 @@ sub check_steppingstone {
     }
 
     # also catch intermediate pages from known repositories:
-    my @redir_patterns = (
-        qr/<meta name="citation_pdf_url" content="(.+?)"/, # arxiv.org, springer.com
-        qr/class='outLink' href="http:\/\/philpapers.org\/go.pl[^"]+u=(http.+?)"/, # philpapers.org
-        qr/(http:\/\/www.plosone.org\/article\/.+?representation=PDF)" id="downloadPdf"/, #PLOS One
+    my %redir_patterns = (
+        # arxiv.org, springer.com:
+        qr/<meta name="citation_pdf_url" content="(.+?)"/ => '*',
+        # philpapers.org:
+        qr/class='outLink' href="http:\/\/philpapers.org\/go.pl[^"]+u=(http.+?)"/ => '*', 
+        # PLOSOne:
+        qr/(http:\/\/www.plosone.org\/article\/.+?representation=PDF)" id="downloadPdf"/ => '*',
+        # Google Drive:
+        qr/content="https:\/\/drive.google.com\/file\/d\/(.+?)\// => 'https://googledrive.com/host/*',
         );
-    for my $pat (@redir_patterns) {
+    while (my ($pat, $target) = each(%redir_patterns)) {
         if ($loc->{content} =~ /$pat/) {
-            print "repository page for document $1.\n" if $verbosity;
-            $target = URI::Escape::uri_unescape($1);
+            my $m = $1;
+            $target =~ s/\*/$m/; 
+            return 0 if $target eq $loc->{url};
+            print "repository page for document $target.\n" if $verbosity;
+            $target = URI::Escape::uri_unescape($target);
             $target =~ s/\s/%20/g; # fix links with whitespace
             $target = URI->new($target);
             $target = $target->abs(URI->new($loc->{url}));

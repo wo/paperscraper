@@ -70,11 +70,11 @@ $features{TITLE} = [
     [$or->('several words', 'in continuation with good TITLE'), [0.1, -0.4], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
-    ['occurs in marginals', [0.25, 0], 2],
+    ['occurs in marginals', [0.4, 0], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
     ['words common in content', [0.1, -0.3], 3],
-    ['probable AUTHOR', [-0.3, 0.1], 3],
+    ['probable AUTHOR', [-0.3, 0.1], 4],
     [$and->('best AUTHOR', 'other good TITLEs'), [-0.7, 0.05], 4],
     [$or->('best TITLE', 'in continuation with good TITLE'), [0.5, -0.8], 4],
     ['separated from AUTHOR only by TITLE', [0.3, -0.6], 4],
@@ -463,7 +463,7 @@ $f{'contains address words'} = memoize(sub {
     $_[0]->{plaintext} =~ $re_address_word;
 });
 
-my $re_bad_title = qr/\b(?:thanks?|@|[12]\d{3}|)/ix;
+my $re_bad_title = qr/\b(?:thanks?|@|[12]\d{3})/ix;
 $f{'contains other bad title words'} = memoize(sub {
    $_[0]->{plaintext} =~ $re_bad_title;
 });
@@ -509,7 +509,7 @@ sub style_similarity {
     $score *= 0.2 if $ch1->{fsize} != $ch2->{fsize};
     my $a1 = alignment($ch1);
     my $a2 = alignment($ch2);
-    $score *= 0.5 if ($a2 ne 'justify' && $a2 ne 'justify' && $a1 ne $a2);
+    $score *= 0.8 if ($a2 ne 'justify' && $a2 ne 'justify' && $a1 ne $a2);
     return $score;
 }
 
@@ -523,7 +523,7 @@ $f{'style appears on several pages'} = memoize(sub {
         next if $ch->{page} eq $_[0]->{page};
         # ignore intro pages:
         last if $ch->{page}->{number} <= ($numpages/5 + 1);
-        if (style_similarity($_[0], $ch) == 1) {
+        if (style_similarity($_[0], $ch) >= 0.8) {
             $ret += 0.5;
         }
         return 1 if $ret >= 1;
@@ -535,7 +535,7 @@ $f{'in continuation with good TITLE'} = sub {
     my $best = $_[0]->{best}->{TITLE}->[0];
     return undef unless $best;
     my $best_p = $best->{p}->('TITLE');
-    my @score = (1, 1);
+    my @score = (1, 1); # prev, next
     foreach my $i (0, 1) {
         my $sib = $_[0]->{($i ? 'next' : 'prev')};
         unless ($sib && $sib->{page} eq $_[0]->{page}) {

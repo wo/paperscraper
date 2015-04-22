@@ -222,6 +222,22 @@ my %tests = (
    title => "Avicenna’s “Vague Individual” and its Impact on Medieval Latin Philosophy",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/32-Liao-Bias.pdf' => {
+   authors => ["S. Matthew Liao"],
+   title => "Bias and Reasoning: Haidt’s Theory of Moral Judgment",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/22-Weatherson-Centrality.pdf' => {
+   authors => ["Brian Weatherson"],
+   title => "Centrality and Marginalisation",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/33-Otsuka-Saving.pdf' => {
+   authors => ["Michael Otsuka"],
+   title => "Saving Lives, Moral Theory, and the Claims of Individuals",
+ },
+
+
 );
 
 sub proc {
