@@ -117,7 +117,8 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    exit $status;
+    POSIX::_exit($status); 
+    #exit $status;
 }
 
 sub next_pages {
@@ -125,7 +126,7 @@ sub next_pages {
         return [{ source_id => 0, url => $opts{p}, last_checked => 0 }];
     }
     my $NUM_URLS = 10;
-    my $min_age = gmtime()-(24*60*60);
+    my $min_age = gmtime()+(24*60*60);
     my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources "
         ."WHERE last_checked < '".($min_age->ymd)."' "
@@ -237,6 +238,7 @@ sub process {
             unless (grep /\Q$old_url\E/, @urls);
     }
     my $pg_content = force_utf8(strip_tags($res->{content}));
+    $pg_content =~ s/\s\s+/ /g;
     print "page content: $pg_content\n\n" if $verbosity > 5;
     print "updating page $page_id records\n" if $verbosity > 1;
     $pg_update->execute(1, $pg_content, $page_id);
