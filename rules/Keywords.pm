@@ -50,7 +50,8 @@ our $re_session_id = qr{
     \bs\w*id=[\w_-]+|
     halsid=[\w_-]+|
     wpnonce=\w+|
-    locale=[\w_-]+
+    locale=[\w_-]+|
+    session=[\w_-]+
 }xi;
 
 # stuff that indicates publication info:

@@ -288,18 +288,22 @@ sub process {
         # location, but keep its URL.
     }
 
-    # get anchor text and default author from source pages:
-    # TODO: this assumes there is only one source page.
+    # get anchor text, default author, source url+content from source
+    # pages: (TODO better handle locations with > 1 source page?) 
     $loc->{anchortext} = '';
     $loc->{default_author} = '';
     $loc->{source_url} = '';
+    $loc->{source_content} = '';
     if ($loc_id) {
-        ($loc->{anchortext}, $loc->{default_author}, $loc->{source_url}) =
+        ($loc->{anchortext}, $loc->{default_author}, 
+         $loc->{source_url}, $loc->{source_content}) =
             $dbh->selectrow_array(
                 "SELECT links.anchortext, sources.default_author, "
-                ."sources.url FROM links INNER JOIN sources ON "
+                ."sources.url, sources.content "
+                ."FROM links INNER JOIN sources ON "
                 ."links.source_id = sources.source_id "
-                ."WHERE links.location_id = $loc_id LIMIT 1");
+                ."WHERE links.location_id = $loc_id "
+                ."ORDER BY sources.last_checked LIMIT 1");
     }
 
     # Except for html documents, we don't have the text content
@@ -315,8 +319,7 @@ sub process {
             return 0;
         }
         if ($spamminess >= $CERT_SPAM) {
-            print "spam score $spamminess, "
-                ."not checking any further\n" if $verbosity;
+            print "spam score $spamminess, not checking any further\n" if $verbosity;
             $db_saveloc->execute($loc->{filetype}, $loc->{filesize}, 
                                  $spamminess, undef, $loc_id)
                 or warn DBI->errstr;
@@ -338,6 +341,7 @@ sub process {
     }
     add_meta("$file.xml", 'anchortext', $loc->{anchortext});
     add_meta("$file.xml", 'sourceauthor', $loc->{default_author});
+    add_meta("$file.xml", 'sourcecontent', $loc->{source_content});
 
     # extract author, title, abstract:
     my $result = Extractor->new();

@@ -1,17 +1,21 @@
 #! /usr/bin/perl -w
 use strict;
+use warnings;
 use Carp;
 use DBI;
 use URI::URL;
+use POSIX qw[ _exit ];
 use HTML::LinkExtractor;
+use Text::Unidecode 'unidecode';
 use Data::Dumper;
 use Time::Piece;
 use Getopt::Std;
-use Encode;
+use Encode qw(decode encode);
 use FindBin qw($Bin);
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use util::Io;
+use util::String;
 use util::Errors;
 use rules::Keywords;
 binmode STDOUT, ":utf8";
@@ -64,9 +68,15 @@ $dbh->{'mysql_auto_reconnect'} = 1;
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do("SET NAMES 'utf8'");
 
-my $pg_update = $dbh->prepare(
+my $pg_ping = $dbh->prepare(
     "UPDATE sources SET last_checked = NOW(), status = ? "
-    ."WHERE source_id = ?");
+    ."WHERE source_id = ?")
+    or die "Couldn't connect to database: " . DBI->errstr;
+
+my $pg_update = $dbh->prepare(
+    "UPDATE sources SET last_checked = NOW(), status = ?, content = ? "
+    ."WHERE source_id = ?")
+    or die "Couldn't connect to database: " . DBI->errstr;
 
 my $db_insert_location = $dbh->prepare(
     "INSERT IGNORE INTO locations (url, status) VALUES (?,0)")
@@ -74,7 +84,8 @@ my $db_insert_location = $dbh->prepare(
 
 my $db_insert_link = $dbh->prepare(
     "INSERT IGNORE INTO links (source_id, location_id, anchortext) "
-    ."VALUES (?,?,?)");
+    ."VALUES (?,?,?)")
+    or die "Couldn't connect to database: " . DBI->errstr;
 
 my @abort;
 $SIG{INT} = sub {
@@ -120,6 +131,7 @@ sub next_pages {
         ."WHERE last_checked < '".($min_age->ymd)."' "
         ."OR last_checked IS NULL ORDER BY last_checked "
         ."LIMIT $NUM_URLS";
+    #print $query;
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
     return $pages;
 }
@@ -133,20 +145,18 @@ sub process {
     my $res = fetch_url($page->{url}, $mtime);
     if ($res && $res->code == 304) {
         print "not modified.\n" if $verbosity;
-        $pg_update->execute(1, $page_id) unless $opts{p};
+        $pg_ping->execute(1, $page_id) unless $opts{p};
         return;
     }
     if (!$res || !$res->is_success || !$res->{content}) {
-        print "error:\n   ", ($res ? $res->status_line : ''), "\n"
-            if $verbosity;
-        $pg_update->execute($res ? $res->code : 900, $page_id)
-            unless $opts{p};
+        print "error:\n   ", ($res ? $res->status_line : ''), "\n" if $verbosity;
+        $pg_ping->execute($res ? $res->code : 900, $page_id) unless $opts{p};
         return;
     }
     # also check for 404 errors without proper HTTP status:
     if ($res->{content} =~ /Error 404/) {
         print "page contains 404 error message\n" if $verbosity;
-        $pg_update->execute('404', $page_id) unless $opts{p};
+        $pg_ping->execute('404', $page_id) unless $opts{p};
         return;
     }
     
@@ -156,6 +166,7 @@ sub process {
         ."ON links.location_id = locations.location_id "
         ."WHERE source_id = $page_id");
     my @old_urls =  $opts{p} ? () : @{$old_urls};
+    print "old links: \n", join("\n",@old_urls), "\n" if $verbosity > 3;
     
     # extract links from page and add them to DB if new:
     my @links;
@@ -180,11 +191,11 @@ sub process {
         print "checking link: $url ($text)\n" if ($verbosity > 1);
         next if ($url eq $page->{url});
         if ($url =~ /$re_ignore_url/) {
-            print "URL ignored.\n"  if ($verbosity > 1);
+            print "link ignored.\n"  if ($verbosity > 1);
             next;
         }
         if (grep /\Q$url\E/, @old_urls) {
-            print "URL already in DB.\n" if ($verbosity > 1);
+            print "link already in DB.\n" if ($verbosity > 1);
             next;
         }
         # check for session variants:
@@ -196,8 +207,7 @@ sub process {
                 my $old_url_fragment = $old_url;
                 $old_url_fragment =~ s/$re_session_id//;
                 if ($url2 eq $old_url_fragment) {
-                    print "session variant of $old_url\n"
-                        if ($verbosity > 1);
+                    print "session variant of $old_url\n" if ($verbosity > 1);
                     next LINKS;
                 }
             }
@@ -205,14 +215,18 @@ sub process {
         $url =~ s/\s/%20/g; # fix links with whitespace
         print "new link: $url ($text)\n" if $verbosity;
         next LINKS if $opts{p};
+        my $loc_id;
         my $res = $db_insert_location->execute($url)
             or print DBI->errstr;
         if ($res eq '0E0') {
             # insert ignored due to duplicate url
-            print "(location already in database)\n" if $verbosity;
-            next LINKS;
+            print "location already in database\n" if $verbosity;
+            my $qu = "SELECT location_id FROM locations WHERE url = ?";
+            $loc_id = $dbh->selectrow_array($qu, undef, $url);
         }
-        my $loc_id = $db_insert_location->{mysql_insertid};
+        else {
+            $loc_id = $db_insert_location->{mysql_insertid};
+        }
         $db_insert_link->execute($page_id, $loc_id, $text);
         push @old_urls, $url;
     }
@@ -222,7 +236,15 @@ sub process {
         remove_link($old_url, $page_id)
             unless (grep /\Q$old_url\E/, @urls);
     }
-    $pg_update->execute(1, $page_id);
+    my $pg_content = force_utf8(strip_tags($res->{content}));
+    print "page content: $pg_content\n\n" if $verbosity > 5;
+    print "updating page $page_id records\n" if $verbosity > 1;
+    $pg_update->execute(1, $pg_content, $page_id);
+}
+
+sub force_utf8 {
+    # brute force -- transliterate to ascii:
+    return unidecode($_[0]);
 }
 
 sub remove_link {
