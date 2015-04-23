@@ -40,6 +40,7 @@ need to install gcc and openssl first.)
   sudo cpan -i Text::Capitalize
   sudo cpan -i Text::Names
   sudo cpan -i Text::Aspell
+  sudo cpan -i Text::Unidecode
   sudo cpan -i String::Approx
   sudo cpan -i Algorithm::NaiveBayes
   sudo cpan -i AI::Categorizer

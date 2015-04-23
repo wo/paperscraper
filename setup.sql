@@ -39,6 +39,7 @@ CREATE TABLE sources (
   found_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_checked DATETIME DEFAULT NULL,
   default_author VARCHAR(128) DEFAULT NULL,
+  content TEXT DEFAULT NULL,
   PRIMARY KEY (source_id),
   UNIQUE KEY (url),
   KEY (last_checked)

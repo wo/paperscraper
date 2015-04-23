@@ -214,7 +214,7 @@ $f{'many gaps between lines'} = sub {
         }
     }
     #print "xxx $gaps gaps vs $nogaps inner-paragraph lines\n";
-    return max(0, min(1, 1.5 - $nogaps/($gaps*2)));
+    return max(0, min(1, 1.5 - $nogaps/$gaps));
 };
 
 $f{'low confidence'} = sub {
