@@ -7,7 +7,7 @@ use Getopt::Std;
 use List::Util qw/max min/;
 use Data::Dumper;
 use util::Io;
-use util::String 'strip_tags';
+use util::String qw/strip_tags tokenize/;
 use util::Functools qw/reduce/;
 use Exporter;
 our @ISA = ('Exporter');
@@ -132,8 +132,7 @@ sub mergechunks {
     my ($lines, $chunk) = (@_); # lines up to now and next chunk
 
     # skip empty chunks:
-    if (!$chunk->{text} 
-        || $chunk->{text} =~ /^(?:<[^>]+>)?\s*(?:<[^>]+>)?$/) {
+    if (!$chunk->{text} || $chunk->{text} =~ /^(?:<[^>]+>)?\s*(?:<[^>]+>)?$/) {
         return $lines;
     }
     print "chunk: ", $chunk->{text}, "\n" if $verbose;
@@ -371,10 +370,12 @@ sub tidy_text {
     my $str = shift;
     # strip empty tags:
     $str =~ s/<([^>\s]+)[^>]*>\s*<\/\1>//g;
-    return fixchars($str);
+    $str = fix_chars($str);
+    $str = fix_kerning($str);
+    return $str;
 }
 
-sub fixchars {
+sub fix_chars {
     my $str = shift;
     my %trans;
 
@@ -422,16 +423,33 @@ sub fixchars {
     # strip newline characters within text chunks:
     $str =~ s/\n//g;
 
-    # strip S I L L Y S P A C E S left by pdftohtml:
-    # TODO -- should be much more careful here, checking with
-    # dictionaries, etc.
-    if ($str !~ /\p{isAlpha}{2}/ && $str =~ /\p{isAlpha}\s\p{isAlpha}/) {
-        $str =~ s/\s//g;
-    }
-
     #while ($str =~ /([^a-zA-Z\d\s\.\[\]\(\),-\?:"'])/g) {
         #print "odd char $1 :", ord($1)," in $str\n";
     #}
+    return $str;
+}
+
+sub fix_kerning {
+    my $str = shift;
+
+    # pdftohtml often leaves S I L L Y  S PA C E S in words, especially
+    # in author names, where dictionary lookups are of little help:
+    if ($str =~ / \p{isAlpha} \p{isAlpha} \p{isAlpha} /) {
+        print "odd kerning in $str\n" if $verbose;
+        #$str =~ s/(?<! ) //g;
+        $str =~ s/ (\p{isAlpha}) /$1/g;
+        print "turned to $str\n" if $verbose;
+        # If we're lucky, we now have sensible word breaks because
+        # pdftohtml put double spaces where there should be single
+        # spaces. Otherwise we enter the next clause.
+    }
+    # Sometimes there are nospacesatallbetweenwords.
+    while ($str =~ /(\p{isAlpha}{25,})/g) {
+        print "odd kerning in $str: $1\n" if $verbose;  
+        my $repl = tokenize($1);
+        $str =~ s/$1/$repl/;
+        print "turned to $str\n" if $verbose;
+    }
     return $str;
 }
 

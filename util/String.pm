@@ -5,11 +5,12 @@ use utf8;
 use HTML::Strip;
 use Text::Capitalize;
 use Text::Aspell;
+use Memoize;
 use lib '..';
 use rules::Keywords;
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw/&strip_tags &tidy_text &plaintext &is_word/;
+our @EXPORT = qw/&strip_tags &tidy_text &plaintext &is_word &tokenize/;
 
 sub strip_tags_new {
     my $str = shift;
@@ -167,6 +168,59 @@ sub is_word {
     return $sp && $sp->check($_[0]);
 }
 
+sub tokenize {
+    # Split 'stringofwords' into 'string of words'. If second argument
+    # is set (for internal use), return value is prefixed by a number
+    # counting how many non-dictionary words ar in the returned
+    # string.
+    my ($str, $recurse) = @_;
+    if (is_word($str)) {
+        return $recurse ? "0 $str" : $str;
+    }
+    if (length($str) < 3) {
+        return $recurse ? "1 $str" : $str;
+    }
+    my @wordlist;
+    my $numbad;
+    my $max_cut = length($str) < 17 ? length($str)-2 : 15;
+    for my $cut (1 .. $max_cut) {
+        my $w = substr($str, 0, $cut);
+        # our dictionary counts every single letter as a word, ignore all but 'a':
+        if ($w eq 'a' or ($cut > 1 and is_word($w))) {
+            #print "$w|",substr($str, $cut),"?\n";
+            my ($rembad, @remlist) = split(' ', tokenize(substr($str, $cut), 1));
+            # prefer short word lists with few non-dict words:
+            if (!@wordlist or $rembad < $numbad or 
+                ($numbad == $rembad and $#remlist+1 < $#wordlist)) {
+                @wordlist = ($w, @remlist);
+                $numbad = $rembad;
+                #print "(1) best tokenization of $str so far: $numbad ", join(' ', @wordlist), "\n";
+            }
+        }
+    }
+    unless (@wordlist) {
+        # string does not begin with a dictionary word
+        for my $cut (1 .. $max_cut) {
+            my $w = substr($str, 0, $cut);
+            #print "$w|",substr($str, $cut),"?\n";
+            my ($rembad, @remlist) = split(' ', tokenize(substr($str, $cut), 1));
+            #print "tokenized: ",($rembad + 1)," $w ", join(' ', @remlist)," [$#remlist, $#wordlist]\n";
+            if (!@wordlist or $rembad+1 < $numbad or
+                ($numbad == $rembad+1 and $#remlist+1 < $#wordlist)) {
+                @wordlist = ($w, @remlist);
+                $numbad = $rembad + 1;
+                #print "(2) best tokenization of $str so far: $numbad ", join(' ', @wordlist), "\n";
+            }
+        }
+    }
+    #print "best tokenization of $str: $numbad ", join(' ', @wordlist), "\n";
+    if ($recurse) {
+        return "$numbad ".join(' ', @wordlist);
+    }
+    return join ' ', @wordlist;
+}
+memoize('tokenize');
+
 sub fix_html {
     my $str = shift;
     my %open = ('i', 0, 'b', 0, 'sub', 0, 'sup', 0);
@@ -192,5 +246,7 @@ sub fix_html {
     }
     return $res;
 }
+
+
 
 1;
