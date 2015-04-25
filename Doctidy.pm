@@ -136,6 +136,11 @@ sub mergechunks {
     if (!$chunk->{text} || $chunk->{text} =~ /^(?:<[^>]+>)?\s*(?:<[^>]+>)?$/) {
         return $lines;
     }
+    # skip extremely small chunks sometimes inserted by publishers:
+    if ($chunk->{height} < 5) {
+        print "skipping tiny chunk: $chunk->{text}\n" if $verbose;
+        return $lines;
+    }
     print "chunk: ", $chunk->{text}, "\n" if $verbose;
 
     # turn very first chunk into first line:
