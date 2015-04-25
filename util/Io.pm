@@ -58,9 +58,11 @@ sub fetch_url {
             $content = $response->{_content};
         }
     }
-    # without the next line, Perl crashes when applying regexes
-    # (e.g. /\n$re_bib_heading\n/):
-    $content =~ s/[\t\r\n]+/\n/g;
+    if ($response->{filetype} eq 'html') {
+        # without this, Perl crashes when applying regexes
+        # (e.g. /\n$re_bib_heading\n/):
+        $content =~ s/[\t\r\n]+/\n/g;
+    }
     $response->{content} = $content;
     return $response;
 }
