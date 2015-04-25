@@ -18,13 +18,13 @@ our @EXPORT_OK = '@spam_features';
 
 our @spam_features = (
     ['non-text filetype', [1, 0]],
-    ['html', [0.1, -0.1]],
+    ['html', [0.2, -0.1]],
     ['bad anchortext', [0.3, -0.1]],
     ['bad path', [0.3, -0.1]],
     ['index file', [0.4, -0.1]],
     ['Bayesian classifier thinks text is spam', [0.8, -0.5]],
-    ['no long text passages between links', [0.4, -0.1]],
-    ['high tag density', [0.2, -0.1]],
+    ['no long text passages between links', [0.6, -0.1]],
+    ['high tag density', [0.5, -0.1]],
     ['contains words typical for course notes', [0.3, -0.1]],
     ['contains words typical for papers', [-0.4, 0.1]],
     ['contains words typical for interviews', [0.2, 0]],
@@ -147,7 +147,7 @@ $f{'no long text passages between links'} = sub {
     foreach my $txt (split(/<a /i, $loc->{content})) {
         $longest_text = length($txt) if (length($txt) > $longest_text);
     }
-    return max(0, 1 - $longest_text/2000);
+    return max(0, min(1, 1.2 - $longest_text/2000));
 };
 
 $f{'short'} = sub {
@@ -185,7 +185,7 @@ $f{'few words per page'} = sub {
     my $loc = shift;
     return undef unless defined($loc->{extractor});
     my $numpages = $loc->{extractor}->{numpages};
-    return undef unless $numpages;
+    return undef unless $numpages > 1;
     my $char_p_page = length($loc->{text}) / $numpages;
     #print "xxx my char_p_page $char_p_page\n";
     return max(0, min(1, 1.5 - $char_p_page/1000));
