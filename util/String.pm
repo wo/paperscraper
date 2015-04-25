@@ -87,8 +87,8 @@ sub plaintext {
     my $txt = shift;
     # remove excessive whitespace:
     $txt =~ s|\s\s+| |g;
-    # remove footnote marks:
-    $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>||g;
+    # remove footnote marks, but keep whitespace:
+    $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>| |g;
     # and trailing footnote star *:
     $txt =~ s/(\*|\x{2217})\s*$//;
     # and non-<sup>'ed footnote symbols in brackets:
