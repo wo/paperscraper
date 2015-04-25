@@ -237,6 +237,16 @@ my %tests = (
    title => "Saving Lives, Moral Theory, and the Claims of Individuals",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Pasnau-Democritus.pdf' => {
+   authors => ["Robert Pasnau"],
+   title => "Democritus and Secondary Qualities",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/32-List-Discursive.pdf' => {
+   authors => ["Christian List"],
+   title => "The Discursive Dilemma and Public Reason",
+ },
+
 
 );
 

@@ -26,23 +26,30 @@ sub verbosity {
 }
 
 sub parse {
-    my $str = shift;
+    my $chunk = shift;
+    my $str = $chunk->{plaintext};
     my %res; # name => probability
     print "--parsing name $str\n" if $verbose;
     my @parts = split($re_name_separator, $str);
+    my $skipped = 0;
     while (my ($i, $part) = each @parts) {
         if ($part !~
             /^(?:$re_name_before)?($re_name)(?:$re_name_after)?$/
             || $1 =~ /$re_noname/) {
             print "---skipping $part\n" if $verbose;
+            $skipped++;
             next;
         }
         my %name = ('text' => $1,
                     'first' => $2,
                     'last' => $3,
                     'prev_names' => [keys(%res)],
-                    'line' => $str);
+                    'chunk' => $chunk);
         my $p = $estim->test(\%name);
+        if ($skipped) {
+            print "---follows non-name: decreasing probability\n" if $verbose;
+            $p *= 0.8;
+        }
         if ($p > 0.5) {
             $res{$name{text}} = $p;
         }

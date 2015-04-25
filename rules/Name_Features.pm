@@ -1,5 +1,6 @@
 package rules::Name_Features;
 use warnings;
+use List::Util qw/min max/;
 use rules::Helper;
 use rules::Keywords;
 use lib '../';
@@ -10,6 +11,7 @@ our @EXPORT_OK = '@name_features';
 
 our @name_features = (
     ['contains university location', [-0.8, 0.05]],
+    ['name occurs in lower case in article', [-0.4, 0.1]],
     ['first names contain initial', [0.2, 0]],
     ['first names contain common first name', [0.4, -0.1]],
     ['first names contain common word', [-0.3, 0.1]],
@@ -81,18 +83,33 @@ $f{'surnames contain word'} = sub {
     return 0;
 };
 
+$f{'name occurs in lower case in article'} = sub {
+    # first test whole name:
+    my $str = lc($_[0]->{text});
+    # testing '\w $str': in the middle of a sentence
+    return 1 if ($_[0]->{chunk}->{doc}->{text} =~ /\w $str\b/);
+    # now test parts of name, but note that e.g. an article by
+    # Christian List might well contain 'list':
+    my $parts_matched = 0;
+    while ($_[0]->{text} =~ /([[:upper:]]\w+)/g) {
+        $str = lc($1);
+        $parts_matched++ if ($_[0]->{chunk}->{doc}->{text} =~ /\b$str\b/);
+    }
+    return min(1, $parts_matched/2);
+};
+
 my $re_sep = qr/\band\b|&amp;|,|[^\p{isAlpha}\d\.\s\@-]/i;
 $f{'is first name in line or follows comma or and'} = sub {
     return 1 unless @{$_[0]->{prev_names}};
     my $name = $_[0]->{text};
-    return $_[0]->{line} =~ /$re_sep\s+$name/;
+    return $_[0]->{chunk}->{plaintext} =~ /$re_sep\s+$name/;
 };
     
 $f{'separated from earlier names by non-names'} = sub {
     return undef unless @{$_[0]->{prev_names}};
     my $prev = $_[0]->{prev_names}->[-1];
     my $name = $_[0]->{text};
-    return $_[0]->{line} =~ /$prev.*\w{5,}.*$name/;
+    return $_[0]->{chunk}->{plaintext} =~ /$prev.*\w{5,}.*$name/;
 };
 
 compile(\@name_features, \%f);

@@ -13,6 +13,7 @@ use rules::Helper;
 use rules::NameExtractor;
 use rules::Keywords;
 use Exporter;
+use Data::Dumper;
 our @ISA = ('Exporter');
 our @EXPORT_OK = qw/%features/;
 
@@ -71,14 +72,15 @@ $features{TITLE} = [
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.4, 0], 2],
+    ['occurs on source page', [0.4, -0.4], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
-    ['words common in content', [0.1, -0.3], 3],
+    #['words common in content', [0.1, -0.3], 3],
     ['probable AUTHOR', [-0.3, 0.1], 4],
     [$and->('best AUTHOR', 'other good TITLEs'), [-0.7, 0.05], 4],
-    [$or->('best TITLE', 'in continuation with good TITLE'), [0.5, -0.8], 4],
-    ['separated from AUTHOR only by TITLE', [0.3, -0.6], 4],
-    ['resembles best TITLE', [0.1, -0.5], 4],
+    [$or->('best TITLE', 'in continuation with good TITLE'), [0.5, -0.8], 5],
+    ['separated from AUTHOR only by TITLE', [0.3, -0.6], 5],
+    ['resembles best TITLE', [0.1, -0.5], 5],
     ];
 
 $features{AUTHOR} = [
@@ -93,7 +95,7 @@ $features{AUTHOR} = [
     ['several words', [0, -0.5]],
     ['begins with possible name', [0.3, -0.4]],
     ['typical list of names', [0.2, 0]],
-    ['largest text on page', [-0.4, 0], 2],
+    ['largest text on page', [-0.2, 0], 2],
     ['contains digit', [-0.1, 0.05], 2],
     ['gap above', [0.25, -0.3], 2],
     ['gap below', [0.15, -0.15], 2],
@@ -108,7 +110,7 @@ $features{AUTHOR} = [
     ['contains several English words', [-0.2, 0.1], 3],
     ['resembles source author', [0.1, -0.1], 3],
     [$or->('near good TITLE', 'near other good AUTHORs'), [0.2, -0.5], 4],
-    ['resembles best AUTHOR', [0.1, -0.5], 4],
+    ['resembles best AUTHOR', [0.1, -0.5], 5],
     ];
 
 $features{HEADING} = [
@@ -288,7 +290,7 @@ $f{'previous line FOOTER'} = sub {
 };
  
 $f{'resembles best FOOTNOTESTART'} = sub {
-    return undef if scalar @{$_[0]->{best}->{FOOTNOTESTART}} <= 1;
+    return undef unless @{$_[0]->{best}->{FOOTNOTESTART}};
     my $best = $_[0]->{best}->{FOOTNOTESTART}->[0];
     my $ret = 1;
     $ret -= 0.6 if alignment($_[0]) ne alignment($best);
@@ -339,7 +341,11 @@ $f{'all caps'} = memoize(sub {
 });
 
 $f{'large font'} = memoize(sub {
-    .5 + max(min($_[0]->{fsize}-2, 5), -5) / 10;
+    if ($_[0]->{doc}->{largest_font} == 0) {
+        # no large font in document
+        return undef;
+    }
+    return .5 + max(min($_[0]->{fsize}-2, 5), -5) / 10;
 });
 
 $f{'normal font'} = memoize(sub {
@@ -492,6 +498,12 @@ $f{'resembles source author'} = memoize(sub {
     return 0;
 });
 
+$f{'occurs on source page'} = memoize(sub {
+    return undef unless $_[0]->{doc}->{sourcecontent};
+    my $str = $_[0]->{plaintext};
+    return $_[0]->{doc}->{sourcecontent} =~ /$str/i;
+});
+
 $f{'occurs in marginals'} = memoize(sub {
     return undef if length($_[0]->{plaintext}) < 5;
     for my $ch (@{$_[0]->{doc}->{marginals}}) {
@@ -614,7 +626,7 @@ sub is_best {
     my $label = shift;
     return sub {
         my $best = $_[0]->{best}->{$label}->[0];
-        return undef unless $best && $best->{p};
+        return undef unless $best;
         return 1 if $_[0] eq $best;
         my $dist = $best->{p}->($label) - $_[0]->{p}->($label);
         return max(1 - $dist*10, 0);
@@ -650,8 +662,10 @@ $f{'resembles best AUTHOR'} = sub {
     return 0 if $f{'all caps'}->($_[0]) != $f{'all caps'}->($best);
     return 0 if ($_[0]->{text} =~ /,/) != ($best->{text} =~ /,/);
     # is on other side of title?
-    my $title = $_[0]->{best}->{TITLE}->[0]->{id} || 0;
-    return 0 if ($_[0]->{id} < $title) != ($best->{id} < $title);
+    if (@{$_[0]->{best}->{TITLE}}) {
+        my $title = $_[0]->{best}->{TITLE}->[0]->{id};
+        return 0 if ($_[0]->{id} < $title) != ($best->{id} < $title);
+    }
     # smaller flaws:
     my $ret = 1;
     $ret -= 0.3 if alignment($_[0]) ne alignment($best);
@@ -673,7 +687,7 @@ $f{'resembles best TITLE'} = sub {
     my $ret = 1;
     $ret -= 0.5 if $f{'all caps'}->($_[0]) != $f{'all caps'}->($best);
     $ret -= 0.3 if alignment($_[0]) ne alignment($best);
-    $ret -= abs($_[0]->{fsize} - $best->{fsize}) * 0.2;
+    $ret -= max(0.5, abs($_[0]->{fsize} - $best->{fsize}) * 0.1);
     foreach my $feat ('bold', 'italic') {
         $ret -= 0.3 if $f{$feat}->($_[0]) != $f{$feat}->($best);
     }
@@ -933,8 +947,7 @@ $f{'contains possible name'} = memoize(sub {
 
 $f{'contains probable name'} = memoize(sub {
     unless (exists $_[0]->{names}) {
-        my $str = $_[0]->{plaintext};
-        $_[0]->{names} = rules::NameExtractor::parse($str);
+        $_[0]->{names} = rules::NameExtractor::parse($_[0]);
     }
     return 0 unless %{$_[0]->{names}};
     return max(values(%{$_[0]->{names}}));
@@ -986,24 +999,30 @@ $f{'high punctuation frequency'} = memoize(freq('[,\.:\(\)\[\]-]', 5));
 
 sub largest_text {
     my $dir = shift;
-    my $count_allequal = shift;
     return sub {
         my $ch = $_[0];
-        my $tolerance = $ch->{doc}->{fromOCR} ? 1 : 0;
-        my $anything_smaller = 0;
+        if ($ch->{doc}->{largest_font} == 0) {
+            # no large font in document
+            return undef;
+        }
+        my $largest_size = 0;
         while (($ch = $ch->{$dir}) && $ch->{page} eq $_[0]->{page}) {
             next if (length($ch->{plaintext}) < 5);
-            return 0 if $ch->{fsize} > $_[0]->{fsize}+$tolerance;
-            $anything_smaller = 1 if $ch->{fsize} < $_[0]->{fsize};
+            $largest_size = max($largest_size, $ch->{fsize});
         }
-        return $count_allequal ? $anything_smaller : 1;
+        my $diff = $_[0]->{fsize} - $largest_size;
+        # return 1 if nothing is as large, 0.8 if other chunks equally
+        # large, 0 if other chunks significantly larger:
+        return min(1, max(0, 0.8 + $diff/3));
     }
 }
 
+
+
 $f{'largest text on rest of page'} = largest_text('next');
 
-$f{'largest text on page'} = memoize(allof(largest_text('next', 1),
-                                            largest_text('prev', 1)));
+$f{'largest text on page'} = memoize(allof(largest_text('next'),
+                                           largest_text('prev')));
 
 $f{'rest of page has same font size'} = sub {
     my $ch = $_[0];

@@ -25,6 +25,7 @@ sub new {
         fromHTML => 0,
         anchortexts => [],
         sourceauthors => [],
+        sourcecontent => '',
         chunks => [],
         pages => [],
         numpages => 0,
@@ -106,6 +107,9 @@ sub init {
     $self->{anchortexts} = \@anchortexts;
     my @sourceauthors = $xml =~ /<sourceauthor>(.+?)<\/sourceauthor>/g;
     $self->{sourceauthors} = \@sourceauthors;
+    if ($xml =~ /<sourcecontent>(.+?)<\/sourcecontent>/) {
+        $self->{sourcecontent} = $1;
+    }
 
     say(3, "collecting text chunks");
 
@@ -143,7 +147,6 @@ sub init {
     $self->{chunks} = \@chunks;
 
     $self->fontinfo();
-    $self->relativize_fsize();
     $self->geometry();
     $self->strip_coverpages();
     $self->strip_marginals();
@@ -212,13 +215,14 @@ sub pageinfo {
 sub fontinfo {
     my $self = shift;
 
-    # find most common ('default') font-size and line-spacing (as
-    # fraction):
+    # find default font size and line-spacing (as fraction):
     my %fs_freq;
     my %sp_freq;
     foreach my $ch (@{$self->{chunks}}) {
         next if length($ch->{plaintext}) < 10;
+        # ignore footnotes:
         next if $ch->{bottom} / $ch->{page}->{bottom} > 0.7;
+        # ignore endnotes and references:
         last if $self->{numpages} > 2 &&
             $ch->{page}->{number} / $self->{numpages} > 0.7;
         $fs_freq{$ch->{fsize}} = 0
@@ -243,7 +247,20 @@ sub fontinfo {
     }
     $self->{linespacing} = $default_sp < 1 ? 1 : $default_sp;
     say(3, "default line spacing $self->{linespacing}");
+
+    # relativise font-sizes so that = default, +2 = [120-130)%, etc.
+    # For OCR'ed documents, font-sizes are unreliable, so we generally
+    # round +3 to +2, -1 to 0 etc. Also, store largest font size.
+    $self->{largest_font} = 0;
+    foreach my $ch (@{$self->{chunks}}) {
+        $ch->{fsize} = ($ch->{fsize} - $default_fs) * 10/$default_fs;
+        if ($ch->{fsize} > $self->{largest_font} and length($ch->{plaintext}) > 5) {
+            $self->{largest_font} = $ch->{fsize};
+        }
+    }
+    
 }
+
 
 sub geometry {
     my $self = shift;
@@ -262,21 +279,6 @@ sub geometry {
     foreach my $par (@pars) {
         $self->{geometry}->{$par} /= @{$self->{pages}};
         say(3, "default page $par: ", $self->{geometry}->{$par});
-    }
-}
-
-sub relativize_fsize {
-    my $self = shift;
-
-    # relativise font-sizes; e.g.  +2 = [120-130)%.  For OCR'ed
-    # documents, font-sizes are unreliable, so we round +3 to +2, -1
-    # to 0 etc.
-    my $def = $self->{fontsize};
-    foreach my $ch (@{$self->{chunks}}) {
-        #print "relativising $ch->{text}: ($ch->{fsize} - $def) * 10/$def";
-        #$ch->{fsize} = sprintf "%.0f\n", (($ch->{fsize} - $def) * 10/$def);
-        $ch->{fsize} = ($ch->{fsize} - $def) * 10/$def;
-        #print " = $ch->{fsize}\n";
     }
 }
 
