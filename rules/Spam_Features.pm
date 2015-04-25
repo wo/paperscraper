@@ -177,7 +177,7 @@ $f{'most lines short'} = sub {
     return undef unless @lengths;
     my $median = $lengths[int((0+@lengths)/2)];
     #print "xxx median $median\n";
-    return max(0, min(1, 1.5 - $median/70));
+    return max(0, min(1, 1.3 - $median/70));
 };
 
 $f{'few words per page'} = sub {
