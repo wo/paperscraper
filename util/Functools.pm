@@ -19,12 +19,15 @@ sub reduce {
 }
 
 sub someof {
+    # returns undef if one of the results is undef
     my @codes = @_;
     return sub {
 	my $res = 0;
 	foreach my $code (@codes) {
 	    next unless ref $code;
-	    $res = max($res, $code->(@_) || 0);
+            my $r = $code->(@_);
+            return undef unless defined($r);
+	    $res = max($res, $r);
 	    return 1 if $res == 1;
 	}
 	return $res;
@@ -32,12 +35,15 @@ sub someof {
 }
 
 sub allof {
+    # returns undef if one of the results is undef
     my @codes = @_;
     return sub {
 	my $res = 1;
 	foreach my $code (@codes) {
 	    next unless ref $code;
-	    $res = min($res, $code->(@_) || 0);
+            my $r = $code->(@_);
+            return undef unless defined($r);
+	    $res = min($res, $r);
 	    return 0 if $res == 0;
 	}
 	return $res;
