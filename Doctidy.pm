@@ -115,7 +115,8 @@ sub xml2chunk {
     $chunk->{right} = $chunk->{left} + $chunk->{width};
     $chunk->{bottom} = $chunk->{top} + $chunk->{height};
     $chunk->{col} = 0;
-    $chunk->{length} = length(strip_tags($chunk->{text}));
+    $chunk->{plaintext} = strip_tags($chunk->{text});
+    $chunk->{length} = length($chunk->{plaintext});
     return $chunk;
 }
 
@@ -215,20 +216,23 @@ sub append {
     }
     my $subsup_threshold = $line->{height}*0.1;
     if ($line->{bottom} - $chunk->{bottom} > $subsup_threshold
-        && ($line->{top} - $chunk->{top} > $subsup_threshold
-            || $chunk->{height} < $line->{height}*0.7)) {
-        print "chunk is sup\n" if $verbose;
+        and ($line->{top} - $chunk->{top} > $subsup_threshold
+             or $chunk->{height} < $line->{height}*0.7)
+        and $chunk->{length} < 4) {
         # Assumption: lines never start with subscripted text.
+        print "chunk is sup\n" if $verbose;
         $line->{text} .= "<sup>".$chunk->{text}."</sup>";
     }
     elsif ($chunk->{bottom} - $line->{bottom} > $subsup_threshold
-           && $chunk->{top} - $line->{top} > $subsup_threshold) {
-        print "chunk is sub (or line sup)\n" if $verbose;
-        if ($chunk->{width} <= $line->{width}) {
+           and $chunk->{top} - $line->{top} > $subsup_threshold) {
+        if ($chunk->{width} <= $line->{width}
+            and $chunk->{length} < 4) {
+            print "chunk is sub\n" if $verbose;
             $line->{text} .= "<sub>".$chunk->{text}."</sub>";
         }
-        else {
-            # Footnotes often start with supscripted text.
+        elsif (length($line->{plaintext}) < 4) {
+            # e.g. footnotes: often start with supscripted text
+            print "chunk follows sup\n" if $verbose;
             $line->{text} = "<sup>".$line->{text}."</sup>".$chunk->{text};
         }
     }
@@ -241,6 +245,11 @@ sub append {
         $line->{bottom} = max($line->{bottom}, $chunk->{bottom});
         $line->{height} = $line->{bottom} - $line->{top};
     }
+
+    # <sup>S</sup>MALLCAPS S<sup>OMETIMES</sup> cause problems:
+    $line->{text} =~ s/<su.>([[:upper:]])<\/su.>([[:upper:]]+)/$1$2/;
+    $line->{text} =~ s/([[:upper:]])<su.>([[:upper:]]+)<\/su.>/$1$2/g;
+ 
     $line->{width} = $chunk->{right} - $line->{left};
     $line->{right} = $chunk->{right};
     $line->{length} += $chunk->{length}
