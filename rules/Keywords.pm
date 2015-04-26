@@ -105,8 +105,8 @@ our $re_noname = qr/
 # unicode character classes like \p{IsAlpha} seem buggy, so I use POSIX:
 my $upper = '[[:upper:]]';
 my $alpha = '[[:alpha:]]';
-my $fname = qr/$upper$alpha*(?:[\-\']$alpha+)*/; # John, J, Hans-Peter, T'or
-my $re_name_first =  qr/$fname(?:[\s\.]$fname){0,2}\.?/; # Ann Mary, J.R.G., J.Robbie G.
+my $fname = qr/$upper\.?$alpha*(?:[\-\']$alpha+)*/; # John, J, J., Hans-Peter, T'or
+my $re_name_first =  qr/$fname(?:\s$fname){0,2}\.?/; # Ann Mary, J.R.G., J.Robbie G.
 my $re_name_middle = qr/$alpha+(?:\s$alpha+){0,3}/; # von, de la
 my $re_name_last = qr/$alpha*$upper[\S\-\']*$alpha{2}/;
     # using \S here because foreign chars sometimes not IsAlpha
