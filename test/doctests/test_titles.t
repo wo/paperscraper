@@ -247,6 +247,12 @@ my %tests = (
    title => "The Discursive Dilemma and Public Reason",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-List-Emergent.pdf' => {
+   authors => ["Christian List", "Marcus Pivato"],
+   title => "Emergent Chance",
+ },
+
+
 
 );
 
