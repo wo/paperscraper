@@ -41,6 +41,7 @@ my %tests = (
 
  '/home/wo/programming/opp-tools/test/doctests/33-Lange-Einstein.pdf' => "Einstein is widely understood as regarding “principle theories” (such as the theory of relativity) as explanatorily powerless. This brief paper shows that Einstein’s remarks admit of another interpretation, according to which principle theories possess explanatory power. This interpretation is motivated primarily by showing that James Jeans made remarks very similar to Einstein’s at nearly the same time, but Jeans reconciled those remarks with holding principle theories to be explanatory. Einstein’s remarks could well be getting at the same point as Jeans’s. This view of principle and constructive theories is independently valuable. It undermines Salmon’s “friendly physicist” example as an argument for the view that there are facts that can be explained by both principle and constructive theories.",
 
+ '/home/wo/programming/opp-tools/test/doctests/AB-Grundmann-Thought.pdf' => "Descriptions of Gettier cases can be interpreted in ways that are incompatible with the standard judgment that they are cases of justified true belief without knowledge. Timothy Williamson claims that this problem cannot be avoided by adding further stipulations to the case descriptions. To the contrary, we argue that there is a fairly simple way to amend the Ford case, a standard description of a Gettier case, in such a manner that all deviant interpretations are ruled out. This removes one major objection to interpreting our judgments about Gettier cases as strict conditionals.",
 
 
 );

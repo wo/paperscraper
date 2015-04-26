@@ -967,7 +967,7 @@ sub extract_abstract {
         $abstract =~ s/^(.+\w\w.?[\.\?!]).*$/$1/s;
     }
     # strip "Abstract:" beginning:
-    $abstract =~ s/^\s*(<.>)*$re_abstract(<\/.>)*[\.:\n]\s*//i;
+    $abstract =~ s/^(?:\s|<.>)*$re_abstract[\.:]?(?:<\/.>)*[\.:\n]?\s*//i;
     $self->{abstract} = tidy_text($abstract);
 
     say(1, "abstract: '", $self->{abstract}, "'");
