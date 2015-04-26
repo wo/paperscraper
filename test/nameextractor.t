@@ -17,7 +17,8 @@ my %tests = (
  'Ash Asudeh, Carleton University' => ['Ash Asudeh'],
  'Teddy Seidenfeld, Mark J. Schervish, and Joseph B. Kadane' => ['Teddy Seidenfeld', 'Mark J. Schervish', 'Joseph B. Kadane'],
  'Formal Study, John L. Pollock' => ['John L. Pollock'],
- 'NEIL TENNANT, Department of Philosophy, 230 North Oval Mall' => ['NEIL TENNANT'],
+ 'E. J. Coffman' => ['E. J. Coffman'],
+ 'NEIL TENNANT, Department of Philosophy, 230 North Oval Mall' => ['Neil Tennant'],
 
 );
 
