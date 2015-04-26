@@ -41,6 +41,7 @@ $f{'unusual dimensions'} = sub {
         push @widths, $page->{width};
         last if $page->{number} > 8;
     }
+    return undef unless scalar @widths > 2;
     # ignore next page if there are enough pages:
     if (scalar @widths > 4) {
         shift @widths;
