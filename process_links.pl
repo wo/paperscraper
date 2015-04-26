@@ -240,6 +240,8 @@ sub process {
         # we save as UTF-8, so remove original encoding tags:
         $loc->{content} =~ s/<meta[^>]+content-type[^>]+>//gi;
         $loc->{text} = strip_tags($loc->{content});
+        # prevent perl crashes:
+        $loc->{text} =~ s/\n\s*\n/\n/g;
     }
     if (!save($file, $loc->{content}, $is_text)) {
         error("cannot save local file");
@@ -309,6 +311,7 @@ sub process {
     # Except for html documents, we don't have the text content
     # yet, but we nevertheless do a preliminary spam test now,
     # so that we can stop processing if something is clear spam:
+    print "spam check\n" if $verbosity > 1; 
     my $spamfilter = spamfilter();
     my $spamminess = $spamfilter->test($loc);
     if ($spamminess > 0.5) {

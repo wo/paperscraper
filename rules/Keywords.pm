@@ -7,7 +7,6 @@ our @ISA = ('Exporter');
 our @EXPORT = qw/
 $re_ignore_url
 $re_session_id
-$re_coverpage
 $re_name
 $re_name_inverted
 $re_noname
@@ -79,11 +78,6 @@ our $re_legalese = qr/\b(?:
 
 our $re_thanks = qr/\b(?:
     thank|comments|suggestions|helpful|grateful
-    )\b/ix;
-
-our $re_coverpage = qr/\b(?:
-    Manuscript\sInformation|
-    Terms\sand\sConditions
     )\b/ix;
 
 # stuff that disqualifies something from being a name:

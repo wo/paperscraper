@@ -56,7 +56,7 @@ $features{TITLE} = [
     ['within first few pages', [0.1, -1]],
     ['long', [-0.1, 0.1]],
     [$and->('large font', 'largest text on rest of page'), [0.5, -0.5], 2],
-    ['largest text on rest of page', [0.2, 0], 2],
+    ['largest text on page', [0.2, -0.2], 2],
     ['bold', [0.3, -0.05], 2],
     ['all caps', [0.2, 0], 2],
     ['centered', [0.3, -0.2], 2],

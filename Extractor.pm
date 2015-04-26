@@ -201,8 +201,8 @@ sub pageinfo {
     $page{height} = $page{bottom} - $page{top};
     $page{chunks} = $chunks;
     $page{doc} = $chunks->[0]->{doc};
-    if ($verbosity > 1) {
-        $page{text} = $chunks->[0]->{text};
+    if ($verbosity > 1) { # for debugging
+        $page{text} = $chunks->[0]->{text}.'...';
     }
 
     foreach (@$chunks) {
@@ -215,7 +215,8 @@ sub pageinfo {
 sub fontinfo {
     my $self = shift;
 
-    # find default font size and line-spacing (as fraction):
+    # find default font, size and line-spacing (as fraction):
+    my %fn_freq;
     my %fs_freq;
     my %sp_freq;
     foreach my $ch (@{$self->{chunks}}) {
@@ -225,39 +226,41 @@ sub fontinfo {
         # ignore endnotes and references:
         last if $self->{numpages} > 2 &&
             $ch->{page}->{number} / $self->{numpages} > 0.7;
-        $fs_freq{$ch->{fsize}} = 0
-            unless defined $fs_freq{$ch->{fsize}};
+        $fs_freq{$ch->{fsize}} = 0 unless defined $fs_freq{$ch->{fsize}};
+        $fn_freq{$ch->{font}} = 0 unless defined $fn_freq{$ch->{font}};
         $fs_freq{$ch->{fsize}}++;
+        $fn_freq{$ch->{fsize}}++;
         next unless $ch->{prev};
         my $spacing = ($ch->{top} - $ch->{prev}->{top}) / $ch->{height};
         $spacing = sprintf "%.1f", $spacing;
         $sp_freq{$spacing}++;
     }
 
-    my ($default_fs,) = each(%fs_freq);
-    while (my ($fs, $freq) = each(%fs_freq)) {
-        $default_fs = $fs if $freq > $fs_freq{$default_fs};
-    }
-    $self->{fontsize} = $default_fs || 1;
+    my @sizes = sort { $fs_freq{$a} <=> $fs_freq{$b} } keys(%fs_freq);
+    $self->{fontsize} = (@sizes) ? $sizes[0] : 10;
     say(3, "default font size $self->{fontsize}");
 
-    my ($default_sp,) = each(%sp_freq);
-    while (my ($sp, $freq) = each(%sp_freq)) {
-        $default_sp = $sp if $freq > $sp_freq{$default_sp};
-    }
-    $self->{linespacing} = $default_sp < 1 ? 1 : $default_sp;
+    my @fonts = sort { $fn_freq{$a} <=> $fn_freq{$b} } keys(%fn_freq);
+    $self->{font} = (@fonts) ? $fonts[0] : 10;
+    say(3, "default font $self->{font}");
+    
+    my @spacings = sort { $sp_freq{$a} <=> $sp_freq{$b} } keys(%sp_freq);
+    $self->{linespacing} = (@spacings && $spacings[0] > 1) ? $spacings[0] : 1;
     say(3, "default line spacing $self->{linespacing}");
 
-    # relativise font-sizes so that = default, +2 = [120-130)%, etc.
+    # relativise font-sizes so that 0 = default, +2 = [120-130)%, etc.
     # For OCR'ed documents, font-sizes are unreliable, so we generally
-    # round +3 to +2, -1 to 0 etc. Also, store largest font size.
-    $self->{largest_font} = 0;
+    # round +3 to +2, -1 to 0 etc. Also, store largest relativized
+    # size.
+    $self->{largest_font} = $self->{fontsize};
     foreach my $ch (@{$self->{chunks}}) {
-        $ch->{fsize} = ($ch->{fsize} - $default_fs) * 10/$default_fs;
+        $ch->{fsize} = ($ch->{fsize} - $self->{linespacing}) 
+                       * 10/$self->{linespacing};
         if ($ch->{fsize} > $self->{largest_font} and length($ch->{plaintext}) > 5) {
             $self->{largest_font} = $ch->{fsize};
         }
     }
+    say(3, "largest font (relative): $self->{largest_font}");
     
 }
 
@@ -288,10 +291,12 @@ sub strip_coverpages {
     use rules::Page_Features;
     util::Estimator->verbose($verbosity > 4 ? 1 : 0);
 
+    my @startpages = @{$self->{pages}}[0..min(2,$#{$self->{pages}})];
     my $res = label_chunks(
-        chunks => $self->{pages},
+        chunks => \@startpages,
         features => \%rules::Page_Features::features,
         labels => ['COVERPAGE'],
+        iterations => 1,
         );
 
     foreach my $page (@{$res->{COVERPAGE}}) {
@@ -413,6 +418,8 @@ sub get_text {
     foreach my $ch (@{$self->{chunks}} ) {
         $self->{text} .= $ch->{plaintext}."\n";
     }
+    # prevent perl crashes:
+    $self->{text} =~ s/\n\s*\n/\n/g;
 }
 
 sub init_confidence {

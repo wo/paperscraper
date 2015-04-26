@@ -134,9 +134,15 @@ sub mergechunks {
 
     # skip empty chunks:
     if (!$chunk->{text} || $chunk->{text} =~ /^(?:<[^>]+>)?\s*(?:<[^>]+>)?$/) {
+        print "skipping empty chunk: $chunk->{text}\n";
         return $lines;
     }
-    print "chunk: ", $chunk->{text}, "\n" if $verbose;
+    # skip extremely small chunks sometimes inserted by publishers:
+    if ($chunk->{height} < 5) {
+        print "skipping tiny chunk: $chunk->{text}\n" if $verbose;
+        return $lines;
+    }
+    print "chunk: $chunk->{text}\n" if $verbose;
 
     # turn very first chunk into first line:
     unless (@$lines) {
@@ -378,7 +384,7 @@ sub sortlines {
 sub tidy_text {
     my $str = shift;
     # strip empty tags:
-    $str =~ s/<([^>\s]+)[^>]*>\s*<\/\1>//g;
+    $str =~ s/<([^>\s]+)[^>]*>(\s*)<\/\1>/$2/g;
     $str = fix_chars($str);
     $str = fix_kerning($str);
     return $str;
