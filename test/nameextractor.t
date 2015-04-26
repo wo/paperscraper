@@ -21,12 +21,13 @@ my %tests = (
 
 );
 
-rules::NameExtractor::verbosity(1);
+rules::NameExtractor::verbosity(0);
 
 foreach my $str (keys %tests) {
     print "$str\n";
+    my $chunk = { 'plaintext' => $str };
     my @names = sort @{$tests{$str}};
-    my %res = %{parse($str)};
+    my %res = %{parse($chunk)};
     my @au;
     while (my ($name, $prob) = each %res) {
         print "$name: $prob\n";

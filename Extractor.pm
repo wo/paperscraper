@@ -215,8 +215,7 @@ sub pageinfo {
 sub fontinfo {
     my $self = shift;
 
-    # find default font, size and line-spacing (as fraction):
-    my %fn_freq;
+    # find default font-size and line-spacing:
     my %fs_freq;
     my %sp_freq;
     foreach my $ch (@{$self->{chunks}}) {
@@ -227,9 +226,7 @@ sub fontinfo {
         last if $self->{numpages} > 2 &&
             $ch->{page}->{number} / $self->{numpages} > 0.7;
         $fs_freq{$ch->{fsize}} = 0 unless defined $fs_freq{$ch->{fsize}};
-        $fn_freq{$ch->{font}} = 0 unless defined $fn_freq{$ch->{font}};
         $fs_freq{$ch->{fsize}}++;
-        $fn_freq{$ch->{fsize}}++;
         next unless $ch->{prev};
         my $spacing = ($ch->{top} - $ch->{prev}->{top}) / $ch->{height};
         $spacing = sprintf "%.1f", $spacing;
@@ -237,15 +234,11 @@ sub fontinfo {
     }
 
     my @sizes = sort { $fs_freq{$a} <=> $fs_freq{$b} } keys(%fs_freq);
-    $self->{fontsize} = (@sizes) ? $sizes[0] : 10;
+    $self->{fontsize} = (@sizes) ? $sizes[-1] : 10;
     say(3, "default font size $self->{fontsize}");
 
-    my @fonts = sort { $fn_freq{$a} <=> $fn_freq{$b} } keys(%fn_freq);
-    $self->{font} = (@fonts) ? $fonts[0] : 10;
-    say(3, "default font $self->{font}");
-    
     my @spacings = sort { $sp_freq{$a} <=> $sp_freq{$b} } keys(%sp_freq);
-    $self->{linespacing} = (@spacings && $spacings[0] > 1) ? $spacings[0] : 1;
+    $self->{linespacing} = (@spacings && $spacings[-1] > 1) ? $spacings[-1] : 1;
     say(3, "default line spacing $self->{linespacing}");
 
     # relativise font-sizes so that 0 = default, +2 = [120-130)%, etc.
@@ -254,8 +247,8 @@ sub fontinfo {
     # size.
     $self->{largest_font} = $self->{fontsize};
     foreach my $ch (@{$self->{chunks}}) {
-        $ch->{fsize} = ($ch->{fsize} - $self->{linespacing}) 
-                       * 10/$self->{linespacing};
+        $ch->{fsize} = ($ch->{fsize} - $self->{fontsize}) 
+                       * 10/$self->{fontsize};
         if ($ch->{fsize} > $self->{largest_font} and length($ch->{plaintext}) > 5) {
             $self->{largest_font} = $ch->{fsize};
         }

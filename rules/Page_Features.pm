@@ -32,21 +32,37 @@ $f{'very first page'} = sub {
 };
 
 $f{'unusual dimensions'} = sub {
+    # documents that were once scanned often have some variability in
+    # page dimensions, so we have to check for variability: (We only
+    # check width because height is often very variable anyway.)
+    my @widths;
     my $page = $_[0];
-    my $count = 0;
     while (($page = $page->{next})) {
-        $count++ if $page->{width} == $_[0]->{width};
-        return 0 if $count > 2;
+        push @widths, $page->{width};
+        last if $page->{number} > 8;
     }
-    return $count ? 0.5 : 1;
+    # ignore next page if there are enough pages:
+    if (scalar @widths > 4) {
+        shift @widths;
+    }
+    @widths = sort { $a <=> $b } @widths;
+    my $tolerance = $widths[-1] - $widths[0];
+    #print "xxx width $_[0]->{width} in ",@widths," +- $tolerance\n";
+    return 1 if $_[0]->{width} + $tolerance < $widths[0];
+    return 1 if $_[0]->{width} - $tolerance > $widths[-1];
+    return 0;
 };
 
 $f{'no normal font'} = sub {
-    my $default_font = $_[0]->{doc}->{font};
-    my @normal = grep { length($_->{text}) > 8 
-                        and $_->{font} == $default_font } 
-                      @{$_[0]->{chunks}};
-    return @normal ? 0 : 1;
+    my $ret = 1;
+    foreach my $ch (@{$_[0]->{chunks}}) {
+        next unless length($ch->{text}) > 8;
+        my $diff = abs($ch->{fsize});
+        #print "$diff $ch->{fsize} $ch->{text}\n";
+        return 0 if $diff == 0;
+        $ret = 0.5 if $diff < 2;
+    }
+    return $ret;
 };
 
 

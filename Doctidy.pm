@@ -134,7 +134,7 @@ sub mergechunks {
 
     # skip empty chunks:
     if (!$chunk->{text} || $chunk->{text} =~ /^(?:<[^>]+>)?\s*(?:<[^>]+>)?$/) {
-        print "skipping empty chunk: $chunk->{text}\n";
+        print "skipping empty chunk: $chunk->{text}\n" if $verbose;
         return $lines;
     }
     # skip extremely small chunks sometimes inserted by publishers:
