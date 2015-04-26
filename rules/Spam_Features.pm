@@ -103,7 +103,7 @@ $f{'bad path'} = sub {
 my $re_course_words = qr/\bcourse|seminar|schedule|readings|textbook|students|\bpresentation|handout|essay|\bweek|hours/i;
 $f{'contains words typical for course notes'} = sub {
     my $loc = shift;
-    return undef unless defined($loc->{text});
+    return undef unless defined($loc->{text}) && $loc->{text};
     my $count = () = ($loc->{text} =~ /$re_course_words/g);
     return min(1, ($count*1000)/length($loc->{text}));
 };
