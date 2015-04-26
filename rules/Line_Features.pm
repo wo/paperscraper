@@ -444,20 +444,21 @@ sub gap {
 
 $f{'gap above'} = memoize(sub {
     my $gap = gap($_[0], 'prev');
-    return 0.7 unless $gap; # no element above
+    return undef unless $gap; # no element above
     return max(min($gap-1, 1), 0);
 });
 
 $f{'gap below'} = memoize(sub {
     my $gap = gap($_[0], 'next');
-    return 0.7 unless $gap; # no element below
+    return undef unless $gap; # no element below
     return max(min($gap-1, 1), 0);
 });
 
 $f{'greater gap above than below'} = memoize(sub {
-    my $gap_above = gap($_[0], 'prev') || 0.7;
-    my $gap_below = gap($_[0], 'next') || 0.7;
-    return $gap_above > $gap_below + 0.1;
+    my $gap_above = gap($_[0], 'prev');
+    my $gap_below = gap($_[0], 'next');
+    return undef unless $gap_above and $gap_below;
+    return $gap_above > ($gap_below + 0.1);
 });
 
 my $re_address_word = qr/\b(?:

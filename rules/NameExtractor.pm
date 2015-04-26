@@ -40,6 +40,7 @@ sub parse {
             $skipped++;
             next;
         }
+        print "parsing |$2|$3|\n" if $verbose;
         my %name = ('text' => $1,
                     'first' => $2,
                     'last' => $3,

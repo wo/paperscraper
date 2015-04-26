@@ -87,6 +87,7 @@ $f{'name occurs in lower case in article'} = sub {
     # first test whole name:
     my $str = lc($_[0]->{text});
     # testing '\w $str': in the middle of a sentence
+    return undef unless exists($_[0]->{chunk}->{doc});
     return 1 if ($_[0]->{chunk}->{doc}->{text} =~ /\w $str\b/);
     # now test parts of name, but note that e.g. an article by
     # Christian List might well contain 'list':
