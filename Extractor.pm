@@ -245,11 +245,11 @@ sub fontinfo {
     # For OCR'ed documents, font-sizes are unreliable, so we generally
     # round +3 to +2, -1 to 0 etc. Also, store largest relativized
     # size.
-    $self->{largest_font} = $self->{fontsize};
+    $self->{largest_font} = 0;
     foreach my $ch (@{$self->{chunks}}) {
         $ch->{fsize} = ($ch->{fsize} - $self->{fontsize}) 
                        * 10/$self->{fontsize};
-        if ($ch->{fsize} > $self->{largest_font} and length($ch->{plaintext}) > 5) {
+        if ($ch->{fsize} > $self->{largest_font} && length($ch->{plaintext}) > 5) {
             $self->{largest_font} = $ch->{fsize};
         }
     }
@@ -427,7 +427,25 @@ sub init_confidence {
         $self->decr_confidence(0.98, 'less than 5 pages');
     }
     if ($self->{numpages} > 80) {
-        $self->decr_confidence(0.95, 'more than 80 pages');
+        $self->decr_confidence(0.9, 'more than 80 pages');
+    }
+}
+
+sub punish_reviews {
+    # quick hack
+    my $self = shift;
+    my $score = 0;
+    my $start = $self->{text};
+    $start = substr($start, 0, min(500,length($start)));
+    $score -= 0.5 if $self->{numpages} > 10;
+    $score += 0.3 if $start =~ /\breview/i;
+    $score += 0.2 if $start =~ /Press/;
+    $score += 0.2 if $start =~ /[\d\s]{12}/; # ISIN
+    $score += 0.3 if $start =~ /\b\d{3,4}pp/i; # 285pp.
+    $score += ($self->{text} =~ /\n$re_bib_heading\n/) ? -0.1 : 0.1;
+    $score += ($self->{largest_font} > 5) ? -0.3 : 0.1;
+    if ($score > 0) {
+        $self->decr_confidence(1-$score/3, "possibly review (score $score)");
     }
 }
 
@@ -855,7 +873,7 @@ sub extract_authors_and_title {
                     foreach my $old (@{$self->{authors}}) {
                         next NAME if Text::Names::samePerson($name, $old);
                     }
-                    $self->decr_confidence(min(1,$prob+0.2), "author $name probability only $prob");
+                    $self->decr_confidence(min(1,$prob+0.2), "author $name probability $prob");
                     push @chunk_authors, $name;
                 }
                 # restore correct order:
@@ -885,6 +903,8 @@ sub extract_authors_and_title {
         my $lead = $parsing->{quality} - $parsings[0]->{quality};
         $self->decr_confidence(1 + min(0.1, $lead-0.2), 'alternatives');
     }
+
+    $self->punish_reviews();
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
     say(1, "title: '", $self->{title}, "'");
