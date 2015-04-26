@@ -418,6 +418,8 @@ sub get_text {
     foreach my $ch (@{$self->{chunks}} ) {
         $self->{text} .= $ch->{plaintext}."\n";
     }
+    # prevent perl crashes:
+    $self->{text} =~ s/\n\s*\n/\n/g;
 }
 
 sub init_confidence {
