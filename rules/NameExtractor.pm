@@ -52,10 +52,18 @@ sub parse {
             $p *= 0.8;
         }
         if ($p > 0.5) {
-            $res{$name{text}} = $p;
+            my $fullname = tidy_name($name{text});
+            $res{$fullname} = $p;
         }
     }
     return \%res;
+}
+
+sub tidy_name {
+    my $name = shift;
+    # decapitalize 'Thomas SCANLON':
+    $name =~ s/([[:upper:]]{3,})/\u\L$1/g;
+    return $name;
 }
 
 1;
