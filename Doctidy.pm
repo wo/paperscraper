@@ -83,6 +83,7 @@ sub doctidy {
 
 sub pagetidy {
     my $page = shift;
+    print "== tidying page:\n$page\n\n" if $verbose;
     $page =~ s/<br \/>//g;
     $page =~ s/\r//g; # remove ^M carriage returns
     $page =~ s/ ?\t ?/ /g; # sometimes garble pdfs
@@ -91,7 +92,9 @@ sub pagetidy {
     my $lines = reduce(\&mergechunks, [], @chunks);
     my @sorted = sortlines($lines);
     my $xml = reduce(\&chunk2xml, '', @sorted);
-    return $xml;
+    $page =~ s/<text.+<\/text>/$xml/s;
+    print "== tidied page:\n$page\n\n" if $verbose;
+    return $page;
 }
 
 sub elem {

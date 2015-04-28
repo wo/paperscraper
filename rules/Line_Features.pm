@@ -342,6 +342,7 @@ $f{'all caps'} = memoize(sub {
 
 $f{'large font'} = memoize(sub {
     if ($_[0]->{doc}->{largest_font} == 0) {
+        print "xxx no large font in doc!\n";
         # no large font in document
         return undef;
     }
