@@ -59,7 +59,7 @@ sub doctidy {
     while (<IN>) {
         $_ = Encode::decode_utf8($_);
         if ($inpage) {
-            if (/^<\/page>/) {
+            if (/<\/page>/) {
                 print OUT pagetidy($page);
                 $inpage = 0;
             }
@@ -68,7 +68,7 @@ sub doctidy {
                 next;
             }
         }
-        if (/^<page /) {
+        if (/<page /) {
             $inpage = 1;
             $page = '';
         }
