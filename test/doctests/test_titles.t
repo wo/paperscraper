@@ -257,6 +257,12 @@ my %tests = (
    title => "Identity, Variability, and Multiple Realization in the Special Sciences",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Pinillos-Ambiguity.pdf' => {
+   authors => ["Ángel Pinillos"],
+   title => "Ambiguity and Referential Machinery",
+ },
+
+
 
 
 );
