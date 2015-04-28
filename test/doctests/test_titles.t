@@ -252,6 +252,11 @@ my %tests = (
    title => "Emergent Chance",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/12-Shapiro-Identity.pdf' => {
+   authors => ["Lawrence A. Shapiro", "Thomas W. Polger"],
+   title => "Identity, Variability, and Multiple Realization in the Special Sciences",
+ },
+
 
 
 );

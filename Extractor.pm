@@ -261,19 +261,24 @@ sub fontinfo {
 sub geometry {
     my $self = shift;
 
-    # find average page dimensions:
+    # find common page dimensions:
     my @pars = ('top', 'right', 'bottom', 'left');
-    $self->{geometry} = {};
+    my %freq;
     foreach my $par (@pars) {
-        $self->{geometry}->{$par} = 0;
+        $freq{$par} = {};
     }
     foreach my $page (@{$self->{pages}}) {
         foreach my $par (@pars) {
-            $self->{geometry}->{$par} += $page->{$par};
+            $freq{$par}->{$page->{$par}} = 0 
+                unless defined $freq{$par}->{$page->{$par}};
+            $freq{$par}->{$page->{$par}}++;
         }
     }
+    $self->{geometry} = {};
     foreach my $par (@pars) {
-        $self->{geometry}->{$par} /= @{$self->{pages}};
+        my @vals = sort { $freq{$par}->{$a} <=> $freq{$par}->{$b} }
+                        keys(%{$freq{$par}});
+        $self->{geometry}->{$par} = (@vals) ? $vals[-1] : 0;
         say(3, "default page $par: ", $self->{geometry}->{$par});
     }
 }

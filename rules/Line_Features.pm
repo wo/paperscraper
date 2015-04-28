@@ -24,7 +24,7 @@ $features{HEADER} = [
     ['gap below', [0.2, -0.3]],
     ['small font', [0.2, -0.2]],
     ['line begins or ends with digit', [0.2, -0.1]],
-    ['outside normal page dimensions', [0.2, -0]],
+    ['outside normal page dimensions', [0.2, -0.1]],
     ['resembles other HEADERs', [0.2, -0.3], 2]
     ];
 
