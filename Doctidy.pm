@@ -54,15 +54,22 @@ sub doctidy {
     open OUT, ">$file.tidy" or die $!;
     binmode(OUT, ":utf8");
 
+    my $inpage = 0;
     my $page = '';
     while (<IN>) {
         $_ = Encode::decode_utf8($_);
-        if (/^<text /) { 
-            $page .= $_;
-            next;
+        if ($inpage) {
+            if (/<\/page>/) {
+                print OUT pagetidy($page);
+                $inpage = 0;
+            }
+            else {
+                $page .= $_;
+                next;
+            }
         }
-        if (/^<\/page>/) {
-            print OUT pagetidy($page);
+        if (/<page /) {
+            $inpage = 1;
             $page = '';
         }
         print OUT $_;
@@ -76,16 +83,18 @@ sub doctidy {
 
 sub pagetidy {
     my $page = shift;
-    print "== tidying page ==\n" if $verbose;
+    print "== tidying page:\n$page\n\n" if $verbose;
     $page =~ s/<br \/>//g;
     $page =~ s/\r//g; # remove ^M carriage returns
     $page =~ s/ ?\t ?/ /g; # sometimes garble pdfs
-    my @texts = split /\n/, $page;
+    my @texts = ($page =~ /(<text.+?<\/text>)/sg);
     my @chunks = map { xml2chunk($_) } @texts;
     my $lines = reduce(\&mergechunks, [], @chunks);
     my @sorted = sortlines($lines);
     my $xml = reduce(\&chunk2xml, '', @sorted);
-    return $xml;
+    $page =~ s/<text.+<\/text>/$xml/s;
+    print "== tidied page:\n$page\n\n" if $verbose;
+    return $page;
 }
 
 sub elem {
@@ -95,7 +104,7 @@ sub elem {
        if ($attr) {
            return $str =~ /$attr="(.*?)"/ && $1;
        }
-       if ($str =~ /^<.+?>(.*)<.+?>$/) {
+       if ($str =~ /^<.+?>(.*)<.+?>$/s) {
            return tidy_text($1);
        }
     };

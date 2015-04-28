@@ -446,7 +446,9 @@ sub punish_reviews {
     $score += 0.3 if $start =~ /\breview/i;
     $score += 0.2 if $start =~ /Press/;
     $score += 0.2 if $start =~ /[\d\s]{12}/; # ISIN
-    $score += 0.3 if $start =~ /\b\d{3,4}pp/i; # 285pp.
+    $score += 0.3 if $start =~ /\b\d{3,4}(?: ?pp| pages)/i; # 285pp.
+    $score += 0.3 if $start =~ /\bhardcover/i;
+    $score += 0.1 if $start =~ /\b\d{2,4}\.\d\d/i; # 29.95
     $score += ($self->{text} =~ /\n$re_bib_heading\n/) ? -0.1 : 0.1;
     $score += ($self->{largest_font} > 5) ? -0.3 : 0.1;
     if ($score > 0) {
