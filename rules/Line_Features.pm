@@ -492,6 +492,7 @@ $f{'resembles anchor text'} = memoize(sub {
 });
  
 $f{'resembles source author'} = memoize(sub {
+    # xxx TODO should check name in {plaintext}, not text itself!
     return undef unless @{$_[0]->{doc}->{sourceauthors}};
     for my $str (@{$_[0]->{doc}->{sourceauthors}}) {
        return 1 if (amatch($str, ['i 30%'], $_[0]->{plaintext}));

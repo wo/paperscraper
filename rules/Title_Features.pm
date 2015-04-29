@@ -3,6 +3,7 @@ use warnings;
 use List::Util qw/min max reduce/;
 use Text::LevenshteinXS qw/distance/;
 use Statistics::Lite qw/mean/;
+use String::Approx 'amatch';
 use rules::Helper;
 use rules::Keywords;
 use lib '../';
@@ -44,6 +45,11 @@ our @parsing_features = (
     ['author=title', [-0.1, 0]],
     ['author=title and further authors', [-0.4, 0]],
     ['author=title only has author part', [-0.6, 0]],
+    # These are mainly here to adjust the confidence value:
+    ['title is among first few lines', [0.2, -0.3]],
+    ['title is largest text on page', [0.2, -0.2]],
+    ['title occurs on source page', [0.4, -0.4]],
+    ['authors contain source author', [0.2, -0.2]],
     );
 
 my %f;
@@ -268,6 +274,58 @@ $f{'author=title only has author part'} = sub {
         $text =~ s/$re_name_separator//;
     }
     return length($text) < 5 ? 1 : 0;
+};
+
+$f{'title is among first few lines'} = sub {
+    my @blocks = grep {$_->{label}->{TITLE}} @{$_[0]->{blocks}};
+    return 0 unless @blocks;
+    return 3 / max($blocks[0]->{chunks}->[0]->{id}+1, 3);
+};
+
+$f{'title is largest text on page'} = sub {
+    my @blocks = grep {$_->{label}->{TITLE}} @{$_[0]->{blocks}};
+    return 0 unless @blocks;
+    my @title_chunks = @{$blocks[0]->{chunks}};
+    my $largest_size = 0;
+    for my $ch (@{$blocks[0]->{chunks}->[0]->{page}->{chunks}}) {
+        next if (grep { $ch eq $_ } @title_chunks);
+        next if (length($ch->{plaintext}) < 5);
+        $largest_size = max($largest_size, $ch->{fsize});
+    }
+    my $diff = $title_chunks[0]->{fsize} - $largest_size;
+    # return 1 if nothing is as large, 0.5 if other chunks equally
+    # large, 0 if other chunks significantly larger:
+    return min(1, max(0, 0.5 + $diff/5));
+};
+    
+$f{'title occurs on source page'} = sub {
+    my @blocks = grep {$_->{label}->{TITLE}} @{$_[0]->{blocks}};
+    return 0 unless @blocks;
+    my $sourcecontent = $blocks[0]->{chunks}->[0]->{doc}->{sourcecontent};
+    return undef unless $sourcecontent;
+    my $str = strip_tags($blocks[0]->{text});
+    return $sourcecontent =~ /$str/i;
+};
+
+$f{'authors contain source author'} = sub {
+    my @blocks = grep {$_->{label}->{AUTHOR}} @{$_[0]->{blocks}};
+    return 0 unless @blocks;
+    my @sourceauthors = @{$blocks[0]->{chunks}->[0]->{doc}->{sourceauthors}};
+    return undef unless @sourceauthors;
+    my @authors;
+    for my $block (@blocks) {
+        foreach my $ch (@{$block->{chunks}}) {
+            while (my ($name, $prob) = each %{$ch->{names}}) {
+                push @authors, tidy_text($name);
+            }
+        }
+    }
+    for my $src_au (@{$_[0]->{doc}->{sourceauthors}}) {
+        foreach my $au (@authors) {
+            return 1 if (amatch($src_au, ['i 30%'], $au));
+        }
+    }
+    return 0;
 };
 
 compile(\%block_features, \%f);
