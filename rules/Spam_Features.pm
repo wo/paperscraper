@@ -127,7 +127,7 @@ $f{'contains words typical for papers'} = sub {
 $f{'few verbs'} = sub {
     # e.g. bibliographies and other lists
     my $loc = shift;
-    return undef unless defined($loc->{text});
+    return undef unless defined($loc->{text}) && $loc->{text};
     my $count = () = ($loc->{text} =~ /\bis\b/g);
     # print "xxx $count verbs in ".length($loc->{text})." Bytes\n";
     return max(0, 1 - ($count*1000)/length($loc->{text}));
