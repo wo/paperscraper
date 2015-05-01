@@ -441,7 +441,7 @@ sub punish_reviews {
     my $self = shift;
     my $score = 0;
     my $start = $self->{text};
-    $start = substr($start, 0, min(500,length($start)));
+    $start = substr($start, 0, min(5000,length($start)));
     $score -= 0.5 if $self->{numpages} > 10;
     $score += 0.3 if $start =~ /\breview/i;
     $score += 0.2 if $start =~ /Press/;
