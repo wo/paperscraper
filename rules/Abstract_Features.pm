@@ -9,7 +9,7 @@ our @ISA = ('Exporter');
 our @EXPORT_OK = qw/@block_features/;
 
 our @block_features = (
-    ['chunks have high score', [1, -1]],
+    ['chunks have high score', [0.8, -0.5]],
     ['reasonably long', [0.2, -0.2]],
     ['begins and ends neatly', [0.1, -0.3]],
     ['first chunk probable ABSTRACTSTART', [0.2, -0.4]],
