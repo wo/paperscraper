@@ -12,8 +12,8 @@ our @block_features = (
     ['chunks have high score', [1, -1]],
     ['reasonably long', [0.2, -0.2]],
     ['begins and ends neatly', [0.1, -0.3]],
-    ['first chunk probable ABSTRACTSTART', [0.2, -0.3]],
-    ['last chunk probable ABSTRACTEND', [0.2, -0.3]],
+    ['first chunk probable ABSTRACTSTART', [0.2, -0.4]],
+    ['last chunk probable ABSTRACTEND', [0.2, -0.4]],
     ['contains legalese, publication or acknowledgment words', [-0.4, 0]],
     );
 
@@ -47,8 +47,8 @@ $f{'chunks are similar'} = sub {
 
 $f{'reasonably long'} = sub {
     my $str = reduce { $a .' '. $b->{text} } '', @{$_[0]};
-    if (length($str) > 1000) {
-        return max(0, 1 - (length($str)-1000)/1000);
+    if (length($str) > 1200) {
+        return max(0, 1 - (length($str)-1200)/1200);
     }
     if (length($str) < 250) {
         return max(0, 1 - (250-length($str))/100);

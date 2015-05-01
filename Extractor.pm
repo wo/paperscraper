@@ -311,7 +311,7 @@ sub strip_marginals {
     use rules::Line_Features;
     util::Estimator->verbose($verbosity > 4 ? 1 : 0);
 
-    my $max_y = $self->{geometry}->{top} + 5;
+    my $max_y = $self->{geometry}->{top} + 25;
     my $headers = label_chunks(
         chunks => [ 
             grep { $_->{top} <= $max_y } @{$self->{chunks}}
@@ -931,28 +931,34 @@ sub extract_abstract {
             next if $done{$chunk};
             say(5, "\nstarting with: $chunk->{text} ($threshold)");
             my @current = ($chunk);
+            # go through earlier chunks until we hit a plausible
+            # starting point:
             my $start = $chunk;
             while ($start = $start->{prev}) {
                 my $min = $threshold;
+                # the further away, the more reluctant we are:
                 $min += (scalar @current)/400;
+                # be more reluctant if we've just met a plausible
+                # ABSTRACTSTART, less if we haven't:
                 $min += ($current[0]->{p}->('ABSTRACTSTART')-0.5);
-                my $p = $start->{p}->('ABSTRACT');
+                my $p = max($start->{p}->('ABSTRACT'), $start->{p}->('ABSTRACTSTART'));
                 if ($p < $min) {
-                    say(5, "stopping at: $start->{text} ($p < $min)");
+                    say(5, "stopping before: $start->{text} ($p < $min)");
                     last;
                 }
                 say(5, "prepending: $start->{text} ($p > $min)");
                 unshift @current, $start;
                 $done{$start} = 1;
             }
+            # go through later chunks until we hit a plausible end point:
             my $end = $chunk;
             while ($end = $end->{next}) {
                 my $min = $threshold;
                 $min += (scalar @current)/200;
                 $min += ($current[-1]->{p}->('ABSTRACTEND')-0.5);
-                my $p = $end->{p}->('ABSTRACT');
+                my $p = max($end->{p}->('ABSTRACT'), $end->{p}->('ABSTRACTEND'));
                 if ($p < $min) {
-                    say(5, "stopping at: $end->{text} ($p < $min)");
+                    say(5, "stopping before: $end->{text} ($p < $min)");
                     last;
                 }
                 say(5, "appending: $end->{text} ($p > $min)");
