@@ -111,7 +111,7 @@ $f{'contains words typical for course notes'} = sub {
 my $re_interview_words = qr/interview|do you/i;
 $f{'contains words typical for interviews'} = sub {
     my $loc = shift;
-    return undef unless defined($loc->{text});
+    return undef unless defined($loc->{text}) && $loc->{text};
     my $count = () = ($loc->{text} =~ /$re_interview_words/g);
     return min(1, ($count*2000)/length($loc->{text}));
 };
