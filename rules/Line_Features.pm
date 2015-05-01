@@ -21,10 +21,11 @@ our @EXPORT_OK = qw/%features/;
 our %features;
 
 $features{HEADER} = [
-    ['gap below', [0.2, -0.3]],
+    ['gap below', [0.2, -0.2]],
     ['small font', [0.2, -0.2]],
     ['line begins or ends with digit', [0.2, -0.1]],
     ['outside normal page dimensions', [0.2, -0.1]],
+    ['text recurs on top of several other pages', [0.6, -0.2]],
     ['resembles other HEADERs', [0.2, -0.3], 2]
     ];
 
@@ -247,6 +248,24 @@ $f{'line begins or ends with digit'} = sub {
 
 $f{'is digit'} = sub {
     return $_[0]->{plaintext} =~ /^\d+$/;
+};
+
+$f{'text recurs on top of several other pages'} = sub {
+    return undef unless $_[0]->{doc}->{numpages} > 3;
+    my $txt1 = $_[0]->{plaintext};
+    $txt1 =~ s/\d|\s//g; # strip page numbers and whitespace
+    return undef unless $txt1;
+    my $count = 0;
+    for my $page (@{$_[0]->{doc}->{pages}}) {
+        for my $i (0..2) {
+            next unless exists $page->{chunks}->[$i];
+            my $txt2 = $page->{chunks}->[$i]->{plaintext};
+            $txt2 =~ s/\d|\s//g;
+            $count++ if $txt1 eq $txt2;
+            return 1 if $count > 2;
+        }
+    }
+    return 0;
 };
 
 $f{'resembles other HEADERs'} = sub {

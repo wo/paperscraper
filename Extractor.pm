@@ -311,7 +311,7 @@ sub strip_marginals {
     use rules::Line_Features;
     util::Estimator->verbose($verbosity > 4 ? 1 : 0);
 
-    my $max_y = $self->{geometry}->{top} + 5;
+    my $max_y = $self->{geometry}->{top} + 25;
     my $headers = label_chunks(
         chunks => [ 
             grep { $_->{top} <= $max_y } @{$self->{chunks}}
