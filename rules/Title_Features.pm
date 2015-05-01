@@ -304,7 +304,7 @@ $f{'title occurs on source page'} = sub {
     my $sourcecontent = $blocks[0]->{chunks}->[0]->{doc}->{sourcecontent};
     return undef unless $sourcecontent;
     my $str = strip_tags($blocks[0]->{text});
-    return $sourcecontent =~ /$str/i;
+    return $sourcecontent =~ /\Q$str/i;
 };
 
 $f{'authors contain source author'} = sub {

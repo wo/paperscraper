@@ -522,7 +522,7 @@ $f{'resembles source author'} = memoize(sub {
 $f{'occurs on source page'} = memoize(sub {
     return undef unless $_[0]->{doc}->{sourcecontent};
     my $str = $_[0]->{plaintext};
-    return $_[0]->{doc}->{sourcecontent} =~ /$str/i;
+    return $_[0]->{doc}->{sourcecontent} =~ /\Q$str/i;
 });
 
 $f{'occurs in marginals'} = memoize(sub {
