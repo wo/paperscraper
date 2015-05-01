@@ -444,7 +444,6 @@ sub punish_reviews {
     $start = substr($start, 0, min(5000,length($start)));
     $score -= 0.5 if $self->{numpages} > 10;
     $score += ($start =~ /\breview/i) ? 0.3 : -0.1;
-    $score += 0.1 if $start =~ /\bpp.)/i; # 285pp.
     $score += 0.2 if $start =~ /Press/;
     $score += 0.2 if $start =~ /[\d\s]{12}/; # ISIN
     $score += 0.3 if $start =~ /\b\d{3,4}(?: ?pp| pages)/i; # 285pp.
