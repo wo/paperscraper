@@ -498,7 +498,7 @@ $f{'contains other bad title words'} = memoize(sub {
 
 $f{'abstract heading'} = sub {
    $_[0]->{plaintext} =~ /^\W*abstract\W*$/i;
-});
+};
 
 $f{'matches content pattern'} = memoize(sub {
     $_[0]->{plaintext} =~ $re_content;
