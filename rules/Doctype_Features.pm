@@ -21,12 +21,12 @@ our %features;
 $features{REVIEW} = [
     ['short', [0.1, -0.4]],
     ['beginning contains "review"', [0.3, -0.2]],
-    ['url contains review keywords', [0.3, 0]],
-    ['beginning contains "Press"', [0.2, 0]],
+    ['url contains review keywords', [0.3, -0.05]],
+    ['beginning contains "Press"', [0.2, -0.1]],
     ['beginning contains "hardcover"', [0.3, 0]],
-    ['beginning contains price', [0.2, 0]],
+    ['beginning contains price', [0.2, -0.1]],
     ['beginning contains ISIN', [0.2, 0]],
-    ['beginning contains page number info', [0.3, 0]],
+    ['beginning contains page number info', [0.3, -0.1]],
     ['no large font', [0.2, 0]],
     ['contains bibliography section', [-0.1, 0.1]],
     ];
@@ -35,7 +35,7 @@ $features{REVIEW} = [
 my %f;
 
 $f{'short'} = sub {
-    return min(1, max(0, ($_[0]->{numpages}-10)/10));
+    return min(1, max(0, (15-$_[0]->{numpages})/10));
 };
 
 sub in_beginning {
@@ -50,7 +50,7 @@ sub in_beginning {
 
 $f{'beginning contains "review"'} = in_beginning('\breview');
 
-$f{'beginning contains "Press"'} = in_beginning(' Press');
+$f{'beginning contains "Press"'} = in_beginning(' Press\b');
 
 $f{'beginning contains "hardcover"'} = in_beginning('\bhardcover');
 

@@ -19,6 +19,7 @@ our @name_features = (
     ['surnames contain common word', [-0.3, 0.1]],
     ['surnames contain word', [-0.1, 0.1]],
     ['is first name in line or follows comma or and', [0.1, -0.5]],
+    ['follows publication word', [-0.3, 0]],
     ['separated from earlier names by non-names', [-0.3, 0]],
     );
 
@@ -105,7 +106,12 @@ $f{'is first name in line or follows comma or and'} = sub {
     my $name = $_[0]->{text};
     return $_[0]->{chunk}->{plaintext} =~ /$re_sep\s+$name/;
 };
-    
+
+$f{'follows publication word'} = sub {
+    my $name = $_[0]->{text};
+    return $_[0]->{chunk}->{plaintext} =~ /$re_publication_word.*$name/;
+};
+
 $f{'separated from earlier names by non-names'} = sub {
     return undef unless @{$_[0]->{prev_names}};
     my $prev = $_[0]->{prev_names}->[-1];
