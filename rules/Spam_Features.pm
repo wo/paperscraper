@@ -119,7 +119,7 @@ $f{'contains words typical for interviews'} = sub {
 my $re_paper_words = qr/in section|finally,/i;
 $f{'contains words typical for papers'} = sub {
     my $loc = shift;
-    return undef unless defined($loc->{text});
+    return undef unless defined($loc->{text}) && $loc->{text};
     my $count = () = ($loc->{text} =~ /$re_paper_words/g);
     return min(1, ($count*4000)/length($loc->{text}));
 };

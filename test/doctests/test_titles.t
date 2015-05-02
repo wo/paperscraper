@@ -262,7 +262,15 @@ my %tests = (
    title => "Ambiguity and Referential Machinery",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Allen-Primary.pdf' => {
+   authors => ["Colin Allen", "Trent Lange"],
+   title => "Primary Sequential Memory: an activation-based connectionist model",
+ },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Weisberg-Structure.pdf' => {
+   authors => ["John Matthewson", "Michael Weisberg"],
+   title => "The Structure of Tradeoffs in Model Building",
+ },
 
 
 );
