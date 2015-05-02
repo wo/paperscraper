@@ -343,6 +343,7 @@ sub process {
         return errorcode();
     }
     add_meta("$file.xml", 'anchortext', $loc->{anchortext});
+    add_meta("$file.xml", 'url', $loc->{url});
     add_meta("$file.xml", 'sourceauthor', $loc->{default_author});
     add_meta("$file.xml", 'sourcecontent', $loc->{source_content});
 
