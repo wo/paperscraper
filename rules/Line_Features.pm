@@ -68,12 +68,13 @@ $features{TITLE} = [
     ['contains publication keywords', [-0.5, 0.1], 2],
     ['contains address words', [-0.3, 0.1], 2],
     ['contains other bad title words', [-0.4, 0.1], 2],
+    ['abstract heading', [-0.5, 0], 2],
     ['possible date', [-0.5, 0], 2],
     [$or->('several words', 'in continuation with good TITLE'), [0.1, -0.4], 2],
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.4, 0], 2],
-    ['occurs on source page', [0.4, -0.4], 2],
+    ['occurs on source page', [0.2, -0.4], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
     #['words common in content', [0.1, -0.3], 3],
@@ -103,7 +104,7 @@ $features{AUTHOR} = [
     ['occurs in marginals', [0.2, 0], 2],
     [$and->('best TITLE', 'other good AUTHORs'), [-0.4, 0.05], 3],
     ['probable HEADING', [-0.7, 0.2], 3],
-    ['probable ABSTRACTSTART', [-0.6, 0.2], 3],
+    #['probable ABSTRACTSTART', [-0.6, 0.2], 3],
     ['contains publication keywords', [-0.4, 0], 3],
     #['contains year', [-0.1, 0], 3],
     ['contains page-range', [-0.3, 0], 3],
@@ -495,6 +496,10 @@ $f{'contains other bad title words'} = memoize(sub {
    $_[0]->{plaintext} =~ $re_bad_title;
 });
 
+$f{'abstract heading'} = sub {
+   $_[0]->{plaintext} =~ /^\W*abstract\W*$/i;
+});
+
 $f{'matches content pattern'} = memoize(sub {
     $_[0]->{plaintext} =~ $re_content;
 });
@@ -523,7 +528,7 @@ $f{'resembles source author'} = memoize(sub {
 $f{'occurs on source page'} = memoize(sub {
     return undef unless $_[0]->{doc}->{sourcecontent};
     my $str = $_[0]->{plaintext};
-    return $_[0]->{doc}->{sourcecontent} =~ /\Q$str/i;
+    return $_[0]->{doc}->{sourcecontent} =~ /\b\Q$str\b/i;
 });
 
 $f{'occurs in marginals'} = memoize(sub {
