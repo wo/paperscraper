@@ -55,7 +55,7 @@ our $re_session_id = qr{
 
 # stuff that indicates publication info:
 our $re_publication_word = qr/\b(?:
-    forthcoming|editors?|edited|publish\w*|press|volume
+    forthcoming|editors?|ed\.|eds\.|edited|publish\w*|press|volume|
     to\sappear\sin|draft|editor\w*|reprints?|excerpt|
     circulation|cite
     )\b/ix;

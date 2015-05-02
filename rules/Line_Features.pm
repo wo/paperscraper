@@ -1013,7 +1013,7 @@ $f{'contains letters'} = sub {
 };
 
 $f{'contains publication keywords'} = sub {
-    $_[0]->{plaintext} =~ /$re_year_words|$re_publication_word|$re_journal/;    
+    $_[0]->{plaintext} =~ /$re_year_words|$re_publication_word|$re_journal/i;    
 };
 
 sub freq {
