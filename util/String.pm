@@ -83,18 +83,24 @@ sub strip_tags {
     return $str;
 }
 
-sub plaintext {
+sub strip_footnotes {
     my $txt = shift;
-    # remove excessive whitespace:
-    $txt =~ s|\s\s+| |g;
     # remove footnote marks, but keep whitespace:
     $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>| |g;
-    # and trailing footnote star *:
-    $txt =~ s/(\*|\x{2217})\s*$//;
+    # remove trailing footnote star *, cross, etc.:
+    $txt =~ s/(?:<.>)?(?:\*|\x{2217}|†|‡)(?:<\/.>)?\s*$//;
     # and non-<sup>'ed footnote symbols in brackets:
     $txt =~ s|\[.\]$||;
     # and non-<sup>'ed number right after last word:
     $txt =~ s|([\pL\?!])\d$|$1|;
+    return $txt;
+}
+
+sub plaintext {
+    my $txt = shift;
+    # remove excessive whitespace:
+    $txt =~ s|\s\s+| |g;
+    $txt = strip_footnotes($txt);
     $txt = strip_tags($txt);
     return $txt;
 }
@@ -129,13 +135,7 @@ sub tidy_text {
         # chop surrounding quotes:
         $txt =~ s|^$re_lquote(.+)$re_rquote.?\s*$|$1|;
         # remove footnote marks:
-        $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>||g;
-        # and trailing footnote star or cross:
-        $txt =~ s/(\*|\x{2217}|†)\s*$//;
-        # and non-<sup>'ed footnote symbols in brackets:
-        $txt =~ s|\[.\]$||;
-        # and non-<sup>'ed number right after last word:
-        $txt =~ s|([\pL\?!])\d$|$1|;
+        $txt = strip_footnotes($txt);
         # fix HTML:
         $txt = fix_html($txt);
     } while ($txt ne $otxt);

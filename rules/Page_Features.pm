@@ -12,20 +12,19 @@ our @EXPORT_OK = qw/%features/;
 our %features;
 
 $features{COVERPAGE} = [
-    ['document has many pages', [0, -0.5]],
+    # We want to strip coverpages inserted by JSTOR etc., but not
+    # separate coverpages inserted by the authors listing title,
+    # author, affiliation etc., which are sometimes the only place
+    # where title and authors are listed.
     ['very first page', [0.1, -0.4]],
     ['unusual dimensions', [0.4, -0.4]],
     ['no normal font', [0.3, -0.3]],
-    ['contains typical coverpage words', [0.4, -0.4]],
-    ['more than 1 page before page with no 2', [0.4, -0.5]],
+    ['contains typical coverpage words', [0.4, -0.5]],
+    ['more than 1 page before page with no 2', [0.3, -0.5]],
     ['next page begins with capital letter', [0.1, -0.4]],
     ];
 
 my %f;
-
-$f{'document has many pages'} = sub {
-    return $_[0]->{doc}->{numpages} > 3;
-};
 
 $f{'very first page'} = sub { 
     return $_[0]->{number} == 0;

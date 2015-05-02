@@ -169,18 +169,19 @@ $features{ABSTRACTSTART} = [
     ['previous line probable HEADING', [0.4, -0.1], 2],
     ['previous line probable ABSTRACT', [-0.4, 0.2], 2],
     ['begins in upper case', [0.1, -0.4], 2], 
-    ['begins with "abstract:"', [0.7, 0], 2],
+    ['begins with "abstract:"', [0.6, 0], 2],
+    ['previous line is abstract heading', [0.6, 0], 2],
     ['gap above', [0.2, -0.1]],
     ];
 
 $features{ABSTRACTEND} = [
     ['within first few pages', [0.2, -0.8]],
-    ['probable ABSTRACT', [0.3, -0.5], 2],
+    ['probable ABSTRACT', [0.3, -0.4], 2],
     ['next line indented', [0.2, -0.1], 2],
     ['long', [-0.1, 0.2], 2],
     ['previous line short', [-0.2, 0], 2],
     ['ends with terminator', [0.1, -0.3], 2],
-    ['gap below', [0.2, -0.2]],
+    ['gap below', [0.3, -0.2]],
     ];
 
 $features{BIB} = [
@@ -822,6 +823,14 @@ $f{'previous line probable ABSTRACT'} = sub {
 $f{'previous line is bibliography heading'} = sub {
     if ($_[0]->{prev} &&
         $_[0]->{prev}->{plaintext} =~ /^$re_bib_heading$/) {
+        return 1;
+    }
+    return 0;
+};
+
+$f{'previous line is abstract heading'} = sub {
+    if ($_[0]->{prev} &&
+        $_[0]->{prev}->{plaintext} =~ /^abstract.?/i) {
         return 1;
     }
     return 0;

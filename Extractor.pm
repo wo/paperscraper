@@ -26,6 +26,8 @@ sub new {
         anchortexts => [],
         sourceauthors => [],
         sourcecontent => '',
+        url => '',
+        doctype => {}, # 'REVIEW' => 0.7, ...
         chunks => [],
         pages => [],
         numpages => 0,
@@ -110,6 +112,9 @@ sub init {
     if ($xml =~ /<sourcecontent>(.+?)<\/sourcecontent>/s) {
         $self->{sourcecontent} = $1;
     }
+    if ($xml =~ /<url>(.+?)<\/url>/s) {
+        $self->{url} = $1;
+    }
 
     say(3, "collecting text chunks");
 
@@ -147,12 +152,13 @@ sub init {
     $self->{chunks} = \@chunks;
 
     $self->fontinfo();
-    $self->geometry();
+    $self->get_geometry();
     $self->strip_coverpages();
     $self->strip_marginals();
     $self->strip_footnotes();
     $self->get_text();
     $self->{numwords} = () = ($self->{text} =~ /\s\w\w/g);
+    $self->get_doctype();
     $self->init_confidence();
 
 }
@@ -258,7 +264,7 @@ sub fontinfo {
 }
 
 
-sub geometry {
+sub get_geometry {
     my $self = shift;
 
     # find common page dimensions:
@@ -436,24 +442,21 @@ sub init_confidence {
     }
 }
 
-sub punish_reviews {
-    # quick hack
+sub get_doctype {
     my $self = shift;
-    my $score = 0;
-    my $start = $self->{text};
-    $start = substr($start, 0, min(5000,length($start)));
-    $score -= 0.5 if $self->{numpages} > 10;
-    $score += ($start =~ /\breview/i) ? 0.3 : -0.1;
-    $score += 0.2 if $start =~ /Press/;
-    $score += 0.2 if $start =~ /[\d\s]{12}/; # ISIN
-    $score += 0.3 if $start =~ /\b\d{3,4}(?: ?pp| pages)/i; # 285pp.
-    $score += 0.3 if $start =~ /\bhardcover/i;
-    $score += 0.2 if $start =~ /\b\d{2,4}\.\d\d/i; # 29.95
-    $score += ($self->{text} =~ /\n$re_bib_heading\n/) ? -0.1 : 0.1;
-    $score += ($self->{largest_font} > 5) ? -0.3 : 0.1;
-    if ($score > 0) {
-        $self->decr_confidence(1-$score/3, "possibly review (score $score)");
+    use rules::Doctype_Features;
+    util::Estimator->verbose($verbosity > 4 ? 1 : 0);
+    my @doctypes = ('REVIEW');
+    my $res = label_chunks(
+        chunks => [$self],
+        features => \%rules::Doctype_Features::features,
+        labels => \@doctypes,
+        iterations => 1,
+        );
+    for my $dt (@doctypes) {
+        $self->{doctype}->{$dt} = $self->{p}->($dt);
     }
+        
 }
 
 sub decr_confidence {
@@ -911,7 +914,10 @@ sub extract_authors_and_title {
         $self->decr_confidence(1 + min(0.1, $lead-0.2), 'alternatives');
     }
 
-    $self->punish_reviews();
+    if ($self->{doctype}->{REVIEW} > 0.3) {
+        my $review_p = $self->{doctype}->{REVIEW};
+        $self->decr_confidence(1-$review_p/2, "possibly review: $review_p");
+    }
 
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
     say(1, "title: '", $self->{title}, "'");
