@@ -3,6 +3,7 @@ use warnings;
 use List::Util qw/min max reduce/;
 use Text::LevenshteinXS qw/distance/;
 use Statistics::Lite qw/mean/;
+use Text::Names qw/samePerson/;
 use String::Approx 'amatch';
 use rules::Helper;
 use rules::Keywords;
@@ -303,7 +304,7 @@ $f{'title occurs on source page'} = sub {
     return 0 unless @blocks;
     my $sourcecontent = $blocks[0]->{chunks}->[0]->{doc}->{sourcecontent};
     return undef unless $sourcecontent;
-    my $str = strip_tags($blocks[0]->{text});
+    my $str = tidy_text($blocks[0]->{text});
     return $sourcecontent =~ /\Q$str/i;
 };
 
@@ -314,14 +315,15 @@ $f{'authors contain source author'} = sub {
     return undef unless @sourceauthors;
     my @authors;
     for my $block (@blocks) {
-        foreach my $ch (@{$block->{chunks}}) {
+        for my $ch (@{$block->{chunks}}) {
             while (my ($name, $prob) = each %{$ch->{names}}) {
                 push @authors, tidy_text($name);
             }
         }
     }
-    for my $src_au (@{$_[0]->{doc}->{sourceauthors}}) {
+    for my $src_au (@sourceauthors) {
         foreach my $au (@authors) {
+            return 1 if Text::Names::samePerson($src_au, $au);
             return 1 if (amatch($src_au, ['i 30%'], $au));
         }
     }
