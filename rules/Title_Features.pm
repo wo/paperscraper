@@ -49,8 +49,8 @@ our @parsing_features = (
     # These are mainly here to adjust the confidence value:
     ['title is among first few lines', [0.2, -0.3]],
     ['title is largest text on page', [0.2, -0.2]],
-    ['title occurs on source page', [0.4, -0.4]],
-    ['authors contain source author', [0.2, -0.2]],
+    #['title occurs on source page', [0.4, -0.4]],
+    #['authors contain source author', [0.2, -0.2]],
     );
 
 my %f;
@@ -64,8 +64,8 @@ foreach my $label (qw/TITLE AUTHOR/) {
         else {
             $p = $_[0]->{p}->($label);
         }
-        # emphasise differences between 0.5 and 1:
-        return max(0, 0.35 + ($p-0.5)*1.3);
+        # zoom in on difference between 0.5 and 1:
+        return max(0, ($p-0.5)*2);
     };
 }
 

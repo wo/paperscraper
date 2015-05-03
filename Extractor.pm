@@ -159,7 +159,6 @@ sub init {
     $self->get_text();
     $self->{numwords} = () = ($self->{text} =~ /\s\w\w/g);
     $self->get_doctype();
-    $self->init_confidence();
 
 }
 
@@ -426,7 +425,7 @@ sub get_text {
     $self->{text} =~ s/\n\s*\n/\n/g;
 }
 
-sub init_confidence {
+sub adjust_confidence {
     my $self = shift;
     if ($self->{fromOCR}) {
         $self->decr_confidence(0.8, 'from OCR');
@@ -440,6 +439,46 @@ sub init_confidence {
     if ($self->{numpages} > 80) {
         $self->decr_confidence(0.9, 'more than 80 pages');
     }
+    if ($self->{doctype}->{REVIEW} > 0.3) {
+        my $review_p = $self->{doctype}->{REVIEW};
+        $self->decr_confidence(1-$review_p/2, "possibly review: $review_p");
+    }
+    if (exists $self->{author_title_parsings}) {
+        my @parsings = @{$self->{author_title_parsings}};
+        my $parsing = $parsings[0];
+        $self->decr_confidence(0.5 + ($parsing->{quality} - 0.3) * 0.7, 
+                               'parsing quality');
+        if ($parsings[1]) {
+            my $lead = $parsing->{quality} - $parsings[1]->{quality};
+            $self->decr_confidence(1 + min(0.1, $lead-0.2),
+                                   'alternative parsings');
+        }
+        for my $block (@{$parsing->{blocks}}) {
+            for my $label ('TITLE', 'AUTHOR') {
+                if ($block->{label}->{$label}) {
+                    my $min_p = min(map { $_->{p}->($label) } @{$block->{chunks}});
+                    $self->decr_confidence(min(1, $min_p+0.2),
+                                           "$label chunk probability $min_p");
+                }
+            }
+        }
+        if ($self->{sourcecontent}
+            && $self->{sourcecontent} !~ /\Q$self->{title}/i) {
+            $self->decr_confidence(0.7, "title not on source page");
+        }
+        if ($self->{sourceauthors}) {
+            my $source_author = 0;
+            for my $au (@{$self->{authors}}) {
+                for my $src_au (@{$self->{sourceauthors}}) {
+                    $source_author = 1 if Text::Names::samePerson($src_au, $au);
+                    $source_author = 1 if (amatch($src_au, ['i 30%'], $au));
+                }
+            }
+            unless ($source_author) {
+                $self->decr_confidence(0.9, "source author not among authors");
+            }
+        }
+    }    
 }
 
 sub get_doctype {
@@ -515,6 +554,7 @@ sub extract {
         warn $@ if $@;
         $done{$task} = 1;
     }
+    $self->adjust_confidence();
 }
 
 sub merge {
@@ -854,8 +894,9 @@ sub extract_authors_and_title {
     }
 
     @parsings = sort { $b->{quality} <=> $a->{quality} } @parsings;
+    $self->{author_title_parsings} = \@parsings;
 
-    my $parsing = shift @parsings;
+    my $parsing = $parsings[0];
     say(3, "best parsing", $parsing->{text});
 
     foreach my $block (@{$parsing->{blocks}}) {
@@ -907,22 +948,11 @@ sub extract_authors_and_title {
         }
     }
 
-    $self->decr_confidence(0.5 + ($parsing->{quality} - 0.3) * 0.7, 
-                           'parsing quality');
-    if ($parsings[0]) {
-        my $lead = $parsing->{quality} - $parsings[0]->{quality};
-        $self->decr_confidence(1 + min(0.1, $lead-0.2), 'alternatives');
-    }
-
-    if ($self->{doctype}->{REVIEW} > 0.3) {
-        my $review_p = $self->{doctype}->{REVIEW};
-        $self->decr_confidence(1-$review_p/2, "possibly review: $review_p");
-    }
-
     say(1, "authors: '", (join "', '", @{$self->{authors}}), "'");
     say(1, "title: '", $self->{title}, "'");
     say(2, "confidence: ", $self->{confidence});
 }
+
 
 sub extract_abstract {
     my $self = shift;
