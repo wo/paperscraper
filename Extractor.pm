@@ -471,7 +471,7 @@ sub adjust_confidence {
             for my $au (@{$self->{authors}}) {
                 for my $src_au (@{$self->{sourceauthors}}) {
                     $source_author = 1 if Text::Names::samePerson($src_au, $au);
-                    $source_author = 1 if (amatch($src_au, ['i 30%'], $au));
+                    #$source_author = 1 if (amatch($src_au, ['i 30%'], $au));
                 }
             }
             unless ($source_author) {

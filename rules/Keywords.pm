@@ -82,9 +82,9 @@ our $re_thanks = qr/\b(?:
 
 # stuff that disqualifies something from being a name:
 our $re_address_word = qr/\b(?:
-    universit\w+|center|centre|institute?|college|
+    universit\w+|center|centre|institut.?|college|
     avenue|street|professor|department|program|
-    philosophy|linguistics|
+    philosoph.*|linguistics|filosofi.*|
     umass|uc
     )\b/ix;
 
