@@ -347,7 +347,7 @@ sub process {
     add_meta("$file.xml", 'sourceauthor', $loc->{default_author});
     add_meta("$file.xml", 'sourcecontent', $loc->{source_content});
 
-    # extract author, title, abstract:
+    # extract author, title, abstract, ...:
     my $result = Extractor->new();
     $result->verbosity($verbosity > 1 ? $verbosity-1 : 0);
     eval {
@@ -398,11 +398,22 @@ EOD
     # store result in database:
     my $doc_id = $loc->{document_id};
     if ($doc_id) {
-        print "updating records for document $doc_id.\n" if $verbosity;
-        $db_savedoc->execute(
-            $loc->{authors}, $loc->{title}, $loc->{abstract}, 
-            $loc->{length}, $loc->{confidence}, $doc_id)
-            or warn DBI->errstr;
+        my $old_doc = old_record($doc_id);
+        if ($old_doc->{meta_confidence} == 1) { 
+            # values were set manually
+            print "not updating records for document $doc_id.\n" if $verbosity;
+            # hack to get document into oppweb after manual editing:
+            my $old_doc = { %$loc, %$old_doc };
+            $old_doc->{confidence} = 1;
+            add_to_oppweb($old_doc);
+        }
+        else {
+            print "updating records for document $doc_id.\n" if $verbosity;
+            $db_savedoc->execute(
+                $loc->{authors}, $loc->{title}, $loc->{abstract}, 
+                $loc->{length}, $loc->{confidence}, $doc_id)
+                or warn DBI->errstr;
+        }
     }
     else {
         my $alt = find_duplicate($loc);
@@ -426,22 +437,27 @@ EOD
                 or warn DBI->errstr;
             $doc_id = $db_adddoc->{mysql_insertid};
             print "document added as id $doc_id\n" if $verbosity;
-            if (exists $cfg{'OPP_WEB'}
-                && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
-                && $loc->{confidence} > $cfg{'CONFIDENCE_THRESHOLD'}) {
-                $db_add_oppweb->execute(
-                    $loc->{url}, $loc->{filetype}, $loc->{authors}, 
-                    $loc->{title}, $loc->{abstract}, $loc->{length}, 
-                    $loc->{source_url}, $loc->{confidence},
-                    $loc->{spamminess}, $loc->{text})
-                    or warn DBI->errstr;
-            }
+            add_to_oppweb($loc);
         }
     }
     $db_saveloc->execute(
         $loc->{filetype}, $loc->{filesize},
         $loc->{spamminess}, $doc_id, $loc_id)
         or warn DBI->errstr;
+}
+
+sub add_to_oppweb {
+    my $loc = shift;
+    if (exists $cfg{'OPP_WEB'}
+        && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
+        && $loc->{confidence} > $cfg{'CONFIDENCE_THRESHOLD'}) {
+        $db_add_oppweb->execute(
+            $loc->{url}, $loc->{filetype}, $loc->{authors}, 
+            $loc->{title}, $loc->{abstract}, $loc->{length}, 
+            $loc->{source_url}, $loc->{confidence},
+            $loc->{spamminess}, $loc->{text})
+            or warn DBI->errstr;
+    }
 }
 
 sub fetch_document {
@@ -478,7 +494,7 @@ sub fetch_document {
     # has really (substantially) changed. HTTP headers are not to
     # be trusted on this. So we also check for changes in
     # filesize:
-    my $old_filesize = defined $loc->{filesize} ? $loc->{filesize} : 0;
+    my $old_filesize = $loc->{status} ? $loc->{filesize} : 0;
     if (!$opts{r} && $old_filesize && 
         abs($old_filesize-$res->{filesize}) / $res->{filesize} < 0.2) {
         print "no substantial change in filesize.\n" if $verbosity;
@@ -639,6 +655,13 @@ sub check_steppingstone {
     $target = ${$as[0]}{href};
     $target =~ s/\s/%20/g; # fix links with whitespace
     return $target if length($target) < 256;
+}
+
+sub old_record {
+    my $doc_id = shift;
+    my $qu = "SELECT * FROM documents WHERE document_id = $doc_id";
+    my $doc = $dbh->selectrow_hashref($qu);
+    return $doc;
 }
 
 sub find_duplicate {
