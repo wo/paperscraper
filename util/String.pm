@@ -86,7 +86,8 @@ sub strip_tags {
 sub strip_footnotes {
     my $txt = shift;
     # remove footnote marks, but keep whitespace:
-    $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>| |g;
+    my $fn_mark = qr/\W?.?\W?(?:,\W?.?)?/; # e.g.: '2','*','a','a,b' 
+    $txt =~ s|<sup>(?:<.>)*$fn_mark(?:</.>)*</sup>| |g;
     # remove trailing footnote star *, cross, etc.:
     $txt =~ s/(?:<.>)?(?:\*|\x{2217}|†|‡|§)(?:<\/.>)?\s*$//;
     # and non-<sup>'ed footnote symbols in brackets:
@@ -98,10 +99,9 @@ sub strip_footnotes {
 
 sub plaintext {
     my $txt = shift;
-    # remove excessive whitespace:
-    $txt =~ s|\s\s+| |g;
     $txt = strip_footnotes($txt);
     $txt = strip_tags($txt);
+    $txt =~ s|\s\s+| |g;
     return $txt;
 }
 

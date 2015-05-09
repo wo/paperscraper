@@ -93,9 +93,11 @@ $f{'name occurs in lower case in article'} = sub {
     # now test parts of name, but note that e.g. an article by
     # Christian List might well contain 'list':
     my $parts_matched = 0;
-    while ($_[0]->{text} =~ /([[:upper:]]\w+)/g) {
+    while ($_[0]->{text} =~ /([[:upper:]]\w+)/g) { # upper-case parts
         $str = lc($1);
-        $parts_matched++ if ($_[0]->{chunk}->{doc}->{text} =~ /\b$str\b/);
+        if ($_[0]->{chunk}->{doc}->{text} =~ /\b$str(?!@)\b/) {
+            $parts_matched++;
+        }
     }
     return min(1, $parts_matched/2);
 };
@@ -114,9 +116,12 @@ $f{'follows publication word'} = sub {
 
 $f{'separated from earlier names by non-names'} = sub {
     return undef unless @{$_[0]->{prev_names}};
-    my $prev = $_[0]->{prev_names}->[-1];
     my $name = $_[0]->{text};
-    return $_[0]->{chunk}->{plaintext} =~ /$prev.*\w{5,}.*$name/;
+    # {prev_names} is unsorted, so test all:
+    for my $prev (@{$_[0]->{prev_names}}) {
+        return 0 unless $_[0]->{chunk}->{plaintext} =~ /$prev.*\w{5,}.*$name/;
+    }
+    return 1;
 };
 
 compile(\@name_features, \%f);

@@ -272,6 +272,15 @@ my %tests = (
    title => "The Structure of Tradeoffs in Model Building",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/22-Dulin-etal-Effects.pdf' => {
+   authors => ["David Dulin", "Yvette Hatwell", "Zenon Pylyshyn", "Sylvie Chokron"],
+   title => "Effects of peripheral and central visual impairment on mental imagery capacity",
+ },
+
+ '/home/wo/programming/opp-tools/test/doctests/22-Merricks-Composition.pdf' => {
+   authors => ["Trenton Merricks"],
+   title => "Composition as Identity, Mereological Essentialism, and Counterpart Theory",
+ },
 
 );
 
