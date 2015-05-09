@@ -43,6 +43,7 @@ our @parsing_features = (
     ['author blocks are similar', [0.2, -0.4]],
     ['first author near title', [0.2, -0.5]],
     ['author and title on same page', [0, -0.5]],
+    ['a lot of text between authors', [-0.6, 0]],
     ['author=title', [-0.1, 0]],
     ['author=title and further authors', [-0.4, 0]],
     ['author=title only has author part', [-0.6, 0]],
@@ -248,6 +249,24 @@ $f{'author and title on same page'} = sub {
     return undef unless $author && $title;
     $author = $author->{chunks}->[0];
     return $author->{page} == $title->{chunks}->[0]->{page};
+};
+    
+$f{'a lot of text between authors'} = sub {
+    my @blocks = grep { $_->{label}->{AUTHOR} } @{$_[0]->{blocks}};
+    return undef unless scalar @blocks > 1;
+    my $max_textlen = 0;
+    for my $i (1 .. $#blocks) {
+        my $ch = $blocks[$i-1]->{chunks}->[0];
+        my $end = $blocks[$i]->{chunks}->[0];
+        my $textlen = 0;
+        #print "text between $ch->{text} and $end->{text}:\n";
+        while (($ch = $ch->{next}) && ($ch ne $end)) {
+            #print "    $ch->{text}\n";
+            $textlen += length($ch->{plaintext});
+        }
+        $max_textlen = max($max_textlen, $textlen);
+    }
+    return ($max_textlen-200)/500;
 };
 
 $f{'author=title'} = sub {
