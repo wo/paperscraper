@@ -84,9 +84,6 @@ sub doctidy {
 sub pagetidy {
     my $page = shift;
     print "== tidying page:\n$page\n\n" if $verbose;
-    $page =~ s/<br \/>//g;
-    $page =~ s/\r//g; # remove ^M carriage returns
-    $page =~ s/ ?\t ?/ /g; # sometimes garble pdfs
     my @texts = ($page =~ /(<text.+?<\/text>)/sg);
     my @chunks = map { xml2chunk($_) } @texts;
     my $lines = reduce(\&mergechunks, [], @chunks);
@@ -394,8 +391,21 @@ sub tidy_text {
     my $str = shift;
     # strip empty tags:
     $str =~ s/<([^>\s]+)[^>]*>(\s*)<\/\1>/$2/g;
+    $str = fix_whitespace($str);
     $str = fix_chars($str);
     $str = fix_kerning($str);
+    return $str;
+}
+
+sub fix_whitespace {
+    my $str = shift;
+    $str =~ s/<br \/>/ /g;
+    $str =~ s/\s|\h|\v|\R/ /g; # replace all kinds of horizontal and vertical whitespace and linebreaks by ' '
+    $str =~ s/   */  /g; # strip excessive whitespace 
+    #$str =~ s/\r//g; # remove ^M carriage returns
+    #$str=~ s/ ?\t ?/ /g; # and tabs
+    #$str =~ s/\xOB|\x0C|\x85|\x{2028}|\x{2029}/ /g; # and line/paragraph separators
+    #$str =~ s/\n/ /g; # no newline chars in line chunks
     return $str;
 }
 
@@ -443,9 +453,6 @@ sub fix_chars {
     while (my ($key,$esc) = each(%trans)) {
         $str =~ s/$key/$esc/g;
     }
-
-    # strip newline characters within text chunks:
-    $str =~ s/\n//g;
 
     #while ($str =~ /([^a-zA-Z\d\s\.\[\]\(\),-\?:"'])/g) {
         #print "odd char $1 :", ord($1)," in $str\n";

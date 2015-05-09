@@ -88,7 +88,7 @@ sub strip_footnotes {
     # remove footnote marks, but keep whitespace:
     $txt =~ s|<sup>(?:<.>)*\W?.?\W?(?:</.>)*</sup>| |g;
     # remove trailing footnote star *, cross, etc.:
-    $txt =~ s/(?:<.>)?(?:\*|\x{2217}|†|‡)(?:<\/.>)?\s*$//;
+    $txt =~ s/(?:<.>)?(?:\*|\x{2217}|†|‡|§)(?:<\/.>)?\s*$//;
     # and non-<sup>'ed footnote symbols in brackets:
     $txt =~ s|\[.\]$||;
     # and non-<sup>'ed number right after last word:
