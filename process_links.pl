@@ -362,9 +362,9 @@ sub process {
     }
 
     $loc->{extractor} = $result;
-    $loc->{authors} = force_utf8(join ', ', @{$result->{authors}});
-    $loc->{title} = force_utf8($result->{title});
-    $loc->{abstract} = force_utf8($result->{abstract});
+    $loc->{authors} = join ', ', @{$result->{authors}};
+    $loc->{title} = $result->{title};
+    $loc->{abstract} = $result->{abstract};
     $loc->{confidence} = $result->{confidence};
     $loc->{length} = $result->{numwords};
     $loc->{text} = $result->{text};
@@ -698,17 +698,5 @@ sub spamfilter {
         $spam_estim->add_feature(@$_);
     }
     return $spam_estim;
-}
-
-sub force_utf8 {
-    # when parsing PDFs, we sometimes get mess that is not valid
-    # UTF-8, which can make the HTML/RSS invalid.
-    my $str = shift;
-    return $str if (Encode::is_utf8($str, 1));
-    $str = decode 'utf8', $str;
-    return $str if (Encode::is_utf8($str, 1));
-    $str =~ s/[^\x{21}-\x{7E}]//g;
-    return $str if (Encode::is_utf8($str, 1));
-    return "";
 }
 

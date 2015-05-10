@@ -7,7 +7,7 @@ use Getopt::Std;
 use List::Util qw/max min/;
 use Data::Dumper;
 use util::Io;
-use util::String qw/strip_tags tokenize/;
+use util::String qw/strip_tags tokenize force_utf8/;
 use util::Functools qw/reduce/;
 use Exporter;
 our @ISA = ('Exporter');
@@ -391,6 +391,7 @@ sub tidy_text {
     my $str = shift;
     # strip empty tags:
     $str =~ s/<([^>\s]+)[^>]*>(\s*)<\/\1>/$2/g;
+    $str = force_utf8($str);
     $str = fix_whitespace($str);
     $str = fix_chars($str);
     $str = fix_kerning($str);

@@ -10,7 +10,7 @@ use lib '..';
 use rules::Keywords;
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw/&strip_tags &tidy_text &plaintext &is_word &tokenize/;
+our @EXPORT = qw/&strip_tags &tidy_text &plaintext &is_word &tokenize &force_utf8/;
 
 sub strip_tags_new {
     my $str = shift;
@@ -249,6 +249,17 @@ sub fix_html {
     return $res;
 }
 
+sub force_utf8 {
+    # when parsing PDFs, we sometimes get mess that is not valid
+    # UTF-8, which can make the HTML/RSS invalid.
+    my $str = shift;
+    return $str if (Encode::is_utf8($str, 1));
+    $str = Encode::decode('utf8', $str);
+    return $str if (Encode::is_utf8($str, 1));
+    $str =~ s/[^\x{21}-\x{7E}]//g;
+    return $str if (Encode::is_utf8($str, 1));
+    return "";
+}
 
 
 1;

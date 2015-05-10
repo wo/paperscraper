@@ -108,7 +108,7 @@ sub fix_ocr {
     # fix some common OCR mistakes:
     $xml =~ s/(?<=[a-z])0(?=[a-z])/o/g;    # 0 => o
     $xml =~ s/(?<=[a-z])1(?=[a-z])/i/g;    # 1 => i
-    $xml =~ s/. .u \&\#174\;//g;           # This the JSTOR logo
+    $xml =~ s/. .u \&\#174\;//g;           # the JSTOR logo
     return $xml;
 }
 

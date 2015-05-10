@@ -5,6 +5,7 @@ use Data::Dumper;
 use LWP;
 use Encode;
 use Encode 'is_utf8';
+use Encoding::FixLatin 'fix_latin';
 use HTTP::Date;
 use Exporter;
 our @ISA = ('Exporter');
