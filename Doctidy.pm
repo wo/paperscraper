@@ -391,6 +391,7 @@ sub tidy_text {
     my $str = shift;
     # strip empty tags:
     $str =~ s/<([^>\s]+)[^>]*>(\s*)<\/\1>/$2/g;
+    $str =~ s/<. \/>//g; # '<b />' in http://www.cs.cornell.edu/home/halpern/papers/cheathus.pdf
     $str = force_utf8($str);
     $str = fix_whitespace($str);
     $str = fix_chars($str);
