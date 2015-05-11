@@ -61,8 +61,8 @@ sub parse {
 
 sub tidy_name {
     my $name = shift;
-    # decapitalize 'Thomas SCANLON':
-    $name =~ s/([[:upper:]]{3,})/\u\L$1/g;
+    # decapitalize 'Thomas SCANLON', but not 'CSI Jenkins' or 'Samuel Wheeler III':
+    $name =~ s/([[:upper:]]{4,})/\u\L$1/g;
     return $name;
 }
 
