@@ -244,10 +244,10 @@ sub process {
     $pg_update->execute(1, $pg_content, $page_id);
 }
 
-sub force_utf8 {
-    # brute force -- transliterate to ascii:
-    return unidecode($_[0]);
-}
+#sub force_utf8 {
+#    # brute force -- transliterate to ascii:
+#    return unidecode($_[0]);
+#}
 
 sub remove_link {
     my $url = shift;
