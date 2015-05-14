@@ -249,16 +249,6 @@ sub process {
         return errorcode();
     }
 
-    # check if this is a subpage with further links to papers:
-    if (is_subpage($loc)) {
-        # is_supage stores the subpage in the 'sources' table, so
-        # we only need to indicate in 'locations' that this isn't
-        # a document URL; we use the status field for that:
-        error("subpage with more links");
-        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
-        return 0;
-    }
-
     # check if this is an intermediate page leading to the actual paper:
     my $target = check_steppingstone($loc, $res);
     if ($target) {
@@ -275,6 +265,7 @@ sub process {
         }
         print "adding target link to queue: $target.\n" if $verbosity;
         $loc->{url} = $target;
+        delete $loc->{text}; # for first round of spam filter 
         push @queue, $loc;
         return 0;
         # We could alternatively replace the URL in the database, but
@@ -288,6 +279,16 @@ sub process {
         # (a parent of ...) a location of the document. That's
         # cumbersome, so instead I simply overwrite the current
         # location, but keep its URL.
+    }
+
+    # check if this is a subpage with further links to papers:
+    if (is_subpage($loc)) {
+        # is_supage stores the subpage in the 'sources' table, so
+        # we only need to indicate in 'locations' that this isn't
+        # a document URL; we use the status field for that:
+        error("subpage with more links");
+        $db_err->execute(errorcode(), $loc_id) or warn DBI->errstr;
+        return 0;
     }
 
     # get anchor text, default author, source url+content from source
@@ -451,12 +452,16 @@ sub add_to_oppweb {
     if (exists $cfg{'OPP_WEB'}
         && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
         && $loc->{confidence} > $cfg{'CONFIDENCE_THRESHOLD'}) {
+        print "adding to opp-web database.\n" if $verbosity;
         $db_add_oppweb->execute(
             $loc->{url}, $loc->{filetype}, $loc->{authors}, 
             $loc->{title}, $loc->{abstract}, $loc->{length}, 
             $loc->{source_url}, $loc->{confidence},
             $loc->{spamminess}, $loc->{text})
             or warn DBI->errstr;
+    }
+    else {
+        print "not adding to opp-web database.\n" if $verbosity;
     }
 }
 
@@ -617,6 +622,8 @@ sub check_steppingstone {
         qr/<meta name="citation_pdf_url" content="(.+?)"/ => '*',
         # philpapers.org:
         qr/class='outLink' href="http:\/\/philpapers.org\/go.pl[^"]+u=(http.+?)"/ => '*', 
+        # philsci-archive.pitt.edu:
+        qr/<meta name="eprints.document_url" content="(.+?)" / => '*',
         # PLOSOne:
         qr/(http:\/\/www.plosone.org\/article\/.+?representation=PDF)" id="downloadPdf"/ => '*',
         # Google Drive:
@@ -667,6 +674,7 @@ sub old_record {
 sub find_duplicate {
     my $loc = shift;
     # get documents with essentially same title:
+    # (TODO: doesn't work if one title has <i>, the other doesn't)
     my $ti = $loc->{title};
     $ti =~ s/\W+$//;
     my $qu = "SELECT documents.document_id, url, meta_confidence, "
