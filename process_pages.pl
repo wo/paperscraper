@@ -231,16 +231,15 @@ sub process {
         $db_insert_link->execute($page_id, $loc_id, $text);
         push @old_urls, $url;
     }
-    return if $opts{p};
     # remove disappeared links:
     foreach my $old_url (@old_urls) {
         remove_link($old_url, $page_id)
             unless (grep /\Q$old_url\E/, @urls);
     }
     my $pg_content = force_utf8(strip_tags($res->{content}));
-    $pg_content =~ s/\s\s+/ /g;
+    $pg_content =~ s/\s+/ /g;
     print "page content: $pg_content\n\n" if $verbosity > 5;
-    print "updating page $page_id records\n" if $verbosity > 1;
+    print "updating page $page_id records\n" if $verbosity;
     $pg_update->execute(1, $pg_content, $page_id);
 }
 

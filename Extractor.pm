@@ -453,8 +453,7 @@ sub adjust_confidence {
                                'parsing quality');
         if ($parsings[1]) {
             my $lead = $parsing->{quality} - $parsings[1]->{quality};
-            $self->decr_confidence(1 + min(0.1, $lead-0.2),
-                                   'alternative parsings');
+            $self->decr_confidence(1 + min(0.1, $lead-0.2), 'alternative parsings');
         }
         for my $block (@{$parsing->{blocks}}) {
             for my $label ('TITLE', 'AUTHOR') {
@@ -469,7 +468,7 @@ sub adjust_confidence {
             && $self->{sourcecontent} !~ /\Q$self->{title}/i) {
             $self->decr_confidence(0.7, "title not on source page");
         }
-        if ($self->{sourceauthors}) {
+        if (@{$self->{sourceauthors}}) {
             my $source_author = 0;
             for my $au (@{$self->{authors}}) {
                 for my $src_au (@{$self->{sourceauthors}}) {
