@@ -31,10 +31,10 @@ if ($opts{h}) {
 Fetches source pages and stores new links found there in the
 database.
 
-Usage: $0 [-sh] [-p url] [-v verbosity]
+Usage: $0 [-sh] [-p url or id] [-v verbosity]
 
 -v        : verbosity level (0-10), default: 1
--p        : url that will be processed (result not written to DB)
+-p        : url that will be processed (result not written to DB) or id
 -h        : this message
 
 EOF
@@ -123,7 +123,18 @@ sub leave {
 
 sub next_pages {
     if ($opts{p}) {
-        return [{ source_id => 0, url => $opts{p}, last_checked => 0 }];
+        my ($url, $id);
+        if ($opts{p} =~ /^\d+$/) {
+            $id = $opts{p};
+            ($url) = $dbh->selectrow_array("SELECT url FROM sources WHERE source_id = $id");
+            die "no source with id $id" unless $url;
+        }
+        else {
+            $url = $opts{p};
+            ($id) = $dbh->selectrow_array("SELECT source_id FROM sources WHERE url = '$url'");
+            $id = 0 unless $id;
+        }
+        return [{ source_id => $id, url => $url, last_checked => 0 }];
     }
     my $NUM_URLS = 10;
     my $min_age = gmtime()-(24*60*60);
