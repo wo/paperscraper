@@ -89,8 +89,7 @@ my $_ua;
 sub _get_ua {
     if (!$_ua) {
         $_ua = LWP::UserAgent->new;
-        $_ua->agent('Mozilla/5.0 (X11; Linux i686; rv:2.0.1) '
-                    .'Gecko/20100101 Firefox/4.0.1 opp-tools');
+        $_ua->agent('Mozilla/5.0 (X11; Linux x86_64; rv:37.0) Gecko/20100101 Firefox/37.0');
         # allow cookies e.g. for google sites redirects
         $_ua->cookie_jar({});
         # fix bug with utf-8 in header, see
