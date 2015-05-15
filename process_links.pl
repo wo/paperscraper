@@ -167,7 +167,7 @@ sub next_locations {
         $url = $opts{p};
         ($id) = $dbh->selectrow_array("SELECT location_id"
                 ." FROM locations WHERE url = '$opts{p}'");
-        $id = 0;
+        $id = 0 unless $id;
         $opts{n} = 1;
         return [{ location_id => $id, url => $url }];
     }
@@ -448,9 +448,13 @@ EOD
 }
 
 sub add_to_oppweb {
+    return unless (exists $cfg{'OPP_WEB'});
     my $loc = shift;
-    if (exists $cfg{'OPP_WEB'}
-        && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
+    # don't show all the papers from newly added source pages:
+    my ($ok) = $dbh->selectrow_array("SELECT 1 FROM sources WHERE "
+               "found_date < DATE_SUB(NOW(), INTERVAL 12 HOURS) "
+               ."AND url = ".$dbh->quote($loc->{source_url}));
+    if ($ok && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
         && $loc->{confidence} > $cfg{'CONFIDENCE_THRESHOLD'}) {
         print "adding to opp-web database.\n" if $verbosity;
         $db_add_oppweb->execute(
