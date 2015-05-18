@@ -47,6 +47,11 @@ my %tests = (
 
  '/home/wo/programming/opp-tools/test/doctests/22-Weisberg-Structure.pdf' => "Despite their best efforts, scientists may be unable to construct models that simultaneously exemplify every theoretical virtue. One explanation for this is the existence of tradeoffs: relationships of attenuation that constrain the extent to which models can have such desirable qualities. In this paper, we characterize three types of tradeoffs theorists may confront. These characterizations are then used to examine the relationships between parameter precision and several types of generality. We show that several of these relationships exhibit tradeoffs and discuss what consequences those tradeoffs have for theoretical practice.",
 
+ '/home/wo/programming/opp-tools/test/doctests/AB2-Balcerak-Reasoning.pdf' => "In this essay we argue that reasoning can sometimes generate epistemic justification, rather than merely transmitting justification that the subject already possesses to new beliefs. We also suggest a way to account for it in terms of the relationship between epistemic normative requirements, justification and cognitive capacities.",
+
+ '/home/wo/programming/opp-tools/test/doctests/AB2Schoubye-What.pdf' => "It is sometimes argued that certain sentences of natural language fail to express truth conditional contents. Standard examples include e.g. Tipper is ready and Steel is strong enough. In this paper, we provide a novel analysis of truth conditional meaning (what is said) using the notion of a question under discussion. This account (i) explains why these types of sentences are not, in fact, semantically underdetermined (yet seem truth conditionally incomplete), (ii) provides a principled analysis of the process by which natural language sentences (in general) can come to have enriched meanings in context, and (iii) shows why various alternative views, e.g. so-called Radical Contextualism, Moderate Contextualism, and Semantic Minimalism, are partially right in their respective analyses of the problem, but also all ultimately wrong. Our analysis achieves this result using a standard truth conditional and compositional semantics and without making any assumptions about enriched logical forms, i.e. logical forms containing phonologically null expressions.",
+
+
 );
 
 sub proc {

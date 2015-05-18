@@ -15,6 +15,7 @@ our @block_features = (
     ['first chunk probable ABSTRACTSTART', [0.2, -0.4]],
     ['last chunk probable ABSTRACTEND', [0.2, -0.4]],
     ['contains legalese, publication or acknowledgment words', [-0.4, 0]],
+    ['earlier possible abstracts', [-0.3, 0.3]],
     );
 
 my %f;
@@ -54,6 +55,16 @@ $f{'reasonably long'} = sub {
         return max(0, 1 - (250-length($str))/100);
     }
     return 1;
+};
+
+$f{'earlier possible abstracts'} = sub {
+    my $ch = $_[0]->[0];
+    my $n = 1;
+    while (($ch = $ch->{prev})) {
+        $n++ if $ch->{p}->('ABSTRACT') > 0.5;
+        last if $n >= 20;
+    }
+    return $n/20;
 };
 
 $f{'begins and ends neatly'} = sub {

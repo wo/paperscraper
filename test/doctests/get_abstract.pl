@@ -15,6 +15,7 @@ my $verbosity = exists($opts{v}) ? $opts{v} : 0;
 
 my $file = shift @ARGV;
 $file = abs_path($file);
+Converter::verbosity(5) if $verbosity > 5;
 convert2xml($file);
 print "XML file:\n" if $verbosity > 5;
 system("cat $file.xml") if $verbosity > 5;

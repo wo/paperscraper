@@ -156,10 +156,10 @@ $features{ABSTRACT} = [
     ['begins with "abstract:"', [0.7, 0]],
     ['long', [0.2, -0.2]],
     ['matches content pattern', [0.1, -0.3]],
-    ['preceeded by many ABSTRACTs', [-1, 0.1], 2],
-    ['probable HEADING', [-0.6, 0.2], 3],
-    ['near other ABSTRACT', [0.3, -0.3], 3],
     ['continues abstract', [0.5, -0.1], 3],
+    ['a lot of earlier ABSTRACTs', [-1, 0.1], 3],
+    ['near other ABSTRACT', [0.3, -0.3], 3],
+    ['probable HEADING', [-0.6, 0.2], 3],
     ];
 
 $features{ABSTRACTSTART} = [
@@ -167,21 +167,22 @@ $features{ABSTRACTSTART} = [
     ['probable ABSTRACT', [0.3, -0.5], 2],
     ['long', [0.1, -0.4], 2],
     ['previous line short', [0.2, -0.2], 2],
+    ['same length as previous line', [-0.7, 0], 2],
+    ['gap above', [0.2, -0.2]],
     ['previous line probable HEADING', [0.4, -0.1], 2],
     ['previous line probable ABSTRACT', [-0.4, 0.2], 2],
     ['begins in upper case', [0.1, -0.4], 2], 
-    ['begins with "abstract:"', [0.6, 0], 2],
-    ['previous line is abstract heading', [0.6, 0], 2],
-    ['gap above', [0.2, -0.1]],
+    ['begins with "abstract:"', [0.7, 0], 2],
+    ['previous line is abstract heading', [0.7, 0], 2],
     ];
 
 $features{ABSTRACTEND} = [
     ['within first few pages', [0.2, -0.8]],
-    ['probable ABSTRACT', [0.3, -0.4], 2],
-    ['next line indented', [0.2, -0.1], 2],
+    ['probable ABSTRACT', [0.3, -0.1], 2], # min 0.5!
+    ['next line indented', [0.2, 0], 2],
     ['long', [-0.1, 0.2], 2],
     ['previous line short', [-0.2, 0], 2],
-    ['ends with terminator', [0.1, -0.3], 2],
+    ['ends with terminator', [0.2, -0.3], 2],
     ['gap below', [0.3, -0.2]],
     ];
 
@@ -404,7 +405,7 @@ $f{'on last page'} = memoize(sub {
     return $_[0]->{page}->{number} == $_[0]->{doc}->{numpages};
 });
 
-$f{'preceeded by many ABSTRACTs'} = sub {
+$f{'a lot of earlier ABSTRACTs'} = sub {
     my $ch = $_[0];
     my $n = 1;
     while (($ch = $ch->{prev})) {
@@ -465,13 +466,13 @@ sub gap {
 
 $f{'gap above'} = memoize(sub {
     my $gap = gap($_[0], 'prev');
-    return undef unless $gap; # no element above
+    return 1 unless $gap; # no element above
     return max(min($gap-1, 1), 0);
 });
 
 $f{'gap below'} = memoize(sub {
     my $gap = gap($_[0], 'next');
-    return undef unless $gap; # no element below
+    return 1 unless $gap; # no element below
     return max(min($gap-1, 1), 0);
 });
 
@@ -1081,8 +1082,16 @@ $f{'previous line has larger font'} = sub {
 
 $f{'previous line short'} = memoize(sub {
     my $prev = $_[0]->{prev};
-    return 0.5 unless $prev;
+    return undef unless $prev;
     return max(min(2 - length($prev->{plaintext})/40, 1), 0);
+});
+
+$f{'same length as previous line'} = memoize(sub {
+    my $prev = $_[0]->{prev};
+    return undef unless $prev;
+    return 0 if abs($_[0]->{left} - $prev->{left}) > 5;
+    return 0 if abs($_[0]->{right} - $prev->{right}) > 5;
+    return 1;
 });
 
 $f{'ends with terminator'} = memoize(sub {
@@ -1096,7 +1105,7 @@ $f{'ends with terminator'} = memoize(sub {
 });
 
 $f{'previous line ends with terminator'} = memoize(sub {
-    return 0.5 unless $_[0]->{prev};
+    return undef unless $_[0]->{prev};
     return $f{'ends with terminator'}->($_[0]->{prev});
 });
 
