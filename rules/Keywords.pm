@@ -41,7 +41,7 @@ our $re_ignore_url = qr{
     ^javascript|
     ^.+//[^/]+/?$|          # TLD
     twitter\.com|
-    \.(?:css|mp3|avi|jpg|gif)$
+    \.(?:css|mp3|avi|mov|jpg|gif|ppt)$
 }xi;
 
 # ignore this part of a URL when checking for new links:

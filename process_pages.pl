@@ -171,6 +171,7 @@ sub process {
         $pg_ping->execute('404', $page_id) unless $opts{p};
         return;
     }
+    print "\n $res->{content}\n" if $verbosity > 5;
     
     # fetch currently stored links from db:
     my $old_urls = $dbh->selectcol_arrayref(
@@ -185,10 +186,7 @@ sub process {
     eval {
         my $link_ex = new HTML::LinkExtractor(undef, $res->base, 1);
         $link_ex->parse(\$res->{content});
-        # ignore links with rel="nopapers":
-        @links = grep { 
-            $_->{href} && (!$_->{rel} || $_->{rel} ne 'nopapers') }
-            @{$link_ex->links};
+        @links = grep { $_->{href} } @{$link_ex->links};
     };
     my @urls = map $_->{href}, @links;
 
@@ -197,8 +195,7 @@ sub process {
         my $url = $$new_link{href};
         # unescape tilde character in urls:
         $url =~ s/%7e/~/i;
-        my $text = $$new_link{_TEXT};
-        next unless $text;
+        my $text = $$new_link{_TEXT} || ''; # e.g., 'pdf' img link
         binmode STDOUT, ":utf8"; # why oh why?
         print "checking link: $url ($text)\n" if ($verbosity > 1);
         next if ($url eq $page->{url});
