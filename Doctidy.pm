@@ -85,9 +85,9 @@ sub pagetidy {
     my $page = shift;
     print "== tidying page:\n$page\n\n" if $verbose;
     my @texts = ($page =~ /(<text.+?<\/text>)/sg);
-    my @chunks = map { xml2chunk($_) } @texts;
+    my @chunks = sortlines(map { xml2chunk($_) } @texts);
     my $lines = reduce(\&mergechunks, [], @chunks);
-    my @sorted = sortlines($lines);
+    my @sorted = columnize(@$lines);
     my $xml = reduce(\&chunk2xml, '', @sorted);
     $page =~ s/<text.+<\/text>/$xml/s;
     print "== tidied page:\n$page\n\n" if $verbose;
@@ -275,9 +275,21 @@ sub combine_letters {
 }
 
 sub sortlines {
-    my $lines = shift;
+    # first sort lines top->bottom and left->right:
+    my @lines = @_;
+    sub comp {
+        my $tolerance = ($b->{bottom} - $b->{top})/3;
+        return 1 if $a->{top} > $b->{bottom}-$tolerance;
+        return -1 if $b->{top} > $a->{bottom}-$tolerance;
+        return $a->{left} <=> $b->{left};
+    }
+    return sort comp @lines;
+}
 
-    print "== sorting lines ==\n" if $verbose;
+sub columnize {
+    my @lines = @_;
+
+    print "== columnizing lines ==\n" if $verbose;
 
     # The order of text elements produced by pdftohtml is not reliable:
     # sometimes a first line in a PDF is a footnote. (OTOH, the order
@@ -294,18 +306,9 @@ sub sortlines {
     #  | col2 | col6 col6 col6 |
     #  | col7 col7 col7 col7   |
 
-    # first sort lines top->bottom and left->right:
-    sub comp {
-        my $tolerance = ($b->{bottom} - $b->{top})/3;
-        return 1 if $a->{top} > $b->{bottom}-$tolerance;
-        return -1 if $b->{top} > $a->{bottom}-$tolerance;
-        return $a->{left} <=> $b->{left};
-    }
-    my @lines = sort comp @$lines;
-
     my @newlines;
     my $numcols = 1;
-    for (my $i=0; $i<@lines; $i++) {
+    for (my $i=0; $i<=$#lines; $i++) {
 
         # Go through lines until we hit a case where the next line is
         # to the right and not yet recognized as such:
@@ -368,7 +371,7 @@ sub sortlines {
         # the supercolumn; we still need to columnize them:
 
         print "sorting lines in left column\n" if $verbose;
-        @leftcol = sortlines(\@leftcol);
+        @leftcol = columnize(@leftcol);
         # Now the subcolumn {col} values start with 1; fix:
         foreach my $line (@leftcol) {
             $line->{col} += $numcols;
@@ -376,7 +379,7 @@ sub sortlines {
         $numcols = $leftcol[-1]->{col};
 
         print "sorting lines in right column\n" if $verbose;
-        @rightcol = sortlines(\@rightcol);
+        @rightcol = columnize(@rightcol);
         foreach my $line (@rightcol) {
             $line->{col} += $numcols;
         }
@@ -387,7 +390,7 @@ sub sortlines {
         @newlines = sort { $a->{col}*1000 + $a->{top} <=>
                         $b->{col}*1000 + $b->{top} } @newlines;
     }
-    print "done sorting\n" if $verbose;
+    print "done columnizing\n" if $verbose;
     return @newlines;
 }
 
