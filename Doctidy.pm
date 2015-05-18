@@ -279,7 +279,7 @@ sub sortlines {
 
     print "== sorting lines ==\n" if $verbose;
 
-    # The order of textelements produced by pdftohtml is not reliable:
+    # The order of text elements produced by pdftohtml is not reliable:
     # sometimes a first line in a PDF is a footnote. (OTOH, the order
     # of chunks within a single line tends to be reliable.) Also,
     # sorting lines by vertical position would get multi-column
@@ -287,11 +287,14 @@ sub sortlines {
     #
     # To sort the lines, I assign column numbers, like so:
     #
-    #  | col1 col1 col1  |
-    #  | col2 | col3     |
-    #  | col2 | col3     |
-    #  | col4 col4 col4  |
+    #  | col1 col1 col1 col1   |
+    #  | col2 | col3 col3 col3 |
+    #  | col2 | col3 col3 col3 |
+    #  | col2 |  col4  | col5  |
+    #  | col2 | col6 col6 col6 |
+    #  | col7 col7 col7 col7   |
 
+    # first sort lines top->bottom and left->right:
     sub comp {
         my $tolerance = ($b->{bottom} - $b->{top})/3;
         return 1 if $a->{top} > $b->{bottom}-$tolerance;
@@ -304,47 +307,43 @@ sub sortlines {
     my $numcols = 1;
     for (my $i=0; $i<@lines; $i++) {
 
-        if ($verbose) {
-            print "line $i: ",$lines[$i]->{text},"\n";
-        }
-
+        # Go through lines until we hit a case where the next line is
+        # to the right and not yet recognized as such:
+        
+        print "line $i: ",$lines[$i]->{text},"\n" if $verbose;
         push @newlines, $lines[$i];
+
         $lines[$i]->{col} = $numcols unless $lines[$i]->{col};
 
-        next unless ($lines[$i+1]
+        next unless (exists $lines[$i+1]
                      && $lines[$i]->{length} > 5
                      && $lines[$i+1]->{length} > 5
                      && $lines[$i+1]->{top} <= $lines[$i]->{bottom}-5
                      && $lines[$i+1]->{left} > $lines[$i]->{right}
-                     && $lines[$i+1]->{col} <= $lines[$i]->{col});
+                     && $lines[$i+1]->{col} <= $lines[$i]->{col}); # initial {col} is 0
 
-        if ($verbose) {
-            print "line $i: ",$lines[$i]->{text},"\n";
-            print "line $i+1: ",$lines[$i+1]->{text},"\n";
-            print "line $i+1 is to the right of $i.\n";
-        }
-        # i+1 is to the right of i and not yet recognized as
-        # different column. Look up and down for more lines
-        # belonging to their blocks until we encounter lines that
-        # break the border:
-        
+        print "line $i+1 to the right of $i: $lines[$i+1]->{text}\n" if $verbose;
+
+        # Look up and down for more lines belonging to the columns of
+        # line i and i+1 until we encounter lines that break the
+        # border:
         my @leftcol = ($lines[$i]);
         my @rightcol = ($lines[$i+1]);
         my $j = $i;
         my $unbroken = 1;
         while ($unbroken) {
             $j = ($j <= $i ? $j-1 : $j+1);
-            $unbroken = $lines[$j];
+            $unbroken = 0 unless $j >= 0 && exists $lines[$j];
             
             # only consider lines from the same column as i and i+1:
             if ($unbroken && (!$lines[$j]->{col} 
                               || $lines[$j]->{col} == $lines[$i]->{col})) {
                 if ($lines[$j]->{right} < $lines[$i+1]->{left}) {
-                    print "line $j same col as $i.\n" if $verbose;
+                    print "line $j same col as $i: $lines[$j]->{text}\n" if $verbose;
                     push @leftcol, $lines[$j];
                 }
                 elsif ($lines[$j]->{left} > $lines[$i]->{right}) {
-                    print "line $j same col as $i+1.\n" if $verbose;
+                    print "line $j same col as $i+1: $lines[$j]->{text}\n" if $verbose;
                     push @rightcol, $lines[$j];
                 }
                 else {
@@ -358,32 +357,37 @@ sub sortlines {
             }
         }
         
-        #if ($#leftcol > 2 && $#rightcol > 2) {
-        $numcols++;
+        # If there are embedded columns, e.g.
+        #
+        #  | foo foo foo | bar |
+        #  | foo1 | foo2 | bar |
+        #  | foo1 | foo2 | bar |
+        #  | foo foo foo | bar |
+        #
+        # then the subcolumns are currently all recognized as part of
+        # the supercolumn; we still need to columnize them:
+
+        print "sorting lines in left column\n" if $verbose;
+        @leftcol = sortlines(\@leftcol);
+        # Now the subcolumn {col} values start with 1; fix:
         foreach my $line (@leftcol) {
-            $line->{col} = $numcols;
+            $line->{col} += $numcols;
         }
-        $numcols++;
+        $numcols = $leftcol[-1]->{col};
+
+        print "sorting lines in right column\n" if $verbose;
+        @rightcol = sortlines(\@rightcol);
         foreach my $line (@rightcol) {
-            $line->{col} = $numcols;
+            $line->{col} += $numcols;
         }
-        #}
-        #else {
-        #    print "ignoring columnisation: too small\n" if $verbose;
-            # Merge chunks that are on the same line and not in
-            # different columns, unless they are really far apart:
-        #    my $ex = $lines[$i]->{width} / $lines[$i]->{length};
-        #    if ($lines[$i]->{right} + 10*$ex > $lines[$i+1]->{left}) {
-        #        print "appending\n" if $verbose;
-        #        append($lines[$i], $lines[$i+1]);
-        #        $i++;
-        #    }
-        #}
+        $numcols = $rightcol[-1]->{col};
     }
+    # sort by column, top->bottom:
     if ($numcols > 1) {
         @newlines = sort { $a->{col}*1000 + $a->{top} <=>
                         $b->{col}*1000 + $b->{top} } @newlines;
     }
+    print "done sorting\n" if $verbose;
     return @newlines;
 }
 
