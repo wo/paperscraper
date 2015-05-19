@@ -7,13 +7,13 @@ fi
 trap '' ERR
 while true
 do
-    timeout 300 ./process_pages.pl
+    timeout 100 perl ./process_pages.pl 
     RES=$?
     if [ $RES -eq 9 ]
     then
         exit
     fi
-    timeout 300 ./process_links.pl
+    timeout 100 perl ./process_links.pl
     RES=$?
     if [ $RES -eq 9 ]
     then

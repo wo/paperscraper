@@ -178,7 +178,7 @@ sub process {
         "SELECT url FROM links INNER JOIN locations "
         ."ON links.location_id = locations.location_id "
         ."WHERE source_id = $page_id");
-    my @old_urls =  $opts{p} ? () : @{$old_urls};
+    my @old_urls = @{$old_urls};
     print "old links: \n", join("\n",@old_urls), "\n" if $verbosity > 3;
     
     # extract links from page and add them to DB if new:
