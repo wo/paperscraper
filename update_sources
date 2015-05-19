@@ -247,7 +247,7 @@ $dispatch->{modify} = sub {
         $db_set_url->execute($url, $id)
             or ret(0, DBI->errstr || "set failed");
     }
-    ret(1, "$id modified ($cur_author to $author)");
+    ret(1, "$id modified");
 };
 
 sub change_author {

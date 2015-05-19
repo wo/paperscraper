@@ -86,6 +86,7 @@ sub pagetidy {
     print "== tidying page:\n$page\n\n" if $verbose;
     my @texts = ($page =~ /(<text.+?<\/text>)/sg);
     my @chunks = sortlines(map { xml2chunk($_) } @texts);
+    @chunks = strip_linenumbers(@chunks);
     my $lines = reduce(\&mergechunks, [], @chunks);
     my @sorted = columnize(@$lines);
     my $xml = reduce(\&chunk2xml, '', @sorted);
@@ -394,11 +395,39 @@ sub columnize {
     return @newlines;
 }
 
+sub strip_linenumbers {
+    # strip line numbers that are common in proofs from publishers:
+    my @chunks = @_;
+    my @numbers = grep { $_->{text} =~ /^\s*\d+\s*$/ } @chunks;
+    return @chunks unless scalar(@numbers) > 5;
+    # figure out most frequent horizontal position to tell apart line
+    # numbers from footnote labels, page number, etc.:
+    my %x_freq;
+    for my $ch (@numbers) {
+        $x_freq{$ch->{left}} = 0 unless defined $x_freq{$ch->{left}};
+        $x_freq{$ch->{left}}++;
+    }
+    my @x_freqs = sort { $x_freq{$a} <=> $x_freq{$b} } keys(%x_freq);
+    my $lineno_x = $x_freqs[-1];
+    # don't be too strict, as '9' may begin a little further to the
+    # right than '10':
+    @numbers = grep { abs($_->{left}-$lineno_x) < 8 } @numbers;
+    print "stripping line numbers ", (map { $_->{text} } @numbers), "\n"
+        if $verbose;
+    my @res;
+    my %lookup;
+    @lookup{@numbers} = ();
+    for my $ch (@chunks) {
+        push(@res, $ch) unless exists $lookup{$ch};
+    }
+    return @res;
+}
+
 sub tidy_text {
     my $str = shift;
     # strip empty tags:
     $str =~ s/<([^>\s]+)[^>]*>(\s*)<\/\1>/$2/g;
-    $str =~ s/<. \/>//g; # '<b />' in http://www.cs.cornell.edu/home/halpern/papers/cheathus.pdf
+    $str =~ s/<. \/>//g; # '<b />' in www.cs.cornell.edu/home/halpern/papers/cheathus.pdf
     $str = force_utf8($str);
     $str = fix_whitespace($str);
     $str = fix_chars($str);
