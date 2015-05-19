@@ -538,7 +538,7 @@ sub is_subpage {
     print "link density $numlinks/$textlen high enough\n" if $verbosity > 1;
 
     # subpage must have at least three links of paper filetypes:
-    $numlinks = () = ($loc->{content} =~ /\.(pdf|\.doc)\b/ig);
+    $numlinks = () = ($loc->{content} =~ /\.(pdf|\.docx?)\b/ig);
     unless ($numlinks > 2) {
         print "no: $numlinks links to paper files\n" if $verbosity > 1;
         return 0;
