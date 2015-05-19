@@ -380,7 +380,7 @@ sub remove_chunk {
     removelink($chunk);
 
     my $doc = $chunk->{doc};
-    if ($chunk->{id} >= scalar $doc->{chunks}) {
+    if ($chunk->{id} >= scalar @{$doc->{chunks}}) {
         warn "splice problem at $doc->{url}\n";
     }
     my $rem = splice @{$doc->{chunks}}, $chunk->{id}, 1;
