@@ -58,7 +58,7 @@ $rss->channel(
 while (my $row = $select->fetchrow_hashref) {
    my @authors = split(/\s*,\s*/, $row->{authors});
    $rss->add_item(
-       title       => dec($row->{title}),
+       title       => dec($row->{title}.$row->{found_date}),
        link        => $row->{url},
        description => dec($row->{abstract}),
        format      => $row->{filetype},

@@ -538,7 +538,7 @@ sub is_subpage {
     print "link density $numlinks/$textlen high enough\n" if $verbosity > 1;
 
     # subpage must have at least three links of paper filetypes:
-    $numlinks = () = ($loc->{content} =~ /\.(pdf|\.doc)\b/ig);
+    $numlinks = () = ($loc->{content} =~ /\.(pdf|\.docx?)\b/ig);
     unless ($numlinks > 2) {
         print "no: $numlinks links to paper files\n" if $verbosity > 1;
         return 0;
@@ -560,9 +560,12 @@ sub is_subpage {
     foreach my $source (@sources) {
         # subpage must be located at same host and path as parent:
         my $source_path = $source->{url};
+        print "candidate source: $source_path\n" if $verbosity > 4;
         $source_path =~ s/(?<=\w\/)[^\/]+\.[^\/]+$//; # strip filename
-        next unless $loc->{url} =~ /^$source_path/;
+        print "$loc->{url} begins with $source_path ?\n" if $verbosity > 4;
+        next unless $loc->{url} =~ /^\Q$source_path/;
         # parent page must allow crawling:
+        print "source crawl depth ($source->{crawl_depth}) > 0?\n" if $verbosity > 4;
         next if $source->{crawl_depth} == 0;
         push @parents, $source;
     }
