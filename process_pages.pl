@@ -35,6 +35,7 @@ Usage: $0 [-sh] [-p url or id] [-v verbosity]
 
 -v        : verbosity level (0-10), default: 1
 -p        : url that will be processed (result not written to DB) or id
+-n        : do not write result to DB  
 -h        : this message
 
 EOF
@@ -132,12 +133,15 @@ sub next_pages {
         else {
             $url = $opts{p};
             ($id) = $dbh->selectrow_array("SELECT source_id FROM sources WHERE url = '$url'");
-            $id = 0 unless $id;
+            unless ($id) {
+                $opts{n} = 1;
+                $id = 0;
+            }
         }
         return [{ source_id => $id, url => $url, last_checked => 0 }];
     }
     my $NUM_URLS = 10;
-    my $min_age = gmtime()-(24*60*60);
+    my $min_age = gmtime()-(12*60*60);
     my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources "
         ."WHERE last_checked < '".($min_age->ymd)."' "
@@ -152,23 +156,23 @@ sub process {
     my $page = shift;
     print "\nchecking page $page->{url}\n" if $verbosity;
     my $page_id = $page->{source_id};
-    my $mtime = (defined $page->{last_checked}) ?
+    my $mtime = (defined $page->{last_checked} && 1==0) ? # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX temporally disabled!
         $page->{last_checked} : 0;
     my $res = fetch_url($page->{url}, $mtime);
     if ($res && $res->code == 304) {
         print "not modified.\n" if $verbosity;
-        $pg_ping->execute(1, $page_id) unless $opts{p};
+        $pg_ping->execute(1, $page_id) unless $opts{n};
         return;
     }
     if (!$res || !$res->is_success || !$res->{content}) {
         print "error:\n   ", ($res ? $res->status_line : ''), "\n" if $verbosity;
-        $pg_ping->execute($res ? $res->code : 900, $page_id) unless $opts{p};
+        $pg_ping->execute($res ? $res->code : 900, $page_id) unless $opts{n};
         return;
     }
     # also check for 404 errors without proper HTTP status:
     if ($res->{content} =~ /Error 404/) {
         print "page contains 404 error message\n" if $verbosity;
-        $pg_ping->execute('404', $page_id) unless $opts{p};
+        $pg_ping->execute('404', $page_id) unless $opts{n};
         return;
     }
     print "\n $res->{content}\n" if $verbosity > 5;
@@ -183,8 +187,10 @@ sub process {
     
     # extract links from page and add them to DB if new:
     my @links;
+    my $base = ($res->{content} =~ /<base href=['"]?(.+?)['"]?>/) ? 
+        $1 : $res->base();
     eval {
-        my $link_ex = new HTML::LinkExtractor(undef, $res->base, 1);
+        my $link_ex = new HTML::LinkExtractor(undef, $base, 1);
         $link_ex->parse(\$res->{content});
         @links = grep { $_->{href} } @{$link_ex->links};
     };
@@ -223,7 +229,7 @@ sub process {
         }
         $url =~ s/\s/%20/g; # fix links with whitespace
         print "new link: $url ($text)\n" if $verbosity;
-        next LINKS if $opts{p};
+        next LINKS if $opts{n};
         my $loc_id;
         my $res = $db_insert_location->execute($url)
             or print DBI->errstr;
