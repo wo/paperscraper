@@ -631,6 +631,8 @@ sub check_steppingstone {
         qr/class='outLink' href="http:\/\/philpapers.org\/go.pl[^"]+u=(http.+?)"/ => '*', 
         # philsci-archive.pitt.edu:
         qr/<meta name="eprints.document_url" content="(.+?)" / => '*',
+        # sciencedirect.com:
+        qr/pdfurl="(.+?)"/ => '*',
         # PLOSOne:
         qr/(http:\/\/www.plosone.org\/article\/.+?representation=PDF)" id="downloadPdf"/ => '*',
         # Google Drive:
