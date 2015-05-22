@@ -522,6 +522,9 @@ sub fetch_document {
 }
 
 sub is_subpage {
+    # currently disabled because too many false positives
+    return 0;
+
     my $loc = shift;
     return unless $loc->{location_id} && $loc->{filetype} eq 'html';
 
