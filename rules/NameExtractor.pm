@@ -2,6 +2,7 @@ package rules::NameExtractor;
 use strict;
 use warnings;
 use Exporter;
+use utf8;
 use List::Util qw/max min/;
 use Cwd 'abs_path';
 use File::Basename;
@@ -28,6 +29,8 @@ sub verbosity {
 sub parse {
     my $chunk = shift;
     my $str = $chunk->{plaintext};
+    # remove footnote stars *, crosses, etc.: 
+    $str =~ s/[\*\x{2217}†‡§]/ /g;
     my %res; # name => probability
     print "--parsing name $str\n" if $verbose;
     my @parts = split($re_name_separator, $str);

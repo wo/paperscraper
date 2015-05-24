@@ -287,6 +287,11 @@ my %tests = (
    title => "Saving Relativism From its Saviour",
  },
 
+ '/home/wo/programming/opp-tools/test/doctests/23-Badgaiyan-Priming.pdf' => {
+   authors => ["Rajendra D. Badgaiyan", "Daniel L. Schacter", "Nathaniel M. Alpert"],
+   title => "Priming within and across Modalities: Exploring the Nature of rCBF Increases and Decreases",
+ },
+
 
 );
 
