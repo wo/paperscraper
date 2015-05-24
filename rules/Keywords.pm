@@ -62,7 +62,7 @@ our $re_publication_word = qr/\b(?:
     )\b/ix;
 
 our $re_journal = qr/\b(?:
-    journal|studies|philosophical|proceedings
+    journal|studies|proceedings
     )\b/ix;
 
 our $re_publisher = qr/\b(?:

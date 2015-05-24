@@ -178,15 +178,20 @@ sub mergechunks {
         return $lines;
     }
 
-    # Does the chunk begin too far right or left?
+    # Does the chunk begin too far right? Here we have to be careful
+    # because two-column papers often have rather little space between
+    # the columns. So we err on the side of keeping too many chunks
+    # and fix this later when columnizing.
     my $chunk_x = $chunk->{left};
     my $ex = $line->{width} / $line->{length};
-    my $max_x = $line->{right} + 7*$ex;
+    my $max_x = $line->{right} + 2*$ex;
     if ($chunk_x > $max_x) {
         print "  $chunk_x > $max_x: too far right\n" if $verbose;
         push @$lines, $chunk;
         return $lines;
     }
+    
+    # Does the chunk begin too far left?
     my $overlap = $line->{right} - $chunk_x;
     if ($overlap > 3*$ex) {
         print "  chunks overlap by $overlap!\n" if $verbose;
@@ -360,6 +365,18 @@ sub columnize {
                 $unbroken = 1;
             }
         }
+
+        # Ignore single-line columns unless the chunks are really far
+        # apart:
+        if (scalar @leftcol == 1 && scalar @rightcol == 1) {
+            my $ex = $lines[$i]->{width} / $lines[$i]->{length};
+            if ($lines[$i]->{right} + 10*$ex > $lines[$i+1]->{left}) {
+                print "ignoring narrow, one-line columnisation\n" if $verbose;
+                append($lines[$i], $lines[$i+1]);
+                $i++;
+                next;
+            }
+        }
         
         # If there are embedded columns, e.g.
         #
@@ -386,6 +403,7 @@ sub columnize {
         }
         $numcols = $rightcol[-1]->{col};
     }
+
     # sort by column, top->bottom:
     if ($numcols > 1) {
         @newlines = sort { $a->{col}*1000 + $a->{top} <=>

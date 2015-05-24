@@ -53,6 +53,9 @@ my %tests = (
 
  '/home/wo/programming/opp-tools/test/doctests/bradleyan-regresses-eds-hochberg-mulligan.pdf' => "Old English manors have their ghosts. And though I would not want to call analytic philosophy a ‘manor’, nor exactly ‘old’, it certainly is of some decent English origin, and it left adolescence a while ago. No wonder then, that it is not exempt from haunting terrors. One particular spectre has been haunting it for decades; it already gave some analytic pioneers the creeps, and we still now and then find people terrified by it: the ghost of old Bradley has not yet found its rest and keeps on threatening people with his notorious regress. The present essay is a lecture in exorcism; much of the fear old Bradley spread, so I will argue, peters out once we dare to look it in the eye.",
 
+ '/home/wo/programming/opp-tools/test/doctests/23-Badgaiyan-Priming.pdf' => "Neuroimaging studies suggest that within-modality priming is associated with reduced regional cerebral blood flow (rCBF) in the extrastriate area, whereas cross-modality priming is associated with increased rCBF in prefrontal cortex. To characterize the nature of rCBF changes in within- and cross-modality priming, we conducted two neuroimaging experiments using positron emission tomography (PET). In experiment 1, rCBF changes in within-modality auditory priming on a word stem completion task were observed under same- and different-voice conditions.",
+
+
 );
 
 sub proc {
