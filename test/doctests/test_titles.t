@@ -281,6 +281,12 @@ my %tests = (
    authors => ["Trenton Merricks"],
    title => "Composition as Identity, Mereological Essentialism, and Counterpart Theory",
  },
+    
+ '/home/wo/programming/opp-tools/test/doctests/22-Koelbel-Saving.pdf' => {
+   authors => ["Max Kölbel"],
+   title => "Saving Relativism From its Saviour",
+ },
+
 
 );
 

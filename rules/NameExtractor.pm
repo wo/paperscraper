@@ -62,7 +62,12 @@ sub parse {
 sub tidy_name {
     my $name = shift;
     # decapitalize 'Thomas SCANLON', but not 'CSI Jenkins' or 'Samuel Wheeler III':
-    $name =~ s/([[:upper:]]{4,})/\u\L$1/g;
+    while ($name =~ /\b([[:upper:]]{2,})\b/g) {
+        my $w = $1;
+        if (length($w) > 3 || in_dict($w, 'firstnames') || in_dict($w, 'surnames')) {
+            $name =~ s/($w)/\u\L$1/g;
+        }
+    }
     return $name;
 }
 
