@@ -62,7 +62,7 @@ our $re_publication_word = qr/\b(?:
     )\b/ix;
 
 our $re_journal = qr/\b(?:
-    journal|studies|proceedings
+    journal|philosophical|studies|proceedings
     )\b/ix;
 
 our $re_publisher = qr/\b(?:
@@ -73,7 +73,7 @@ our $re_publisher = qr/\b(?:
 our $re_editor = qr/^\(?ed(?:itor)?s?[\.\)].?$/ix;
 
 our $re_legalese = qr/\b(?:
-    copyright|\(c\)|©|trademarks?|registered|
+    copyright|\(c\)|©|\x{A9}|trademarks?|registered|distributed\sunder|
     terms\sand\sconditions|http|permission
     )\b/ix;
 
