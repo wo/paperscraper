@@ -528,10 +528,7 @@ $f{'resembles source author'} = memoize(sub {
 
 $f{'occurs on source page'} = memoize(sub {
     return undef unless $_[0]->{doc}->{sourcecontent};
-    my $str = $_[0]->{plaintext};
-    #print "xxx looking for '$str' in '$_[0]->{doc}->{sourcecontent}'\n\n";
-    return $_[0]->{doc}->{sourcecontent} =~ /\Q$str/i;
-    # no \b here because e.g. 'Foo Bar?' does not end with \b
+    return is_rough_substring($_[0]->{plaintext}, $_[0]->{doc}->{sourcecontent});
 });
 
 $f{'occurs in marginals'} = memoize(sub {

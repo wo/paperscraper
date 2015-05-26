@@ -5,12 +5,24 @@ use utf8;
 use HTML::Strip;
 use Text::Capitalize;
 use Text::Aspell;
+use Text::Unidecode 'unidecode';
 use Memoize;
 use lib '..';
 use rules::Keywords;
 use Exporter;
 our @ISA = ('Exporter');
-our @EXPORT = qw/&strip_tags &tidy_text &plaintext &is_word &tokenize &force_utf8/;
+our @EXPORT = qw/&strip_tags &tidy_text &plaintext &is_word &tokenize &force_utf8 &is_rough_substring/;
+
+sub is_rough_substring {
+    # for locating titles on source pages
+    my ($needle, $haystack) = @_;
+    # transliterate to ascii:
+    $needle = unidecode($needle);
+    $haystack = unidecode($haystack);
+    #print "xxx searching '$needle' in '$haystack'\n\n"; 
+    # no \b here because e.g. 'Foo Bar?' does not end with \b
+    return $haystack =~ /\Q$needle/i;
+}
 
 sub strip_tags_new {
     my $str = shift;

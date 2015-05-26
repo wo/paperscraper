@@ -465,7 +465,7 @@ sub adjust_confidence {
             }
         }
         if ($self->{sourcecontent}
-            && $self->{sourcecontent} !~ /\Q$self->{title}/i) {
+            && !is_rough_substring($self->{title}, $self->{sourcecontent})) {
             $self->decr_confidence(0.7, "title not on source page");
         }
         if (@{$self->{sourceauthors}}) {

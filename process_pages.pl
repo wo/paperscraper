@@ -6,7 +6,6 @@ use DBI;
 use URI::URL;
 use POSIX qw[ _exit ];
 use HTML::LinkExtractor;
-use Text::Unidecode 'unidecode';
 use Data::Dumper;
 use Time::Piece;
 use Getopt::Std;
