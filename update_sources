@@ -26,6 +26,8 @@ $0 [options] <action> <id>
 Options (only relevant for "add" and "modify"):
 --author : set default_author
 --crawl  : set crawl_depth
+--type   : set source type (1=personal page, 2=journal,repository,etc.)
+--name   : set name of journal,repository,etc.
 --url    : set new URL
 
 Example:
@@ -59,6 +61,8 @@ sub ret {
 
 my $action = '';
 my $id = '';
+my $type = 1;
+my $name = '';
 my $author;
 my $url;
 my $crawl;
@@ -70,15 +74,15 @@ if ($is_cgi) {
     #}
     $action = $cgi->param('action');
     $id = uri_unescape($cgi->param('id'));
-    #$author = uri_unescape($cgi->param('author')) if $cgi->param('author');
+    $type = uri_unescape($cgi->param('type')) if $cgi->param('type');
     $author = $cgi->param('author') if $cgi->param('author');
-    #print "cgi param: $author\n"; 
     $author = uri_unescape($author);
     #print "uri_unescape: $author\n"; 
     #$author = Encode::encode("UTF-8", $author);
     #$author = $cgi->param('author') if $cgi->param('author');
     $crawl = $cgi->param('crawl') if $cgi->param('crawl');
     $url = uri_unescape($cgi->param('url')) if $cgi->param('url');
+    $name = uri_unescape($cgi->param('name')) if $cgi->param('name');
     ret(0, "id/url parameter missing") unless $id;
 }
 else {
@@ -90,6 +94,8 @@ else {
     $id = $ARGV[1];
     GetOptions('author=s' => \$author,
                'crawl=i' => \$crawl,
+               'name=s' => \$name,
+               'type=i' => \$type,
                'url=s' => \$url);
 }
 
@@ -104,8 +110,8 @@ my $dispatch = {};
 
 my $db_add = $dbh->prepare(<<SQL);
    INSERT IGNORE INTO sources
-   (url, status, default_author)
-   VALUES(?, 0, ?)
+   (url, status, type, default_author, name)
+   VALUES(?, 0, ?, ?, ?)
 SQL
 
 my $db_set_author = $dbh->prepare(<<SQL);
@@ -121,7 +127,7 @@ my $db_set_url = $dbh->prepare(<<SQL);
 SQL
 
 $dispatch->{add} = sub {
-    my $res = $db_add->execute($id, $author)
+    my $res = $db_add->execute($id, $type, $author, $name)
         or ret(0, DBI->errstr || "MySQL execution failed");
     ret(0, "$id already in database") if ($res eq '0E0');
     my $source_id = $db_add->{mysql_insertid};
