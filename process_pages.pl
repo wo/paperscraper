@@ -193,14 +193,16 @@ sub process {
         my $link_ex = new HTML::LinkExtractor(undef, $base, 1);
         $link_ex->parse(\$res->{content});
         @links = grep { $_->{href} } @{$link_ex->links};
+        for my $link (@links) {
+            $link->{href} = tidy_url($link->{href});
+        }
     };
+        
     my @urls = map $_->{href}, @links;
 
   LINKS:
     foreach my $new_link (@links) {
         my $url = $$new_link{href};
-        # unescape tilde character in urls:
-        $url =~ s/%7e/~/i;
         my $text = $$new_link{_TEXT} || ''; # e.g., 'pdf' img link
         binmode STDOUT, ":utf8"; # why oh why?
         print "checking link: $url ($text)\n" if ($verbosity > 1);
@@ -227,7 +229,6 @@ sub process {
                 }
             }
         }
-        $url =~ s/\s/%20/g; # fix links with whitespace
         print "new link: $url ($text)\n" if $verbosity;
         next LINKS if $opts{n};
         my $loc_id;
@@ -245,11 +246,13 @@ sub process {
         $db_insert_link->execute($page_id, $loc_id, $text);
         push @old_urls, $url;
     }
+    
     # remove disappeared links:
     foreach my $old_url (@old_urls) {
         remove_link($old_url, $page_id)
             unless (grep /\Q$old_url\E/, @urls);
     }
+
     my $pg_content = force_utf8(strip_tags($res->{content}));
     $pg_content =~ s/\s+/ /g;
     print "page content: $pg_content\n\n" if $verbosity > 5;
@@ -297,4 +300,11 @@ sub remove_link {
 	}
     }
     return 1;
+}
+
+sub tidy_url {
+    my $url = shift;
+    $url =~ s/%7e/~/i; # unescape tilde character
+    $url =~ s/\s/%20/g; # fix whitespace
+    return $url;
 }
