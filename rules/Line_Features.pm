@@ -74,15 +74,15 @@ $features{TITLE} = [
     ['high uppercase frequency', [0.1, -0.2], 2],
     ['resembles anchor text', [0.5, -0.1], 2],
     ['occurs in marginals', [0.4, 0], 2],
-    ['occurs on source page', [0.2, -0.4], 2],
+    ['occurs on source page', [0.2, -0.5], 2],
     ['probable CONTENT', [-0.4, 0.2], 3],
     ['probable HEADING', [-0.4, 0.2], 3],
     #['words common in content', [0.1, -0.3], 3],
     ['probable AUTHOR', [-0.3, 0.1], 4],
     [$and->('best AUTHOR', 'other good TITLEs'), [-0.7, 0.05], 4],
     [$or->('best TITLE', 'in continuation with good TITLE'), [0.5, -0.8], 5],
-    ['separated from AUTHOR only by TITLE', [0.3, -0.6], 5],
-    ['resembles best TITLE', [0.1, -0.5], 5],
+    ['separated from AUTHOR only by TITLE', [0.2, -0.6], 5],
+    ['resembles best TITLE', [0.1, -0.6], 5],
     ];
 
 $features{AUTHOR} = [
@@ -529,7 +529,9 @@ $f{'resembles source author'} = memoize(sub {
 $f{'occurs on source page'} = memoize(sub {
     return undef unless $_[0]->{doc}->{sourcecontent};
     my $str = $_[0]->{plaintext};
-    return $_[0]->{doc}->{sourcecontent} =~ /\b\Q$str\b/i;
+    #print "xxx looking for '$str' in '$_[0]->{doc}->{sourcecontent}'\n\n";
+    return $_[0]->{doc}->{sourcecontent} =~ /\Q$str/i;
+    # no \b here because e.g. 'Foo Bar?' does not end with \b
 });
 
 $f{'occurs in marginals'} = memoize(sub {
