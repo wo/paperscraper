@@ -97,6 +97,7 @@ $features{AUTHOR} = [
     ['several words', [0, -0.5]],
     ['begins with possible name', [0.3, -0.4]],
     ['typical list of names', [0.2, 0]],
+    ['SEP author', [1, -1]],
     ['largest text on page', [-0.2, 0], 2],
     ['contains digit', [-0.1, 0.05], 2],
     ['gap above', [0.25, -0.3], 2],
@@ -751,6 +752,12 @@ $f{'resembles best BIBSTART'} = sub {
 $f{'like pdf author'} = sub {
     # TODO
     return 0;
+};
+
+$f{'SEP author'} = sub {
+    return undef if ($_[0]->{doc}->{url} !~ /stanford\.edu\/entries/);
+    # e.g.: Valentin Goranko &lt;<i>valentin.goranko@philosophy.su.se</i>&gt;
+    return ($_[0]->{text} =~ /\w+ &lt;<i>.+@.+&gt;$/);
 };
 
 $f{'typical list of names'} = sub {

@@ -225,6 +225,8 @@ $f{'author blocks are similar'} = sub {
 };
 
 $f{'first author near title'} = sub {
+    my $doc = $_[0]->{blocks}->[0]->{chunks}->[0]->{doc};
+    return undef if ($doc->{url} =~ /stanford\.edu\/entries/);
     my ($author, $title);
     foreach (@{$_[0]->{blocks}}) {
         $author = $_ if $_->{label}->{AUTHOR} && !$author;
@@ -241,6 +243,8 @@ $f{'first author near title'} = sub {
 };
 
 $f{'author and title on same page'} = sub {
+    my $doc = $_[0]->{blocks}->[0]->{chunks}->[0]->{doc};
+    return undef if ($doc->{url} =~ /stanford\.edu\/entries/);
     my ($author, $title);
     foreach (@{$_[0]->{blocks}}) {
         $author = $_ if $_->{label}->{AUTHOR} && !$author;

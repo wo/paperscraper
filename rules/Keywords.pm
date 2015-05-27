@@ -38,6 +38,7 @@ $re_dash
 our $re_ignore_url = qr{
     \#|
     ^mailto|
+    ^data|
     ^javascript|
     ^.+//[^/]+/?$|          # TLD
     twitter\.com|
