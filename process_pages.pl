@@ -9,7 +9,7 @@ use HTML::LinkExtractor;
 use Data::Dumper;
 use Time::Piece;
 use Getopt::Std;
-use Encode qw(decode encode);
+use Encode qw(decode encode decode_utf8);
 use FindBin qw($Bin);
 use Cwd 'abs_path';
 use File::Basename 'dirname';
@@ -190,7 +190,8 @@ sub process {
         $1 : $res->base();
     eval {
         my $link_ex = new HTML::LinkExtractor(undef, $base, 1);
-        $link_ex->parse(\$res->{content});
+        my $decoded_content = Encode::decode_utf8($res->{content});
+        $link_ex->parse(\$decoded_content);
         @links = grep { $_->{href} } @{$link_ex->links};
         for my $link (@links) {
             $link->{href} = tidy_url($link->{href});
