@@ -757,7 +757,7 @@ $f{'like pdf author'} = sub {
 $f{'SEP author'} = sub {
     return undef if ($_[0]->{doc}->{url} !~ /stanford\.edu\/entries/);
     # e.g.: Valentin Goranko &lt;<i>valentin.goranko@philosophy.su.se</i>&gt;
-    return ($_[0]->{text} =~ /\w+ &lt;<i>.+@.+&gt;$/);
+    return ($_[0]->{text} =~ /\w+ &lt;.+@.+&gt;$/);
 };
 
 $f{'typical list of names'} = sub {
