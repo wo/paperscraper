@@ -281,6 +281,9 @@ sub remove_link {
         ."AND source_id = $page_id");
     my ($links_left) = $dbh->selectrow_array(
         "SELECT source_id FROM links WHERE location_id = $loc_id");
+    return 1;
+    # deleting orphaned locations currently disabled as it leads to
+    # papers being rediscovered as new after outages.
     if (!$links_left || $links_left eq '0') {
         print "deleting orphaned location $loc_id.\n" if $verbosity;
         # Occasionally an orphaned location still leads to a valuable
