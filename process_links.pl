@@ -191,9 +191,10 @@ sub next_locations {
             my $where;
             my $min_age = gmtime()-(24*60*60);
             # No. Toss a coin to decide whether to (a) verify old
-            # papers and re-check locations with HTTP errors, or (b)
-            # give old spam and parser errors a new chance. Mostly we
-            # want to do (a). 
+            # papers (e.g. checking for substantive revisions) and
+            # re-check locations with HTTP errors, or (b) give old
+            # spam and parser errors a new chance. Mostly we want to
+            # do (a).
             if (rand(10) <= 9) {
                 # (a) re-process old papers and HTTP errors:
                 $where = "(status NOT BETWEEN 2 AND 99) AND"
