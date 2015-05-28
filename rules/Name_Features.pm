@@ -89,13 +89,13 @@ $f{'name occurs in lower case in article'} = sub {
     my $str = lc($_[0]->{text});
     # testing '\w $str': in the middle of a sentence
     return undef unless exists($_[0]->{chunk}->{doc});
-    return 1 if ($_[0]->{chunk}->{doc}->{text} =~ /\w $str\b/);
+    return 1 if ($_[0]->{chunk}->{doc}->{text} =~ /\w \Q$str\b/);
     # now test parts of name, but note that e.g. an article by
     # Christian List might well contain 'list':
     my $parts_matched = 0;
     while ($_[0]->{text} =~ /([[:upper:]]\w+)/g) { # upper-case parts
         $str = lc($1);
-        if ($_[0]->{chunk}->{doc}->{text} =~ /\b$str(?!@)\b/) {
+        if ($_[0]->{chunk}->{doc}->{text} =~ /\b\Q$str(?!@)\b/) {
             $parts_matched++;
         }
     }
@@ -106,12 +106,12 @@ my $re_sep = qr/\band\b|&amp;|,|[^\p{isAlpha}\d\.\s\@-]/i;
 $f{'is first name in line or follows comma or and'} = sub {
     return 1 unless @{$_[0]->{prev_names}};
     my $name = $_[0]->{text};
-    return $_[0]->{chunk}->{plaintext} =~ /$re_sep\s+$name/;
+    return $_[0]->{chunk}->{plaintext} =~ /$re_sep\s+\Q$name/;
 };
 
 $f{'follows publication word'} = sub {
     my $name = $_[0]->{text};
-    return $_[0]->{chunk}->{plaintext} =~ /$re_publication_word.*$name/;
+    return $_[0]->{chunk}->{plaintext} =~ /$re_publication_word.*\Q$name/;
 };
 
 $f{'separated from earlier names by non-names'} = sub {
@@ -119,7 +119,7 @@ $f{'separated from earlier names by non-names'} = sub {
     my $name = $_[0]->{text};
     # {prev_names} is unsorted, so test all:
     for my $prev (@{$_[0]->{prev_names}}) {
-        return 0 unless $_[0]->{chunk}->{plaintext} =~ /$prev.*\w{5,}.*$name/;
+        return 0 unless $_[0]->{chunk}->{plaintext} =~ /$prev.*\w{5,}.*\Q$name/;
     }
     return 1;
 };
