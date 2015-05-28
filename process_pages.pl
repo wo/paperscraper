@@ -137,11 +137,11 @@ sub next_pages {
                 $id = 0;
             }
         }
-        return [{ source_id => $id, url => $url, last_checked => 0 }];
+        return [{ source_id => $id, url => $url, content => '', last_checked => 0 }];
     }
     my $NUM_URLS = 10;
     my $min_age = gmtime()-(12*60*60);
-    my $query = "SELECT source_id, url, UNIX_TIMESTAMP(last_checked) "
+    my $query = "SELECT source_id, url, content, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources "
         ."WHERE last_checked < '".($min_age->ymd)."' "
         ."OR last_checked IS NULL ORDER BY last_checked "
@@ -255,8 +255,11 @@ sub process {
 
     my $pg_content = force_utf8(strip_tags($res->{content}));
     $pg_content =~ s/\s+/ /g;
-    print "page content: $pg_content\n\n" if $verbosity > 5;
     print "updating page $page_id records\n" if $verbosity;
+    if ($verbosity > 1) {
+        print "page content used to be:\n$page->{content}\n\n";
+        print "new page content:\n$pg_content\n\n";
+    }
     $pg_update->execute(1, $pg_content, $page_id);
 }
 
