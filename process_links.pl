@@ -186,7 +186,7 @@ sub next_locations {
         # Do we have unprocessed locations?
         my $where = $opts{r} ? "0 = 0" : "status = 0";
         my @locations = @{$fetch->($where)};
-        print scalar @locations, " new locations.\n" if $verbosity;
+        print "\n\n", scalar @locations, " new locations.\n" if $verbosity;
 
         if (!@locations) {
             my $where;
