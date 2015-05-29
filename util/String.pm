@@ -2,7 +2,6 @@ package util::String;
 use strict;
 use warnings;
 use utf8;
-use HTML::Strip;
 use Text::Capitalize;
 use Text::Aspell;
 use Text::Unidecode 'unidecode';
@@ -24,13 +23,6 @@ sub is_rough_substring {
     return $haystack =~ /\Q$needle/i;
 }
 
-sub strip_tags_new {
-    my $str = shift;
-    my $hs = HTML::Strip->new();
-    my $text = $hs->parse($str);
-    $hs->eof;
-    return $text;
-}
 
 sub strip_tags {
     # this is from http://www.perlmonks.org/?node_id=161281
@@ -272,6 +264,5 @@ sub force_utf8 {
     return $str if (Encode::is_utf8($str, 1));
     return "";
 }
-
 
 1;

@@ -7,6 +7,7 @@ use URI::URL;
 use HTML::LinkExtractor;
 use Data::Dumper;
 use Time::Piece;
+use POSIX qw(_exit);
 use Getopt::Std;
 use Encode qw(decode encode decode_utf8);
 use FindBin qw($Bin);
@@ -17,6 +18,7 @@ use util::String;
 use util::Errors;
 use rules::Keywords;
 binmode STDOUT, ":utf8";
+$| = 1; # auto flush stdout
 
 my %cfg = do 'config.pl';
 my $path = dirname(abs_path(__FILE__));
@@ -118,7 +120,7 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    exit $status;
+    POSIX::_exit($status);
 }
 
 sub next_pages {
@@ -143,10 +145,10 @@ sub next_pages {
     my $min_age = gmtime()-(12*60*60);
     my $query = "SELECT source_id, url, content, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources "
-        ."WHERE last_checked < '".($min_age->ymd)."' "
+        ."WHERE last_checked < '".($min_age->ymd)." ".($min_age->hms)."' "
         ."OR last_checked IS NULL ORDER BY last_checked "
         ."LIMIT $NUM_URLS";
-    print $query if $verbosity > 1;
+    print "$query\n" if $verbosity > 2;
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
     return $pages;
 }

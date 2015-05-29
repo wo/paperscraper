@@ -9,6 +9,7 @@ use FindBin qw($Bin);
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use DBI;
+use POSIX qw(_exit);
 use String::Approx 'amatch';
 use Digest::MD5;
 use HTML::LinkExtractor;
@@ -25,6 +26,7 @@ use Converter;
 use Extractor;
 use POSIX qw/strftime/;
 binmode STDOUT, ":utf8";
+$| = 1; # auto flush stdout
 chdir(dirname($0));
 
 my %cfg = do 'config.pl';
@@ -150,7 +152,7 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    exit($status);
+    POSIX::_exit($status);
 }
 
 sub next_locations {
