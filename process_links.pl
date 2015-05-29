@@ -186,8 +186,9 @@ sub next_locations {
         # Do we have unprocessed locations?
         my $where = $opts{r} ? "0 = 0" : "status = 0";
         my @locations = @{$fetch->($where)};
+        print scalar @locations, " new locations.\n" if $verbosity;
+
         if (!@locations) {
-            print "no new locations.\n" if $verbosity;
             my $where;
             my $min_age = gmtime()-(24*60*60);
             # No. Toss a coin to decide whether to (a) verify old
