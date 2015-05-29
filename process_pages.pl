@@ -148,7 +148,7 @@ sub next_pages {
         ."WHERE last_checked < '".($min_age->ymd)." ".($min_age->hms)."' "
         ."OR last_checked IS NULL ORDER BY last_checked "
         ."LIMIT $NUM_URLS";
-    print "$query\n" if $verbosity > 2;
+    print "$query\n" if $verbosity > 1;
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
     return $pages;
 }
