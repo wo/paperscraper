@@ -155,8 +155,7 @@ sub process {
     my $page = shift;
     print "\nchecking page $page->{url}\n" if $verbosity;
     my $page_id = $page->{source_id};
-    my $mtime = (defined $page->{last_checked} && 1==0) ? # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX temporally disabled!
-        $page->{last_checked} : 0;
+    my $mtime = (defined $page->{last_checked}) ? $page->{last_checked} : 0;
     my $res = fetch_url($page->{url}, $mtime);
     if ($res && $res->code == 304) {
         print "not modified.\n" if $verbosity;
@@ -205,14 +204,14 @@ sub process {
         my $url = $$new_link{href};
         my $text = $$new_link{_TEXT} || ''; # e.g., 'pdf' img link
         binmode STDOUT, ":utf8"; # why oh why?
-        print "checking link: $url ($text)\n" if ($verbosity > 1);
+        print "checking link: $url ($text)\n" if $verbosity > 2;
         next if ($url eq $page->{url});
         if ($url =~ /$re_ignore_url/) {
-            print "link ignored.\n"  if ($verbosity > 1);
+            print "link ignored.\n"  if $verbosity > 2;
             next;
         }
         if (grep /\Q$url\E/, @old_urls) {
-            print "link already in DB.\n" if ($verbosity > 1);
+            print "link already in DB.\n" if $verbosity > 2;
             next;
         }
         # check for session variants:
@@ -224,7 +223,7 @@ sub process {
                 my $old_url_fragment = $old_url;
                 $old_url_fragment =~ s/$re_session_id//;
                 if ($url2 eq $old_url_fragment) {
-                    print "session variant of $old_url\n" if ($verbosity > 1);
+                    print "session variant of $old_url\n" if $verbosity > 2;
                     next LINKS;
                 }
             }
@@ -255,11 +254,12 @@ sub process {
 
     my $pg_content = force_utf8(strip_tags($res->{content}));
     $pg_content =~ s/\s+/ /g;
-    print "updating page $page_id records\n" if $verbosity;
-    if ($verbosity > 1) {
-        print "page content used to be:\n$page->{content}\n\n" if $page->{content};
+    my $old_content = $page->{content} || '';
+    if ($verbosity > 1 && $pg_content ne $old_content) {
+        print "page content used to be:\n$page->{content}\n\n";
         print "new page content:\n$pg_content\n\n";
     }
+    print "updating page $page_id records\n" if $verbosity;
     $pg_update->execute(1, $pg_content, $page_id);
 }
 
