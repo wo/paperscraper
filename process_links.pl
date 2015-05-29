@@ -113,8 +113,8 @@ my $db_adddoc = $dbh->prepare(
 
 my $db_add_oppweb = $dbh->prepare(
     "INSERT IGNORE INTO docs "
-    ."(found_date, url, filetype, authors, title, abstract, "
-    ."numwords, source_url, meta_confidence, spamminess, content) "
+    ."(found_date, url, filetype, authors, title, abstract, numwords, "
+    ."source_url, source_name, meta_confidence, spamminess, content) "
     ."VALUES (NOW(),?,?,?,?,?,?,?,?,?,?)");
 
 my @abort;
@@ -405,7 +405,7 @@ EOD
             # values were set manually
             print "not updating records for document $doc_id.\n" if $verbosity;
             # hack to get document into oppweb after manual editing:
-            my $old_doc = { %$loc, %$old_doc };
+            my $old_doc = { %$loc, %$old_doc }; # merge loc and old_doc hashes
             $old_doc->{confidence} = 1;
             add_to_oppweb($old_doc);
         }
@@ -458,10 +458,12 @@ sub add_to_oppweb {
     if ($ok && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
         && $loc->{confidence} > $cfg{'CONFIDENCE_THRESHOLD'}) {
         print "adding to opp-web database.\n" if $verbosity;
+        my ($source_name) = $dbh->selectrow_array("SELECT name"
+                            ." FROM sources WHERE url = '$loc->{source_url}'");
         $db_add_oppweb->execute(
             $loc->{url}, $loc->{filetype}, $loc->{authors}, 
             $loc->{title}, $loc->{abstract}, $loc->{length}, 
-            $loc->{source_url}, $loc->{confidence},
+            $loc->{source_url}, $source_name, $loc->{confidence},
             $loc->{spamminess}, $loc->{text})
             or warn DBI->errstr;
     }
