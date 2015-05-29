@@ -257,7 +257,7 @@ sub process {
     $pg_content =~ s/\s+/ /g;
     print "updating page $page_id records\n" if $verbosity;
     if ($verbosity > 1) {
-        print "page content used to be:\n$page->{content}\n\n";
+        print "page content used to be:\n$page->{content}\n\n" if $page->{content};
         print "new page content:\n$pg_content\n\n";
     }
     $pg_update->execute(1, $pg_content, $page_id);
