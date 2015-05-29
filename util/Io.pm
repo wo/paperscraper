@@ -3,6 +3,7 @@ use strict;
 no warnings 'utf8';
 use Data::Dumper;
 use LWP;
+use URI;
 use Encode;
 use Encode 'is_utf8';
 use HTTP::Date;
@@ -31,6 +32,8 @@ sub fetch_url {
     my @locations = ($url);
     while ($response->code eq "301" or $response->code eq "302") {
         $url = $response->header('Location');
+        # fix invalid relative redirects:
+        $url = URI->new_abs($url, $response->base)->canonical();
         print "Redirected to $url\n" if $verbosity;
         if (grep { $url eq $_ } @locations) {
             print "Redirect loop!\n" if $verbosity;

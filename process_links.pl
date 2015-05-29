@@ -222,7 +222,7 @@ sub process {
     my $loc_id = $loc->{location_id};
     binmode STDOUT, ":utf8";
     print "\nchecking location $loc_id: $loc->{url} (status ",
-        $loc->{status}," spamminess ",($loc->{spamminess} || 0),")\n"
+        ($loc->{status} || 0)," spamminess ",($loc->{spamminess} || 0),")\n"
         if $verbosity;
     push @processed, $loc->{url};
 
