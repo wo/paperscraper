@@ -8,7 +8,7 @@ use Encode;
 use FindBin qw($Bin);
 use Cwd 'abs_path';
 use File::Basename 'dirname';
-use POSIX qw[ _exit ];
+use POSIX qw(exit);
 use DBI;
 use String::Approx 'amatch';
 use Digest::MD5;
@@ -149,7 +149,7 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    POSIX::_exit($status); 
+    POSIX::exit($status); 
     #exit($status);
 }
 

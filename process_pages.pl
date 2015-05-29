@@ -4,7 +4,7 @@ use warnings;
 use Carp;
 use DBI;
 use URI::URL;
-use POSIX qw[ _exit ];
+use POSIX qw(exit);
 use HTML::LinkExtractor;
 use Data::Dumper;
 use Time::Piece;
@@ -117,7 +117,7 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    POSIX::_exit($status); 
+    POSIX::exit($status); 
     #exit $status;
 }
 
