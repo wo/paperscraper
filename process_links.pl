@@ -8,7 +8,6 @@ use Encode;
 use FindBin qw($Bin);
 use Cwd 'abs_path';
 use File::Basename 'dirname';
-use POSIX qw(exit);
 use DBI;
 use String::Approx 'amatch';
 use Digest::MD5;
@@ -140,7 +139,9 @@ leave(0);
 sub leave {
     my $status = $_[0];
     unlink($lockfile);
-    $dbh->disconnect() if $dbh;
+    if ($dbh) {
+        $dbh->disconnect() or die("$DBI::errstr $DBI::err\n");
+    }
     if (@abort) {
         if ($abort[0] eq 'INT') {
             $status = 9;
@@ -149,8 +150,7 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    POSIX::exit($status); 
-    #exit($status);
+    exit($status);
 }
 
 sub next_locations {

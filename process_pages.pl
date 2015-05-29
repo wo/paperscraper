@@ -4,7 +4,6 @@ use warnings;
 use Carp;
 use DBI;
 use URI::URL;
-use POSIX qw(exit);
 use HTML::LinkExtractor;
 use Data::Dumper;
 use Time::Piece;
@@ -108,7 +107,9 @@ leave(0);
 sub leave {
     my $status = $_[0];
     unlink($lockfile);
-    $dbh->disconnect() if $dbh;
+    if ($dbh) {
+        $dbh->disconnect() or die("$DBI::errstr $DBI::err\n");
+    }
     if (@abort) {
         if ($abort[0] eq 'INT') {
             $status = 9;
@@ -117,8 +118,7 @@ sub leave {
             Carp::confess(@abort);
         }
     }
-    POSIX::exit($status); 
-    #exit $status;
+    exit $status;
 }
 
 sub next_pages {
