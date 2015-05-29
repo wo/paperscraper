@@ -115,7 +115,7 @@ my $db_add_oppweb = $dbh->prepare(
     "INSERT IGNORE INTO docs "
     ."(found_date, url, filetype, authors, title, abstract, numwords, "
     ."source_url, source_name, meta_confidence, spamminess, content) "
-    ."VALUES (NOW(),?,?,?,?,?,?,?,?,?,?)");
+    ."VALUES (NOW(),?,?,?,?,?,?,?,?,?,?,?)");
 
 my @abort;
 $SIG{INT} = sub {
