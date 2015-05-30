@@ -82,7 +82,12 @@ if ($is_cgi) {
     #$author = $cgi->param('author') if $cgi->param('author');
     $crawl = $cgi->param('crawl') if $cgi->param('crawl');
     $url = uri_unescape($cgi->param('url')) if $cgi->param('url');
-    $name = uri_unescape($cgi->param('name')) if $cgi->param('name');
+    if ($cgi->param('name')) {
+        $name = uri_unescape($cgi->param('name'));
+    }
+    elsif ($cgi->param('author')) {
+        $name = $author."'s site";
+    }
     ret(0, "id/url parameter missing") unless $id;
 }
 else {
@@ -97,6 +102,9 @@ else {
                'name=s' => \$name,
                'type=i' => \$type,
                'url=s' => \$url);
+    if (!$name && $author) {
+        $name = $author."'s site";
+    }
 }
 
 my $dbh = DBI->connect('DBI:mysql:'.$cfg{'MYSQL_DB'}, $cfg{'MYSQL_USER'},
