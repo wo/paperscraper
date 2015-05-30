@@ -187,8 +187,9 @@ sub process {
     
     # extract links from page and add them to DB if new:
     my @links;
-    my $base = ($res->{content} =~ /<base href=['"]?(\w.+?)['"]?>/) ? 
+    my $base = ($res->{content} =~ /<base href=['"]?(\w.+?)['"]?\s*\/?>/) ? 
         $1 : $res->base();
+    print "xxx $base\n";
     eval {
         my $link_ex = new HTML::LinkExtractor(undef, $base, 1);
         my $decoded_content = Encode::decode_utf8($res->{content});
