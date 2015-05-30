@@ -23,7 +23,6 @@ sub is_rough_substring {
     return $haystack =~ /\Q$needle/i;
 }
 
-
 sub strip_tags {
     # this is from http://www.perlmonks.org/?node_id=161281
     my $str = shift;

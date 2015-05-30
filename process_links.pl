@@ -636,7 +636,7 @@ sub check_steppingstone {
 
     # also catch intermediate pages from known repositories:
     my %redir_patterns = (
-        # arxiv.org, springer.com:
+        # arxiv.org, springer.com, researchgate, etc.:
         qr/<meta name="citation_pdf_url" content="(.+?)"/ => '*',
         # philpapers.org:
         qr/class='outLink' href="http:\/\/philpapers.org\/go.pl[^"]+u=(http.+?)"/ => '*', 
