@@ -43,6 +43,7 @@ our $re_ignore_url = qr{
     ^.+//[^/]+/?$|          # TLD
     twitter\.com|
     fonts\.googleapis\.com|
+    philpapers\.org/asearch|
     \.(?:css|mp3|avi|mov|jpg|gif|ppt|png|ico|mso|xml)(?:\?.+)?$   # .css?version=12
 }xi;
 

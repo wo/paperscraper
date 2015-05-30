@@ -258,7 +258,7 @@ sub process {
     $pg_content =~ s/\s+/ /g;
     my $old_content = $page->{content} || '';
     if ($verbosity > 1 && $pg_content ne $old_content) {
-        print "page content used to be:\n$page->{content}\n\n";
+        print "page content used to be:\n$old_content\n\n";
         print "new page content:\n$pg_content\n\n";
     }
     print "updating page $page_id records\n" if $verbosity;
