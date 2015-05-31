@@ -22,9 +22,10 @@ sub fetch_url {
     my $if_modified_since = shift || 0;
     my $ua = _get_ua();
     print "fetching document $url.\n" if $verbosity > 1;
-    my %headers = (
-        'If-Modified-Since' => HTTP::Date::time2str($if_modified_since)
-        );
+    my %headers = ();
+    if ($if_modified_since) {
+        $headers{'If-Modified-Since'} = HTTP::Date::time2str($if_modified_since);
+    }
     my $response = _ua_get($ua, $url, \%headers);
     print Dumper $response if $verbosity > 7;
     $response->{url} = $url;
@@ -41,13 +42,13 @@ sub fetch_url {
         }
         push(@locations, $url);
         eval {
-            $response = $ua->get($url, %headers);
+            $response = _ua_get($ua, $url, \%headers);
        };
     }
-   if (!$response->is_success) {
-       print "status ", $response->status_line, "\n" if $verbosity;
-       return $response;
-   }
+    if (!$response->is_success) {
+        print "status ", $response->status_line, "\n" if $verbosity;
+        return $response;
+    }
     print "ok, file retrieved\n" if $verbosity > 1;
     $response->{filesize} = length($response->content);
     $response->{filetype} = _get_filetype($response);
@@ -72,10 +73,15 @@ sub fetch_url {
 }
 
 sub _ua_get {
-    # Otherwise we get a warning due to perl's y2038 bug when handling
-    # cookies
     my ($ua, $url, $headers) = @_;
     my %headers = %{$headers};
+    # Emulate a web browser profile:
+    $headers{'accept'} = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
+    $headers{'accept-language'} = 'en-US,en;q=0.5';
+    # block 'TE' header:
+    push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, SendTE => 0, PeerHTTPVersion => "1.1");
+    # Without the following voodoo we get a warning due to perl's
+    # y2038 bug when handling cookies:
     open OLDERR,     ">&", \*STDERR or die "Can't dup STDERR: $!";
     select OLDERR;
     open STDERR, ">/dev/null"       or die "Can't change STDERR: $!";
@@ -91,7 +97,7 @@ sub _ua_get {
 my $_ua;
 sub _get_ua {
     if (!$_ua) {
-        $_ua = LWP::UserAgent->new;
+        $_ua = LWP::UserAgent->new(keep_alive=>1);
         $_ua->agent('Mozilla/5.0 (X11; Linux x86_64; rv:37.0) Gecko/20100101 Firefox/37.0');
         # allow cookies e.g. for google sites redirects
         $_ua->cookie_jar({});
