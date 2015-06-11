@@ -1,0 +1,2223 @@
+
+=====
+2015-06-05 14:31:30.581886
+http://127.0.0.1:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-05-29'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-05 14:37:46.914984
+http://127.0.0.1:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-05-29'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-05 14:37:47.691175
+http://127.0.0.1:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-05-29'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-07 21:02:08.312481
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:02:10.595646
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:02:55.171451
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:03:20.162025
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:03:50.852423
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:04:23.390142
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:07:01.551404
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:07:26.585101
+http://127.0.0.2:5000/doclist
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-07 21:07:26.815074
+http://127.0.0.2:5000/favicon.ico
+GET
+127.0.0.1
+
+=====
+2015-06-07 21:07:26.844398
+http://127.0.0.2:5000/favicon.ico
+GET
+127.0.0.1
+
+=====
+2015-06-07 21:11:18.801139
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:22.884274
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:32.672178
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:33.234575
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:33.571670
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:33.909518
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:34.278999
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:34.676813
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:35.370493
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:11:46.265362
+http://127.0.0.2:5000/topiclist/mind
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:12:05.969735
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:12:21.294188
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:13:12.541349
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:15:46.426957
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:16:05.246759
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-07 21:16:10.620364
+http://127.0.0.2:5000/topiclist/mind?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'mind' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','71','69','64','60','59','57','56','54','50','47','44','43','42','40','38','34','33','21','14')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 71
+retrieved doc 69
+retrieved doc 64
+retrieved doc 60
+retrieved doc 59
+retrieved doc 57
+retrieved doc 56
+retrieved doc 54
+retrieved doc 50
+retrieved doc 47
+retrieved doc 44
+retrieved doc 43
+retrieved doc 42
+retrieved doc 40
+retrieved doc 38
+retrieved doc 34
+retrieved doc 33
+retrieved doc 21
+retrieved doc 14
+
+=====
+2015-06-09 12:42:09.090250
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:29:19.385569
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:29:21.516897
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:29:23.935886
+http://127.0.0.2:5000/topiclist/political?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'political' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:29:27.902788
+http://127.0.0.2:5000/topiclist/political?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'political' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:30:00.829479
+http://127.0.0.2:5000/topiclist/political?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'political' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:31:04.487126
+http://127.0.0.2:5000/topiclist/political?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'political' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:31:26.220886
+http://127.0.0.2:5000/topiclist/political?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'political' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:31:43.215224
+http://127.0.0.2:5000/topiclist/political?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'political' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 17:31:46.012602
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 17:31:46.044521
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:42:56.408958
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 19:42:58.637354
+http://127.0.0.2:5000/topiclist/ethics?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'ethics' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 19:43:01.180545
+http://127.0.0.2:5000/topiclist/ethics?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'ethics' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 19:43:02.915232
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 19:43:04.481795
+http://127.0.0.2:5000/topiclist/epistemology?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'epistemology' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 19:43:07.000840
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:43:07.038415
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:43:36.662646
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:43:37.443928
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:43:37.891362
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:51:27.726859
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:51:44.669341
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:52:08.800291
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:53:02.908755
+http://feedlist/
+GET
+127.0.0.1
+
+=====
+2015-06-11 19:54:04.984509
+http://127.0.0.2:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-06-04'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-11 19:54:06.215490
+http://127.0.0.2:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-06-04'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-11 19:54:07.020504
+http://127.0.0.2:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-06-04'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-11 19:54:07.562359
+http://127.0.0.2:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-06-04'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-11 19:54:07.949574
+http://127.0.0.2:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-06-04'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-11 19:54:08.268852
+http://127.0.0.2:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-06-04'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-11 19:54:08.574279
+http://127.0.0.2:5000/feedlist
+GET
+127.0.0.1
+SELECT doc_id, authors, title, abstract, url, filetype,
+                       numwords, source_url, source_name, found_date,
+                       DATE_FORMAT(found_date, '%d %M %Y') AS found_day
+                       FROM docs
+                       WHERE found_date < CURDATE() AND found_date >= '2015-06-04'
+                       ORDER BY found_date DESC
+                     LIMIT 200 OFFSET 0
+
+=====
+2015-06-11 19:54:15.337502
+http://127.0.0.2:5000/doclist?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                       GROUP_CONCAT(T.label) AS topic_labels,
+                       GROUP_CONCAT(T.topic_id) AS topic_ids,
+                       GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                       FROM (docs D CROSS JOIN
+                             (SELECT * FROM topics WHERE is_default = 1) AS T)
+                       LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       GROUP BY D.doc_id
+                       ORDER BY D.found_date DESC
+                     LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 19:54:20.713584
+http://127.0.0.2:5000/topiclist/ethics?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'ethics' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+
+=====
+2015-06-11 19:54:22.470540
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+=====
+2015-06-11 19:56:35.662289
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:56:38.208479
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:56:56.107187
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:56:56.831344
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:57:02.609479
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:57:03.263464
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:57:03.773018
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:57:07.515845
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=72&class=1&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+
+=====
+2015-06-11 19:57:18.312174
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=74&class=0&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+UPDATE docs2topics SET strength = NULL WHERE topic_id = {0} AND is_training < 1
+
+=====
+2015-06-11 19:57:22.182267
+http://127.0.0.2:5000/train?topic=ethics&topic_id=8&doc=73&class=0&next=%2Ft%2Fethics
+GET
+127.0.0.1
+/train
+
+         SELECT D.*, M.strength
+         FROM docs D, docs2topics M
+         WHERE M.doc_id = D.doc_id AND M.topic_id = {0} AND M.is_training = 1
+         ORDER BY D.found_date DESC
+         LIMIT 100
+    
+UPDATE docs2topics SET strength = NULL WHERE topic_id = {0} AND is_training < 1
+
+=====
+2015-06-11 20:11:05.819164
+http://127.0.0.2:5000/topiclist/political?offset=0
+GET
+127.0.0.1
+SELECT D.doc_id, M.strength, T.label, T.topic_id
+                   FROM topics T, docs D
+                   LEFT JOIN docs2topics M USING (doc_id)
+                   WHERE T.label = 'political' AND M.topic_id = T.topic_id
+                   AND (strength >= 0.5 OR strength IS NULL)
+                   ORDER BY D.found_date DESC
+                   LIMIT 20 OFFSET 0
+                
+SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
+                           D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+                           GROUP_CONCAT(T.label) AS topic_labels,
+                           GROUP_CONCAT(T.topic_id) AS topic_ids,
+                           GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
+                           FROM (docs D CROSS JOIN
+                                 (SELECT * FROM topics WHERE is_default = 1) AS T)
+                           LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                           WHERE D.doc_id IN ('74','73','72','71','70','69','68','67','66','65','64','63','62','61','60','59','58','57','56','55')
+                           GROUP BY D.doc_id
+                           ORDER BY D.found_date DESC
+                         LIMIT 20 OFFSET 0
+retrieved doc 74
+retrieved doc 73
+retrieved doc 72
+retrieved doc 71
+retrieved doc 70
+retrieved doc 69
+retrieved doc 68
+retrieved doc 67
+retrieved doc 66
+retrieved doc 65
+retrieved doc 64
+retrieved doc 63
+retrieved doc 62
+retrieved doc 61
+retrieved doc 60
+retrieved doc 59
+retrieved doc 58
+retrieved doc 57
+retrieved doc 56
+retrieved doc 55
+unclassified documents in get_docs
+SELECT * FROM docs WHERE doc_id IN ('64','65','66','67','68','69','70','71','55','56','57','58','59','60','61','62','63')
+initializing 8 classifier
+loading classifier model from disk
+doc 71 classified for topic 8: 0.239617477165
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (71,8,0.239617477165)
+            ON DUPLICATE KEY UPDATE strength=0.239617477165
+        
+doc 70 classified for topic 8: 0.351035953553
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (70,8,0.351035953553)
+            ON DUPLICATE KEY UPDATE strength=0.351035953553
+        
+doc 69 classified for topic 8: 0.270441159449
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (69,8,0.270441159449)
+            ON DUPLICATE KEY UPDATE strength=0.270441159449
+        
+doc 68 classified for topic 8: 0.364577153326
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (68,8,0.364577153326)
+            ON DUPLICATE KEY UPDATE strength=0.364577153326
+        
+doc 67 classified for topic 8: 0.357117223893
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (67,8,0.357117223893)
+            ON DUPLICATE KEY UPDATE strength=0.357117223893
+        
+doc 66 classified for topic 8: 0.380746425655
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (66,8,0.380746425655)
+            ON DUPLICATE KEY UPDATE strength=0.380746425655
+        
+doc 65 classified for topic 8: 0.358319821097
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (65,8,0.358319821097)
+            ON DUPLICATE KEY UPDATE strength=0.358319821097
+        
+doc 64 classified for topic 8: 0.272366978586
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (64,8,0.272366978586)
+            ON DUPLICATE KEY UPDATE strength=0.272366978586
+        
+doc 63 classified for topic 8: 0.365297283641
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (63,8,0.365297283641)
+            ON DUPLICATE KEY UPDATE strength=0.365297283641
+        
+doc 62 classified for topic 8: 0.321997913708
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (62,8,0.321997913708)
+            ON DUPLICATE KEY UPDATE strength=0.321997913708
+        
+doc 61 classified for topic 8: 0.408533151076
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (61,8,0.408533151076)
+            ON DUPLICATE KEY UPDATE strength=0.408533151076
+        
+doc 60 classified for topic 8: 0.304436670934
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (60,8,0.304436670934)
+            ON DUPLICATE KEY UPDATE strength=0.304436670934
+        
+doc 59 classified for topic 8: 0.273807186338
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (59,8,0.273807186338)
+            ON DUPLICATE KEY UPDATE strength=0.273807186338
+        
+doc 58 classified for topic 8: 0.318552616287
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (58,8,0.318552616287)
+            ON DUPLICATE KEY UPDATE strength=0.318552616287
+        
+doc 57 classified for topic 8: 0.322912842298
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (57,8,0.322912842298)
+            ON DUPLICATE KEY UPDATE strength=0.322912842298
+        
+doc 56 classified for topic 8: 0.272907687265
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (56,8,0.272907687265)
+            ON DUPLICATE KEY UPDATE strength=0.272907687265
+        
+doc 55 classified for topic 8: 0.291299928475
+
+            INSERT INTO docs2topics (doc_id, topic_id, strength)
+            VALUES (55,8,0.291299928475)
+            ON DUPLICATE KEY UPDATE strength=0.291299928475
+        
