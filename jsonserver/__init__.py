@@ -37,12 +37,9 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['MYSQL_DATABASE_USER'] = config('MYSQL_USER')
 app.config['MYSQL_DATABASE_PASSWORD'] = config('MYSQL_PASS')
 app.config['MYSQL_DATABASE_DB'] = config('MYSQL_DB')
-app.config['MIN_CONFIDENCE'] = config('MIN_CONFIDENCE')
+app.config['MIN_CONFIDENCE'] = config('CONFIDENCE_THRESHOLD')
 app.config['MAX_SPAM'] = config('MAX_SPAM')
 app.config['DOCS_PER_PAGE'] = 20
-
-print config('DOCS_PER_PAGE')
-
 
 mysql = MySQL()
 mysql.init_app(app)
@@ -108,10 +105,10 @@ def topiclist(topic):
     topic_id = 0
     while True:
         query = '''SELECT D.doc_id, M.strength, T.label, T.topic_id
-                   FROM topics T, docs D
-                   LEFT JOIN docs2topics M USING (doc_id)
-                   WHERE T.label = '{0}' AND M.topic_id = T.topic_id
-                   AND (strength >= {1} OR strength IS NULL)
+                   FROM (docs D CROSS JOIN
+                         (SELECT * FROM topics WHERE label='{0}') AS T)
+                   LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id)
+                   WHERE strength >= {1} OR strength IS NULL
                    ORDER BY D.found_date DESC
                    LIMIT {2} OFFSET {3}
                 '''.format(topic, min_p, limit, offset)
@@ -210,19 +207,28 @@ def editdoc():
 
 @app.route("/train")
 def train():
-    app.logger.debug("/train")
+    username = request.args.get('user')
     topic_id = int(request.args.get('topic_id'))
-    topic = request.args.get('topic')
     doc_id = int(request.args.get('doc'))
     hamspam = int(request.args.get('class'))
     db = get_db()
     cur = db.cursor()
+    # check if user is allowed to train this classifier:
+    if username != 'wo':
+        query = "SELECT label FROM topics WHERE topic_id = %s LIMIT 1"
+        cur.execute(query, (topic_id,))
+        rows = cur.fetchall()
+        if not rows or (rows[0][0] != username):
+            app.logger.info(rows[0])
+            app.logger.info('{0} not allowed to train {1}'.format(username, topic_id))
+            return jsonify({ 'msg':'user not allowed to train classifier' })
     query = '''
         INSERT INTO docs2topics (doc_id, topic_id, strength, is_training)
         VALUES ({0},{1},{2},1)
         ON DUPLICATE KEY UPDATE strength={2}, is_training=1
     '''
     query = query.format(doc_id, topic_id, hamspam)
+    app.logger.debug(query)
     cur.execute(query)
     db.commit()
     msg = update_classifier(topic_id)
@@ -262,6 +268,21 @@ def update_classifier(topic_id):
     else:
         msg = "classifier not yet ready because only positive or negative training samples"
     return msg
+
+@app.route('/init_topic')
+def init_topic():
+    label = request.args.get('label') 
+    db = get_db()
+    cur = db.cursor()
+    query = "INSERT INTO topics (label) VALUES (%s)"
+    try:
+        app.logger.info(query, label)
+        cur.execute(query, (label,))
+        db.commit()
+    except:
+        app.logger.warn("failed to insert %s", label)
+        return jsonify({'msg': 'Failed'})
+    return jsonify({'msg':'OK'})
 
 
 def get_docs(select, offset=0, limit=app.config['DOCS_PER_PAGE']):
@@ -412,9 +433,6 @@ class Capturing(list):
     def __exit__(self, *args):
         self.extend(self._stringio.getvalue().splitlines())
         sys.stdout = self._stdout
-
-
-################ For access to the opp-tools database #################
 
 @app.route("/opp-queue")
 def list_uncertain_docs():
