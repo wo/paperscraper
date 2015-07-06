@@ -13,7 +13,7 @@ from flask.ext.mysql import MySQL
 
 # access perl config file 'config.pl'
 config_cache = {}
-config_file = 'config.pl'
+config_file = join(abspath(dirname(__file__)), '../config.pl')
 def config(key):
     if key not in config_cache:
         if 'perlstr' not in config_cache:
