@@ -390,6 +390,9 @@ def prettify(doc):
     doc['filetype'] = doc['filetype'].upper()
     doc['reldate'] = relative_date(doc['found_date'])
     doc['deltadate'] = relative_date(doc['found_date'], 1)
+    # remove keys that don't need to be transmitted to client:
+    if 'content' in doc:
+        del doc['content']
     return doc
 
 def short_url(url):
