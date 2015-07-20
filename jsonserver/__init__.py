@@ -160,6 +160,22 @@ def topiclist(topic):
 
     return jsonify({ 'msg': 'OK', 'docs': docs, 'topic_id': topic_id })
 
+@app.route('/edit-source', methods=['POST'])
+def editsource():
+    source_type = request.form['type']
+    url = request.form['url']
+    default_author = request.form['default_author']
+    source_name = request.form['name']
+    db = get_db()
+    cur = db.cursor()
+    query = '''INSERT INTO sources (url, status, type, default_author, name)
+               VALUES(%s, 0, %s, %s, %s)
+               ON DUPLICATE KEY UPDATE type=%s, default_author=%s, name=%s'''
+    app.logger.debug(','.join((query,url,source_type,default_author,source_name)))
+    cur.execute(query, (url,source_type,default_author,source_name,source_type,default_author,source_name))
+    db.commit()
+    return jsonify({'msg':'OK'})
+    
 @app.route('/editdoc', methods=['POST'])
 def editdoc():
     doc_id = request.form['doc_id']
