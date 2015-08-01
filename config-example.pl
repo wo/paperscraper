@@ -21,3 +21,7 @@ CONFIDENCE_THRESHOLD  => 0.6,
 # CGI access to update_sources is restricted to IP addresses matching
 # the following pattern (regexp):
 ALLOWED_IPS  => '127.0.0.1',
+
+# For superfeedr api:
+SUPERFEEDR_USER => 'opp',
+SUPERFEEDR_TOKEN => 'abcdefg',

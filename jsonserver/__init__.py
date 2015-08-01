@@ -162,7 +162,7 @@ def topiclist(topic):
 
 @app.route('/edit-source', methods=['POST'])
 def editsource():
-    source_type = request.form['type']
+    source_type = int(request.form['type'])
     url = request.form['url']
     default_author = request.form['default_author']
     source_name = request.form['name']
@@ -174,8 +174,21 @@ def editsource():
     app.logger.debug(','.join((query,url,source_type,default_author,source_name)))
     cur.execute(query, (url,source_type,default_author,source_name,source_type,default_author,source_name))
     db.commit()
+    insert_id = cur.lastrowid
+
+    if source_type == 3:
+        # register new blog subscription on superfeedr:
+        from superscription import Superscription
+        ss = Superscription(config('SUPERFEEDR_USER'), token=config('SUPERFEEDR_TOKEN'))
+        r = ss.subscribe(
+            hub_topic=url,
+            hub_callback=request.url_root+'new_blog_post/'+insert_id)
+        if not r or r.status_code != 203:
+            return jsonify({'msg':'could not register blog on superfeedr!'})
+
     return jsonify({'msg':'OK'})
-    
+
+
 @app.route('/editdoc', methods=['POST'])
 def editdoc():
     doc_id = request.form['doc_id']
