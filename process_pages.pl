@@ -145,9 +145,10 @@ sub next_pages {
     my $min_age = gmtime()-(12*60*60);
     my $query = "SELECT source_id, url, content, UNIX_TIMESTAMP(last_checked) "
         ."AS last_checked FROM sources "
-        ."WHERE last_checked < '".($min_age->ymd)." ".($min_age->hms)."' "
-        ."OR last_checked IS NULL ORDER BY last_checked "
-        ."LIMIT $NUM_URLS";
+        ."WHERE type != 3 AND "
+        ."(last_checked < '".($min_age->ymd)." ".($min_age->hms)."' "
+        ." OR last_checked IS NULL) "
+        ."ORDER BY last_checked LIMIT $NUM_URLS";
     print "$query\n" if $verbosity > 1;
     my $pages = $dbh->selectall_arrayref($query, { Columns=>{} });
     return $pages;
