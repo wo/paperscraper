@@ -38,8 +38,8 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['MYSQL_DATABASE_USER'] = config('MYSQL_USER')
 app.config['MYSQL_DATABASE_PASSWORD'] = config('MYSQL_PASS')
 app.config['MYSQL_DATABASE_DB'] = config('MYSQL_DB')
-app.config['MIN_CONFIDENCE'] = config('CONFIDENCE_THRESHOLD')
-app.config['MAX_SPAM'] = config('MAX_SPAM')
+app.config['MIN_CONFIDENCE'] = float(config('CONFIDENCE_THRESHOLD'))
+app.config['MAX_SPAM'] = float(config('SPAM_THRESHOLD'))
 app.config['DOCS_PER_PAGE'] = 20
 
 mysql = MySQL()
@@ -205,9 +205,7 @@ def editsource():
 
 @app.route('/new_blog_post/<source_id>', methods=['POST'])
 def process_new_post(source_id):
-    # retrieve post info
-    # check if philosophical content
-    # add to db
+    # retrieve post info, check if philosophical content, add to db
     feed = json.loads(request.get_data())
     source_url = feed['status']['feed']
     status = feed['status']['code']
@@ -215,19 +213,19 @@ def process_new_post(source_id):
     app.logger.debug(json.dumps(feed, indent=4, separators=(',',': ')))
     db = get_db()
     cur = db.cursor()
-    query = "SELECT default_author FROM sources WHERE source_id = %s LIMIT 1"
+    query = "SELECT default_author, url, name FROM sources WHERE source_id = %s LIMIT 1"
     cur.execute(query, (source_id,))
     rows = cur.fetchall()
     if not rows:
-        app.logger.warn('source id {} not in database'.format(source_id))
+        app.logger.warn('superfeedr source id {} not in database'.format(source_id))
         return 'OK'
-    default_author = rows[0][0]
+    (default_author, source_url, source_name) = rows[0]
     posts = []
     for item in feed.get('items', []):
         post = {}
         post['url'] = item.get('permalinkUrl') or item.get('id')
         if not post['url']:
-            app.logger.error('ignoring post without permalinkUrl or id')
+            app.logger.error('ignoring superfeedr post without permalinkUrl or id')
             continue
         post['content'] = item.get('content') or item.get('summary')
         if not post['content']:
@@ -237,29 +235,57 @@ def process_new_post(source_id):
         if not post['title']:
             app.logger.error('post {} has no title?!'.format(post['url']))
             continue
-        # xxx TODO retrieve author from group blogs
+        # xxx TODO retrieve author for group blogs
         post['authors'] = default_author
+        post['filetype'] = 'blogpost'
+        post['abstract'] = make_abstract(post['content'])
+        post['numwords'] = len(post['content'].split())
+        post['source_url'] = source_url
+        post['source_name'] = source_name
         posts.append(post)
 
     from classifier import BinaryClassifier, doc2text
     docs = [doc2text(post) for post in posts]
-    clf = BinaryClassifier('blogspam')
+    clf = BinaryClassifier(0) # classifier 0 is for blogspam; note that 1=>blogspam, 0=>blogham!
     clf.load()
     probs = clf.classify(docs)
     for i, (p_no, p_yes) in enumerate(probs):
-        app.logger.debug("post {} has blogspam probability {}".format(i, p_yes))
-        if (p_yes > 100):
-            query = '''
-               INSERT INTO docs2topics (doc_id, topic_id, strength)
-               VALUES ({0},{1},{2})
-               ON DUPLICATE KEY UPDATE strength={2}
-            '''
-            query = query.format(rows[i]['doc_id'], topic_id, p_ham)
-            app.logger.debug(query)
-            cur.execute(query)
+        post = posts[i]
+        app.logger.debug("post {} has blogspam probability {}".format(post['title'], p_yes))
+        if p_yes > app.config['MAX_SPAM'] * 3/2:
+            app.logger.debug("max {}".format(app.config['MAX_SPAM'] * 3/2))
+            continue
+        post['status'] = 1 if p_yes < app.config['MAX_SPAM'] * 2/3 else 0
+        post['spamminess'] = p_yes
+        post['meta_confidence'] = 0.75
+        query = "INSERT INTO docs ({}, found_date) VALUES ({} NOW())".format(
+            ', '.join(post.keys()), '%s, '*len(post.keys()))
+        app.logger.debug(query + ', '.join(map(str, post.values())))
+        try:
+            cur.execute(query, post.values())
             db.commit()
+        except:
+            app.logger.error('failed to insert blog post {}'.format(post['title']))
 
     return 'OK'
+    
+def make_abstract(text):
+    from nltk.tokenize import sent_tokenize
+    # Setup:
+    # pip install nltk
+    # python
+    # import nltk
+    # nltk.import('punkt')
+    sentences = sent_tokenize(text[:1000])
+    abstract = ''
+    for sent in sentences:
+        abstract += sent+' '
+        if len(abstract) > 500:
+            break
+    # strip tags:
+    abstract = re.sub('<[^<]+?>', '', abstract)
+    abstract = re.sub('<', '&lt;', abstract)
+    return abstract
 
 @app.route('/editdoc', methods=['POST'])
 def editdoc():
