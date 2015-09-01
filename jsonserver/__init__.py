@@ -64,13 +64,26 @@ def log_request():
         request.method,
         request.remote_addr]))
 
+@app.route("/doc")
+def doc():
+    doc_id = int(request.args.get('doc_id', 0))
+    db = get_db()
+    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    query = "SELECT * FROM docs WHERE doc_id = %s"
+    cur.execute(query, (doc_id,))
+    docs = cur.fetchall()
+    if not docs:
+        return jsonify({ 'msg': 'there seems to be no doc with that id' })
+    doc = prettify(docs[0])
+    return jsonify({ 'msg': 'OK', 'doc': doc })
+
 @app.route("/doclist")
 def doclist():
     offset = int(request.args.get('start', 0))
     where = '' if request.args.get('quarantined') else 'WHERE D.status = 1'
     docs = get_docs('''SELECT D.doc_id, D.status, D.authors, D.title, D.abstract, D.url, 
                        D.filetype, D.found_date, D.numwords, D.source_url, D.source_name,
-                       D.meta_confidence, D.spamminess
+                       D.meta_confidence, D.spamminess,
                        GROUP_CONCAT(T.label) AS topic_labels,
                        GROUP_CONCAT(T.topic_id) AS topic_ids,
                        GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
@@ -113,7 +126,7 @@ def topiclist(topic):
                    FROM (docs D CROSS JOIN
                          (SELECT * FROM topics WHERE label='{0}') AS T)
                    LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id)
-                   WHERE (strength >= {1} OR strength IS NULL)
+                   WHERE (M.strength >= {1} OR M.strength IS NULL)
                    {2}
                    ORDER BY D.found_date DESC
                    LIMIT {3} OFFSET {4}
@@ -235,8 +248,10 @@ def process_new_post(source_id):
         if not post['title']:
             app.logger.error('post {} has no title?!'.format(post['url']))
             continue
-        # xxx TODO retrieve author for group blogs
-        post['authors'] = default_author
+        if 'actor' in item:
+            post['authors'] = item['actor'].get('displayName') or item['actor'].get('id')
+        else:
+            post['authors'] = default_author
         post['filetype'] = 'blogpost'
         post['abstract'] = make_abstract(post['content'])
         post['numwords'] = len(post['content'].split())
@@ -246,7 +261,7 @@ def process_new_post(source_id):
 
     from classifier import BinaryClassifier, doc2text
     docs = [doc2text(post) for post in posts]
-    clf = BinaryClassifier(0) # classifier 0 is for blogspam; note that 1=>blogspam, 0=>blogham!
+    clf = BinaryClassifier(0) # classifier 0 is for blogspam; note that 1=>blogspam, 0=>blogham
     clf.load()
     probs = clf.classify(docs)
     for i, (p_no, p_yes) in enumerate(probs):
@@ -260,12 +275,12 @@ def process_new_post(source_id):
         post['meta_confidence'] = 0.75
         query = "INSERT INTO docs ({}, found_date) VALUES ({} NOW())".format(
             ', '.join(post.keys()), '%s, '*len(post.keys()))
-        app.logger.debug(query + ', '.join(map(str, post.values())))
+        app.logger.debug(query + ', '.join(map(unicode, post.values())))
         try:
             cur.execute(query, post.values())
             db.commit()
         except:
-            app.logger.error('failed to insert blog post {}'.format(post['title']))
+            app.logger.error(u'failed to insert blog post {}'.format(post['title']))
 
     return 'OK'
     
@@ -274,8 +289,9 @@ def make_abstract(text):
     # Setup:
     # pip install nltk
     # python
-    # import nltk
-    # nltk.import('punkt')
+    #    import nltk
+    #    nltk.import('punkt')
+    # sudo mv ~/nltk_data /usr/lib/
     sentences = sent_tokenize(text[:1000])
     abstract = ''
     for sent in sentences:
@@ -290,8 +306,9 @@ def make_abstract(text):
 @app.route('/editdoc', methods=['POST'])
 def editdoc():
     doc_id = request.form['doc_id']
-    url = request.form['doc_url']
-    quarantined = request.form.get('quarantined', False)
+    #url = request.form.get('doc_url')
+    status = request.form.get('status', 1)
+    found_now = request.form.get('found_now', False)
     authors = request.form['authors']
     title = request.form['title']
     abstract = request.form['abstract']
@@ -323,19 +340,19 @@ def editdoc():
         #            WHERE document_id=%s
         #            '''
         #else:
-        if quarantined:
+        if found_now:
             query = '''
-                    UPDATE docs SET status=1, found_date=NOW(), authors=%s, title=%s,
+                    UPDATE docs SET status=%s, found_date=NOW(), authors=%s, title=%s,
                     abstract=%s, meta_confidence=1
                     WHERE doc_id=%s
                     '''
         else:
             query = '''
-                    UPDATE docs SET authors=%s, title=%s, abstract=%s, meta_confidence=1
+                    UPDATE docs SET status=%s, authors=%s, title=%s, abstract=%s, meta_confidence=1
                     WHERE doc_id=%s
                     '''
-        app.logger.debug(','.join((query,authors,title,abstract,doc_id)))
-        cur.execute(query, (authors, title, abstract, doc_id))
+        app.logger.debug(','.join((query,status,authors,title,abstract,doc_id)))
+        cur.execute(query, (status, authors, title, abstract, doc_id))
         db.commit()
     return jsonify({'msg':'OK'})
 
@@ -391,7 +408,7 @@ def update_classifier(topic_id):
             clf.train(docs, classes)
             clf.save()
         msg += '\n'.join(output)
-        # We might reclassify all documents now, but we postpone this step
+        # We could reclassify all documents now, but we postpone this step
         # until the documents are actually displayed (which may be never
         # for sufficiently old ones). So we simply undefine the topic
         # strengths to mark that no classification has yet been made.
@@ -417,7 +434,6 @@ def init_topic():
         app.logger.warn("failed to insert %s", label)
         return jsonify({'msg': 'Failed'})
     return jsonify({'msg':'OK'})
-
 
 def get_docs(select, offset=0, limit=app.config['DOCS_PER_PAGE']):
     query = "{0} LIMIT {1} OFFSET {2}".format(select, limit, offset)
