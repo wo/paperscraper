@@ -79,8 +79,16 @@ def doc():
 
 @app.route("/doclist")
 def doclist():
-    offset = int(request.args.get('start', 0))
-    where = '' if request.args.get('quarantined') else 'WHERE D.status = 1'
+    offset = int(request.args.get('offset', 0))
+    where = []
+    doctype = request.args.get('type')
+    if doctype == 'papers':
+        where.append('D.filetype != "blogpost"')
+    if doctype == 'blogposts':
+        where.append('D.filetype = "blogpost"')
+    if not request.args.get('quarantined'):
+        where.append('D.status = 1')
+    where = 'WHERE {}'.format(' AND '.join(where)) if where else ''
     docs = get_docs('''SELECT D.doc_id, D.status, D.authors, D.title, D.abstract, D.url, 
                        D.filetype, D.found_date, D.numwords, D.source_url, D.source_name,
                        D.meta_confidence, D.spamminess,
@@ -120,7 +128,15 @@ def topiclist(topic):
     offset = int(request.args.get('start') or 0)
     limit = app.config['DOCS_PER_PAGE']
     topic_id = 0
-    where = '' if request.args.get('quarantined') else 'AND D.status = 1'
+    where = []
+    doctype = request.args.get('type')
+    if doctype == 'papers':
+        where.append('D.filetype != "blogpost"')
+    if doctype == 'blogposts':
+        where.append('D.filetype = "blogpost"')
+    if not request.args.get('quarantined'):
+        where.append('D.status = 1')
+    where = 'AND {}'.format(' AND '.join(where)) if where else ''
     while True:
         query = '''SELECT D.doc_id, M.strength, T.label, T.topic_id
                    FROM (docs D CROSS JOIN
