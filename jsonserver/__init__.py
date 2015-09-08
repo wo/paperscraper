@@ -178,11 +178,13 @@ def editsource():
 
     if source_type == 3:
         # register new blog subscription on superfeedr:
+        app.logger.debug('subcribing on superfeedr')
         from superscription import Superscription
         ss = Superscription(config('SUPERFEEDR_USER'), token=config('SUPERFEEDR_TOKEN'))
         r = ss.subscribe(
             hub_topic=url,
             hub_callback=request.url_root+'new_blog_post/'+insert_id)
+        app.logger.debug(r.status_code)
         if not r or r.status_code != 203:
             return jsonify({'msg':'could not register blog on superfeedr!'})
 
@@ -264,7 +266,7 @@ def train():
     return jsonify({ 'msg':msg })
 
 def update_classifier(topic_id):
-    from classifier import BinaryClassifier, Doc
+    from classifier import BinaryClassifier, doc2text
     db = get_db()
     cur = db.cursor(MySQLdb.cursors.DictCursor)
     query = '''
@@ -277,7 +279,7 @@ def update_classifier(topic_id):
     app.logger.debug(query)
     cur.execute(query.format(topic_id))
     rows = cur.fetchall()
-    docs = [Doc(row) for row in rows]
+    docs = [doc2text(row) for row in rows]
     classes = [row['strength'] for row in rows]
     msg = ''
     if (0 in classes and 1 in classes):
