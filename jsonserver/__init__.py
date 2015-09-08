@@ -125,7 +125,7 @@ def topiclist(topic):
     # and keep getting more documents until we have DOCS_PER_PAGE
     # many:
     rows = []
-    offset = int(request.args.get('start') or 0)
+    offset = int(request.args.get('offset') or 0)
     limit = app.config['DOCS_PER_PAGE']
     topic_id = 0
     where = []
@@ -216,6 +216,7 @@ def editsource():
         # register new blog subscription on superfeedr:
         from superscription import Superscription
         ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
+        msg = 'could not register blog on superfeedr!'
         try:
             callback=request.url_root+'new_blog_post/{}'.format(insert_id)
             app.logger.debug('suscribing to {} on {} via superfeedr'.format(url,callback))
@@ -223,14 +224,33 @@ def editsource():
             if success:
                 return jsonify({'msg':'OK'})
         except:
-            msg = 'could not register blog on superfeedr!'
             if ss.response.status_code:
                 msg += ' status {}'.format(ss.response.status_code)
             else:
                 msg += ' no response from superseedr server'
-            return jsonify({'msg':msg})
+        return jsonify({'msg':msg})
 
     return jsonify({'msg':'OK'})
+    
+    # xxx todo:
+    if request.form['submit'] == 'Discard Entry':
+        if source_type == '3':
+            # remove new blog subscription on superfeedr:
+            from superscription import Superscription
+            ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
+            msg = 'could not unsubscribe blog from superfeedr!'
+            try:
+                app.logger.debug('removing {} from superfeedr'.format(url))
+                success = ss.unsubscribe(hub_topic=url)
+                if success:
+                    return jsonify({'msg':'OK'})
+            except:
+                if ss.response.status_code:
+                    msg += ' status {}'.format(ss.response.status_code)
+                else:
+                    msg += ' no response from superseedr server'
+            return jsonify({'msg':msg})
+
 
 @app.route('/new_blog_post/<source_id>', methods=['POST'])
 def process_new_post(source_id):
@@ -256,20 +276,21 @@ def process_new_post(source_id):
         if not post['url']:
             app.logger.error('ignoring superfeedr post without permalinkUrl or id')
             continue
-        post['content'] = item.get('content') or item.get('summary')
-        if not post['content']:
+        content = item.get('content') or item.get('summary')
+        if not content:
             app.logger.error('post {} has no content?!'.format(post['url']))
             continue
+        post['content'] = strip_tags(content)
         post['title'] = item.get('title')
         if not post['title']:
             app.logger.error('post {} has no title?!'.format(post['url']))
             continue
-        if 'actor' in item:
+        if (not default_author or default_author == 'Anonymous') and 'actor' in item:
             post['authors'] = item['actor'].get('displayName') or item['actor'].get('id')
         else:
             post['authors'] = default_author
         post['filetype'] = 'blogpost'
-        post['abstract'] = make_abstract(post['content'])
+        post['abstract'] = make_abstract(content)
         post['numwords'] = len(post['content'].split())
         post['source_url'] = source_url
         post['source_name'] = source_name
@@ -283,7 +304,7 @@ def process_new_post(source_id):
     for i, (p_no, p_yes) in enumerate(probs):
         post = posts[i]
         app.logger.debug("post {} has blogspam probability {}".format(post['title'], p_yes))
-        if p_yes > app.config['MAX_SPAM'] * 3/2:
+        if p_yes > app.config['MAX_SPAM'] * 2:
             app.logger.debug("max {}".format(app.config['MAX_SPAM'] * 3/2))
             continue
         post['status'] = 1 if p_yes < app.config['MAX_SPAM'] * 2/3 else 0
@@ -299,8 +320,20 @@ def process_new_post(source_id):
             app.logger.error(u'failed to insert blog post {}'.format(post['title']))
 
     return 'OK'
+
+def strip_tags(text, keep_italics=False):
+    if keep_italics:
+        text = re.sub(r'<(/?)[ib]>', r'{\1emph}', text)
+    text = re.sub('<.+?>', ' ', text, flags=re.MULTILINE|re.DOTALL)
+    text = re.sub('<', '&lt;', text)
+    text = re.sub('  +', ' ', text)
+    text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
+    if keep_italics:
+        text = re.sub(r'{(/?)emph}', r'<\1i>', text)
+    return text
     
 def make_abstract(text):
+    text = strip_tags(text, keep_italics=True)
     from nltk.tokenize import sent_tokenize
     # Setup:
     # pip install nltk
@@ -312,11 +345,8 @@ def make_abstract(text):
     abstract = ''
     for sent in sentences:
         abstract += sent+' '
-        if len(abstract) > 500:
+        if len(abstract) > 600:
             break
-    # strip tags:
-    abstract = re.sub('<[^<]+?>', '', abstract)
-    abstract = re.sub('<', '&lt;', abstract)
     return abstract
 
 @app.route('/editdoc', methods=['POST'])
@@ -635,7 +665,7 @@ def list_uncertain_docs():
          OFFSET {2}
     '''
     limit = app.config['DOCS_PER_PAGE']
-    offset = int(request.args.get('start') or 0)
+    offset = int(request.args.get('offset') or 0)
     max_spam = 0.3
     min_confidence = app.config['MIN_CONFIDENCE']
     where = "spamminess <= {0} AND meta_confidence <= {1}".format(max_spam, min_confidence)

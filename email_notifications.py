@@ -71,7 +71,7 @@ Edit/Delete: http://umsu.de/opp/edit-doc?doc_id={doc_id}
 
 msg = MIMEText(body)
 msg['Subject'] = subject
-msg['From'] = 'Philosophical Progress <wo@umsu.de>'
+msg['From'] = 'Philosophical Progress <opp@umsu.de>'
 msg['To'] = 'wo@umsu.de'
 
 #print msg.as_string()
