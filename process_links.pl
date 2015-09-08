@@ -114,9 +114,9 @@ my $db_adddoc = $dbh->prepare(
 
 my $db_add_oppweb = $dbh->prepare(
     "INSERT IGNORE INTO docs "
-    ."(found_date, url, filetype, authors, title, abstract, numwords, "
+    ."(found_date, url, status, filetype, authors, title, abstract, numwords, "
     ."source_url, source_name, meta_confidence, spamminess, content) "
-    ."VALUES (NOW(),?,?,?,?,?,?,?,?,?,?,?)");
+    ."VALUES (NOW(),?,?,?,?,?,?,?,?,?,?,?,?)");
 
 my @abort;
 $SIG{INT} = sub {
@@ -410,6 +410,9 @@ EOD
             # values were set manually
             print "not updating records for document $doc_id.\n" if $verbosity;
             # hack to get document into oppweb after manual editing:
+            # --- this is not needed any more for low-confidence or
+            # medium-spamminess documents that are in the docs table
+            # with status 0, so probably can be removed
             my $old_doc = { %$loc, %$old_doc }; # merge loc and old_doc hashes
             $old_doc->{confidence} = 1;
             add_to_oppweb($old_doc);
@@ -456,25 +459,28 @@ EOD
 sub add_to_oppweb {
     return unless (exists $cfg{'OPP_WEB'});
     my $loc = shift;
-    # don't show all the papers from newly added source pages:
+    # don't show papers from newly added source pages:
     my ($ok) = $dbh->selectrow_array("SELECT 1 FROM sources WHERE "
                ."found_date < DATE_SUB(NOW(), INTERVAL 12 HOUR) "
                ."AND url = ".$dbh->quote($loc->{source_url}));
-    if ($ok && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}
-        && $loc->{confidence} > $cfg{'CONFIDENCE_THRESHOLD'}) {
-        print "adding to opp-web database.\n" if $verbosity;
-        my ($source_name) = $dbh->selectrow_array("SELECT name"
-                            ." FROM sources WHERE url = '$loc->{source_url}'");
-        $db_add_oppweb->execute(
-            $loc->{url}, $loc->{filetype}, $loc->{authors}, 
-            $loc->{title}, $loc->{abstract}, $loc->{length}, 
-            $loc->{source_url}, $source_name, $loc->{confidence},
-            $loc->{spamminess}, $loc->{text})
-            or warn DBI->errstr;
-    }
-    else {
+    unless ($ok && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}/2) {
         print "not adding to opp-web database.\n" if $verbosity;
+        return 0;
     }
+    my $status = 1;
+    if ($loc->{spamminess} > $cfg{'SPAM_THRESHOLD'}
+        || $loc->{confidence} < $cfg{'CONFIDENCE_THRESHOLD'}) {
+        $status = 0;
+    }
+    print "adding to opp-web database.\n" if $verbosity;
+    my ($source_name) = $dbh->selectrow_array("SELECT name"
+                        ." FROM sources WHERE url = '$loc->{source_url}'");
+    $db_add_oppweb->execute(
+        $loc->{url}, $status, $loc->{filetype}, $loc->{authors}, 
+        $loc->{title}, $loc->{abstract}, $loc->{length}, 
+        $loc->{source_url}, $source_name, $loc->{confidence},
+        $loc->{spamminess}, $loc->{text})
+        or warn DBI->errstr;
 }
 
 sub fetch_document {
@@ -706,12 +712,15 @@ sub find_duplicate {
     my @alts = @{$dbh->selectall_arrayref($qu, { Slice => {} })};
     foreach my $alt (@alts) {
         # compare authors, abstract, length:
+        print "$alt->{length} vs $loc->{length}\n";
         next if abs($alt->{length} - $loc->{length}) / $loc->{length} > 0.2;
         my $loc_au = join('', sort(split(', ', $loc->{authors})));
         my $alt_au = join('', sort(split(', ', $alt->{authors})));
+        print "$alt_au vs $loc_au\n";
         next unless (amatch($loc_au, ['i 50%'], $alt_au));
         my $loc_ab = substr($loc->{abstract}, 0, 400);
         my $alt_ab = substr($loc->{abstract}, 0, 400);
+        print "$alt_ab vs $loc_ab\n";
         return $alt if (amatch($loc_ab, ['i 50%'], $alt_ab));
     }
     return undef;

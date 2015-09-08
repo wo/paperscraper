@@ -5,6 +5,7 @@ import itertools
 from collections import defaultdict
 import re
 import sys
+import json
 from cStringIO import StringIO
 from os.path import abspath, dirname, join
 import MySQLdb.cursors
@@ -37,8 +38,8 @@ app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['MYSQL_DATABASE_USER'] = config('MYSQL_USER')
 app.config['MYSQL_DATABASE_PASSWORD'] = config('MYSQL_PASS')
 app.config['MYSQL_DATABASE_DB'] = config('MYSQL_DB')
-app.config['MIN_CONFIDENCE'] = config('CONFIDENCE_THRESHOLD')
-app.config['MAX_SPAM'] = config('MAX_SPAM')
+app.config['MIN_CONFIDENCE'] = float(config('CONFIDENCE_THRESHOLD'))
+app.config['MAX_SPAM'] = float(config('SPAM_THRESHOLD'))
 app.config['DOCS_PER_PAGE'] = 20
 
 mysql = MySQL()
@@ -63,20 +64,44 @@ def log_request():
         request.method,
         request.remote_addr]))
 
+@app.route("/doc")
+def doc():
+    doc_id = int(request.args.get('doc_id', 0))
+    db = get_db()
+    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    query = "SELECT * FROM docs WHERE doc_id = %s"
+    cur.execute(query, (doc_id,))
+    docs = cur.fetchall()
+    if not docs:
+        return jsonify({ 'msg': 'there seems to be no doc with that id' })
+    doc = prettify(docs[0])
+    return jsonify({ 'msg': 'OK', 'doc': doc })
+
 @app.route("/doclist")
 def doclist():
-    offset = int(request.args.get('start') or 0)
-    docs = get_docs('''SELECT D.doc_id, D.authors, D.title, D.abstract, D.url, D.filetype,
-                       D.found_date, D.numwords, D.source_url, D.source_name, D.meta_confidence,
+    offset = int(request.args.get('offset', 0))
+    where = []
+    doctype = request.args.get('type')
+    if doctype == 'papers':
+        where.append('D.filetype != "blogpost"')
+    if doctype == 'blogposts':
+        where.append('D.filetype = "blogpost"')
+    if not request.args.get('quarantined'):
+        where.append('D.status = 1')
+    where = 'WHERE {}'.format(' AND '.join(where)) if where else ''
+    docs = get_docs('''SELECT D.doc_id, D.status, D.authors, D.title, D.abstract, D.url, 
+                       D.filetype, D.found_date, D.numwords, D.source_url, D.source_name,
+                       D.meta_confidence, D.spamminess,
                        GROUP_CONCAT(T.label) AS topic_labels,
                        GROUP_CONCAT(T.topic_id) AS topic_ids,
                        GROUP_CONCAT(COALESCE(M.strength, -1)) AS strengths
                        FROM (docs D CROSS JOIN
                              (SELECT * FROM topics WHERE is_default = 1) AS T)
                        LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id) 
+                       {}
                        GROUP BY D.doc_id
                        ORDER BY D.found_date DESC
-                    ''', offset=offset)
+                    '''.format(where), offset=offset)
     return jsonify({ 'msg': 'OK', 'docs': docs })
 
 @app.route('/feedlist')
@@ -87,7 +112,7 @@ def feedlist():
                        numwords, source_url, source_name, found_date,
                        DATE_FORMAT(found_date, '%d %M %Y') AS found_day
                        FROM docs
-                       WHERE found_date < CURDATE() AND found_date >= '{0}'
+                       WHERE status = 1 AND found_date < CURDATE() AND found_date >= '{0}'
                        ORDER BY found_date DESC
                     '''.format(start_date), limit=200)
     return jsonify({ 'msg': 'OK', 'docs': docs })
@@ -100,18 +125,28 @@ def topiclist(topic):
     # and keep getting more documents until we have DOCS_PER_PAGE
     # many:
     rows = []
-    offset = int(request.args.get('start') or 0)
+    offset = int(request.args.get('offset') or 0)
     limit = app.config['DOCS_PER_PAGE']
     topic_id = 0
+    where = []
+    doctype = request.args.get('type')
+    if doctype == 'papers':
+        where.append('D.filetype != "blogpost"')
+    if doctype == 'blogposts':
+        where.append('D.filetype = "blogpost"')
+    if not request.args.get('quarantined'):
+        where.append('D.status = 1')
+    where = 'AND {}'.format(' AND '.join(where)) if where else ''
     while True:
         query = '''SELECT D.doc_id, M.strength, T.label, T.topic_id
                    FROM (docs D CROSS JOIN
                          (SELECT * FROM topics WHERE label='{0}') AS T)
                    LEFT JOIN docs2topics M ON (D.doc_id = M.doc_id AND M.topic_id = T.topic_id)
-                   WHERE strength >= {1} OR strength IS NULL
+                   WHERE (M.strength >= {1} OR M.strength IS NULL)
+                   {2}
                    ORDER BY D.found_date DESC
-                   LIMIT {2} OFFSET {3}
-                '''.format(topic, min_p, limit, offset)
+                   LIMIT {3} OFFSET {4}
+                '''.format(topic, min_p, where, limit, offset)
         app.logger.debug(query)
         cur = get_db().cursor(MySQLdb.cursors.DictCursor)
         cur.execute(query)
@@ -162,7 +197,7 @@ def topiclist(topic):
 
 @app.route('/edit-source', methods=['POST'])
 def editsource():
-    source_type = int(request.form['type'])
+    source_type = request.form['type']
     url = request.form['url']
     default_author = request.form['default_author']
     source_name = request.form['name']
@@ -170,69 +205,201 @@ def editsource():
     cur = db.cursor()
     query = '''INSERT INTO sources (url, status, type, default_author, name)
                VALUES(%s, 0, %s, %s, %s)
-               ON DUPLICATE KEY UPDATE type=%s, default_author=%s, name=%s'''
+               ON DUPLICATE KEY UPDATE type=%s, default_author=%s, name=%s, source_id=LAST_INSERT_ID(source_id)'''
     app.logger.debug(','.join((query,url,source_type,default_author,source_name)))
     cur.execute(query, (url,source_type,default_author,source_name,source_type,default_author,source_name))
     db.commit()
     insert_id = cur.lastrowid
 
-    if source_type == 3:
+    app.logger.debug(source_type)
+    if source_type == '3':
         # register new blog subscription on superfeedr:
         app.logger.debug('subcribing on superfeedr')
         from superscription import Superscription
-        ss = Superscription(config('SUPERFEEDR_USER'), token=config('SUPERFEEDR_TOKEN'))
-        r = ss.subscribe(
-            hub_topic=url,
-            hub_callback=request.url_root+'new_blog_post/'+insert_id)
-        app.logger.debug(r.status_code)
-        if not r or r.status_code != 203:
-            return jsonify({'msg':'could not register blog on superfeedr!'})
+        ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
+        msg = 'could not register blog on superfeedr!'
+        try:
+            callback=request.url_root+'new_blog_post/{}'.format(insert_id)
+            app.logger.debug('suscribing to {} on {} via superfeedr'.format(url,callback))
+            success = ss.subscribe(hub_topic=url, hub_callback=callback)
+            if success:
+                return jsonify({'msg':'OK'})
+        except:
+            if ss.response.status_code:
+                msg += ' status {}'.format(ss.response.status_code)
+            else:
+                msg += ' no response from superseedr server'
+        return jsonify({'msg':msg})
 
     return jsonify({'msg':'OK'})
+    
+    # xxx todo:
+    if request.form['submit'] == 'Discard Entry':
+        if source_type == '3':
+            # remove new blog subscription on superfeedr:
+            from superscription import Superscription
+            ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
+            msg = 'could not unsubscribe blog from superfeedr!'
+            try:
+                app.logger.debug('removing {} from superfeedr'.format(url))
+                success = ss.unsubscribe(hub_topic=url)
+                if success:
+                    return jsonify({'msg':'OK'})
+            except:
+                if ss.response.status_code:
+                    msg += ' status {}'.format(ss.response.status_code)
+                else:
+                    msg += ' no response from superseedr server'
+            return jsonify({'msg':msg})
 
+
+@app.route('/new_blog_post/<source_id>', methods=['POST'])
+def process_new_post(source_id):
+    # retrieve post info, check if philosophical content, add to db
+    feed = json.loads(request.get_data())
+    source_url = feed['status']['feed']
+    status = feed['status']['code']
+    app.logger.debug('superfeedr notification for {} (status {})'.format(source_url, status))
+    app.logger.debug(json.dumps(feed, indent=4, separators=(',',': ')))
+    db = get_db()
+    cur = db.cursor()
+    query = "SELECT default_author, url, name FROM sources WHERE source_id = %s LIMIT 1"
+    cur.execute(query, (source_id,))
+    rows = cur.fetchall()
+    if not rows:
+        app.logger.warn('superfeedr source id {} not in database'.format(source_id))
+        return 'OK'
+    (default_author, source_url, source_name) = rows[0]
+    posts = []
+    for item in feed.get('items', []):
+        post = {}
+        post['url'] = item.get('permalinkUrl') or item.get('id')
+        if not post['url']:
+            app.logger.error('ignoring superfeedr post without permalinkUrl or id')
+            continue
+        content = item.get('content') or item.get('summary')
+        if not content:
+            app.logger.error('post {} has no content?!'.format(post['url']))
+            continue
+        post['content'] = strip_tags(content)
+        post['title'] = item.get('title')
+        if not post['title']:
+            app.logger.error('post {} has no title?!'.format(post['url']))
+            continue
+        if (not default_author or default_author == 'Anonymous') and 'actor' in item:
+            post['authors'] = item['actor'].get('displayName') or item['actor'].get('id')
+        else:
+            post['authors'] = default_author
+        post['filetype'] = 'blogpost'
+        post['abstract'] = make_abstract(content)
+        post['numwords'] = len(post['content'].split())
+        post['source_url'] = source_url
+        post['source_name'] = source_name
+        posts.append(post)
+
+    from classifier import BinaryClassifier, doc2text
+    docs = [doc2text(post) for post in posts]
+    clf = BinaryClassifier(0) # classifier 0 is for blogspam; note that 1=>blogspam, 0=>blogham
+    clf.load()
+    probs = clf.classify(docs)
+    for i, (p_no, p_yes) in enumerate(probs):
+        post = posts[i]
+        app.logger.debug("post {} has blogspam probability {}".format(post['title'], p_yes))
+        if p_yes > app.config['MAX_SPAM'] * 2:
+            app.logger.debug("max {}".format(app.config['MAX_SPAM'] * 3/2))
+            continue
+        post['status'] = 1 if p_yes < app.config['MAX_SPAM'] * 2/3 else 0
+        post['spamminess'] = p_yes
+        post['meta_confidence'] = 0.75
+        query = "INSERT INTO docs ({}, found_date) VALUES ({} NOW())".format(
+            ', '.join(post.keys()), '%s, '*len(post.keys()))
+        app.logger.debug(query + ', '.join(map(unicode, post.values())))
+        try:
+            cur.execute(query, post.values())
+            db.commit()
+        except:
+            app.logger.error(u'failed to insert blog post {}'.format(post['title']))
+
+    return 'OK'
+
+def strip_tags(text, keep_italics=False):
+    if keep_italics:
+        text = re.sub(r'<(/?)[ib]>', r'{\1emph}', text)
+    text = re.sub('<.+?>', ' ', text, flags=re.MULTILINE|re.DOTALL)
+    text = re.sub('<', '&lt;', text)
+    text = re.sub('  +', ' ', text)
+    text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
+    if keep_italics:
+        text = re.sub(r'{(/?)emph}', r'<\1i>', text)
+    return text
+    
+def make_abstract(text):
+    text = strip_tags(text, keep_italics=True)
+    from nltk.tokenize import sent_tokenize
+    # Setup:
+    # pip install nltk
+    # python
+    #    import nltk
+    #    nltk.import('punkt')
+    # sudo mv ~/nltk_data /usr/lib/
+    sentences = sent_tokenize(text[:1000])
+    abstract = ''
+    for sent in sentences:
+        abstract += sent+' '
+        if len(abstract) > 600:
+            break
+    return abstract
 
 @app.route('/editdoc', methods=['POST'])
 def editdoc():
     doc_id = request.form['doc_id']
-    url = request.form['doc_url']
-    opp_doc = True if request.form['oppdocs'] else False
+    #url = request.form.get('doc_url')
+    status = request.form.get('status', 1)
+    found_now = request.form.get('found_now', False)
     authors = request.form['authors']
     title = request.form['title']
     abstract = request.form['abstract']
     db = get_db()
     cur = db.cursor()
     if request.form['submit'] == 'Discard Entry':
-        if opp_doc:
-            query = "UPDATE locations SET spamminess=1 WHERE url=%s"
-            app.logger.debug(','.join((query,url)))
-            cur.execute(query, (url,))
-        else:
-            query = "DELETE FROM docs WHERE doc_id=%s"
-            app.logger.debug(','.join((query,doc_id)))
-            cur.execute(query, (doc_id,))
+        #if opp_doc:
+        #    query = "UPDATE locations SET spamminess=1 WHERE url=%s"
+        #    app.logger.debug(','.join((query,url)))
+        #    cur.execute(query, (url,))
+        #else:
+        query = "DELETE FROM docs WHERE doc_id=%s"
+        app.logger.debug(','.join((query,doc_id)))
+        cur.execute(query, (doc_id,))
         db.commit()
     else:
-        if opp_doc:
-            # Problem: the opp documents table does not store the full
-            # document text, so we need to reprocess the url with opp; to
-            # enforce that, we set status=0 -- process_links.pl will then
-            # add the record to the oppweb docs table (and it won't
-            # overwrite metadata set with confidence=1).
-            query = "UPDATE locations SET status=0 WHERE url=%s"
-            app.logger.debug(query+','+url)
-            cur.execute(query, (url,))
-            db.commit()
+        #if opp_doc:
+        #    # Problem: the opp documents table does not store the full
+        #    # document text, so we need to reprocess the url with opp; to
+        #    # enforce that, we set status=0 -- process_links.pl will then
+        #    # add the record to the oppweb docs table (and it won't
+        #    # overwrite metadata set with confidence=1).
+        #    query = "UPDATE locations SET status=0 WHERE url=%s"
+        #    app.logger.debug(query+','+url)
+        #    cur.execute(query, (url,))
+        #    db.commit()
+        #    query = '''
+        #            UPDATE documents SET authors=%s, title=%s, abstract=%s, meta_confidence=1
+        #            WHERE document_id=%s
+        #            '''
+        #else:
+        if found_now:
             query = '''
-                    UPDATE documents SET authors=%s, title=%s, abstract=%s, meta_confidence=1
-                    WHERE document_id=%s
+                    UPDATE docs SET status=%s, found_date=NOW(), authors=%s, title=%s,
+                    abstract=%s, meta_confidence=1
+                    WHERE doc_id=%s
                     '''
         else:
             query = '''
-                    UPDATE docs SET authors=%s, title=%s, abstract=%s, meta_confidence=1
+                    UPDATE docs SET status=%s, authors=%s, title=%s, abstract=%s, meta_confidence=1
                     WHERE doc_id=%s
                     '''
-        app.logger.debug(','.join((query,authors,title,abstract,doc_id)))
-        cur.execute(query, (authors, title, abstract, doc_id))
+        app.logger.debug(','.join((query,status,authors,title,abstract,doc_id)))
+        cur.execute(query, (status, authors, title, abstract, doc_id))
         db.commit()
     return jsonify({'msg':'OK'})
 
@@ -288,7 +455,7 @@ def update_classifier(topic_id):
             clf.train(docs, classes)
             clf.save()
         msg += '\n'.join(output)
-        # We might reclassify all documents now, but we postpone this step
+        # We could reclassify all documents now, but we postpone this step
         # until the documents are actually displayed (which may be never
         # for sufficiently old ones). So we simply undefine the topic
         # strengths to mark that no classification has yet been made.
@@ -314,7 +481,6 @@ def init_topic():
         app.logger.warn("failed to insert %s", label)
         return jsonify({'msg': 'Failed'})
     return jsonify({'msg':'OK'})
-
 
 def get_docs(select, offset=0, limit=app.config['DOCS_PER_PAGE']):
     query = "{0} LIMIT {1} OFFSET {2}".format(select, limit, offset)
@@ -389,8 +555,8 @@ def get_default_topics():
     return g.default_topics
 
 def classify(rows, topic, topic_id):
-    from classifier import BinaryClassifier, Doc
-    docs = [Doc(row) for row in rows]
+    from classifier import BinaryClassifier, doc2text
+    docs = [doc2text(row) for row in rows]
     with Capturing() as output:
         clf = BinaryClassifier(topic_id)
         clf.load()
@@ -470,6 +636,7 @@ class Capturing(list):
 
 @app.route("/opp-queue")
 def list_uncertain_docs():
+    # unneeded? 
     cur = mysql.connect().cursor(MySQLdb.cursors.DictCursor)
     query = '''
          SELECT
@@ -499,7 +666,7 @@ def list_uncertain_docs():
          OFFSET {2}
     '''
     limit = app.config['DOCS_PER_PAGE']
-    offset = int(request.args.get('start') or 0)
+    offset = int(request.args.get('offset') or 0)
     max_spam = 0.3
     min_confidence = app.config['MIN_CONFIDENCE']
     where = "spamminess <= {0} AND meta_confidence <= {1}".format(max_spam, min_confidence)
