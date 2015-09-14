@@ -77,6 +77,19 @@ def doc():
     doc = prettify(docs[0])
     return jsonify({ 'msg': 'OK', 'doc': doc })
 
+@app.route("/source")
+def source():
+    url = request.args.get('url')
+    db = get_db()
+    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    query = "SELECT * FROM sources WHERE url = %s"
+    cur.execute(query, (url,))
+    sources = cur.fetchall()
+    if not sources:
+        return jsonify({ 'msg': 'there seems to be no source with that url' })
+    source = sources[0]
+    return jsonify({ 'msg': 'OK', 'source': source })
+
 @app.route("/doclist")
 def doclist():
     offset = int(request.args.get('offset', 0))
@@ -197,52 +210,56 @@ def topiclist(topic):
 
 @app.route('/edit-source', methods=['POST'])
 def editsource():
+    source_id = int(request.form['source_id'])
     source_type = request.form['type']
     url = request.form['url']
     default_author = request.form['default_author']
     source_name = request.form['name']
     db = get_db()
     cur = db.cursor()
-    query = '''INSERT INTO sources (url, status, type, default_author, name)
-               VALUES(%s, 0, %s, %s, %s)
-               ON DUPLICATE KEY UPDATE type=%s, default_author=%s, name=%s, source_id=LAST_INSERT_ID(source_id)'''
-    app.logger.debug(','.join((query,url,source_type,default_author,source_name)))
-    cur.execute(query, (url,source_type,default_author,source_name,source_type,default_author,source_name))
-    db.commit()
-    insert_id = cur.lastrowid
-
-    app.logger.debug(source_type)
-    if source_type == '3':
-        # register new blog subscription on superfeedr:
-        app.logger.debug('subcribing on superfeedr')
-        from superscription import Superscription
-        ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
-        msg = 'could not register blog on superfeedr!'
-        try:
-            callback=request.url_root+'new_blog_post/{}'.format(insert_id)
-            app.logger.debug('suscribing to {} on {} via superfeedr'.format(url,callback))
-            success = ss.subscribe(hub_topic=url, hub_callback=callback)
-            if success:
-                return jsonify({'msg':'OK'})
-        except:
-            if ss.response.status_code:
-                msg += ' status {}'.format(ss.response.status_code)
-            else:
-                msg += ' no response from superseedr server'
-        return jsonify({'msg':msg})
-
-    return jsonify({'msg':'OK'})
     
-    # xxx todo:
-    if request.form['submit'] == 'Discard Entry':
+    if request.form['submit'] == 'Remove Source':
         if source_type == '3':
-            # remove new blog subscription on superfeedr:
+            # remove blog subscription on superfeedr:
             from superscription import Superscription
             ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
-            msg = 'could not unsubscribe blog from superfeedr!'
+            success = False
             try:
                 app.logger.debug('removing {} from superfeedr'.format(url))
                 success = ss.unsubscribe(hub_topic=url)
+            except:
+                pass
+            if not success:
+                msg = 'could not unsubscribe blog from superfeedr!'
+                if ss.response.status_code:
+                    msg += ' status {}'.format(ss.response.status_code)
+                else:
+                    msg += ' no response from superfeedr server'
+                return jsonify({'msg':msg})
+        query = "REMOVE FROM sources WHERE url = %s"
+        app.logger.debug(','.join((query,url)))
+        cur.execute(query, (url,))
+        db.commit()
+        return jsonify({'msg':'OK'})
+
+    else:
+        query = '''INSERT INTO sources (url, status, type, default_author, name)
+                   VALUES(%s, 0, %s, %s, %s)
+                   ON DUPLICATE KEY UPDATE type=%s, default_author=%s, name=%s, source_id=LAST_INSERT_ID(source_id)'''
+        app.logger.debug(','.join((query,url,source_type,default_author,source_name)))
+        cur.execute(query, (url,source_type,default_author,source_name,source_type,default_author,source_name))
+        db.commit()
+        insert_id = cur.lastrowid
+
+        if source_id == 0 and source_type == '3':
+            # register new blog subscription on superfeedr:
+            from superscription import Superscription
+            ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
+            msg = 'could not register blog on superfeedr!'
+            try:
+                callback=request.url_root+'new_blog_post/{}'.format(insert_id)
+                app.logger.debug('suscribing to {} on {} via superfeedr'.format(url,callback))
+                success = ss.subscribe(hub_topic=url, hub_callback=callback)
                 if success:
                     return jsonify({'msg':'OK'})
             except:
@@ -251,8 +268,8 @@ def editsource():
                 else:
                     msg += ' no response from superseedr server'
             return jsonify({'msg':msg})
-
-
+        return jsonify({'msg':'OK'})
+    
 @app.route('/new_blog_post/<source_id>', methods=['POST'])
 def process_new_post(source_id):
     # retrieve post info, check if philosophical content, add to db
