@@ -33,6 +33,7 @@ logging.basicConfig(level=logging.DEBUG)
 def parse(url):
     logger.debug("parsing blog post {}".format(url))
     html = get(url).content
+    html = html.decode('utf-8', 'ignore')
     goose = Goose()
     article = goose.extract(raw_html=html)
     goose_text = article.cleaned_text
@@ -84,7 +85,7 @@ def strip_tags(text, keep_italics=False):
     return text
 
 def get_abstract(html):
-    text = strip_tags(html, keep_italics=True).decode('utf-8')
+    text = strip_tags(html, keep_italics=True)
     sentences = sent_tokenize(text[:1000])
     abstract = ''
     for sent in sentences:

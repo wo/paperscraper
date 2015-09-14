@@ -278,6 +278,10 @@ def process_new_post(source_id):
     status = feed['status']['code']
     app.logger.debug('superfeedr notification for {} (status {})'.format(source_url, status))
     app.logger.debug(json.dumps(feed, indent=4, separators=(',',': ')))
+    if status == '0' and not feed.get('items'):
+        app.logger.debug('superfeedr says feed is broken')
+        return 'OK'
+
     db = get_db()
     cur = db.cursor()
     query = "SELECT default_author, url, name FROM sources WHERE source_id = %s LIMIT 1"
@@ -298,7 +302,7 @@ def process_new_post(source_id):
         if not post['url']:
             app.logger.error('ignoring superfeedr post without permalinkUrl or id')
             continue
-        post['title'] = item.get('title')
+        post['title'] = item.get('title','').decode('utf8')
         if not post['title']:
             app.logger.error('post {} has no title?!'.format(post['url']))
             continue
@@ -326,6 +330,10 @@ def process_new_post(source_id):
             # posts:
             post['authors'] = default_author
         posts.append(post)
+        
+    if not posts:
+        app.logger.warn('no posts to save')
+        return 'OK'
 
     from classifier import BinaryClassifier, doc2text
     docs = [doc2text(post) for post in posts]

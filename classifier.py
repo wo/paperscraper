@@ -74,20 +74,20 @@ def doc2text(hash):
 
     # Simple hack to add authors etc. to document features:
     if len(text) < 4000:
-        text += " XLEN_TINY"
+        text += " XLEN_TINY" * 2
     elif len(text) < 8000:
-        text += " XLEN_VSHORT"
+        text += " XLEN_VSHORT" * 2
     elif len(text) < 15000:
-        text += " XLEN_SHORT"
+        text += " XLEN_SHORT" * 2
     elif len(text) < 40000:
-        text += " XLEN_MEDIUM"
+        text += " XLEN_MEDIUM" * 2
     elif len(text) < 80000:
-        text += " XLEN_LONG"
+        text += " XLEN_LONG" * 2
     else:
-        text += " XLEN_VLONG {}"
-    text += (" " + hash['title']) * 2
+        text += " XLEN_VLONG {}" * 2
+    text += (u" " + hash['title']) * 2
     for au in hash['authors'].split(","):
-        text += " " + re.sub(r' (\w+)\s*', r' XAU_\1', au)
+        text += u" " + re.sub(r' (\w+)\s*', r' XAU_\1', au)
     m = re.match(r'(.+)/[^/]*', hash['url']) # url path
     if m:
         text += " XPATH_" + re.sub(r'\W', '_', m.group(1))
