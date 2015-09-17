@@ -50,7 +50,7 @@ def parse(url, feed_content):
     doc['numwords'] = len(doc['content'].split())
     doc['abstract'] = get_abstract(post_html)
     logger.debug("\npost abstract: %s\n", doc['abstract'])
-    doc['authors'] = get_authors(html, post_html)
+    doc['authors'] = get_authors(html, post_html, doc['content'])
     logger.debug("\npost authors: %s\n", doc['authors'])
     return doc
 
@@ -104,20 +104,25 @@ def get_abstract(html):
             break
     return abstract
 
-def get_authors(full_html, post_html):
+def get_authors(full_html, post_html, post_text):
+    # look for 'by (Foo Bar)' near the start of the post
     post_start = full_html.find(post_html)
     #print "post_start: {}".format(post_start)
     tagsoup = r'(?:<[^>]+>|\s)*'
-    prefix = r'[Bb]y\b'+tagsoup
+    by = r'[Bb]y\b'+tagsoup
     name = r'[\w\.\-]+(?: (?!and)[\w\.\-]+){0,3}'
     separator = tagsoup+r'(?: and |, )'+tagsoup
-    re_str = r'{}({})(?:{}({}))*'.format(prefix,name,separator,name)
+    re_str = r'{}({})(?:{}({}))*'.format(by,name,separator,name)
     regex = re.compile(re_str)
     #print "looking for {} in {}".format(re_str, full_html)
     best_match = None
     for m in regex.finditer(full_html):
         #print "{} matches {}".format(re_str, m.group(0))
         #print "({} vs {})".format(m.start(), post_start)
+        # avoid matching "Sadly, so-and-so has been rejected by /British MPs/":
+        if post_text.find(m.group(1)) > 20:
+            logger.debug('author candidate "%s" because too far in text', m.group(1))
+            continue
         if not best_match or abs(m.start()-post_start) < abs(best_match.start()-post_start):
             #print "best match ({} vs {})".format(m.start(), post_start)
             best_match = m
