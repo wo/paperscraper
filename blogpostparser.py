@@ -15,6 +15,7 @@
 # [names]' strings in the vicinity of the start of the blog post to
 # identify authors.
 #
+
 import logging
 import re
 from requests import get
@@ -27,25 +28,30 @@ from nltk.tokenize import sent_tokenize
 #    nltk.import('punkt')
 # sudo mv ~/nltk_data /usr/lib/
 
-logger = logging.getLogger('opp')
+logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-def parse(url):
+def parse(url, feed_content):
     logger.debug("parsing blog post {}".format(url))
     html = get(url).content
+    #logger.debug("\nsite html: %s\n", html)
+    html = html.decode('utf-8', 'ignore')
     goose = Goose()
     article = goose.extract(raw_html=html)
     goose_text = article.cleaned_text
+    logger.debug("\ngoose text: %s\n", goose_text)
+    if not goose_text:
+        logger.info("goose-extract failed, using feed content")
+        goose_text = strip_tags(feed_content)
     post_html = match_text_in_html(goose_text, html)
-    #print "\n\nHTML:\n{}\n\n".format(post_html)
     doc = {}
     doc['content'] = strip_tags(post_html)
-    #print "\n\ncontent:\n{}\n\n".format(doc['content'])
+    logger.debug("\npost content: %s\n", doc['content'])
     doc['numwords'] = len(doc['content'].split())
     doc['abstract'] = get_abstract(post_html)
-    #print "\n\nabstract:\n{}\n\n".format(doc['abstract'])
-    doc['authors'] = get_authors(html, post_html)
-    #print "\n\nauthors:\n{}\n\n".format(doc['authors'])
+    logger.debug("\npost abstract: %s\n", doc['abstract'])
+    doc['authors'] = get_authors(html, post_html, doc['content'])
+    logger.debug("\npost authors: %s\n", doc['authors'])
     return doc
 
 def match_text_in_html(text, html):
@@ -54,10 +60,15 @@ def match_text_in_html(text, html):
     start_words = re.findall(r'\b\w+\b', text[:50])[:-1]
     re_str = r'\b.+?\b'.join(start_words)
     m1 = shortest_match(re_str, html)
-    #print m1.start(1)
+    if not m1:
+        logger.warning(u"%s not found in html: %s", re_str, html)
+    logger.debug(u"best match for start words %s at: %d", re_str, m1.start(1))
     end_words = re.findall(r'\b\w+\b', text[-50:])[1:]
     re_str = r'\b.+?\b'.join(end_words)
     m2 = shortest_match(re_str, html)
+    if not m2:
+        logger.warning(u"%s not found in html: %s", re_str, html)
+    logger.debug(u"best match for end words %s at: %d", re_str, m2.end(1))
     #print m2.end(1)
     return html[m1.start(1):m2.end(1)]
 
@@ -84,7 +95,7 @@ def strip_tags(text, keep_italics=False):
     return text
 
 def get_abstract(html):
-    text = strip_tags(html, keep_italics=True).decode('utf-8')
+    text = strip_tags(html, keep_italics=True)
     sentences = sent_tokenize(text[:1000])
     abstract = ''
     for sent in sentences:
@@ -93,20 +104,25 @@ def get_abstract(html):
             break
     return abstract
 
-def get_authors(full_html, post_html):
+def get_authors(full_html, post_html, post_text):
+    # look for 'by (Foo Bar)' near the start of the post
     post_start = full_html.find(post_html)
     #print "post_start: {}".format(post_start)
     tagsoup = r'(?:<[^>]+>|\s)*'
-    prefix = r'[Bb]y\b'+tagsoup
+    by = r'[Bb]y\b'+tagsoup
     name = r'[\w\.\-]+(?: (?!and)[\w\.\-]+){0,3}'
     separator = tagsoup+r'(?: and |, )'+tagsoup
-    re_str = r'{}({})(?:{}({}))*'.format(prefix,name,separator,name)
+    re_str = r'{}({})(?:{}({}))*'.format(by,name,separator,name)
     regex = re.compile(re_str)
     #print "looking for {} in {}".format(re_str, full_html)
     best_match = None
     for m in regex.finditer(full_html):
         #print "{} matches {}".format(re_str, m.group(0))
         #print "({} vs {})".format(m.start(), post_start)
+        # avoid matching "Sadly, so-and-so has been rejected by /British MPs/":
+        if post_text.find(m.group(1)) > 20:
+            logger.debug('author candidate "%s" because too far in text', m.group(1))
+            continue
         if not best_match or abs(m.start()-post_start) < abs(best_match.start()-post_start):
             #print "best match ({} vs {})".format(m.start(), post_start)
             best_match = m

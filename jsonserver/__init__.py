@@ -1,5 +1,6 @@
 import pprint
 import logging.handlers
+from logging import getLogger
 from datetime import datetime, timedelta
 import itertools
 from collections import defaultdict
@@ -31,8 +32,8 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 app.logger.setLevel(logging.DEBUG)
 logfile = join(abspath(dirname(__file__)), 'data/server.log')
-handler = logging.FileHandler(logfile)
-app.logger.addHandler(handler)
+loghandler = logging.FileHandler(logfile)
+app.logger.addHandler(loghandler)
 
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['MYSQL_DATABASE_USER'] = config('MYSQL_USER')
@@ -278,6 +279,10 @@ def process_new_post(source_id):
     status = feed['status']['code']
     app.logger.debug('superfeedr notification for {} (status {})'.format(source_url, status))
     app.logger.debug(json.dumps(feed, indent=4, separators=(',',': ')))
+    if status == '0' and not feed.get('items'):
+        app.logger.debug('superfeedr says feed is broken')
+        return 'OK'
+
     db = get_db()
     cur = db.cursor()
     query = "SELECT default_author, url, name FROM sources WHERE source_id = %s LIMIT 1"
@@ -287,32 +292,51 @@ def process_new_post(source_id):
         app.logger.warn('superfeedr source id {} not in database'.format(source_id))
         return 'OK'
     (default_author, source_url, source_name) = rows[0]
+    import blogpostparser 
+    getLogger('blogpostparser').addHandler(loghandler)
     posts = []
     for item in feed.get('items', []):
         post = {}
+        post['filetype'] = 'blogpost'
+        post['source_url'] = source_url
+        post['source_name'] = source_name
         post['url'] = item.get('permalinkUrl') or item.get('id')
         if not post['url']:
             app.logger.error('ignoring superfeedr post without permalinkUrl or id')
             continue
-        content = item.get('content') or item.get('summary')
-        if not content:
-            app.logger.error('post {} has no content?!'.format(post['url']))
-            continue
-        post['content'] = strip_tags(content)
-        post['title'] = item.get('title')
+        post['title'] = item.get('title','').decode('utf8')
         if not post['title']:
             app.logger.error('post {} has no title?!'.format(post['url']))
             continue
-        if (not default_author or default_author == 'Anonymous') and 'actor' in item:
-            post['authors'] = item['actor'].get('displayName') or item['actor'].get('id')
-        else:
+        # RSS feeds sometimes only contain a summary of posts, and
+        # often don't contain the author name on group blogs. So we
+        # have to fetch content and author from the actual post url.
+        #
+        #content = item.get('content') or item.get('summary')
+        #if not content:
+        #    app.logger.error('post {} has no content?!'.format(post['url']))
+        #    continue
+        #post['content'] = strip_tags(content)
+        #if (not default_author or default_author == 'Anonymous') and 'actor' in item:
+        #    post['authors'] = item['actor'].get('displayName') or item['actor'].get('id')
+        #else:
+        #    post['authors'] = default_author
+        feed_content = item.get('content') or item.get('summary')
+        try:
+            post.update(blogpostparser.parse(post['url'], feed_content))
+        except Exception, e:
+            app.logger.error('cannot parse {}: {}'.format(post['url'], e))
+            continue
+        if default_author:
+            # overwrite whatever blogpostparser identified as the
+            # author -- should probably make an exception for guest
+            # posts:
             post['authors'] = default_author
-        post['filetype'] = 'blogpost'
-        post['abstract'] = make_abstract(content)
-        post['numwords'] = len(post['content'].split())
-        post['source_url'] = source_url
-        post['source_name'] = source_name
         posts.append(post)
+        
+    if not posts:
+        app.logger.warn('no posts to save')
+        return 'OK'
 
     from classifier import BinaryClassifier, doc2text
     docs = [doc2text(post) for post in posts]
@@ -321,7 +345,7 @@ def process_new_post(source_id):
     probs = clf.classify(docs)
     for i, (p_no, p_yes) in enumerate(probs):
         post = posts[i]
-        app.logger.debug("post {} has blogspam probability {}".format(post['title'], p_yes))
+        app.logger.debug(u"post {} has blogspam probability {}".format(post['title'], p_yes))
         if p_yes > app.config['MAX_SPAM'] * 2:
             app.logger.debug("max {}".format(app.config['MAX_SPAM'] * 3/2))
             continue
