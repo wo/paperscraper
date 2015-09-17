@@ -271,6 +271,17 @@ def editsource():
             return jsonify({'msg':msg})
         return jsonify({'msg':'OK'})
     
+@app.route('/delete-authorname')
+def deleteauthorname():
+    name_id = int(request.args.get('name_id', 0))
+    db = get_db()
+    cur = db.cursor()
+    query = "REMOVE FROM author_names WHERE name_id = %s"
+    app.logger.debug(','.join((query,url)))
+    cur.execute(query, (name_id,))
+    db.commit()
+    return jsonify({'msg':'OK'})
+
 @app.route('/new_blog_post/<source_id>', methods=['POST'])
 def process_new_post(source_id):
     # retrieve post info, check if philosophical content, add to db
