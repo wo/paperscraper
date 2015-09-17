@@ -56,6 +56,13 @@ CREATE TABLE links (
   KEY (source_id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
+CREATE TABLE author_names (
+  name_id INT(11) UNSIGNED NOT NULL auto_increment,
+  name VARCHAR(64) NOT NULL,
+  last_searched DATETIME DEFAULT NULL,
+  PRIMARY KEY (name_id),
+  UNIQUE KEY (name)
+) ENGINE=InnoDB CHARACTER SET utf8;
 
 
 
@@ -76,7 +83,7 @@ CREATE TABLE docs (
   spamminess FLOAT(4,3) UNSIGNED DEFAULT NULL,
   content MEDIUMTEXT DEFAULT NULL,
   PRIMARY KEY (doc_id),
-  UNIQUE KEY url (url),
+  UNIQUE KEY (url),
   KEY (found_date)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
