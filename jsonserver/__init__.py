@@ -1,5 +1,6 @@
 import pprint
 import logging.handlers
+from logging import getLogger
 from datetime import datetime, timedelta
 import itertools
 from collections import defaultdict
@@ -31,8 +32,8 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 app.logger.setLevel(logging.DEBUG)
 logfile = join(abspath(dirname(__file__)), 'data/server.log')
-handler = logging.FileHandler(logfile)
-app.logger.addHandler(handler)
+loghandler = logging.FileHandler(logfile)
+app.logger.addHandler(loghandler)
 
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 app.config['MYSQL_DATABASE_USER'] = config('MYSQL_USER')
@@ -292,6 +293,7 @@ def process_new_post(source_id):
         return 'OK'
     (default_author, source_url, source_name) = rows[0]
     import blogpostparser 
+    getLogger('blogpostparser').addHandler(loghandler)
     posts = []
     for item in feed.get('items', []):
         post = {}
@@ -319,8 +321,9 @@ def process_new_post(source_id):
         #    post['authors'] = item['actor'].get('displayName') or item['actor'].get('id')
         #else:
         #    post['authors'] = default_author
+        feed_content = item.get('content') or item.get('summary')
         try:
-            post.update(blogpostparser.parse(post['url']))
+            post.update(blogpostparser.parse(post['url'], feed_content))
         except Exception, e:
             app.logger.error('cannot parse {}: {}'.format(post['url'], e))
             continue

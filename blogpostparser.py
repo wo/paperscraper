@@ -15,6 +15,7 @@
 # [names]' strings in the vicinity of the start of the blog post to
 # identify authors.
 #
+
 import logging
 import re
 from requests import get
@@ -27,26 +28,30 @@ from nltk.tokenize import sent_tokenize
 #    nltk.import('punkt')
 # sudo mv ~/nltk_data /usr/lib/
 
-logger = logging.getLogger('opp')
+logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-def parse(url):
+def parse(url, feed_content):
     logger.debug("parsing blog post {}".format(url))
     html = get(url).content
+    #logger.debug("\nsite html: %s\n", html)
     html = html.decode('utf-8', 'ignore')
     goose = Goose()
     article = goose.extract(raw_html=html)
     goose_text = article.cleaned_text
+    logger.debug("\ngoose text: %s\n", goose_text)
+    if not goose_text:
+        logger.info("goose-extract failed, using feed content")
+        goose_text = strip_tags(feed_content)
     post_html = match_text_in_html(goose_text, html)
-    #print "\n\nHTML:\n{}\n\n".format(post_html)
     doc = {}
     doc['content'] = strip_tags(post_html)
-    #print "\n\ncontent:\n{}\n\n".format(doc['content'])
+    logger.debug("\npost content: %s\n", doc['content'])
     doc['numwords'] = len(doc['content'].split())
     doc['abstract'] = get_abstract(post_html)
-    #print "\n\nabstract:\n{}\n\n".format(doc['abstract'])
+    logger.debug("\npost abstract: %s\n", doc['abstract'])
     doc['authors'] = get_authors(html, post_html)
-    #print "\n\nauthors:\n{}\n\n".format(doc['authors'])
+    logger.debug("\npost authors: %s\n", doc['authors'])
     return doc
 
 def match_text_in_html(text, html):
@@ -55,10 +60,15 @@ def match_text_in_html(text, html):
     start_words = re.findall(r'\b\w+\b', text[:50])[:-1]
     re_str = r'\b.+?\b'.join(start_words)
     m1 = shortest_match(re_str, html)
-    #print m1.start(1)
+    if not m1:
+        logger.warning(u"%s not found in html: %s", re_str, html)
+    logger.debug(u"best match for start words %s at: %d", re_str, m1.start(1))
     end_words = re.findall(r'\b\w+\b', text[-50:])[1:]
     re_str = r'\b.+?\b'.join(end_words)
     m2 = shortest_match(re_str, html)
+    if not m2:
+        logger.warning(u"%s not found in html: %s", re_str, html)
+    logger.debug(u"best match for end words %s at: %d", re_str, m2.end(1))
     #print m2.end(1)
     return html[m1.start(1):m2.end(1)]
 
