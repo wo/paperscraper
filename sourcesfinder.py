@@ -43,7 +43,7 @@ class SourcesFinder:
                     new_pages.append((name,url))
                 except MySQLdb.IntegrityError:
                     logger.debug(u"{} already in db".format(url))
-            else:
+            if not pages:
                 logger.info("no pages found")
             query = "UPDATE author_names SET last_searched=NOW() WHERE name=%s"
             cur.execute(query, (name,))

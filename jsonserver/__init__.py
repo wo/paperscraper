@@ -212,6 +212,7 @@ def topiclist(topic):
 @app.route('/edit-source', methods=['POST'])
 def editsource():
     source_id = int(request.form['source_id'])
+    status = request.form['status']
     source_type = request.form['type']
     url = request.form['url']
     default_author = request.form['default_author']
@@ -245,10 +246,10 @@ def editsource():
 
     else:
         query = '''INSERT INTO sources (url, status, type, default_author, name)
-                   VALUES(%s, 0, %s, %s, %s)
-                   ON DUPLICATE KEY UPDATE type=%s, default_author=%s, name=%s, source_id=LAST_INSERT_ID(source_id)'''
-        app.logger.debug(','.join((query,url,source_type,default_author,source_name)))
-        cur.execute(query, (url,source_type,default_author,source_name,source_type,default_author,source_name))
+                   VALUES(%s, %s, %s, %s, %s)
+                   ON DUPLICATE KEY UPDATE status=%s, type=%s, default_author=%s, name=%s, source_id=LAST_INSERT_ID(source_id)'''
+        app.logger.debug(','.join((query,url,status,source_type,default_author,source_name)))
+        cur.execute(query, (url,status,source_type,default_author,source_name,status,source_type,default_author,source_name))
         db.commit()
         insert_id = cur.lastrowid
 
@@ -273,11 +274,11 @@ def editsource():
     
 @app.route('/delete-authorname')
 def deleteauthorname():
-    name_id = int(request.args.get('name_id', 0))
+    name_id = request.args.get('name_id', '0')
     db = get_db()
     cur = db.cursor()
-    query = "REMOVE FROM author_names WHERE name_id = %s"
-    app.logger.debug(','.join((query,url)))
+    query = "DELETE FROM author_names WHERE name_id = %s"
+    app.logger.debug(','.join((query, name_id)))
     cur.execute(query, (name_id,))
     db.commit()
     return jsonify({'msg':'OK'})
@@ -357,10 +358,10 @@ def process_new_post(source_id):
     for i, (p_no, p_yes) in enumerate(probs):
         post = posts[i]
         app.logger.debug(u"post {} has blogspam probability {}".format(post['title'], p_yes))
-        if p_yes > app.config['MAX_SPAM'] * 2:
-            app.logger.debug("max {}".format(app.config['MAX_SPAM'] * 3/2))
+        if p_yes > app.config['MAX_SPAM'] * 2/3:
+            app.logger.debug("> max {}".format(app.config['MAX_SPAM'] * 3/2))
             continue
-        post['status'] = 1 if p_yes < app.config['MAX_SPAM'] * 2/3 else 0
+        post['status'] = 1 if p_yes < app.config['MAX_SPAM'] * 3/4 else 0
         post['spamminess'] = p_yes
         post['meta_confidence'] = 0.75
         query = "INSERT INTO docs ({}, found_date) VALUES ({} NOW())".format(

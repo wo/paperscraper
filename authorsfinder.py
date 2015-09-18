@@ -67,8 +67,9 @@ class AuthorsFinder:
         cur = db.cursor()
         findings = []
         for url in self.select_journals():
+            logger.debug(u"looking for author names on %s", url)
             for name in self.get_authornames(url):
-                query = "INSERT INTO author_names (name, last_searched) VALUES (%s, NOW())"
+                query = "INSERT INTO author_names (name, last_searched) VALUES (%s, '1970-01-01')"
                 try:
                     cur.execute(query, (name,))
                     db.commit()
@@ -76,7 +77,7 @@ class AuthorsFinder:
                     logger.debug(u"{} already in db".format(name))
                     findings = [f for f in findings if f[0] != name]
                 else:
-                    logger.debug(u"new author name {} on {}".format(name, url))
+                    logger.debug(u"+++ new author name {}".format(name))
                     name_id = cur.lastrowid
                     findings.append((name, name_id, url))
         if findings:
@@ -109,5 +110,5 @@ class AuthorsFinder:
 
 if __name__ == "__main__":
     af = AuthorsFinder()
-    print af.run()
+    af.run()
 
