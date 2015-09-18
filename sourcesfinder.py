@@ -26,11 +26,10 @@ class SourcesFinder:
         rows = cur.fetchall()
         return [row[0] for row in rows]
 
-    def run(self):
-        num_names = 1
+    def run(self, num_names=1):
         new_pages = []
         for name in self.select_names(num_names):
-            logger.info(u"searching papers page(s) for {}".format(name))
+            logger.info(u"\nsearching papers page(s) for {}".format(name))
             pages = self.pagefinder.search(name)
             db = self.get_db()
             cur = db.cursor()
@@ -183,6 +182,6 @@ if __name__ == "__main__":
         sys.exit(0)
     else:
         sf = SourcesFinder()
-        sf.run()
+        sf.run(num_names=5)
         sys.exit(0)
 

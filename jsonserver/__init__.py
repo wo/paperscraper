@@ -740,13 +740,13 @@ def list_uncertain_docs():
 @app.route("/sources")
 def list_sources():
     cur = mysql.connect().cursor(MySQLdb.cursors.DictCursor)
-    #query = 'SELECT * FROM sources WHERE parent_id IS NULL ORDER BY default_author'
+    #query = 'SELECT * FROM sources WHERE status > 0 ORDER BY default_author'
     query = '''SELECT S.*, COUNT(document_id) AS num_papers
         FROM sources S
         LEFT JOIN links USING (source_id)
         LEFT JOIN locations L USING (location_id)
         LEFT JOIN documents D USING (document_id)
-        WHERE D.document_id IS NULL OR (L.spamminess < 0.5 AND D.meta_confidence > 0.5)
+        WHERE S.status > 0 AND D.document_id IS NULL OR (L.spamminess < 0.5 AND D.meta_confidence > 0.5)
         GROUP BY S.source_id
         ORDER BY S.default_author, S.name
     '''
