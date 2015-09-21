@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from subjectivebayes import BinaryNaiveBayes
 from config import config
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 class SourcesFinder:
@@ -34,7 +34,7 @@ class SourcesFinder:
             db = self.get_db()
             cur = db.cursor()
             for url in pages:
-                logger.info(u"papers page for {}: {}".format(name, url))
+                logger.info(u"papers page for {}: {}".format(name, url))                
                 try:
                     query = "INSERT INTO sources (status,type,url,default_author,name) VALUES (0,1,%s,%s,%s)"
                     cur.execute(query, (url,name,u"{}'s site".format(name)))
@@ -108,9 +108,9 @@ class PapersPageFinder:
             '(publications OR articles OR papers OR "in progress" OR forthcoming)',
         ]
         # search full name first, then last name only:
-        search_phrase = '"{}" '.format(name) + ' '.join(search_terms),
+        search_phrase = u'"{}" '.format(name) + ' '.join(search_terms),
         searchresults = set(self.websearch(search_phrase))
-        search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
+        search_phrase = u'"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
         searchresults |= set(self.websearch(search_phrase))
         for url in searchresults:
             logger.debug("\n")
@@ -118,7 +118,7 @@ class PapersPageFinder:
             try:
                 r = self.fetch(url)
             except:
-                logger.debug("cannot retrieve {}".format(url))
+                logger.debug(u"cannot retrieve {}".format(url))
             else:
                 score = self.evaluate(r, name)
                 if score > 0.7:
@@ -182,6 +182,6 @@ if __name__ == "__main__":
         sys.exit(0)
     else:
         sf = SourcesFinder()
-        sf.run(num_names=5)
+        sf.run(num_names=1)
         sys.exit(0)
 

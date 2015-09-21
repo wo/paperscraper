@@ -358,7 +358,7 @@ def process_new_post(source_id):
     for i, (p_no, p_yes) in enumerate(probs):
         post = posts[i]
         app.logger.debug(u"post {} has blogspam probability {}".format(post['title'], p_yes))
-        if p_yes > app.config['MAX_SPAM'] * 2/3:
+        if p_yes > app.config['MAX_SPAM'] * 3/2:
             app.logger.debug("> max {}".format(app.config['MAX_SPAM'] * 3/2))
             continue
         post['status'] = 1 if p_yes < app.config['MAX_SPAM'] * 3/4 else 0
