@@ -7,13 +7,15 @@
 # Readability misses the intro part of posts, Goose removes all tags
 # (including emphases), and all of them get the mathml formulas
 # wrong. Moreover, none of the modules is able to extract the author
-# name from posts on group blogs.
+# name from posts on group blogs, and many fail to extract any content
+# for blog posts without long blocks of text, such as
+# https://philosophymodsquad.wordpress.com/2015/09/21/
 #
 # Rather than reinventing the wheel completely, what I do here is rely
-# on Goose to identify the main post content, locate that in the html
-# source, and perform my own clean-up on the html; I also look for 'by
-# [names]' strings in the vicinity of the start of the blog post to
-# identify authors.
+# on Goose to identify the main post content (fall-back: rss feed
+# content), locate that in the html source, and perform my own
+# clean-up on the html; I also look for 'by [names]' strings in the
+# vicinity of the start of the blog post to identify authors.
 #
 
 import logging
@@ -55,8 +57,8 @@ def parse(url, feed_content):
     return doc
 
 def match_text_in_html(text, html):
-    # avoid matches in <meta name="description" content="blah blah">):
-    html = re.sub(r'<\s*meta[^>]+>', '', html)
+    # avoid matches e.g. in <meta name="description" content="blah blah">):
+    html = re.sub(r'^.+<body[^>]+>', '', html, flags=re.DOTALL|re.IGNORECASE)
     start_words = re.findall(r'\b\w+\b', text[:50])[:-1]
     re_str = r'\b.+?\b'.join(start_words)
     m1 = shortest_match(re_str, html)
@@ -85,8 +87,10 @@ def shortest_match(re_str, string):
 
 def strip_tags(text, keep_italics=False):
     if keep_italics:
-        text = re.sub(r'<(/?)(?:i|b|em)>', r'{\1emph}', text)
-    text = re.sub('<.+?>', ' ', text, flags=re.MULTILINE|re.DOTALL)
+        text = re.sub(r'<(/?)(?:i|b|em)>', r'{\1emph}', text, flags=re.IGNORECASE)
+    text = re.sub('<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub('<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub('<.+?>', ' ', text, flags=re.DOTALL)
     text = re.sub('<', '&lt;', text)
     text = re.sub('  +', ' ', text)
     text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
