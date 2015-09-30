@@ -203,6 +203,6 @@ if __name__ == "__main__":
         sys.exit(0)
     else:
         sf = SourcesFinder()
-        sf.run(num_names=1)
+        sf.run(num_names=5)
         sys.exit(0)
 

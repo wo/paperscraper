@@ -238,38 +238,50 @@ def editsource():
                 else:
                     msg += ' no response from superfeedr server'
                 return jsonify({'msg':msg})
-        query = "REMOVE FROM sources WHERE url = %s"
-        app.logger.debug(','.join((query,url)))
-        cur.execute(query, (url,))
+        query = "DELETE FROM sources WHERE source_id = %s"
+        cur.execute(query, (source_id,))
+        app.logger.debug(cur._last_executed)
         db.commit()
         return jsonify({'msg':'OK'})
 
     else:
-        query = '''INSERT INTO sources (url, status, type, default_author, name)
-                   VALUES(%s, %s, %s, %s, %s)
-                   ON DUPLICATE KEY UPDATE status=%s, type=%s, default_author=%s, name=%s, source_id=LAST_INSERT_ID(source_id)'''
-        app.logger.debug(','.join((query,url,status,source_type,default_author,source_name)))
-        cur.execute(query, (url,status,source_type,default_author,source_name,status,source_type,default_author,source_name))
-        db.commit()
-        insert_id = cur.lastrowid
+        if source_id != 0:
+            # Is it sensible to change the url of an existing source
+            # page? Not really if an author has moved their site with
+            # all their documents, because then all the links and
+            # document URLs are also new. But sometimes the url
+            # changes and all the links remain the same, e.g. when
+            # Kent Bach's homepage moved from /~kbach to /kbach.
+            query = "UPDATE sources set url=%s, status=%s, type=%s, default_author=%s, name=%s WHERE source_id=%s"
+            cur.execute(query, (url,status,source_type,default_author,source_name,source_id))
+            app.logger.debug(cur._last_executed)
+            db.commit()
+        else:
+            query = '''INSERT INTO sources (url, status, type, default_author, name)
+                       VALUES(%s, %s, %s, %s, %s)
+                       ON DUPLICATE KEY UPDATE status=%s, type=%s, default_author=%s, name=%s, source_id=LAST_INSERT_ID(source_id)'''
+            cur.execute(query, (url,status,source_type,default_author,source_name,status,source_type,default_author,source_name))
+            app.logger.debug(cur._last_executed)
+            db.commit()
+            insert_id = cur.lastrowid
 
-        if source_id == 0 and source_type == '3':
-            # register new blog subscription on superfeedr:
-            from superscription import Superscription
-            ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
-            msg = 'could not register blog on superfeedr!'
-            try:
-                callback=request.url_root+'new_blog_post/{}'.format(insert_id)
-                app.logger.debug('suscribing to {} on {} via superfeedr'.format(url,callback))
-                success = ss.subscribe(hub_topic=url, hub_callback=callback)
-                if success:
-                    return jsonify({'msg':'OK'})
-            except:
-                if ss.response.status_code:
-                    msg += ' status {}'.format(ss.response.status_code)
-                else:
-                    msg += ' no response from superseedr server'
-            return jsonify({'msg':msg})
+            if source_type == '3':
+                # register new blog subscription on superfeedr:
+                from superscription import Superscription
+                ss = Superscription(config('SUPERFEEDR_USER'), password=config('SUPERFEEDR_PASSWORD'))
+                msg = 'could not register blog on superfeedr!'
+                try:
+                    callback=request.url_root+'new_blog_post/{}'.format(insert_id)
+                    app.logger.debug('suscribing to {} on {} via superfeedr'.format(url,callback))
+                    success = ss.subscribe(hub_topic=url, hub_callback=callback)
+                    if success:
+                        return jsonify({'msg':'OK'})
+                except:
+                    if ss.response.status_code:
+                        msg += ' status {}'.format(ss.response.status_code)
+                    else:
+                        msg += ' no response from superseedr server'
+                return jsonify({'msg':msg})
         return jsonify({'msg':'OK'})
     
 @app.route('/delete-authorname')
