@@ -88,6 +88,8 @@ def shortest_match(re_str, string):
 def strip_tags(text, keep_italics=False):
     if keep_italics:
         text = re.sub(r'<(/?)(?:i|b|em)>', r'{\1emph}', text, flags=re.IGNORECASE)
+        # also keep sub/supscript tags, e.g. for 'x_1'
+        text = re.sub(r'<(/?su[bp])>', r'{\1}', text, flags=re.IGNORECASE)
     text = re.sub('<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
     text = re.sub('<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
     text = re.sub('<.+?>', ' ', text, flags=re.DOTALL)
@@ -96,6 +98,7 @@ def strip_tags(text, keep_italics=False):
     text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
     if keep_italics:
         text = re.sub(r'{(/?)emph}', r'<\1i>', text)
+        text = re.sub(r'{(/?su[bp])}', r'<\1>', text)
     return text
 
 def get_abstract(html):
