@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 from subjectivebayes import BinaryNaiveBayes
 from config import config
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class SourcesFinder:
@@ -31,12 +31,12 @@ class SourcesFinder:
         # search for new papers pages matching num_names author names from db
         new_pages = []
         for name in self.select_names(num_names):
-            logger.info(u"\nsearching papers page(s) for {}".format(name))
+            logger.info(u"\nsearching papers page(s) for %s", name)
             pages = self.find_new_pages(name)
             db = self.get_db()
             cur = db.cursor()
             for url in pages:
-                logger.info(u"new papers page for {}: {}".format(name, url))                
+                logger.info(u"new papers page for %s: %s", name, url)                
                 query = "INSERT INTO sources (status,type,url,default_author,name) VALUES (0,1,%s,%s,%s)"
                 cur.execute(query, (url,name,u"{}'s site".format(name)))
                 db.commit()
@@ -74,19 +74,19 @@ class SourcesFinder:
             cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
             rows = cur.fetchall()
             if rows:
-                logger.debug(u"{} already known".format(url))
+                logger.debug(u"%s already known", url)
                 continue
             try:
                 r = self.fetch(url)
             except:
-                logger.debug(u"cannot retrieve {}".format(url))
+                logger.debug(u"cannot retrieve %s", url)
             else:
                 score = self.evaluate(r, name)
                 if score < 0.7:
-                    logger.debug(u"{} doesn't look like a papers page", url)
+                    logger.debug(u"%s doesn't look like a papers page", url)
                     continue
                 if self.is_duplicate(r):
-                    logger.debug(u"{} is a duplicate of an already known page", url)
+                    logger.debug(u"%s is a duplicate of an already known page", url)
                     continue
                 pages.add(url)
         return pages
@@ -106,7 +106,7 @@ class SourcesFinder:
         
     def fetch(self, url):
         headers = { 'User-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:37.0) Gecko/20100101 Firefox/37.0' }
-        logger.debug("fetching {}", url)
+        logger.debug("fetching %s", url)
         return requests.get(url, headers=headers)
         
     def evaluate(self, response, name):
