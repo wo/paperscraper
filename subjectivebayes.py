@@ -2,7 +2,6 @@ import logging
 import math
 import re
 
-logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 class BinaryNaiveBayes:
