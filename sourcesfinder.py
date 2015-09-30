@@ -164,7 +164,6 @@ class SourcesFinder:
             m.group(1)+'www.'+m.group(3), # 'www.', no trailing slash 
             m.group(1)+'www.'+m.group(3)+'/' # 'www.', trailing slash 
         ]
-        print urlvars
         cur.execute("SELECT url FROM sources WHERE url IN (%s, %s, %s, %s)", urlvars)
         rows = cur.fetchall()
         if rows:
