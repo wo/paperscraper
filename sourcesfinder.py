@@ -10,7 +10,8 @@ from email.mime.text import MIMEText
 from subjectivebayes import BinaryNaiveBayes
 from config import config
 
-logging.basicConfig(level=logging.DEBUG)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class SourcesFinder:
@@ -74,19 +75,20 @@ class SourcesFinder:
             cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
             rows = cur.fetchall()
             if rows:
-                logger.debug(u"%s already known", url)
+                logger.info(u"%s already known", url)
                 continue
             try:
                 r = self.fetch(url)
             except:
-                logger.debug(u"cannot retrieve %s", url)
+                logger.info(u"cannot retrieve %s", url)
             else:
                 score = self.evaluate(r, name)
                 if score < 0.7:
-                    logger.debug(u"%s doesn't look like a papers page", url)
+                    logger.info(u"%s doesn't look like a papers page", url)
                     continue
-                if self.is_duplicate(r):
-                    logger.debug(u"%s is a duplicate of an already known page", url)
+                dupe = self.is_duplicate(url)
+                if dupe:
+                    logger.info(u"%s is a duplicate of already known %s", url, dupe)
                     continue
                 pages.add(url)
         return pages
@@ -140,15 +142,34 @@ class SourcesFinder:
             p_yes=0.6, p_no=0.1)
         return classifier
 
-    def is_duplicate(self, r):
+    def is_duplicate(self, url):
         "check if page is already in db under different URL (e.g. /user/1076 and /user/sjones)"
         # tricky: university pages might well have changed in
         # irrelevant ways since the last fetch of the other version;
         # maybe this functionality should be moved to process_pages,
         # where I could check if a new page contains any links to
         # papers that haven't also been found elsewhere and if not
-        # mark it as inactive.
-        return False
+        # mark it as inactive. OTOH, it might still be further
+        # filtering out some obvious cases at this stage, such as
+        # trailing slashes or preceding 'www's.
+        db = self.get_db()
+        cur = db.cursor()
+        m = re.match('^(https?://)(www\.)?(.+?)(/)?$', url)
+        if not m:
+            logger.warn('malformed url %s?', url)
+            return None
+        urlvars = [
+            m.group(1)+m.group(3), # no 'www.', no trailing slash
+            m.group(1)+m.group(3)+'/', # no 'www.', trailing slash
+            m.group(1)+'www.'+m.group(3), # 'www.', no trailing slash 
+            m.group(1)+'www.'+m.group(3)+'/' # 'www.', trailing slash 
+        ]
+        print urlvars
+        cur.execute("SELECT url FROM sources WHERE url IN (%s, %s, %s, %s)", urlvars)
+        rows = cur.fetchall()
+        if rows:
+            return rows[0][0]
+        return None
 
     def sendmail(self, new_pages):
         body = u''
