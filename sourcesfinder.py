@@ -23,7 +23,7 @@ class SourcesFinder:
         # returns list of num names from db to check for new papers pages
         db = self.get_db()
         cur = db.cursor()
-        query = "SELECT name FROM author_names ORDER BY last_searched ASC LIMIT {}".format(num)
+        query = "SELECT name FROM author_names WHERE is_name=1 ORDER BY last_searched ASC LIMIT {}".format(num)
         cur.execute(query)
         rows = cur.fetchall()
         return [row[0] for row in rows]
@@ -223,6 +223,6 @@ if __name__ == "__main__":
         sys.exit(0)
     else:
         sf = SourcesFinder()
-        sf.run(num_names=5)
+        sf.run(num_names=1)
         sys.exit(0)
 

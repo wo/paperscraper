@@ -186,7 +186,7 @@ sub next_locations {
             return $dbh->selectall_arrayref($qu, { Slice => {} });
         };
         # Do we have unprocessed locations?
-        my $where = $opts{r} ? "0 = 0" : "status = 0";
+        my $where = $opts{r} ? "0 = 0" : "status < 1";
         my @locations = @{$fetch->($where)};
         print "\n\n", scalar @locations, " new locations.\n" if $verbosity;
 
@@ -220,6 +220,7 @@ my @processed;
 sub process {
     my $loc = shift;
     my $loc_id = $loc->{location_id};
+    $loc->{from_new_page} = ($loc->{status} < 0);
     binmode STDOUT, ":utf8";
     print "\nchecking location $loc_id: $loc->{url} (status ",
         ($loc->{status} || 0)," spamminess ",($loc->{spamminess} || '?'),")\n"
@@ -289,7 +290,7 @@ sub process {
 
     # check if this is a subpage with further links to papers:
     if (is_subpage($loc)) {
-        # is_supage stores the subpage in the 'sources' table, so
+        # is_subpage stores the subpage in the 'sources' table, so
         # we only need to indicate in 'locations' that this isn't
         # a document URL; we use the status field for that:
         error("subpage with more links");
@@ -460,11 +461,12 @@ sub add_to_oppweb {
     return unless (exists $cfg{'OPP_WEB'});
     my $loc = shift;
     # don't show papers from newly added source pages:
-    my ($ok) = $dbh->selectrow_array("SELECT 1 FROM sources WHERE "
-               ."found_date < DATE_SUB(NOW(), INTERVAL 12 HOUR) "
-               ."AND url = ".$dbh->quote($loc->{source_url}));
-    unless ($ok && $loc->{spamminess} < $cfg{'SPAM_THRESHOLD'}/2) {
-        print "not adding to opp-web database.\n" if $verbosity;
+    if ($loc->{from_new_page}) {
+        print "not adding to opp-web database: new source page.\n" if $verbosity;
+        return 0;
+    }
+    if ($loc->{spamminess} > $cfg{'SPAM_THRESHOLD'}*3/2) {
+        print "not adding to opp-web database: too spammy.\n" if $verbosity;
         return 0;
     }
     my $status = 1;

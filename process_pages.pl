@@ -80,7 +80,7 @@ my $pg_update = $dbh->prepare(
     or die "Couldn't connect to database: " . DBI->errstr;
 
 my $db_insert_location = $dbh->prepare(
-    "INSERT IGNORE INTO locations (url, status) VALUES (?,0)")
+    "INSERT IGNORE INTO locations (url, status) VALUES (?,?)")
     or die "Couldn't connect to database: " . DBI->errstr;
 
 my $db_insert_link = $dbh->prepare(
@@ -159,6 +159,7 @@ sub process {
     print "\nchecking page $page->{url}\n" if $verbosity;
     my $page_id = $page->{source_id};
     my $mtime = (defined $page->{last_checked}) ? $page->{last_checked} : 0;
+    my $page_is_new = (defined $page->{last_checked}) ? 0 : 1;
     my $res = fetch_url($page->{url}, $mtime);
     if ($res && $res->code == 304) {
         print "not modified.\n" if $verbosity;
@@ -234,7 +235,11 @@ sub process {
         print "new link: $url ($text)\n" if $verbosity;
         next LINKS if $opts{n};
         my $loc_id;
-        my $res = $db_insert_location->execute($url)
+        # indicate in location status field whether a link is found on
+        # a newly added page so that documents don't get displayed in
+        # news feed:
+        my $loc_status = $page_is_new ? -1 : 0;
+        my $res = $db_insert_location->execute($url, $loc_status)
             or print DBI->errstr;
         if ($res eq '0E0') {
             # insert ignored due to duplicate url

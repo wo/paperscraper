@@ -289,7 +289,7 @@ def deleteauthorname():
     name_id = request.args.get('name_id', '0')
     db = get_db()
     cur = db.cursor()
-    query = "DELETE FROM author_names WHERE name_id = %s"
+    query = "UPDATE author_names SET is_name=0 WHERE name_id = %s"
     app.logger.debug(','.join((query, name_id)))
     cur.execute(query, (name_id,))
     db.commit()

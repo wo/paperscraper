@@ -57,8 +57,7 @@ class AuthorsFinder:
 
     def get_authornames(self, journal_url):
         r = self.fetch(journal_url)
-        # initial '>' excludes coauthors because PhilPapers often gets those wrong:
-        ms = re.findall(r"><span class='name'>(.+?)</span>", r.text)
+        ms = re.findall(r"<span class='name'>(.+?)</span>", r.text)
         names = { m for m in ms }
         return names
 
