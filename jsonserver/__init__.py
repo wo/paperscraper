@@ -12,6 +12,7 @@ from os.path import abspath, dirname, join
 import MySQLdb.cursors
 from flask import Flask, request, g, jsonify 
 from flask.ext.mysql import MySQL
+from util import normalize_url
 
 # access perl config file 'config.pl'
 config_cache = {}
@@ -80,11 +81,12 @@ def doc():
 
 @app.route("/source")
 def source():
-    url = request.args.get('url')
+    url = normalize_url(request.args.get('url'))
     db = get_db()
     cur = db.cursor(MySQLdb.cursors.DictCursor)
     query = "SELECT * FROM sources WHERE url = %s"
     cur.execute(query, (url,))
+    app.logger.debug(cur._last_executed)
     sources = cur.fetchall()
     if not sources:
         return jsonify({ 'msg': 'there seems to be no source with that url' })
@@ -214,7 +216,7 @@ def editsource():
     source_id = int(request.form['source_id'])
     status = request.form['status']
     source_type = request.form['type']
-    url = request.form['url']
+    url = normalize_url(request.form['url'])
     default_author = request.form['default_author']
     source_name = request.form['name']
     db = get_db()

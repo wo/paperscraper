@@ -9,6 +9,7 @@ import smtplib
 from email.mime.text import MIMEText
 from subjectivebayes import BinaryNaiveBayes
 from config import config
+from util import normalize_url
 
 logging.getLogger("requests").setLevel(logging.WARNING)
 logging.basicConfig(level=logging.INFO)
@@ -69,7 +70,7 @@ class SourcesFinder:
         searchresults |= set(self.websearch(search_phrase))
         for url in searchresults:
             logger.debug("\n")
-            url = urllib.unquote(url) 
+            url = normalize_url(url) 
             # check if url already known:
             cur = self.get_db().cursor()
             cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
