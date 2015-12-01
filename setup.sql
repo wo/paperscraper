@@ -60,6 +60,7 @@ CREATE TABLE author_names (
   name_id INT(11) UNSIGNED NOT NULL auto_increment,
   name VARCHAR(64) NOT NULL,
   last_searched DATETIME DEFAULT NULL,
+  is_name TINYINT UNSIGNED DEFAULT 1,
   PRIMARY KEY (name_id),
   UNIQUE KEY (name)
 ) ENGINE=InnoDB CHARACTER SET utf8;
