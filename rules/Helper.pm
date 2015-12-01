@@ -6,7 +6,6 @@ use List::Util qw/max min/;
 use Cwd 'abs_path';
 use File::Basename;
 use DBI;
-use Biblio::Citation::Compare 'sameWork';
 use lib '..';
 use util::Io;
 use util::Functools qw/someof allof/;
