@@ -1,42 +1,12 @@
 
 SET NAMES 'utf8';
 
-CREATE TABLE documents (
-  document_id INT(11) UNSIGNED NOT NULL auto_increment,
-  found_date DATETIME DEFAULT NULL,
-  last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  authors VARCHAR(255) DEFAULT NULL,
-  title VARCHAR(255) DEFAULT NULL,
-  abstract TEXT DEFAULT NULL,
-  length SMALLINT(6) UNSIGNED DEFAULT NULL,
-  language VARCHAR(8) DEFAULT 'en',
-  meta_confidence FLOAT(4,3) UNSIGNED DEFAULT NULL,
-  PRIMARY KEY (document_id),
-  KEY (found_date)
-) ENGINE=InnoDB CHARACTER SET utf8;
-
-CREATE TABLE locations (
-  location_id INT(11) UNSIGNED NOT NULL auto_increment,
-  url VARCHAR(255) NOT NULL,
-  status SMALLINT(6) DEFAULT NULL,
-  document_id INT(11) UNSIGNED DEFAULT NULL,
-  filetype VARCHAR(8) DEFAULT NULL,
-  filesize INT(10) UNSIGNED DEFAULT NULL,
-  spamminess FLOAT(4,3) UNSIGNED DEFAULT NULL,
-  last_checked DATETIME DEFAULT NULL,
-  PRIMARY KEY (location_id),
-  UNIQUE KEY url (url),
-  KEY (document_id),
-  KEY (last_checked)
-) ENGINE=InnoDB CHARACTER SET utf8;
-
+DROP TABLE IF EXISTS sources;
 CREATE TABLE sources (
   source_id INT(11) UNSIGNED NOT NULL auto_increment,
   type SMALLINT(4) UNSIGNED NOT NULL DEFAULT 1,
   url VARCHAR(255) NOT NULL,
-  status SMALLINT(6) DEFAULT NULL,
-  crawl_depth TINYINT UNSIGNED NOT NULL DEFAULT 1,
-  parent_id INT(11) UNSIGNED DEFAULT NULL,
+  status SMALLINT(6) DEFAULT 1,
   found_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_checked DATETIME DEFAULT NULL,
   default_author VARCHAR(128) DEFAULT NULL,
@@ -47,24 +17,18 @@ CREATE TABLE sources (
   KEY (last_checked)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
-CREATE TABLE links (
-  source_id INT(11) UNSIGNED NOT NULL,
-  location_id INT(11) UNSIGNED NOT NULL,
-  anchortext VARCHAR(255) DEFAULT NULL,
-  PRIMARY KEY (source_id, location_id),
-  KEY (location_id),
-  KEY (source_id)
+DROP TABLE IF EXISTS locations;
+CREATE TABLE locations (
+  location_id INT(11) UNSIGNED NOT NULL auto_increment,
+  url VARCHAR(255) NOT NULL,
+  status SMALLINT(6) DEFAULT NULL,
+  filesize INT(10) UNSIGNED DEFAULT NULL,
+  spamminess FLOAT(4,3) UNSIGNED DEFAULT NULL,
+  last_checked DATETIME DEFAULT NULL,
+  PRIMARY KEY (location_id),
+  UNIQUE KEY url (url),
+  KEY (last_checked)
 ) ENGINE=InnoDB CHARACTER SET utf8;
-
-CREATE TABLE author_names (
-  name_id INT(11) UNSIGNED NOT NULL auto_increment,
-  name VARCHAR(64) NOT NULL,
-  last_searched DATETIME DEFAULT NULL,
-  PRIMARY KEY (name_id),
-  UNIQUE KEY (name)
-) ENGINE=InnoDB CHARACTER SET utf8;
-
-
 
 DROP TABLE IF EXISTS docs;
 CREATE TABLE docs (
@@ -72,6 +36,7 @@ CREATE TABLE docs (
   status SMALLINT(6) DEFAULT 1,
   url VARCHAR(255) NOT NULL,
   filetype VARCHAR(8) DEFAULT NULL,
+  filesize INT(10) UNSIGNED DEFAULT NULL,
   found_date DATETIME DEFAULT NULL,
   authors VARCHAR(255) DEFAULT NULL,
   title VARCHAR(255) DEFAULT NULL,
@@ -110,3 +75,13 @@ CREATE TABLE docs2topics (
 
 INSERT INTO topics (label, is_default) VALUES ('Metaphysics', 1);
 INSERT INTO topics (label, is_default) VALUES ('Epistemology', 1);
+
+DROP TABLE IF EXISTS author_names;
+CREATE TABLE author_names (
+  name_id INT(11) UNSIGNED NOT NULL auto_increment,
+  name VARCHAR(64) NOT NULL,
+  last_searched DATETIME DEFAULT NULL,
+  PRIMARY KEY (name_id),
+  UNIQUE KEY (name)
+) ENGINE=InnoDB CHARACTER SET utf8;
+
