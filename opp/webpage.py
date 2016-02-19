@@ -46,16 +46,16 @@ class Webpage():
         return urljoin(self.base_href(), href)
 
     def session_variables(self):
-        """return list of possible session variables in links"""
+        """return set of possible session variables in links"""
         if self._session_vars is None:
             # start with default list:
-            self._session_vars = ['session', 'session_id', 's_id', 'halsid', 'wpnonce', 'locale']
+            self._session_vars = {'session', 'session_id', 'jsessionid', 's_id', 'halsid', 'wpnonce', 'locale'}
             # add url parameters common to many links:
             hrefs = self.xpath('//a/@href')
             count_params = defaultdict(int)
             for m in re.finditer('([\w_-]+)=', ' '.join(hrefs)):
                 count_params[m.group(1)] += 1
-            self._session_vars += [p for p,i in count_params if i>2]
+            self._session_vars |= set(p for p,i in count_params.items() if i>2)
         return self._session_vars
         
     @lru_cache() # memoize
