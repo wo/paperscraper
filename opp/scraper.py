@@ -292,7 +292,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
 
     if li.doc_id:
         # check for revisions:
-        olddoc = Doc(li.doc_id)
+        olddoc = Doc(doc_id=li.doc_id)
         olddoc.load_from_db()
         if doc.content != olddoc.content:
             sm = SequenceMatcher(None, doc.content, olddoc.content)
