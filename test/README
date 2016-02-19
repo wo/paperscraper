@@ -1,0 +1,8 @@
+Run with pytest using python 3, e.g.:
+
+python3 -m pytest test/test_scraperdaemon.py
+
+For testing the scraper, create a test instance of the database called
+'test_opp' and call
+
+mysql -u USER -p test_opp < setup.sql

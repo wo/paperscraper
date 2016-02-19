@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pdf2xml SYSTEM "pdf2xml.dtd">
+
+<pdf2xml>
+<page number="1" position="absolute" top="0" left="0" height="841" width="595">
+	<fontspec id="0" size="15" family="Times" color="#000000"/>
+	<fontspec id="1" size="9" family="Times" color="#000000"/>
+	<fontspec id="2" size="12" family="Times" color="#000000"/>
+	<fontspec id="3" size="7" family="Times" color="#000000"/>
+<text top="160" left="154" width="304" height="22" font="0">A Test Document for Metadata Extraction</text>
+<text top="194" left="259" width="93" height="16" font="1">Wolfgang Schwarz</text>
+<text top="235" left="134" width="80" height="19" font="2">1 Purpose</text>
+<text top="261" left="134" width="344" height="13" font="3">This is a very short paper serving as a simple test case for metadata extraction.</text>
+<text top="273" left="134" width="344" height="13" font="3">It is unlikely to get published in an academic journal. This is its only paragraph,</text>
+<text top="285" left="134" width="150" height="13" font="3">and for no good reason it cites [1].</text>
+<text top="313" left="134" width="74" height="19" font="2">References</text>
+<text top="339" left="134" width="344" height="13" font="3">[1] Andreas Albrecht and Lorenzo Sorbo (2004): "Can the universe afford infla-</text>
+<text top="351" left="149" width="166" height="13" font="3">tion?" Physical Review D, 70: 063528</text>
+<text top="693" left="303" width="5" height="13" font="3">1</text>
+</page>
+</pdf2xml>

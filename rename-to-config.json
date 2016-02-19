@@ -1,0 +1,11 @@
+{
+    "mysql": {
+        "host": "localhost",
+        "db": "opptools",
+        "user": "user",
+        "pass": "pass"
+    },
+    "tempdir": "/home/wo/programming/opp-tools/temp",
+    "loglevel": 3,
+    "logfile": "/home/wo/programming/opp-tools/log/scraper.log"
+}

@@ -6,27 +6,31 @@ CREATE TABLE sources (
   source_id INT(11) UNSIGNED NOT NULL auto_increment,
   type SMALLINT(4) UNSIGNED NOT NULL DEFAULT 1,
   url VARCHAR(255) NOT NULL,
-  status SMALLINT(6) DEFAULT 1,
+  status SMALLINT(6) DEFAULT 0,
   found_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_checked DATETIME DEFAULT NULL,
   default_author VARCHAR(128) DEFAULT NULL,
   name VARCHAR(128) DEFAULT NULL,
-  content TEXT DEFAULT NULL,
   PRIMARY KEY (source_id),
   UNIQUE KEY (url),
   KEY (last_checked)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
-DROP TABLE IF EXISTS locations;
-CREATE TABLE locations (
-  location_id INT(11) UNSIGNED NOT NULL auto_increment,
+DROP TABLE IF EXISTS links;
+CREATE TABLE links (
+  link_id INT(11) UNSIGNED NOT NULL auto_increment,
   url VARCHAR(255) NOT NULL,
-  status SMALLINT(6) DEFAULT NULL,
-  filesize INT(10) UNSIGNED DEFAULT NULL,
-  spamminess FLOAT(4,3) UNSIGNED DEFAULT NULL,
+  status SMALLINT(6) DEFAULT 0,
+  source_id INT(11) UNSIGNED NOT NULL,
+  found_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_checked DATETIME DEFAULT NULL,
-  PRIMARY KEY (location_id),
-  UNIQUE KEY url (url),
+  etag VARCHAR(255) DEFAULT NULL,
+  filesize INT(10) UNSIGNED DEFAULT NULL,
+  doc_id INT(11) DEFAULT NULL,
+  PRIMARY KEY (link_id),
+  UNIQUE KEY (source_id,url),
+  KEY (source_id),
+  KEY (url),
   KEY (last_checked)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
@@ -34,18 +38,21 @@ DROP TABLE IF EXISTS docs;
 CREATE TABLE docs (
   doc_id INT(11) UNSIGNED NOT NULL auto_increment,
   status SMALLINT(6) DEFAULT 1,
+  type SMALLINT(4) UNSIGNED NOT NULL DEFAULT 1,
   url VARCHAR(255) NOT NULL,
   filetype VARCHAR(8) DEFAULT NULL,
   filesize INT(10) UNSIGNED DEFAULT NULL,
   found_date DATETIME DEFAULT NULL,
+  earlier_id INT(11) UNSIGNED DEFAULT NULL,
   authors VARCHAR(255) DEFAULT NULL,
   title VARCHAR(255) DEFAULT NULL,
   abstract TEXT DEFAULT NULL,
   numwords SMALLINT(6) UNSIGNED DEFAULT NULL,
+  numpages SMALLINT(6) UNSIGNED DEFAULT NULL,
   source_url VARCHAR(255) DEFAULT NULL,
   source_name VARCHAR(255) DEFAULT NULL,
-  meta_confidence FLOAT(4,3) UNSIGNED DEFAULT NULL,
-  spamminess FLOAT(4,3) UNSIGNED DEFAULT NULL,
+  meta_confidence TINYINT UNSIGNED DEFAULT NULL,
+  spamminess TINYINT UNSIGNED DEFAULT NULL,
   content MEDIUMTEXT DEFAULT NULL,
   PRIMARY KEY (doc_id),
   UNIQUE KEY (url),

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<pdf2xml>
+  <page height="1263" number="1" width="893">
+   <fontspec color="#000" family="Times" id="0" size="10"/>
+   <fontspec color="#000" family="Times" id="1" size="15"/>
+   <fontspec color="#000" family="Times" id="2" size="11"/>
+   <fontspec color="#000" family="Times" id="3" size="13"/>
+   <text left="167" top="166" width="162" height="10" font="0">Tan JOURNAL or SYunomc Loom</text>
+     <text left="168" top="179" width="161" height="10" font="0">Volume 11, <strong>Number</strong> 2. June 1946</text>
+    <text left="290" top="219" width="279" height="19" font="1">MODALITIES AND QUANTIFICATION</text>
+    <text left="376" top="247" width="105" height="11" font="2">RUDOLF CARNAP</text>
+    <text left="183" top="266" width="505" height="15" font="1">1. The <strong>problems</strong> of <strong>modal</strong> logic. The purpose of this article is to give a</text>
+     <text left="168" top="284" width="519" height="15" font="1">survey of some results I have found in investigations concerning logical modali-</text>
+     <text left="168" top="302" width="520" height="18" font="1">ties. The results refer: (1) to semantical systems, i.e., symbolic language sys-</text>
+     <text left="168" top="320" width="520" height="18" font="1">tems for which semantical rules of interpretation are laid down; (2) to</text>
+     <text left="168" top="337" width="519" height="15" font="1">corresponding calculi, i.e., syntactical systems with primitive sentences and a</text>
+     <text left="168" top="356" width="520" height="18" font="1">rule of inference; (3) to relations between a semantical system and the corre-</text>
+     <text left="168" top="375" width="121" height="15" font="1">sponding calculus.</text>
+    <text left="183" top="391" width="504" height="16" font="1">The semantical systems to be dealt with are the following: propositional logic</text>
+     <text left="169" top="409" width="519" height="15" font="1">(PL), functional logic (FL), and the corresponding modal systems, viz. modal</text>
+     <text left="168" top="427" width="520" height="19" font="1">propositional logic (MPL) and modal functional logic (MFL). MPL is built</text>
+     <text left="168" top="445" width="521" height="15" font="1">out of PL by the addition of the symbol ‘N’ for logical necessity; likewise MFL</text>
+     <text left="168" top="463" width="520" height="19" font="1">out of FL. In terms of Lewis’s symbol ‘O’ for logical possibility, ‘Np’ means</text>
+     <text left="168" top="481" width="521" height="16" font="1">the same as ‘~O~p’. All other logical modalities can, of course, be deﬁned</text>
+     <text left="168" top="498" width="521" height="16" font="1">on the basis of <strong>‘N’;</strong> e.g., impossibility by ‘N~p’, possibility by ‘~N~p’, con-</text>
+     <text left="168" top="519" width="212" height="14" font="1">tingency by ‘~Np.~N~p’, etc.</text>
+    <text left="183" top="535" width="505" height="16" font="1">The calculi corresponding to these semantical systems are the following: the</text>
+     <text left="168" top="552" width="520" height="16" font="1">propositional calculus (PC), the functional calculus (FC), and the modal calculi</text>
+     <text left="170" top="571" width="379" height="18" font="1">(MPC and MFC) again constructed by the addition of ‘N’.</text>
+    <text left="184" top="588" width="505" height="17" font="1">Lewis's systems of strict implication1 are forms of MPG. So far, no forms of</text>
+     <text left="169" top="606" width="519" height="16" font="1">MFC have been constructed, and the construction of such a system is our chief</text>
+     <text left="168" top="624" width="520" height="16" font="1">aim. The corresponding semantical systems MPL and MFL are constructed</text>
+     <text left="168" top="641" width="520" height="15" font="1">chieﬂy for the purpose of enabling us to show that the modal calculi MPC and</text>
+     <text left="168" top="660" width="520" height="15" font="1">MFC are adequate, i.e., that every sentence provable in them is L-true (analy-</text>
+     <text left="168" top="678" width="521" height="18" font="1">tic). With the help of a normal form, it can further be shown that for MPC</text>
+     <text left="168" top="695" width="521" height="15" font="1">the inverse holds also; MPC is complete in the sense that every sentence which</text>
+     <text left="168" top="714" width="521" height="15" font="1">is L-true in MPL is provable in MPC. The reduction to the normal form con-</text>
+     <text left="168" top="731" width="521" height="15" font="1">stitutes a decision method for MPG and MPL. For MFC likewise a method of</text>
+     <text left="168" top="750" width="521" height="15" font="1">reduction to a normal form will be given. This reduction removes all occur-</text>
+     <text left="168" top="767" width="521" height="15" font="1">rences of ‘N’ of higher order, i.e., such that the scope of one ‘N’ contains another</text>
+     <text left="170" top="785" width="519" height="15" font="1">‘N’. A decision method for MFC is of course not possible; however, the reduc-</text>
+     <text left="168" top="802" width="521" height="15" font="1">tion makes it possible to apply to MFG the known decision methods for special</text>
+     <text left="169" top="824" width="320" height="15" font="1">cases in FC. ,</text>
+    <text left="184" top="838" width="506" height="16" font="1">The semantical systems FL and MFL contain an inﬁnite number of individual</text>
+     <text left="169" top="858" width="521" height="15" font="1">constants. Therefore the representation of these systems requires a very strong</text>
+     <text left="168" top="875" width="521" height="15" font="1">metalanguage, dealing with classes of classes of sentences. Consequently,</text>
+     <text left="168" top="892" width="520" height="19" font="1">the semantical concepts deﬁned, e.g., L-truth, are indeﬁnite (non-effective)</text>
+     <text left="168" top="910" width="521" height="15" font="1">to a high degree. The chief reasons for constructing corresponding calculi are</text>
+     <text left="168" top="928" width="521" height="18" font="1">here, as usually in the case of logical calculi, the following two: (1) avoidance</text>
+     <text left="168" top="945" width="521" height="18" font="1">of any reference to the meanings of the signs and sentences, (2) use of basic</text>
+     <text left="169" top="964" width="520" height="15" font="1">concepts which are effective. The second purpose is here, as generally in the</text>
+     <text left="169" top="981" width="520" height="15" font="1">case of calculi without transﬁnite rules, fulﬁlled in the following sense. Al-</text>
+    <text left="184" top="1018" width="165" height="13" font="3">Received November 26, 1945.</text>
+     <text left="185" top="1030" width="505" height="13" font="3">1 C. I. Lewis and C. H. Langford, Symbolic logic, 1932; the systems are developed from</text>
+    <text left="169" top="1047" width="204" height="15" font="3">those in Lewis’s earlier book (1918).</text>
+     <text left="423" top="1066" width="12" height="12" font="3">33</text>
+    </page>
+</pdf2xml>

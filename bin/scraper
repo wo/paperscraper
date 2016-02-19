@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+import sys
+import logging
+import argparse
+import findmodules
+import scraper
+
+logger = logging.getLogger('opp')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+logger.addHandler(ch)
+
+ap = argparse.ArgumentParser()
+ap.add_argument('url', help='url of source page to scrape')
+ap.add_argument('-d', '--debug_level', default=1, type=int)
+ap.add_argument('-k', '--keep', action='store_true', help='keep temporary files')
+ap.add_argument('-l', '--link', type=str, help='only process this link')
+args = ap.parse_args()
+
+scraper.debuglevel(args.debug_level)
+
+source = scraper.Source(url=args.url)
+source.load_from_db()
+if not source.source_id:
+   raise Exception(args.url+' not a known source')
+if args.link:
+    browser = scraper.Browser(use_virtual_display=True)
+    browser.goto(source.url)
+    source.set_html(browser.page_source)
+    el = browser.find_element_by_xpath("//a[@href='{}']".format(args.link))
+    url = source.make_absolute(args.link)
+    li = scraper.Link(url=url, source=source, element=el)
+    li.load_from_db()
+    scraper.process_link(li, force_reprocess=True, keep_tempfiles=args.keep)
+else:
+    scraper.scrape(source, keep_tempfiles=args.keep)
+
