@@ -75,6 +75,8 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
             pdffile = shortpdffile
         except subprocess.CalledProcessError as e:
             debug(1, 'pdftk failed to produce short pdf! %s', e.output)
+        except subprocess.TimeoutExpired as e:
+            debug(1, 'pdftk timeout!')
 
     try2 = pdf2xml(pdffile, xmlfile, use_ocr=True,
                    debug_level=debug_level, keep_tempfiles=keep_tempfiles)
@@ -125,6 +127,9 @@ def extractor(xmlfile):
         output = output.decode('utf-8', 'ignore')
     except subprocess.CalledProcessError as e:
         debug(1, e.output)
+        return False
+    except subprocess.TimeoutExpired as e:
+        debug(1, 'Extractor timeout!')
         return False
     json_separator = '=========== RESULT ===========\n'
     if not json_separator in output:
