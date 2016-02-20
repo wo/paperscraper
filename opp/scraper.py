@@ -841,16 +841,18 @@ def context_suggests_published(context):
     - "Foo bar". Unfinished Draft (2015)
     - "Foo bar". Journal of obscure philosophy (2015). Penultimate Draft
     """
+    # xxx
+    # return False
     if re.search('forthcoming|unpublished', context, flags=re.I):
-        return True
+        return False
     m = re.search(r'\b(\d{4})\b', context)
     if not m:
-        return False
+        return True
     year = int(m.group(1))
     if 1950 < year < datetime.today().year:
         debug(1, "ignoring paper published in %s", year)
-        return False
-    return True
+        return True
+    return False
 
 def paper_is_old(doc):
     """
