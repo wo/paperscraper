@@ -115,8 +115,12 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
             os.remove(xmlfile)
         return True
     else:
-        debug(1, 'pdf parser failed')
-        return False
+        if try1 and parse1:
+            debug(1, 'ocr failed, sticking with pdftohtml results')
+            return True
+        else:
+            debug(1, 'pdf parser failed both on pdftohtml and ocr')
+            return False
 
 def extractor(xmlfile):
     global _debug_level
@@ -142,7 +146,7 @@ def extractor(xmlfile):
 
 def enrich_xml(xmlfile, doc):
     """
-    add doc properties to xmlfile produced by htmltopdf (or ocr2pdf)
+    add doc properties to xmlfile produced by htmltopdf (or ocr2xml)
     for processing by the Perl metadata extractor
     """
     def mk_el(tag, content):
