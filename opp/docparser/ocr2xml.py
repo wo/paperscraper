@@ -174,11 +174,12 @@ def tidy_hocr_line(line):
     lxml.etree.strip_tags(line, 'span')
     # The following operations are much easier on strings than on
     # etree xml trees.
-    linestr = lxml.etree.tostring(line, encoding=str).rstrip()
+    linestr = lxml.etree.tostring(line, encoding=str)
     m = re.match('(<text.*?>)(.*)(</text>)', linestr, flags=re.DOTALL)
     if not m:
         return line
     (start, content, end) = m.groups()
+    content = content.rstrip()
     content = content.replace('strong>', 'b>')
     content = content.replace('em>', 'i>')
     # merge consecutive:
