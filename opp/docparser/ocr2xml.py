@@ -154,7 +154,7 @@ def xml_add_page(xml, page_hocr):
         if fontsize not in fontnumbers:
             fontnumbers.append(fontsize)
         line.set('font', str(fontnumbers.index(fontsize)))
-        tidy_hocr_line(line)
+        line = tidy_hocr_line(line)
         texts.append(line)
     xml_page.text='\n   '
     for i,fs in enumerate(fontnumbers):
@@ -165,36 +165,37 @@ def xml_add_page(xml, page_hocr):
         xml_page.append(text)
 
 def tidy_hocr_line(line):
-    # discard individual word/node hocr markup from content; don't
-    # discard all markup to preserve <strong> etc.:
+    """
+    remove hocr markup for individual words, replace <strong> by <b>,
+    <em> by <i>, merge consecutive elements etc.
+    """
+    # remove individual word/node hocr markup; don't discard all
+    # markup to preserve <strong> etc.:
     lxml.etree.strip_tags(line, 'span')
-    # replace <strong> by <b>; also treat whole line as bold if much
-    # of it was recognized as such:
-    linetext = lxml.etree.tostring(line, encoding=str, method="text").rstrip()
-    btext, itext = '', ''
-    for child in line.getchildren():
-        if child.tag == 'strong':
-            child.tag == 'b'
-            btext += child.text
-        elif child.tag == 'em':
-            child.tag == 'i'
-            itext += child.text
-    if len(btext) > len(linetext)/2:
-        lxml.etree.strip_tags(line, '*')
-        line.text = ''
-        b = lxml.etree.SubElement(line, 'b')
-        b.text = linetext
-    elif len(itext) > len(linetext)/2:
-        lxml.etree.strip_tags(line, '*')
-        line.text = ''
-        i = lxml.etree.SubElement(line, 'i')
-        i.text = linetext
-    else:
-        # remove trailing whitespace:
-        if len(line):
-            line[-1].tail = line[-1].tail.rstrip()
-        else:
-            line.text = line.text.rstrip()
+    # The following operations are much easier on trings than on etree
+    # xml trees.
+    linestr = lxml.etree.tostring(line, encoding=str).rstrip()
+    m = re.match('(<text.*?>)(.*)(</text>)', linestr)
+    if not m:
+        return line
+    (start, content, end) = m.groups()
+    content = content.replace('strong>', 'b>')
+    content = content.replace('em>', 'i>')
+    # merge consecutive:
+    content = re.sub('</b>(.{0,4})<b>', r'\1', content)
+    content = re.sub('</i>(.{0,4})<i>', r'\1', content)
+    # if most of a line is bold, make whole line bold (important for
+    # title extraction):
+    debug(1, content)
+    bpart = ''.join(re.findall('<b>.+?</b>', content))
+    debug(1, bpart)
+    if len(bpart) > len(content)*2/3:
+        debug(1, '%s > %s', len(bpart), len(content)*2/3)
+        content = '<b>'+re.sub('</?b>', '', content)+'</b>'
+    debug(1, content)
+    linestr = start + content + end
+    debug(1, linestr)
+    return lxml.etree.fromstring(linestr)
 
 def scale(x):
     # A4 documents are 210 x 297 mm = 8.27 x 11.69 in = approx 595
