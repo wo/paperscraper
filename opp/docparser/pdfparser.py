@@ -85,9 +85,10 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
         parse2 = extractor(xmlfile)
         if parse2 and parse1:
             # compare results:
-            if (parse1['authors'] == parse2['authors'] 
-                and parse1['title'] == parse2['title']
-                and parse1['abstract'] == parse2['abstract']):
+            same_authors = (parse1['authors'] == parse2['authors'])
+            same_title = (strip_markup(parse1['title']) == strip_markup(parse2['title']))
+            same_abstract = (strip_markup(parse1['abstract']) == strip_markup(parse2['abstract']))
+            if same_authors and same_title and same_abstract:
                 debug(1, "pdftohtml and pdfocr results agree")
                 doc.meta_confidence *= 1.05
             else:
@@ -101,13 +102,13 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
                 # flag the fact that either pdftohtml or pdfocr
                 # produced false metadata.
                 debug(1, "pdftohtml and pdfocr results disagree")
-                if parse1['authors'] != parse2['authors']:
+                if not same_authors:
                     debug(1, "authors: '%s' vs '%s'", parse1['authors'], parse2['authors'])
                     doc.meta_confidence *= 0.8
-                if parse1['title'] != parse2['title']:
+                if not same_title:
                     debug(1, "title: '%s' vs '%s'", parse1['title'], parse2['title'])
                     doc.meta_confidence *= 0.8
-                if parse1['abstract'] != parse2['abstract']:
+                if not same_abstract: 
                     debug(1, "abstract: '%s' vs '%s'", parse1['abstract'], parse2['abstract'])
                     doc.meta_confidence *= 0.9
         enrich_doc(doc, parse2, preserve_fields=preserve_fields)
@@ -174,6 +175,10 @@ def enrich_doc(doc, extractor_res, preserve_fields=None):
         if k not in preserve_fields:
             setattr(doc, k, v)
     doc.meta_confidence = int(100*float(extractor_res['meta_confidence']))
+
+def strip_markup(string):
+    '''strip <b>, <i>, <sub>, <sup> tags from extracted titles or abstractes'''
+    return re.sub('</?.+?>', '', string)
 
 _debug_level = 0
 
