@@ -175,7 +175,7 @@ def tidy_hocr_line(line):
     # The following operations are much easier on strings than on
     # etree xml trees.
     linestr = lxml.etree.tostring(line, encoding=str).rstrip()
-    m = re.match('(<text.*?>)(.*)(</text>)', linestr)
+    m = re.match('(<text.*?>)(.*)(</text>)', linestr, flags=re.DOTALL)
     if not m:
         return line
     (start, content, end) = m.groups()
@@ -190,6 +190,7 @@ def tidy_hocr_line(line):
     if len(bpart) > len(content)*2/3:
         content = '<b>'+re.sub('</?b>', '', content)+'</b>'
     linestr = start + content + end
+    debug(1, 'xxx => %s', linestr)
     return lxml.etree.fromstring(linestr)
 
 def scale(x):
