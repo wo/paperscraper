@@ -172,8 +172,8 @@ def tidy_hocr_line(line):
     # remove individual word/node hocr markup; don't discard all
     # markup to preserve <strong> etc.:
     lxml.etree.strip_tags(line, 'span')
-    # The following operations are much easier on trings than on etree
-    # xml trees.
+    # The following operations are much easier on strings than on
+    # etree xml trees.
     linestr = lxml.etree.tostring(line, encoding=str).rstrip()
     m = re.match('(<text.*?>)(.*)(</text>)', linestr)
     if not m:
@@ -186,15 +186,10 @@ def tidy_hocr_line(line):
     content = re.sub('</i>(.{0,4})<i>', r'\1', content)
     # if most of a line is bold, make whole line bold (important for
     # title extraction):
-    debug(1, content)
     bpart = ''.join(re.findall('<b>.+?</b>', content))
-    debug(1, bpart)
     if len(bpart) > len(content)*2/3:
-        debug(1, '%s > %s', len(bpart), len(content)*2/3)
         content = '<b>'+re.sub('</?b>', '', content)+'</b>'
-    debug(1, content)
     linestr = start + content + end
-    debug(1, linestr)
     return lxml.etree.fromstring(linestr)
 
 def scale(x):
