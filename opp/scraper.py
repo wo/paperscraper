@@ -841,8 +841,8 @@ def context_suggests_published(context):
     - "Foo bar". Unfinished Draft (2015)
     - "Foo bar". Journal of obscure philosophy (2015). Penultimate Draft
     """
-    # xxx
-    # return False
+    # uncomment for testing paper processing:
+    return False
     if re.search('forthcoming|unpublished', context, flags=re.I):
         return False
     m = re.search(r'\b(\d{4})\b', context)

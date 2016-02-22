@@ -25,7 +25,6 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
     _debug_level = debug_level
     
     pdffile = doc.tempfile
-    xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
 
     try:
         numpages = int(pdfinfo(pdffile)['Pages'])
@@ -35,6 +34,7 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
 
     # first try without ocr:
     OCR_IF_CONFIDENCE_BELOW = 0.8
+    xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
     try1 = pdf2xml(pdffile, xmlfile, use_ocr=False,
                    debug_level=debug_level, keep_tempfiles=keep_tempfiles)
     if try1:
@@ -52,6 +52,7 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
             debug(1, 'extractor failed after pdftohtml, trying ocr')
     else:
         debug(1, 'pdftohtml failed, trying ocr')
+        
     """
     If pdftohtml didn't produce garbage, we don't need to OCR more
     than the first 1-3 pages (depending on doc length); we should then
@@ -93,9 +94,11 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
                 debug(1, 'gs failed to merge pdfs! %s', e.output)
     
     if ocr_numpages < 15:
+        xmlfile = doc.tempfile.rsplit('.')[0] + '-ocr.xml'
         try2 = pdf2xml(pdffile, xmlfile, use_ocr=True,
                        debug_level=debug_level, keep_tempfiles=keep_tempfiles)
     else:
+        debug(1, 'document too long and unable to shorten: giving up')
         try2 = False
     if try2:
         enrich_xml(xmlfile, doc)

@@ -165,9 +165,10 @@ def xml_add_page(xml, page_hocr):
     for i,fs in enumerate(fontnumbers):
         fsp = lxml.etree.Element('fontspec', id=str(i), size=str(fs), family='Times', color='#000')
         xml_page.append(fsp)
-        fsp.tail='\n   '
+        fsp.tail = '\n   '
     for text in texts:
         xml_page.append(text)
+        text.tail = '\n   '
 
 def tidy_hocr_line(line):
     """
