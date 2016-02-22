@@ -12,7 +12,7 @@ def pdfinfo(pdffile):
     #debug(3, ' '.join(cmd))
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=2)
-        output = output.decode('ascii')
+        output = output.decode('utf-8')
     except subprocess.CalledProcessError as e:
         print(e.output)
         raise
