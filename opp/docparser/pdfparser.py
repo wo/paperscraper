@@ -64,7 +64,7 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
     ocr_ranges = None
     preserve_fields = []
     if try1 and parse1:
-        ocr_ranges = [(1,2)] if numpages < 50 else '1-4'
+        ocr_ranges = [(1,2)] if numpages < 50 else [(1,4)]
         preserve_fields = ['text', 'doctype', 'numwords']
     elif numpages > 10:
         ocr_ranges = [(1,7), (numpages-2,numpages)] # first 7 plus last 3
