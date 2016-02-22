@@ -15,7 +15,12 @@ from timeit import default_timer as timer
 from .exceptions import *
 from .pdfinfo import pdfinfo
 
+PDFSEPARATE = '/usr/bin/pdfseparate'
+PDFTOPPM = '/usr/bin/pdftoppm'
+TESSERACT = '/usr/local/bin/tesseract'
+
 OCR_DPI = 300
+
 
 logger = logging.getLogger('opp')
 
@@ -72,19 +77,19 @@ def ocr_page(pdffile, pagenum):
     
     debug(2, 'extracting page %s', pagenum) 
     pagepdf = tempbase+'.pdf'
-    cmd = ['pdftk', pdffile, 'cat', str(pagenum), 'output', pagepdf]
+    cmd = [PDFSEPARATE, '-f', str(pagenum), '-l', str(pagenum), pdffile, pagepdf]
     debug(3, ' '.join(cmd))
     subprocess.check_call(cmd, timeout=2)
     
     debug(2, 'converting page to image') 
     pageppm = tempbase+'.ppm'
-    cmd = ['pdftoppm', '-r', str(OCR_DPI), pagepdf]
+    cmd = [PDFTOPPM, '-r', str(OCR_DPI), pagepdf]
     debug(3, '%s > %s', ' '.join(cmd), pageppm)
     with open(pageppm, 'wb') as f:
         subprocess.check_call(cmd, stdout=f, timeout=2)
     
     debug(2, 'ocr-ing image') 
-    cmd = ['tesseract', pageppm, 'stdout', '-l', 'eng', 'hocr']
+    cmd = [TESSERACT, pageppm, 'stdout', '-l', 'eng', 'hocr']
     debug(3, ' '.join(cmd))
     output = subprocess.check_output(cmd, timeout=20)
     return output
@@ -191,7 +196,6 @@ def tidy_hocr_line(line):
     if len(bpart) > len(content)*2/3:
         content = '<b>'+re.sub('</?b>', '', content)+'</b>'
     linestr = start + content + end
-    debug(1, 'xxx => %s', linestr)
     return lxml.etree.fromstring(linestr)
 
 def scale(x):

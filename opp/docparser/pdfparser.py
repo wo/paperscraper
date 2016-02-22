@@ -8,7 +8,8 @@ import json
 from .pdf2xml import pdf2xml
 from .pdfinfo import pdfinfo
 
-PDFTK = '/usr/bin/pdftk'
+PDFSEPARATE = '/usr/bin/pdfseparate'
+GS = '/usr/bin/gs'
 PERL = '/usr/bin/perl'
 
 PATH = abspath(dirname(__file__))
@@ -58,28 +59,44 @@ def parse(doc, debug_level=1, keep_tempfiles=False):
     pdftohtml didn't work at all, we need to OCR more to get some
     meaningful .text, and extrapolate numwords.
     """
-    ocr_range = None
+    ocr_numpages = numpages
+    ocr_ranges = None
     preserve_fields = []
     if try1 and parse1:
-        ocr_range = '1-2' if numpages < 50 else '1-4'
+        ocr_ranges = [(1,2)] if numpages < 50 else '1-4'
         preserve_fields = ['text', 'doctype', 'numwords']
     elif numpages > 10:
-        ocr_range = '1-7, r3-r1' # first seven plus last three
+        ocr_ranges = [(1,7), (numpages-2,numpages)] # first 7 plus last 3
 
-    if ocr_range:
-        shortpdffile = pdffile.rsplit('.',1)[0] + '-short.pdf'
-        try:
-            cmd = [PDFTK, pdffile, 'cat', ocr_range, 'output', shortpdffile]
+    if ocr_ranges:
+        shortpdfbase = pdffile.rsplit('.',1)[0]
+        pagepattern = shortpdfbase + '%d.pdf'
+        pagefiles = []
+        for (start, end) in ocr_ranges:
+            cmd = [PDFSEPARATE, '-f', str(start), '-l', str(end), pdffile, pagepattern]
             debug(2, ' '.join(cmd))
-            subprocess.check_call(cmd, timeout=5)
-            pdffile = shortpdffile
-        except subprocess.CalledProcessError as e:
-            debug(1, 'pdftk failed to produce short pdf! %s', e.output)
-        except subprocess.TimeoutExpired as e:
-            debug(1, 'pdftk timeout!')
-
-    try2 = pdf2xml(pdffile, xmlfile, use_ocr=True,
-                   debug_level=debug_level, keep_tempfiles=keep_tempfiles)
+            try:
+                subprocess.check_call(cmd, timeout=5)
+                pagefiles.extend([shortpdfbase+str(i)+'.pdf' for i in range(start, end+1)])
+            except Exception as e:
+                debug(1, 'pdfseparate failed to split pdf! %s', e.output)
+        if pagefiles:
+            shortpdffile = shortpdfbase + '-short.pdf'
+            cmd = [GS, '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', '-dPDFSETTINGS=/prepress', 
+                   '-sOutputFile='+shortpdffile] + pagefiles
+            debug(2, ' '.join(cmd))
+            try:
+                subprocess.check_call(cmd, timeout=5)
+                pdffile = shortpdffile
+                ocr_numpages = len(pagefiles)
+            except Exception as e:
+                debug(1, 'gs failed to merge pdfs! %s', e.output)
+    
+    if ocr_numpages < 15:
+        try2 = pdf2xml(pdffile, xmlfile, use_ocr=True,
+                       debug_level=debug_level, keep_tempfiles=keep_tempfiles)
+    else:
+        try2 = False
     if try2:
         enrich_xml(xmlfile, doc)
         parse2 = extractor(xmlfile)
