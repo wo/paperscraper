@@ -139,8 +139,9 @@ sub init {
     my $charno = 1;
     my $lineno = 0;
     for my $page (@pages) {
-        while ($page =~/<fontspec id="(\d+)" size="(\d+)"/og) {
-            $fontsizes{$1} = $2;
+        while ($page =~/(<fontspec.+?>)/g) {
+            my $el = elem($1);
+            $fontsizes{$el->('id')} = $el->('size');
         }
         my @pagechunks;
         while ($page =~ /(<text.*?>.*?<\/text>)/isgo) {
@@ -266,8 +267,7 @@ sub fontinfo {
     # size.
     $self->{largest_font} = 0;
     foreach my $ch (@{$self->{chunks}}) {
-        $ch->{fsize} = ($ch->{fsize} - $self->{fontsize}) 
-                       * 10/$self->{fontsize};
+        $ch->{fsize} = ($ch->{fsize} - $self->{fontsize}) * 10/$self->{fontsize};
         if ($ch->{fsize} > $self->{largest_font} && length($ch->{plaintext}) > 5) {
             $self->{largest_font} = $ch->{fsize};
         }
