@@ -527,7 +527,8 @@ class Link():
         
         # Now try to figure out if siblings belong to context:
         def context_left(i):
-            if par._children.index(el) == 0:
+            if par._children.index(el)-i < 0:
+                # can't catch IndexError: careful of negative indices!
                 return ''
             lsib = par._children[par._children.index(el)-i]
             lsib_outerHTML = lsib.get_attribute('outerHTML')
