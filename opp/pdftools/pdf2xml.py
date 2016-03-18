@@ -6,6 +6,7 @@ from os.path import abspath, dirname, join, exists
 import shutil
 import subprocess
 import logging
+from debug import debug, debuglevel
 from .ocr2xml import ocr2xml
 from .exceptions import *
 
@@ -16,9 +17,7 @@ PATH = abspath(dirname(__file__))
 
 logger = logging.getLogger('opp')
 
-def pdf2xml(pdffile, xmlfile, use_ocr=False, debug_level=0, keep_tempfiles=False):
-    global _debug_level
-    _debug_level = debug_level
+def pdf2xml(pdffile, xmlfile, use_ocr=False, keep_tempfiles=False):
     if not exists(pdffile):
         raise FileNotFoundError('{} not found'.format(pdffile))
     if not use_ocr:
@@ -31,7 +30,7 @@ def pdf2xml(pdffile, xmlfile, use_ocr=False, debug_level=0, keep_tempfiles=False
             return None
     else:
         try:
-            ocr2xml(pdffile, xmlfile, debug_level=_debug_level, keep_tempfiles=keep_tempfiles)
+            ocr2xml(pdffile, xmlfile, keep_tempfiles=keep_tempfiles)
         except NoTextInPDFException:
             return None
         except MalformedPDFError:
@@ -67,9 +66,8 @@ def pdftohtml(pdffile, xmlfile):
     writefile(xmlfile, fix_pdftohtml(xml))
     
 def doctidy(xmlfile):
-    global _debug_level
     cmd = [PERL, join(PATH, 'Doctidy.pm'), xmlfile]
-    if _debug_level > 4:
+    if debuglevel() > 4:
         cmd.insert(2, '-v')
     debug(2, ' '.join(cmd))
     try:
@@ -77,7 +75,7 @@ def doctidy(xmlfile):
     except subprocess.CalledProcessError as e:
         debug(1, e.output)
         raise
-    if _debug_level > 4:
+    if debuglevel() > 4:
         debug(5, stdout.decode('utf-8'))
 
 def xml_ok(xml):
@@ -124,10 +122,4 @@ def readfile(path):
 def writefile(path, txt):
     with open(path, 'w', encoding='utf-8') as f:
         f.write(txt)
-
-_debug_level = 0
-
-def debug(level, msg, *args):
-    if _debug_level >= level:
-        logger.debug(msg, *args)
 

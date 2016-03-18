@@ -1,0 +1,155 @@
+/* CSS Document */
+
+/* Styles permettant de gerer le menu edition de Jahia */
+/*
+#wrapper {
+    margin: 0;
+    width: 1004px;
+    text-align: left;
+    display:block;
+}
+
+#toplinks {
+	clear:both;
+}
+
+#topmodules {
+	margin: 0;
+	top: 0px;
+	width: 1004px;
+ 	border-bottom: 1px dotted #AAAAAA;
+}
+*/
+/* Styles HEC Nico */
+/*
+body {
+  margin:5px;
+  padding:5px;
+  text-align:left;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.errors  {
+	text-align: left;
+	color: red;
+	font-weight: bold;
+}
+
+.formSite  {
+	border: 1px solid;
+	text-align: left;
+	margin: 10px;
+	padding: 5px;
+}
+.line {
+	vertical-align: top;
+}
+img {
+	border: none;
+}
+
+#col1 {
+		width: 15%;
+}
+#col2 {
+		width: 85%;
+}
+*/
+
+
+/* Styles montage */
+body {
+   margin:0px auto;
+   padding:0px;
+   font-family:Arial, Helvetica, sans-serif;
+   color:#000000;
+   font-size:11px;
+   line-height:16px;
+   color:#002F5D;   
+}
+li a:hover {
+	text-decoration:underline;
+	color:#4FC8F3;
+} 
+h1, h2, h3, h4, h5, h6{
+  margin:0px;
+  padding:0px;
+  color:#4E6172;
+}
+a {
+	color:#4E6172;
+	text-decoration:none;	
+}
+a:hover {
+	color:#4FC8F3;
+}
+ul {
+  margin:0px;
+  padding:0px;
+  list-style-type: none;
+}
+/*antai*/
+.richText ul {	
+	list-style-type:disc;
+	margin: 6px 0px;
+	padding-left:25px;
+}
+.richText ul ul {	
+	list-style-type:circle;
+}
+.richText ul ul ul {	
+	list-style-type:square;
+}
+.richText a {
+	text-decoration:underline;
+}
+.richText a:hover {
+	color:#4FC8F3;
+}
+/*antai*/
+span {
+	padding:0px;	
+}
+p, form, input {
+  margin:0px;
+  padding:0px;
+  font-family:"Arial";
+  line-height:16px;  
+}
+p {
+	line-height:16px;
+}
+form {
+	border:none;
+}
+/*
+fieldset  { 
+	border:none;
+	margin:0px;
+	padding:0px;
+}
+legend{
+	display:none;
+}
+*/
+fieldset.formFieldset{
+	border:none;
+	margin:0px;
+	padding:0px;
+}
+fieldset.formFieldset legend{
+	display:none;
+}
+img {
+	border:none;
+}
+.breaker {
+	height:0px;
+	clear:both;
+	overflow:hidden;	
+}
+#aesmenu{
+	position:relative;
+	width:130px;
+	z-index:1000000;
+}

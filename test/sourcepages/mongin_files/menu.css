@@ -1,0 +1,184 @@
+/*
+main struct of pagebody
+*/
+#menuwrapper {
+    background: url( "menubg.gif" ) #fff repeat-y right 50%;
+    display: inline;
+    width: 100%;
+}
+
+/* main content boxes */
+div.content {
+    float: left;
+    margin: auto;
+    width: 73%;
+    *width: 72%;
+}
+
+#editor {
+    padding-left: 15px;
+    width: 100%;
+}
+
+/* onglets */
+#menubar {
+    float: left;
+    clear: both;
+    display: block;
+    width: 100% !important;
+    *width: 95%;
+    margin-top: 12px;
+    *margin-top: 55px !important;
+    margin-bottom: 10px;
+    *padding-bottom: 1px !important;
+    *padding-bottom: 0px;
+    border-bottom: 1px solid #336699;
+}
+
+/* modif joe 4 tabs cross-browser */
+
+#tabs, #floatright_tabs {
+    height: 20px;
+    margin: 0;
+    padding-left: 0px;
+}
+
+#floatright_tabs {
+    float: right;
+}
+
+#tabs li, #floatright_tabs li {
+    display: inline;
+    list-style-type: none;
+}
+
+#tabs span,
+    #tabs a,
+    #floatright_tabs span,
+    #floatright_tabs a {
+    display: block;
+    margin-right: 2px;
+}
+
+/* 4 links onglets */
+#tabs a:link,
+    #tabs a:visited,
+    #floatright_tabs a:link,
+    #floatright_tabs a:visited {
+    float: left;
+    background: #398EC3;
+    font-weight: bold;
+    padding: 2px 4px 2px 4px;
+    text-decoration: none;
+    color: #FFFFFF;
+    margin-top: 4px;
+}
+
+/* end modif */
+
+/* on fly hover */
+#tabs a:hover, #floatright_tabs a:hover {
+    text-decoration: none;
+    background-color: #336699;
+    font-weight: bold;
+    padding: 4px 4px 4px 4px;
+    margin-top: 0px;
+}
+
+/* current tab */
+#tabs .current, #floatright_tabs .current {
+    float: left;
+    text-decoration: none;
+    background-color: #336699;
+    font-weight: bold;
+    padding: 4px 4px 4px 4px;
+    margin-top: 0px;
+    color: #FFFFFF;
+}
+
+.clearing {
+    clear: both;
+    height: 0px;
+}
+
+/* left menu  */
+div.leftMenu {
+    background-color: #FFFFFF;
+    border-right: #808080 1px solid;
+    border-left: #808080 1px solid;
+    border-bottom: #808080 1px solid;
+    float: left; /* mod joe */
+    clear: both; /* end */
+    width: 220px;
+}
+
+div.leftMenu ul a {
+    color: #000000;
+    text-decoration: none;
+    display: block; /* width : 100 %; */
+/* height : 100 %; */
+}
+
+div.leftMenu ul li {
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+}
+
+div.leftMenu ul li a,
+    div.leftMenu ul li span.current {
+    background: url( mainitembg.gif ) #CCCCCC repeat-x;
+    display: block;
+    font-size: 13px;
+    padding: 3px 10px 3px 10px;
+}
+
+div.leftMenu ul li a:hover {
+    background-position: 0% -39px;
+    text-decoration: none;
+    color: #000;
+}
+
+div.leftMenu ul li ul li a {
+    background: none;
+    background-color: #FFFFFF;
+    border-bottom: none;
+    font-weight: normal;
+    padding: 3px 15px 3px 10px;
+    margin-left: 5px;
+}
+
+div.leftMenu ul li ul li a:hover,
+    span.selectedfield {
+    text-decoration: underline;
+    background-position: 0% 0px;
+    color: #398EC3;
+}
+
+span.selectedfield {
+    border-bottom: none;
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 11px 5px 16px;
+}
+
+div.leftMenu ul,
+    div.leftMenu ul li ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+
+div.leftMenu ul li ul {
+    display: block;
+}
+
+div.leftMenu ul li span.current {
+    background-position: 0% -39px;
+    display: block;
+    color: #000;
+    font-weight: bold;
+}
+
+/**/

@@ -2,19 +2,22 @@
 import logging
 import re
 import subprocess
+import logging
 from functools import lru_cache
 
 PDFINFO = '/usr/bin/pdfinfo'
 
+logger = logging.getLogger('opp')
+
 @lru_cache() # memoize
 def pdfinfo(pdffile):
     cmd = [PDFINFO, pdffile]
-    #debug(3, ' '.join(cmd))
+    #logger.debug(' '.join(cmd))
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=2)
         output = output.decode('utf-8')
     except subprocess.CalledProcessError as e:
-        print(e.output)
+        logger.warn(e.output)
         raise
     res = {}
     for line in output.split('\n'):

@@ -34,7 +34,7 @@ sub new {
         sourcecontent => '',
         url => '',
         # will be set by Extractor:
-        doctype => {}, # 'REVIEW' => 0.7, ...
+        #doctype => {}, # 'REVIEW' => 0.7, ...
         chunks => [],
         pages => [],
         numpages => 0,
@@ -173,7 +173,7 @@ sub init {
     $self->strip_footnotes();
     $self->get_text();
     $self->{numwords} = () = ($self->{text} =~ /\s\w\w/g);
-    $self->get_doctype();
+    #$self->get_doctype();
 
 }
 
@@ -456,10 +456,10 @@ sub adjust_confidence {
     if ($self->{numpages} > 80) {
         $self->decr_confidence(0.9, 'more than 80 pages');
     }
-    if ($self->{doctype}->{REVIEW} > 0.3) {
-        my $review_p = $self->{doctype}->{REVIEW};
-        $self->decr_confidence(1-$review_p/2, "possibly review: $review_p");
-    }
+    #if ($self->{doctype}->{REVIEW} > 0.3) {
+    #    my $review_p = $self->{doctype}->{REVIEW};
+    #    $self->decr_confidence(1-$review_p/2, "possibly review: $review_p");
+    #}
     if (exists $self->{author_title_parsings}) {
         my @parsings = @{$self->{author_title_parsings}};
         my $parsing = $parsings[0];
@@ -487,6 +487,7 @@ sub adjust_confidence {
             for my $au (@{$self->{authors}}) {
                 for my $src_au (@{$self->{sourceauthors}}) {
                     $source_author = 1 if Text::Names::samePerson($src_au, $au);
+                    say(5, "checking if $au matches $src_au")
                     #$source_author = 1 if (amatch($src_au, ['i 30%'], $au));
                 }
             }
@@ -516,7 +517,7 @@ sub get_doctype {
 
 sub decr_confidence {
     my ($self, $percent, $reason) = @_;
-    say(5, "reducing confidence by $percent because $reason");
+    say(4, "reducing confidence by $percent because $reason");
     $self->{confidence} *= $percent;
 }
 
@@ -1284,15 +1285,15 @@ sub serialize {
     my %doc = (
         # type => $self->{doctype},
         # chunks => [],
-        numpages => $self->{numpages},
-        numwords => $self->{numwords},
+        #numpages => $self->{numpages},
+        #numwords => $self->{numwords},
         fontsize => $self->{fontsize},
         linespacing => $self->{linespacing},
         authors => join(', ', @{$self->{authors}}),
         title => $self->{title},
         abstract => $self->{abstract},
         # bibliography => [],
-        content => $self->{text},
+        #content => $self->{text},
         meta_confidence => $self->{confidence},
         );
     return encode_json(\%doc);

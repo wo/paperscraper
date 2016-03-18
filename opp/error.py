@@ -26,13 +26,14 @@ message = {
 
     50: 'unknown parser failure',
 
+    57: 'pdfinfo failed',
     58: 'OCR failed',
     59: 'gs failed',
     60: 'pdftohtml produced garbage',
     61: 'pdftohtml failed',
     62: 'no text found in converted document',
     63: 'rtf2pdf failed',
-    64: 'unoconv failed',
+    64: 'pdfcut failed',
     65: 'htmldoc failed',
     66: 'wkhtmltopdf failed',
     67: 'ps2pdf failed',

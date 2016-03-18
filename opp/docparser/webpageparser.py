@@ -14,7 +14,7 @@ def debug(level, msg, *args):
 def parse(doc, debug_level=1):
     """
     tries to enrich doc by metadata (authors, title, abstract,
-    numwords, type, content); returns True if successful, False if
+    numwords, doctype, content); returns True if successful, False if
     doc.page doesn't look like an article.
     """
     page = doc.page
@@ -61,8 +61,8 @@ def parse(doc, debug_level=1):
     # numwords:
     doc.numwords = len(words)
 
-    # type:
-    doc.type = 1
+    # doctype:
+    doc.doctype = 'article'
 
     return True
 

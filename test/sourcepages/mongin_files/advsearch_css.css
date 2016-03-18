@@ -1,0 +1,113 @@
+
+
+
+
+.input { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9px; font-style: normal; color: #000000}
+
+div.searchResultListing {
+    width: 100%;
+    overflow: auto;
+    overflow-y:hidden;
+    font-size:10px;
+    font-size:11px;
+}
+
+.tabs_li {
+    display: inline;
+    list-style-type: none;
+    margin:0 0 0;
+    padding:0 0 0 0;
+    text-indent:0;
+}
+
+#searchPanel {
+    width: 100%;
+    float:left;
+  	clear:both;
+}
+
+#searchPanel * {
+    font-size: 11px;
+}
+
+table.searchResultListing {
+	/*border: 1px solid #666;*/
+	width: 80%;
+	margin: 10px 0 10px 0 !important;
+	font-size:11px;
+}
+
+table.searchResultListing th, table.searchResultListing td {
+	padding: 2px 10px 2px 4px !important;
+	text-align: left;
+	vertical-align: top;
+}
+
+table.searchResultListing thead tr {
+	background-color: #faf1c3;
+}
+
+table.searchResultListing th.sorted {
+	background-color: #f6e896;
+	font-weight:bold;
+}
+
+table.searchResultListing th a,table.searchResultListing th a:visited {
+	color: black;
+}
+
+table.searchResultListing th a:hover {
+	text-decoration: underline;
+	color: black;
+}
+
+table.searchResultListing th.sorted a,table.searchResultListing th.sortable a {
+	background-position: right top;
+	display: block;
+	width: 100%;
+}
+
+table.searchResultListing th.sortable a {
+  padding-right: 5px;
+	background-image: url(/jahia/jsp/jahia/engines/images/arrow_off.png);
+	background-repeat:no-repeat;
+}
+
+table.searchResultListing th.order1 a {
+  padding-right: 5px;
+	background-image: url(/jahia/jsp/jahia/engines/images/arrow_down.png);
+	background-repeat:no-repeat;
+}
+
+table.searchResultListing th.order2 a {
+  padding-right: 5px;
+	background-image: url(/jahia/jsp/jahia/engines/images/arrow_up.png);
+	background-repeat:no-repeat;
+}
+
+table.searchResultListing tr.odd {
+	background-color: #ecf7ce;
+}
+
+table.searchResultListing tr.tableRowEven,tr.even {
+	/*background-color: red;*/
+}
+
+
+table.searchResultListing {
+  padding:0px;
+  width: 100%;
+  margin-left: -2px;
+  margin-right: -2px;
+}
+
+table.searchResultListing thead tr {
+	background-color: #faf1c3;
+}
+table.searchResultListing tr.even {
+	background-color: #ffffff;
+}
+
+div.searchResultListing span.pagelinks a {
+  display: inline;
+}

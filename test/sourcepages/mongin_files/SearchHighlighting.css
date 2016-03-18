@@ -1,0 +1,67 @@
+
+.DwtToolTip .ImgHoverTip_B{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgHoverTip_L{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgHoverTip_R{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgHoverTip_T{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgCurvedShadow_BL{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgCurvedShadow_BR{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgCurvedShadow_B__H{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgCurvedShadow_R__V{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgCurvedShadow_T2R{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgCurvedShadow_TR{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowBig_BL{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowBig_BR{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowBig_B__H{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowBig_R__V{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowBig_TR{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowSmall_BL{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowSmall_BR{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowSmall_B__H{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowSmall_R__V{width:0px;height:0px;overflow:hidden;}
+.DwtToolTip .ImgShadowSmall_TR{width:0px;height:0px;overflow:hidden;}
+
+/*
+.DwtToolTip {
+  width: 500px;
+}*/
+
+/*
+ * Buttons
+ */
+.SearchHighlightDwtButton {
+    width: 16px;
+    height: 15px;
+    background-image:url('./text_highlight_off.gif');
+	  border-color: #E0E0E0 #555555 #555555 #E0E0E0;
+}
+.SearchHighlightDwtButton-activated {
+    width: 16px;
+    height: 15px;
+    background-image: url('./text_highlight_on.gif');
+}
+.SearchHighlightDwtButton-triggered {
+    width: 16px;
+    height: 15px;
+    background-image:url('./text_highlight_on.gif');
+}
+.SearchHighlightDwtButton-toggled {
+    width: 16px;
+    height: 15px;
+    background-image:url('./text_highlight_on.gif');
+}
+
+/*
+* for tooltips
+*/
+.hover_frame_table 		{	border-collapse:collapse;	padding:0px;}
+.hover_spacer_TL	 	  {	width:12px;		height:12px;}
+.hover_spacer_T 		  {	width:auto;		height:16px;}
+.hover_spacer_TR	 	  {	width:20px;		height:16px;}
+.hover_spacer_L	 		  {	width:20px;		height:auto;}
+.hover_spacer_R 		  {	width:20px;		height:auto;}
+.hover_spacer_BL	 	  {	width:20px;		height:20px;}
+.hover_spacer_B 		  {	width:auto;		height:20px; }
+.hover_spacer_BR	 	  {	width:20px;		height:20px;}
+.hover_contents 	    {	white-space: pre-line; width:auto; }
+.hover_tip_top 		    {	  position: absolute;}
+.hover_tip_bottom 	  {		position: relative;}

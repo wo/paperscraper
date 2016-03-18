@@ -17,9 +17,9 @@ def testdb():
     for t in ('sources', 'links', 'docs'):
         cur.execute('DELETE FROM {}'.format(t))
     db.commit()
-    query = "INSERT IGNORE INTO sources (type, url, status, last_checked) VALUES (%s, %s, %s, %s)"
-    cur.execute(query, (1, 'http://umsu.de/papers/', 0, '2016-01-01 12:34'))
-    cur.execute(query, (1, 'http://consc.net/papers.html', 1, None))
+    query = "INSERT IGNORE INTO sources (sourcetype, url, status, last_checked) VALUES (%s, %s, %s, %s)"
+    cur.execute(query, ('personal', 'http://umsu.de/papers/', 0, '2016-01-01 12:34'))
+    cur.execute(query, ('personal', 'http://consc.net/papers.html', 1, None))
     db.commit()
 
 def test_debug(caplog):
@@ -48,11 +48,11 @@ def test_Link(testdb):
     assert li2.filesize == 1234
 
 def test_Doc(testdb):
-    doc = scraper.Doc(url='http://umsu.de/papers/magnetism2.pdf')
+    doc = scraper.Doc(url='http://umsu.de/papers/magnetism.pdf')
     doc.load_from_db()
     doc.update_db(authors='wo')
     assert doc.doc_id > 0
-    doc2 = scraper.Doc(url='http://umsu.de/papers/magnetism2.pdf')
+    doc2 = scraper.Doc(url='http://umsu.de/papers/magnetism.pdf')
     doc2.load_from_db()
     assert doc2.authors == 'wo'
 
@@ -75,6 +75,21 @@ def test_check_steppingstone():
         t = scraper.check_steppingstone(page)
         assert t == target
 
+def test_process(testdb, caplog):
+    source = scraper.Source(url='http://umsu.de/papers/')
+    source.load_from_db()
+    browser = scraper.Browser(use_virtual_display=False)
+    browser.goto(source.url)
+    source.set_html(browser.page_source)
+    link = 'magnetism2.pdf'
+    el = browser.find_element_by_xpath("//a[@href='{}']".format(link))
+    url = source.make_absolute(link)
+    li = scraper.Link(url=url, source=source, element=el)
+    li.load_from_db()
+    scraper.debuglevel(2)
+    scraper.process_link(li, force_reprocess=True, keep_tempfiles=True)
+    assert 'Against Magnetism' in caplog.text()
+    assert 'is the view that' in caplog.text()
 
 #def test_scrape(testdb):
 #    src = scraper.Source(url='http://umsu.de/papers/')

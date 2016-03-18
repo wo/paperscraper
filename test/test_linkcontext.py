@@ -58,6 +58,10 @@ Download'''),
      'http://consc.net/papers/revisability.pdf',
      'Revisability and Conceptual Change in "Two Dogmas of Empiricism".  Journal of Philosophy 108:387-415, 2011.'),
 
+    ('mongin.html',
+     'https://studies2.hec.fr/jahia/webdav/site/hec/shared/sites/mongin/acces_anonyme/page%20internet/O12.MonginExpectedHbk97.pdf',
+     '(O12) "Expected Utility Theory " , Handbook of Economic Methodology, J. Davis, W. Hands and U. Mäk (eds), London, Elgar, 1997, p. 342-350.'),
+    
 ])
 def test_linkcontext(page, link, context, caplog):
     caplog.setLevel(logging.CRITICAL, logger='selenium')
@@ -70,4 +74,5 @@ def test_linkcontext(page, link, context, caplog):
     browser.goto(src)
     el = browser.find_elements_by_xpath('//a[@href="{}"]'.format(link))[0]
     li = scraper.Link(element=el)
-    assert li.html_context() == context
+    res = li.html_context()
+    assert res == context

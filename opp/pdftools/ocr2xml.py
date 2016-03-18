@@ -12,6 +12,7 @@ from statistics import median, stdev
 import lxml.html
 import lxml.etree
 from timeit import default_timer as timer
+from debug import debug, debuglevel
 from .exceptions import *
 from .pdfinfo import pdfinfo
 
@@ -20,14 +21,6 @@ PDFTOPPM = '/usr/bin/pdftoppm'
 TESSERACT = '/usr/local/bin/tesseract'
 
 OCR_DPI = 300
-
-
-logger = logging.getLogger('opp')
-
-def debug(level, msg, *args):
-    if debug.debug_level >= level:
-        logger.debug(msg, *args)
-debug.debug_level = 0
 
 def tempdir():
     if not hasattr(tempdir, 'dirname'):
@@ -39,10 +32,9 @@ def remove_tempdir():
     shutil.rmtree(tempdir())
     del tempdir.dirname
 
-def ocr2xml(pdffile, xmlfile, debug_level=0, keep_tempfiles=False, write_hocr=False):
+def ocr2xml(pdffile, xmlfile, keep_tempfiles=False, write_hocr=False):
     """ocr pdffile and write pdftohtml-type parsing to xmlfile"""
 
-    debug.debug_level = debug_level
     start_time = timer()
     debug(2, "ocr2xml %s %s", pdffile, xmlfile)
 
@@ -50,7 +42,7 @@ def ocr2xml(pdffile, xmlfile, debug_level=0, keep_tempfiles=False, write_hocr=Fa
         numpages = int(pdfinfo(pdffile)['Pages'])
     except e:
         raise MalformedPDFError('pdfinfo failed')
-    debug(1, '%s pages to process', numpages)
+    debug(2, '%s pages to process', numpages)
     
     xml = init_xml()
     hocr = b''
@@ -69,7 +61,7 @@ def ocr2xml(pdffile, xmlfile, debug_level=0, keep_tempfiles=False, write_hocr=Fa
         debug(3, 'cleaning up')
         remove_tempdir()
 
-    debug(1, 'Time: %s seconds', str(end_time - start_time))
+    debug(2, 'Time: %s seconds', str(end_time - start_time))
 
 def ocr_page(pdffile, pagenum):
     """ return (binary) hocr output for single page """

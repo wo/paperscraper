@@ -1,0 +1,20 @@
+/* CSS Document */
+
+/* Home, Home_profs, Blogs */
+.menu_gauche_td, .td_md_home, .menu_droit, .menu_centre_gauche, .centeneur_menu_haut {display:none;}
+
+#page .global_conteneur_backoffice {width: 796px;}
+#page .global_conteneur {width: 660px;}
+.bas_centre {
+	width:660px;
+	background-image:none;
+	background-color:#fff;
+}
+.conteneur_droit{
+	background-image:none;
+	background-color:#fff;
+}
+.conteneur_droit .contenu_centre .titre_site, .conteneur_droit .contenu_centre .titre_site_sq {width:619px;}
+.conteneur_droit .contenu_centre .titre_site_simple {width:618px;}
+.conteneur_droit .contenu_centre .content_center {width:631px;}
+.div_glob_gauche {width:660px;}

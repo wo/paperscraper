@@ -77,3 +77,11 @@ def strip_tags(text, keep_italics=False):
         text = re.sub(r'{(/?)emph}', r'<\1i>', text)
         text = re.sub(r'{(/?su[bp])}', r'<\1>', text)
     return text
+
+def strip_xml(text):
+    '''remove pdf2xml markup'''
+    res = ''
+    reg = re.compile('<text.+?>(.+?)</text', re.DOTALL)
+    for m in reg.finditer(text):
+        res += m.group(1) + '\n'
+    return res

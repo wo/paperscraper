@@ -1,0 +1,273 @@
+
+ul.portletModes {
+	background: url(images/portlets/tabBorder.gif) repeat-x bottom;
+	color: #515C6A;
+	float: right;
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	padding-left: 2px;
+}
+ul.portletModes a {
+	background: url(images/portlets/tabRight.gif) no-repeat right top;
+	border-bottom: 1px solid #515C6A;
+	float: left;
+	margin-right: 2px;
+	text-decoration: none;
+}
+ul.portletModes a:hover {
+	background-position: 100% -26px;
+}
+ul.portletModes a:hover span {
+	background-position: 0% -26px;
+}
+ul.portletModes li {
+	display: inline;
+	margin: 0px;
+	padding: 0px;
+}
+ul.portletModes li.current a {
+	background-position: 100% -26px;
+	border-width: 0px;
+}
+ul.portletModes li.current span {
+	background-position: 0% -26px;
+	padding-bottom: 1px;
+}
+ul.portletModes span {
+	background: url(images/portlets/tabLeft.gif) no-repeat left top;
+	display: block;
+	float: left;
+	padding: 1px 6px 1px 22px;
+	white-space: nowrap;
+	color: #515C6A;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+}
+/* Commented Backslash Hack hides rule from IE5-Mac \*/
+ul.portletModes span {
+	float: none;
+}
+/* End IE5-Mac hack */
+
+ul.windowStates {
+	background: url(images/portlets/tabBorder.gif) repeat-x bottom;
+	color: #515C6A;
+	float: right;
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+ul.windowStates a {
+	background: url(images/windowStates.gif) no-repeat left top;
+	border-bottom: 1px solid #515C6A;
+	float: left;
+	height: 14px;
+	margin-right: 2px;
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	width:17px;
+	z-index: 1;
+}
+
+ul.windowStates a span {
+    display:none;
+}
+
+ul.windowStates a.maximized {
+	background-image: url(images/portlets/windowStates_maximized.gif);
+}
+
+ul.windowStates a.minimized {
+	background-image: url(images/portlets/windowStates_minimized.gif);
+}
+
+ul.windowStates a.normal {
+	background-image: url(images/portlets/windowStates_normal.gif);
+}
+
+ul.windowStates a:hover {
+	background-position: 0% -15px;
+}
+ul.windowStates li {
+	display: inline;
+	margin: 0px;
+	padding: 0px;
+}
+
+ul.windowStates li.current a {
+	display: none;
+}
+/* Commented Backslash Hack hides rule from IE5-Mac \*/
+ul.windowStates div {
+	float: none;
+}
+/* End IE5-Mac hack */
+
+/* #### PORTAL-PORTLET CLASS REFERENCES #### */
+
+
+.Portal-Portlet-Title {
+   background: transparent;
+   margin-left: auto;
+   margin-right: auto;
+   font-family: Verdana, Arial, Helvetica;
+   font-weight: bold;
+   font-size: 180%;
+   background-color: #CCCC99;
+   color: #000000;
+   text-align: center;
+   padding: 4px;
+   border: 1px solid #000000;
+   }
+
+
+.Portal-Portlet-Information {
+   width: 400px;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 1em;
+   margin-top: .5em;
+   font-family: Verdana, Arial, Helvetica;
+   font-style: oblique;
+   font-size: 120%;
+   font-weight: bold;
+   color: #000000;
+   text-align: center;
+   padding: 4px;
+   }
+
+
+.Portal-Portlet-Group {
+   width: 400px;
+   margin-left: auto;
+   margin-right: auto;
+   margin-top: 1em;
+   background-color: transparent;
+   border: 2px solid #000000;
+   text-align: center;
+   }
+
+
+.Portal-Portlet-Legend { }
+
+
+.Portal-Portlet-Footer {
+   font-family: Verdana, Arial, Helvetica;
+   font-size: 90%;
+   color: #000000;
+   }
+
+
+/* ##### PORTAL_PORTLET_GROUP CLASS REFERENCES ##### */
+.Portal-Portlet-Group-Title {
+   font-family: Verdana, Arial, Helvetica;
+   font-weight: bold;
+   font-size: 150%;
+   background-color: #CCCC99;
+   border-bottom: 2px solid #000000;
+   color: #000000;
+   padding: 4px;
+   }
+
+
+.Portal-Portlet-Group-Information { }
+
+
+.Portal-Portlet-Group-Content {
+   font-family: Verdana, Arial, Helvetica;
+   font-size: 110%;
+   color: #000000;
+   margin-top: 1em;
+   text-decoration: none;
+   }
+
+
+.Portal-Portlet-Group-Legend { }
+
+
+.Portal-Portlet-Group-Footer {
+   margin-top: 2em;
+   text-align: center;
+   }
+
+
+/* #### PORTAL-PORTLET-GROUP-SUBGROUP CLASS REFERENCES #### */
+.Portal-Portlet-Group-SubGroup {
+   font-family: Verdana, Arial, Helvetica;
+   font-size: 100%;
+   font-weight: bold;
+   background: #87ACD6;
+   color: #000000;
+   padding: 4px;
+   margin: 0 1em;
+   }
+
+
+/* #### PORTAL-PORTLET-GROUP-CONTENT CLASS REFERENCES #### */
+/* Used in products like JMV for displaying a list of areas */
+.Portal-Portlet-Group-Content-ListItem {
+   font-family: Verdana, Arial, Helvetica;
+   font-size: 100%;
+   margin-top: 3px;
+   font-weight: bold;
+   color: #000000;
+   padding: 4px;
+   text-align: left;
+   }
+
+
+.Portal-Portlet-Group-Content-ListItem a:link
+{
+    text-decoration: underline;
+    color: #035AB4;
+}
+
+
+.Portal-Portlet-Group-Content-ListItem a:visited
+{
+    text-decoration: underline;
+    color: #8403AF;
+}
+
+
+.Portal-Portlet-Group-Content-ListItem a:hover
+{
+    text-decoration: underline;
+    color: #D9011A;
+}
+
+
+/* ####      PORTAL-PORTLET-GROUP-MATRIX      #### */
+/* # This Class reference group handles formatting */
+/* # objects-products-etc within a matrix.         */
+
+.Portal-Portlet-Group-Content-Matrix {
+   width: 90%;
+   margin-right: auto;
+   margin-left: auto;
+   text-align: center;
+   border: solid #6495ED; /* cornflowerblue */
+   border-width: 2px;
+   }
+
+
+.Portal-Portlet-Group-Content-Matrix-Image {
+   border: solid #6495ED; /* cornflowerblue */
+   border-width: 2px;
+   background-color: #C8C8C8; /* a light-medium gray */
+   }
+
+
+.Portal-Portlet-Group-Content-Matrix-Loop {
+   border: solid #6495ED; /* cornflowerblue */
+   border-width: 2px;
+   }
+
+
+.Portal-Portlet-Group-Content-Matrix-Loopcontrol {
+   background-color: #C8C8C8; /* a light-medium gray */
+   color: white;
+   }

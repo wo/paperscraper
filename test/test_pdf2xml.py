@@ -4,7 +4,7 @@ import logging
 import os.path
 import os, sys, shutil
 import json
-from docparser.pdf2xml import pdf2xml
+from docparser import pdf2xml
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'testdocs')

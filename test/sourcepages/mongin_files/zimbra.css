@@ -1,0 +1,269 @@
+/* ------------------------------------------------ */
+/*                 ZIMBRA STYLE                     */
+/* ------------------------------------------------ */
+
+/* Timebase publishing dialog Style */
+
+.TimeBasePublisningDwtMessageDialog .DialogTable { 
+	#background-color: #999999;
+	width: 350px;
+}
+
+.TimeBasePublisningDwtMessageDialog .DialogBody {
+	background-color: #f1f1f1;
+}
+
+.TimeBasePublisningDwtMessageDialog .DialogTitle {
+  background-color: #66a9da;
+  height: 25px;
+  font-size: 12px;
+}
+
+.TimeBasePublisningDwtMessageDialog .DialogTitleCell {
+  padding: 5px;
+}
+
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_BL{background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:10px;height:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_BR{background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:10px;height:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_B__H{background-image:url('');background-position:0px 0px;background-repeat:repeat-x;height:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_L__V{background-image:url('');background-position:0px 0px;background-repeat:repeat-y;width:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_R__V{background-image:url('');background-position:0px 0px;background-repeat:repeat-y;width:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_TL{background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:10px;height:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_TR{background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:10px;height:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogInset_T__H{background-image:url('');background-position:0px 0px;background-repeat:repeat-x;height:10px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_BL{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:4px;height:4px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_BR{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:4px;height:4px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_B__H{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:repeat-x;height:4px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_L__V{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:repeat-y;width:4px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_R__V{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:repeat-y;width:4px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_TL{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:4px;height:4px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_TR{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:no-repeat;width:4px;height:4px;overflow:hidden;}
+.TimeBasePublisningDwtMessageDialog .ImgDialogOutset_T__H{background-color: #999999;background-image:url('');background-position:0px 0px;background-repeat:repeat-x;height:4px;overflow:hidden;}
+
+.TimeBasePublisningDwtMessageDialog .border_shadow_v .ImgShadowBig_R__V {
+  height: 25px !important;
+}
+
+.TimeBasePublisningDwtMessageDialog .dialog_bottom_left_corner {
+  background-color: #999999;   
+}
+
+.TimeBasePublisningDwtMessageDialog .dialog_bottom_right_corner {
+  background-color: #999999;   
+}
+
+.TimeBasePublisningDwtMessageDialog .timeBasedPublishingTitle {
+  height: 35px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: left;
+  vertical-align: top;
+}
+
+.TimeBasePublisningDwtMessageDialog .timeBasedPublishingLabel, 
+.TimeBasePublisningDwtMessageDialog .timeBasedPublishingValue {
+  float: left;
+  height: 20px;
+  font-size: 12px;
+  text-align: left;
+  vertical-align: top;
+  display:inline;
+}
+
+/*
+* Modifiers
+*
+* A modifier represents a change in state that is the same across several objects. For example, different types of
+* buttons all display activation and triggering the same. There's no "selected" modifier because the different
+* objects that can become selected display it differently.
+* <p>
+* The reason that there are chained selectors is so that the modifier won't lose in precedence due to specificity.
+* By itself, the modifier is a single class, so that component of the specificity is 1. A matching declaration with
+* a conflicting style (namely, background-color) will win on specificity if it has two classes. So we need to give
+* the two-class version of the modifier, which will win because it comes later in this file.
+*
+* So far these just apply to buttons.
+*/
+
+/* button in a toolbar */
+.transparent {
+	background-color: transparent;
+}
+/* button in a form or dialog */
+.contrast {
+	background-color: rgb(198, 197, 215);
+}	
+/* button that is the default for some action */
+.active, .DwtDialog .DwtButton.active {
+	background-color: rgb(245, 245, 245);
+}	
+/* button onmouseover */
+.activated, .DwtDialog .DwtButton.activated, .DwtDialog .ColorButton.activated {
+	background-color: rgb(249, 221, 135);
+}
+/* button onmousedown */
+.triggered, .DwtDialog .DwtButton.triggered, .DwtDialog .ColorButton.triggered {
+	background-color: rgb(240, 160, 38);
+}
+
+/* button toggled on */
+.toggled {background-color: rgb(255, 255, 255);}
+
+/* button in the tab bar */
+.DwtTabButton {
+	background-color: transparent;
+}
+
+.DwtTabButton_active {
+	background-color: rgb(245, 245, 245);
+}
+
+.DwtTabButton_inactive {
+	background-color: rgb(198, 197, 215);
+}
+
+.inactive {
+	background-color: rgb(198, 197, 215);
+}
+
+.DwtTabButton.active {
+	background-color: rgb(245, 245, 245);
+}
+
+.active {
+	background-color: rgb(245, 245, 245);
+}
+
+.DwtTabViewPage {
+	background-color: rgb(245, 245, 245);
+	height:600px;
+	overflow: auto;
+}
+
+
+.DwtTabViewPage .TitleBar {
+	background-color: rgb(198, 197, 215);
+	filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#FFF0F0F0,endColorStr=#FF9997B5);
+}
+.DwtTabViewPage .Title {
+	font: bold 12pt Arial, Helvetica, sans-serif;
+	padding: 3px;
+}
+
+
+.DwtPropertyPage {
+	background-color: rgb(245, 245, 245);
+}
+.DwtPropertyPage .TitleBar {
+	background-color: rgb(198, 197, 215);
+	filter:progid:DXImageTransform.Microsoft.Gradient(startColorStr=#FFF0F0F0,endColorStr=#FF9997B5);
+	padding:0px;
+	margin: 0px;
+}
+.DwtPropertyPage .Title {
+	font: bold 12pt Arial, Helvetica, sans-serif;
+	padding: 3px;
+}
+
+.DwtTabViewPage .DwtButton { 
+  width: 60px;
+}
+
+
+#fieldDiffsContainer{
+  margin:0px;
+  padding:0px;
+  height:600px;
+}
+
+#fieldDiffsContainer .undefined_type,
+  #fieldDiffsContainer .number_type,
+  #fieldDiffsContainer .small_type,
+  #fieldDiffsContainer .big_type,
+  #fieldDiffsContainer .date_type,
+  #fieldDiffsContainer .page_type,
+  #fieldDiffsContainer .file_type,
+  #fieldDiffsContainer .app_type,
+  #fieldDiffsContainer .boolean_type,
+  #fieldDiffsContainer .color_type,
+  #fieldDiffsContainer .category_type,
+  #fieldDiffsContainer .small_shared_type,
+  #fieldDiffsContainer .undefined_type_big,
+  #fieldDiffsContainer .number_type_big,
+  #fieldDiffsContainer .small_type_big,
+  #fieldDiffsContainer .big_type_big,
+  #fieldDiffsContainer .date_type_big,
+  #fieldDiffsContainer .page_type_big,
+  #fieldDiffsContainer .file_type_big,
+  #fieldDiffsContainer .app_type_big,
+  #fieldDiffsContainer .boolean_type_big,
+  #fieldDiffsContainer .color_type_big,
+  #fieldDiffsContainer .category_type_big,
+  #fieldDiffsContainer .small_shared_type_big {
+    color: #398EC3;
+    text-decoration: none;
+	font-weight: bold;
+}
+
+/*
+#fieldDiffsContainer .DwtTabBar {
+  border: thin brown solid;
+}*/
+
+#fieldDiffsContainer .DwtTabButton {
+  margin: 0px;
+  padding: 0px;
+}
+
+#fieldDiffsContainer .DwtTabBar td.ImgTabSpacer__H {
+	vertical-align: bottom;
+}
+
+#fieldDiffsContainer .DwtTabButton .DwtTabButton,
+#fieldDiffsContainer .DwtTabButton .DwtTabButton-activated,
+#fieldDiffsContainer .DwtTabButton .DwtTabButton-triggered
+{
+  padding: 5px 5px 5px 5px;
+  height: 20px;
+}
+
+#fieldDiffsContainer .DwtTabButton table {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+#fieldDiffsContainer .DwtTabButton .Text, #fieldDiffsContainer .DwtTabButton .DisabledText {
+  font-weight: bold;
+  font-size: 12px; 
+}
+
+#fieldDiffsContainer .FieldDiffListView .Row {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 0px;
+
+}
+
+#fieldDiffsContainer .FieldDiffListView {
+	margin: 0px;
+  padding: 0px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+#fieldDiffsContainer .DwtHtmlEditor, #fieldDiffsContainer .DwtHtmlEditor_small {
+  width: 100%;
+}
+
+#fieldDiffsContainer .DwtHtmlEditorIFrame {
+  border: 1px black solid;
+  width: 99%;
+}
+
+#fieldDiffsContainer .DwtHtmlEditor, #fieldDiffsContainer .DwtHtmlEditor .DwtHtmlEditorIFrame {
+  height: 200px;
+}
+
+#fieldDiffsContainer .DwtHtmlEditor_small, #fieldDiffsContainer .DwtHtmlEditor_small .DwtHtmlEditorIFrame {
+  height: 50px;
+}

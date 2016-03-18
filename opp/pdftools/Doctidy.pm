@@ -8,7 +8,7 @@ use Getopt::Std;
 use List::Util qw/max min/;
 use Data::Dumper;
 use FindBin;
-use lib "$FindBin::Bin/.";
+use lib "$FindBin::Bin/../docparser";
 use util::Io;
 use util::String qw/strip_tags tokenize force_utf8/;
 use util::Functools qw/reduce/;

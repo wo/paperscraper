@@ -13,8 +13,11 @@ import tempfile
 import db
 import error
 import util
+from debug import debug, debuglevel
 from browser import Browser
 from webpage import Webpage
+from pdftools.pdftools import pdfinfo, pdfcut
+from pdftools.pdf2xml import pdf2xml
 from config import config
 
 logger = logging.getLogger('opp')
@@ -25,7 +28,7 @@ def next_source():
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE"
-             " type != 3" # ignore rss feeds
+             " sourcetype != 'blog'" # ignore rss feeds
              " AND (last_checked IS NULL OR last_checked < %s)"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
@@ -103,7 +106,7 @@ def scrape(source, keep_tempfiles=False):
         # take us e.g. to CMU's general document archive; we don't
         # want that. So here we wait for manual approval of the new
         # url.
-        if source.type == 1:
+        if source.sourcetype == 'personal':
             logger.warning('%s redirects to %s', source.url, browser.current_url)
             source.update_db(status=301)
             return 0
@@ -204,34 +207,23 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         return 0
     
     # fetch url and handle errors, redirects, etc.:
-    time.sleep(1) # be gentle on servers
     url = redir_url or li.url
-    if not force_reprocess and li.last_checked:
-        ims = li.last_checked.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        status,r = util.request_url(url, if_modified_since=ims, etag=li.etag)
-        if (status == 304 or
-            status == 200 and r.headers.get('content-length') == li.filesize):
-            li.update_db()
-            debug(1, "not modified: not processing further")
-            return 0
-    else:
-        status,r = util.request_url(url)
-    
-    if status != 200:
-        li.update_db(status=status)
-        debug(1, "error status %s", status)
+    r = li.fetch(url=url, only_if_modified=not(force_reprocess))
+    if not r: 
         return 0
-
-    li.etag = r.headers.get('etag')
-    li.filesize = r.headers.get('content-length')
-    
+        
     if r.url != url: # redirected
         url = util.normalize_url(r.url)
         # now we treat li as if it directly led to the redirected document
 
+    if r.filetype not in ('html', 'pdf', 'doc', 'rtf'):
+        li.update_db(status=error.code['unsupported filetype'])
+        return debug(1, "unsupported filetype: %s", r.filetype)
+
+    doc = Doc(url=url, r=r, link=li, source=li.source)
+    
     if r.filetype == 'html':
         r.encoding = 'utf-8'
-        doc = Doc(url=url)
         doc.page = Webpage(url, html=r.text)
         debug(5, "\n====== %s ======\n%s\n======\n", url, r.text)
 
@@ -241,7 +233,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
             debug(1, "steppingstone to %s", target_url)
             return process_link(li, redir_url=target_url, 
                                 force_reprocess=force_reprocess, recurse=recurse+1)
-        
+
         # Genuine papers are almost never in HTML format, and almost
         # every HTML page is not a paper. The few exceptions (such as
         # entries on SEP) tend to require special parsing. Hence the
@@ -249,47 +241,85 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         # articles on medium or in plain HTML, we might return to the
         # old procedure of converting the page to pdf and treating it
         # like any candidate paper.
-        import docparser.htmlparser as htmlparser
-        if not htmlparser.parse(doc, debug_level=debuglevel()):
+        doc.content = doc.page.text()
+        doc.numwords = len(doc.content.split())
+        doc.numpages = 1
+        import docparser.webpageparser as htmlparser
+        if not htmlparser.parse(doc):
             debug(1, "no metadata extracted: page ignored")
             li.update_db(status=1)
             return 0
 
-    if r.filetype not in ('pdf', 'doc', 'rtf'):
-        li.update_db(status=error.code['unsupported filetype'])
-        return debug(1, "unsupported filetype: %s", r.filetype)
-
     else:
-        doc = Doc(url=url)
-        doc.r = r
-        doc.link = li
-        doc.source = li.source
-
-        # save document and convert to pdf:
-        doc.tempfile = save_local(r)
-        if not doc.tempfile:
+        # save as pdf:
+        try:
+            doc.tempfile = save_local(r)
+        except:
             return li.update_db(status=error.code['cannot save local file'])
         if r.filetype != 'pdf':
-            doc.tempfile = convert_to_pdf(doc.tempfile)
-            if not doc.tempfile:
+            try:
+                doc.tempfile = convert_to_pdf(doc.tempfile)
+            except:
+                debug(1, 'pdf conversion failed!')
                 return li.update_db(status=error.code['pdf conversion failed'])
+        try:
+            pdfmeta = pdfinfo(doc.tempfile)
+            doc.numpages = int(pdfmeta['Pages'])
+        except:
+            debug(1, 'pdfinfo failed!')
+            return li.update_db(status=error.code['pdfinfo failed'])
+        debug(2, 'pdf has %s pages', doc.numpages)
+        # try pdftohtml:
+        doc.xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
+        if pdf2xml(doc.tempfile, doc.xmlfile, use_ocr=False):
+            # TODO: strip coverpages...
+            doc.content = util.strip_xml(readfile(doc.xmlfile))
+            doc.numwords = len(doc.content.split())
+            # TODO: check quality to see if ocr is needed?
+        else:
+            # use ocr:
+            if doc.numpages > 10:
+                # ocr only first 7 + last 3 pages:
+                pageranges = [(1,7), (doc.numpages-2,doc.numpages)]
+                shortened_pdf = doc.tempfile.rsplit('.')[0] + '-short.pdf'
+                try:
+                    pdfcut(doc.tempfile, shortened_pdf, pageranges)
+                except:
+                    return li.update_db(status=error.code['pdfcut failed'])
+                doc.tempfile = shortened_pdf
+            if not pdf2xml(doc.tempfile, doc.xmlfile, use_ocr=True):
+                return li.update_db(status=error.code['ocr failed'])
+            doc.ocr = True
+            doc.content = util.strip_xml(readfile(doc.xmlfile))
+            if doc.numpages > 10:
+                # extrapolate numwords from numpages and the number of words
+                # on the ocr'ed pages:
+                doc.numwords = len(doc.content.split()) * doc.numpages/10
+            else:
+                doc.numwords = len(doc.content.split())
+
+        # guess doc type (paper, book, review, etc.):
+        import doctyper.doctyper as doctyper
+        doc.doctype = doctyper.evaluate(doc)
 
         # extract metadata:
-        import docparser.pdfparser as pdfparser
-        if not pdfparser.parse(doc, debug_level=debuglevel(), keep_tempfiles=keep_tempfiles):
+        import docparser.paperparser as paperparser
+        if not paperparser.parse(doc, keep_tempfiles=keep_tempfiles):
             logger.warning("metadata extraction failed for %s", url)
             li.update_db(status=error.code['parser error'])
             return 0
-
+            
         # estimate spamminess:
-        import spamfilter.pdffilter 
-        paperprob = spamfilter.pdffilter.evaluate(doc, debug=(debuglevel() > 3))
+        import doctyper.spamfilter as spamfilter
+        paperprob = spamfilter.evaluate(doc)
         doc.spamminess = int((1-paperprob) * 100)
         if doc.spamminess > MAX_SPAMMINESS:
             li.update_db(status=1)
             debug(1, "spam: score %s > %s", doc.spamminess, MAX_SPAMMINESS)
             return 0
 
+        # TODO: classify for main topics?
+            
     if li.doc_id:
         # check for revisions:
         olddoc = Doc(doc_id=li.doc_id)
@@ -335,7 +365,7 @@ class Source(Webpage):
     db_fields = {
         'source_id': 0,
         'url': '',
-        'type': 1, # 1 = personal page, 2 = repository/journal, 3 = blog
+        'sourcetype': 'personal', # (alt: repository, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
         'found_date': None,
         'last_checked': None,
@@ -636,13 +666,38 @@ class Link():
         debug(3, cur._last_executed)
         db.commit()
 
+    def fetch(self, url=None, only_if_modified=True):
+        '''
+        fetch linked document (or url), returns response object on
+        success, otherwise stores error in db and returns None.
+        '''
+        time.sleep(1) # be gentle on servers
+        url = url or self.url
+        if only_if_modified and self.last_checked:
+            ims = self.last_checked.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            status,r = util.request_url(url, if_modified_since=ims, etag=self.etag)
+            if (status == 304 or
+                status == 200 and r.headers.get('content-length') == self.filesize):
+                self.update_db()
+                debug(1, "not modified")
+            return None
+        else:
+            status,r = util.request_url(url)
+        if status != 200:
+            self.update_db(status=status)
+            debug(1, "error status %s", status)
+            return None
+        self.etag = r.headers.get('etag')
+        self.filesize = r.headers.get('content-length')
+        return r
+
 class Doc():
     """ represents a paper """
 
     db_fields = {
         'doc_id': 0,
         'url': '',
-        'type': 1,
+        'doctype': 'article',
         'status': 1,
         'filetype': None,
         'filesize': 0,
@@ -663,7 +718,18 @@ class Doc():
     def __init__(self, **kwargs):
         for k,v in self.db_fields.items():
             setattr(self, k, kwargs.get(k, v))
-
+        self.r = kwargs.get('r', None)
+        if self.r:
+            self.filetype = kwargs.get('filetype', self.r.filetype)
+        self.link = kwargs.get('link', None)
+        if self.link:
+            self.filesize = kwargs.get('filesize', self.link.filesize)
+        self.source = kwargs.get('source', self.link.source if self.link else None)
+        if self.source:
+            self.source_url = kwargs.get('source_url', self.source.url)
+            self.source_name = kwargs.get('source_name', self.source.name)
+        self.ocr = False
+    
     def load_from_db(self, doc_id=0, url=''):
         doc_id = doc_id or self.doc_id
         url = url or self.url
@@ -745,10 +811,7 @@ def check_steppingstone(page):
     for (pattern, retr_target) in redir_patterns:
         m = pattern.search(page.html)
         if m:
-            debug(1, "match %s", m.group(1))
-            debug(1, "normalized %s", requests.utils.unquote(m.group(1)))
             target = util.normalize_url(retr_target(m))
-            debug(1, "target %s", target)
             if target == page.url:
                 return None
             debug(2, "repository page for %s", target)
@@ -775,9 +838,9 @@ def save_local(r):
                 f.write(block)
     except EnvironmentError as e:
         logger.warning("cannot save %s to %s: %s", r.url, tempfile, str(e))
-        return None
+        raise
     return tempfile
-                         
+    
 def convert_to_pdf(tempfile):
     outfile = tempfile.rsplit('.',1)[0]+'.pdf'
     try:
@@ -787,7 +850,7 @@ def convert_to_pdf(tempfile):
         subprocess.check_call(cmd, timeout=20)
     except Exception as e:
         logger.warning("cannot convert %s to pdf: %s", tempfile, str(e))
-        return None
+        raise
     return outfile
 
 def tempdir():
@@ -801,6 +864,10 @@ def remove_tempdir():
         shutil.rmtree(tempdir.dirname)
         del tempdir.dirname
 
+def readfile(path):
+    with open(path, 'r', encoding='utf-8') as f:
+        return f.read()
+        
 def get_duplicate(doc):
     """
     returns a document from db that closely resembles doc, or None
@@ -903,16 +970,3 @@ def scholarquery(author, title):
             return a
     return None
 
-def debuglevel(level=None):
-    """read or set debugging level (0=none, 5=heaps)"""
-    if level:
-        debug._debuglevel = level
-    else:
-        return debug._debuglevel
-
-def debug(level, msg, *args):
-    if debug._debuglevel >= level:
-        logger.debug(msg, *args)
-
-# default:
-debug._debuglevel = 1
