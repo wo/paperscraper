@@ -39,7 +39,7 @@ CREATE TABLE docs (
   doc_id INT(11) UNSIGNED NOT NULL auto_increment,
   status SMALLINT(6) DEFAULT 1,
   doctype VARCHAR(32) NOT NULL,
-  url VARCHAR(255) NOT NULL,
+  url VARCHAR(512) NOT NULL,
   filetype VARCHAR(8) DEFAULT NULL,
   filesize INT(10) UNSIGNED DEFAULT NULL,
   found_date DATETIME DEFAULT NULL,
