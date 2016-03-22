@@ -35,8 +35,8 @@ def parse(doc, keep_tempfiles=False):
         else:
             debug(1, 'confidence %s too low, trying ocr', parse1['meta_confidence'])
     else:
-        # This should never happen
-        logger.warning('extractor failed on %s (ocr-ed), giving up', doc.url)
+        # e.g., Extractor timeout
+        logger.warning('extractor failed on %s, giving up', doc.url)
         return False
     
     # Since we only need author/title/abstract, we don't need to OCR
@@ -106,7 +106,7 @@ def extractor(xmlfile):
     cmd = [PERL, join(path, 'Extractor.pm'), "-v{}".format(debuglevel()), xmlfile]
     debug(2, ' '.join(cmd))
     try:
-        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=10)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=60)
         output = output.decode('utf-8', 'ignore')
     except subprocess.CalledProcessError as e:
         debug(1, e.output)

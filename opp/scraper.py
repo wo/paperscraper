@@ -269,7 +269,8 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
             debug(1, 'pdfinfo failed!')
             return li.update_db(status=error.code['pdfinfo failed'])
         debug(2, 'pdf has %s pages', doc.numpages)
-        # try pdftohtml:
+
+        # convert to xml, first trying pdftohtml:
         doc.xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
         if pdf2xml(doc.tempfile, doc.xmlfile, use_ocr=False):
             # TODO: strip coverpages...
@@ -828,8 +829,9 @@ def check_steppingstone(page):
     
 def save_local(r):
     # use recognizable tempfile name:
-    urlfrag = r.url.split('//',1)[1].split('?')[0]
-    fname = re.sub('\W', '_', urlfrag) + '.' + r.filetype
+    m = re.search('/([^/]+?)(?:\.\w+)?(?:[\?\#].+)*$', r.url)
+    fname = m.group(1) if m else r.url
+    fname = re.sub('\W', '_', fname) + '.' + r.filetype
     tempfile = os.path.join(tempdir(), fname)
     debug(2, "saving %s to %s", r.url, tempfile)
     try:

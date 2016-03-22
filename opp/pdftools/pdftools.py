@@ -45,9 +45,9 @@ def pdfcut(filename, newfilename, pageranges):
     pagefiles = []
     for (start, end) in pageranges:
         cmd = [PDFSEPARATE, '-f', str(start), '-l', str(end), filename, pagepattern]
-        debug(2, ' '.join(cmd))
+        debug(3, ' '.join(cmd))
         try:
-            subprocess.check_call(cmd, timeout=5)
+            subprocess.check_call(cmd, timeout=20)
             pagefiles.extend([shortpdfbase+str(i)+'.pdf' for i in range(start, end+1)])
         except Exception as e:
             debug(1, 'pdfseparate failed to split pdf! %s', e.output)
@@ -55,9 +55,9 @@ def pdfcut(filename, newfilename, pageranges):
     if pagefiles:
         cmd = [GS, '-dBATCH', '-dNOPAUSE', '-q', '-sDEVICE=pdfwrite', '-dPDFSETTINGS=/prepress', 
                '-sOutputFile='+newfilename] + pagefiles
-        debug(2, ' '.join(cmd))
+        debug(3, ' '.join(cmd))
         try:
-            subprocess.check_call(cmd, timeout=5)
+            subprocess.check_call(cmd, timeout=20)
         except Exception as e:
             debug(1, 'gs failed to merge pdfs! %s', e.output)
             raise
