@@ -895,7 +895,7 @@ def get_duplicate(doc):
             continue
         sm = SequenceMatcher(None, doc.content, dupe['content'])
         match_ratio = sm.ratio()
-        if match_ratio < 0.7:
+        if match_ratio < 0.1: # sic
             debug(5, "content too different, ratio %s", match_ratio)
             continue
         debug(4, "duplicate: %s, '%s'", dupe['authors'], dupe['title'])

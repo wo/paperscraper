@@ -4,9 +4,14 @@ import logging
 import os.path
 import sys
 import json
-
+from debug import debug, debuglevel
 import scraper
 import db
+
+debuglevel(5)
+
+curpath = os.path.abspath(os.path.dirname(__file__))
+testdir = os.path.join(curpath, 'testdocs')
 
 @pytest.fixture(scope='module')
 def testdb():
@@ -40,7 +45,6 @@ def test_Source(testdb):
 
 def test_Link(testdb):
     li = scraper.Link(source_id=1, url='http://umsu.de/papers/magnetism2.pdf')
-    li.load_from_db()
     li.update_db(filesize=1234)
     assert li.link_id > 0
     li2 = scraper.Link(source_id=1, url='http://umsu.de/papers/magnetism2.pdf')
@@ -49,7 +53,6 @@ def test_Link(testdb):
 
 def test_Doc(testdb):
     doc = scraper.Doc(url='http://umsu.de/papers/magnetism.pdf')
-    doc.load_from_db()
     doc.update_db(authors='wo')
     assert doc.doc_id > 0
     doc2 = scraper.Doc(url='http://umsu.de/papers/magnetism.pdf')
@@ -75,6 +78,25 @@ def test_check_steppingstone():
         t = scraper.check_steppingstone(page)
         assert t == target
 
+def test_get_duplicate(testdb):
+    doc = scraper.Doc(url='http://umsu.de/papers/driver-2011.pdf')
+    doc.link = scraper.Link(url='http://umsu.de/papers/driver-2011.pdf')
+    doc.content = readfile(os.path.join(testdir, 'attitudes.txt'))
+    doc.numwords = 13940
+    doc.numpages = 26
+    doc.authors = 'Wolfang Schwarz'
+    doc.title = 'Lost memories and useless coins: Revisiting the absentminded driver'
+    doc.update_db()
+    doc2 = scraper.Doc(url='http://download.springer.com/static/pdf/307/art%253A10.1007%252Fs11229-015-0699-z.pdf')
+    doc2.link = scraper.Link(url=doc2.url)
+    doc2.content = 'abcdefghjik'+readfile(os.path.join(testdir, 'attitudes.txt'))
+    doc2.numwords = 14130
+    doc2.numpages = 29
+    doc2.authors = 'Wolfang Schwarz'
+    doc2.title = 'Lost memories and useless coins: revisiting the absentminded driver'
+    dupe = scraper.get_duplicate(doc2)
+    assert dupe.doc_id == doc.doc_id
+
 def test_process(testdb, caplog):
     source = scraper.Source(url='http://umsu.de/papers/')
     source.load_from_db()
@@ -97,6 +119,9 @@ def test_process(testdb, caplog):
 #    scraper.scrape(src)
 
 
+def readfile(path):
+    with open(path, 'r', encoding='utf-8') as f:
+        return f.read()
 
 
 
