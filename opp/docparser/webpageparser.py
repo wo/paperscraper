@@ -3,23 +3,18 @@ import logging
 import re
 from lxml import etree
 from nltk.tokenize import sent_tokenize
+from debug import debug
 
 logger = logging.getLogger(__name__)
 
-_debug_level = 1
-def debug(level, msg, *args):
-    if _debug_level >= level:
-        logger.debug(msg, *args)
-
-def parse(doc, debug_level=1):
+def parse(doc):
     """
     tries to enrich doc by metadata (authors, title, abstract,
     numwords, doctype, content); returns True if successful, False if
     doc.page doesn't look like an article.
     """
     page = doc.page
-    _debug_level = debug_level
-    debug(2, "parsing page {}", page.url)
+    debug(2, "parsing page %s", page.url)
     
     if 'stanford.edu/entries' not in page.url:
         debug(2, "page is not a Stanford Encyclopedia entry")
@@ -37,7 +32,7 @@ def parse(doc, debug_level=1):
     if not preamble_divs:
         debug(2, "page is not a Stanford Encyclopedia entry")
         return False
-    preamble_html = etree.tostring(preamble_divs[0])
+    preamble_html = etree.tostring(preamble_divs[0], encoding='unicode')
     doc.abstract = get_abstract(preamble_html)
 
     # authors:
@@ -45,18 +40,18 @@ def parse(doc, debug_level=1):
     if not copyright_divs:
         debug(2, "page is not a Stanford Encyclopedia entry")
         return False
-    copyright_html = etree.tostring(copyright_divs[0])
+    copyright_html = etree.tostring(copyright_divs[0], encoding='unicode')
     copyright_html = re.sub('<a.+Copyright.+', '', copyright_html)
     copyright_html = re.sub('&lt;.+?&gt;', '', copyright_html)
-    authors = [strip_tags(frag) for frag in copyright_html.split('<br />')]
-    doc.authors = [a for a in authors if a.strip()]
+    authors = [strip_tags(frag).strip() for frag in copyright_html.split('<br/>')]
+    doc.authors = [a for a in authors if a]
 
-    # text:
+    # text content:
     words = page.xpath("//div[@id='article-content']//text()")
     if not words:
         debug(2, "page is not a Stanford Encyclopedia entry")
         return False
-    doc.text = ' '.join([w.strip() for w in words if w.strip()])
+    doc.content = ' '.join([w.strip() for w in words if w.strip()])
 
     # numwords:
     doc.numwords = len(words)
@@ -83,11 +78,11 @@ def strip_tags(text, keep_italics=False):
     return text
 
 def get_abstract(html, max_len=1000):
-    text = strip_tags(html, keep_italics=True)
+    text = strip_tags(html, keep_italics=True).strip()
     sentences = sent_tokenize(text[:1000])
     abstract = ''
     for sent in sentences:
         abstract += sent+' '
         if len(abstract) > 600:
             break
-    return abstract
+    return abstract.strip()

@@ -246,7 +246,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         doc.numpages = 1
         import docparser.webpageparser as htmlparser
         if not htmlparser.parse(doc):
-            debug(1, "no metadata extracted: page ignored")
+            debug(1, "page ignored")
             li.update_db(status=1)
             return 0
 
