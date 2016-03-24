@@ -904,24 +904,29 @@ def get_duplicate(doc):
     
 def context_suggests_published(context):
     """
-    guesses from a link context whether the linked document has
-    already been published.
-
-    TODO -- Tricky cases:
-    - "Foo bar". Unfinished Draft (2015)
-    - "Foo bar". Journal of obscure philosophy (2015). Penultimate Draft
+    returns True if the link context makes it fairly certain that the
+    linked document has already been published before this year.
     """
-    # uncomment for testing paper processing:
-    return False
-    if re.search('forthcoming|unpublished', context, flags=re.I):
+    
+    # uncomment to test paper processing:
+    #return False
+
+    if re.search('forthcoming|unpublished', context, re.I):
+        debug(4, 'forthcoming/unpublished in context suggests not yet published')
         return False
     m = re.search(r'\b(\d{4})\b', context)
-    if not m:
-        return True
-    year = int(m.group(1))
-    if 1950 < year < datetime.today().year:
-        debug(1, "ignoring paper published in %s", year)
-        return True
+    year = m and int(m.group(1))
+    if not year or year < 1950 or year >= datetime.today().year:
+        debug(4, 'no suitable year in context suggests not yet published')
+        return False
+
+    # See https://github.com/wo/opp-tools/issues/54
+    pubterms = [r'\beds?\b', r'edited', r'\d-\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
+    for t in pubterms:
+        if re.search(t, context, re.I):
+            debug(1, "ignoring paper published in %s ('%s' in context)", year, t)
+            return True
+    debug(4, 'no publication keywords, assuming not yet published')
     return False
 
 def paper_is_old(doc):

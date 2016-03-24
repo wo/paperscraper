@@ -4,11 +4,10 @@ import logging
 import os.path
 import sys
 import json
-from debug import debug, debuglevel
 import scraper
 import db
 
-debuglevel(5)
+scraper.debuglevel(5)
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'testdocs')
@@ -33,6 +32,7 @@ def test_debug(caplog):
     assert 'hi there' in caplog.text()
     scraper.debug(5, 'secret')
     assert 'secret' not in caplog.text()
+    scraper.debuglevel(5)
 
 def test_Source(testdb):
     src = scraper.Source(url='http://umsu.de/papers/')
@@ -97,7 +97,21 @@ def test_get_duplicate(testdb):
     dupe = scraper.get_duplicate(doc2)
     assert dupe.doc_id == doc.doc_id
 
-def test_process(testdb, caplog):
+
+@pytest.mark.parametrize(('published','context'), [
+    (1, 'Basic structure and the value of equality, Philosophy and public affairs, 31: 4, 2003'),
+    (1, 'Massimi, M. (2014) "Prescribing laws to nature", Kant-Studien 105, 491-508. [PDF] [journal link]'),
+    (1, 'The Model-Theoretic Argument: From Skepticism to a New Understanding. The Brain in a Vat. Ed. S. Goldberg. Cambridge. 2014.'),
+    (1, 'A Conception of Tarskian Logic. Pacific Philosophical Quarterly 70 (1989): 341-68.'),
+    (0, 'Massimi, M. (forthcoming) "Grounds, modality and nomic necessity in the Critical Kant", in Massimi and Breitenbach (eds.) Kant and the Laws of Nature (Cambridge University Press). [PDF]'),
+    (0, 'A lonelier contractualism'),
+    (0,  'Counterpart Semantics. Unpublished Manuscript, 2011')
+    ])
+def test_context_suggests_published(context, published, caplog):
+    res = scraper.context_suggests_published(context)
+    assert res == published
+
+def xxxtest_process(testdb, caplog):
     source = scraper.Source(url='http://umsu.de/papers/')
     source.load_from_db()
     browser = scraper.Browser(use_virtual_display=False)
@@ -110,6 +124,7 @@ def test_process(testdb, caplog):
     li.load_from_db()
     scraper.debuglevel(2)
     scraper.process_link(li, force_reprocess=True, keep_tempfiles=True)
+    scraper.debuglevel(5)
     assert 'Against Magnetism' in caplog.text()
     assert 'is the view that' in caplog.text()
 

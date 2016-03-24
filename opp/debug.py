@@ -15,5 +15,5 @@ def debuglevel(level=None):
 
 def debug(level, msg, *args):
     if _debuglevel >= level:
-        logger.debug(msg, *args)
+        logger.debug(str(msg), *args)
 
