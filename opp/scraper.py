@@ -179,8 +179,6 @@ def scrape(source, keep_tempfiles=False):
     # new links to paper => mark as 404.
 
 
-MIN_ISPAPER = 50
-
 def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
                  recurse=0):
     """
@@ -314,9 +312,18 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         import doctyper.paperfilter as paperfilter
         paperprob = paperfilter.evaluate(doc)
         doc.is_paper = int(paperprob * 100)
-        if doc.is_paper < MIN_ISPAPER:
+        if doc.is_paper < 50:
             li.update_db(status=1)
-            debug(1, "spam: paper score %s < %s", doc.is_paper, MIN_ISPAPER)
+            debug(1, "spam: paper score %s < 50", doc.is_paper)
+            return 0
+        
+        # estimate whether doc is on philsophy:
+        import doctyper.philosophyfilter as philosophyfilter
+        philprob = philosophyfilter.evaluate(doc)
+        doc.is_philosophy = int(philprob * 100)        
+        if doc.is_philosophy < 50:
+            li.update_db(status=1)
+            debug(1, "spam: philosophy score %s < 50", doc.is_philosophy)
             return 0
 
         # TODO: classify for main topics?

@@ -43,7 +43,7 @@ class DocClassifier:
             self.reset()
     
     def reset(self):
-        debug(4, "creating new classifier")
+        debug(4, "resetting classifier")
         self.vectorizer = TfidfVectorizer(strip_accents='ascii',
                                           stop_words='english')
         self.classifier = MultinomialNB(alpha=0.01)
@@ -64,9 +64,10 @@ class DocClassifier:
         # Tokenize the texts:
         tfidfs = self.vectorizer.fit_transform(texts)
         debug(4, 'Dimensions of tfidfs are %s', tfidfs.shape)
-        #debug(5, self.vectorizer.get_feature_names())
+        debug(5, self.vectorizer.get_feature_names())
         hamspam = array(hamspam).ravel()
-        self.classifier = MultinomialNB().fit(tfidfs, hamspam)
+        self.classifier.fit(tfidfs, hamspam)
+        debug(5, 'classes: %s', self.classifier.classes_)
         self.ready = True
 
     def classify(self, docs):
@@ -81,7 +82,8 @@ class DocClassifier:
         texts = [self.doc2text(doc) for doc in docs]
         tfidfs = self.vectorizer.transform(texts)
         probs = self.classifier.predict_proba(tfidfs)
-        return [p[0] for p in probs]
+        yes_index = 0 if self.classifier.classes_[0] else 1
+        return [p[yes_index] for p in probs]
 
     @staticmethod
     def doc2text(doc):
