@@ -4,7 +4,6 @@ import logging
 import os.path
 import sys
 import scraper
-import db
 
 @pytest.mark.parametrize("page,link,context", [
 

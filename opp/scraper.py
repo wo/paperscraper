@@ -375,7 +375,7 @@ class Source(Webpage):
     }
 
     def __init__(self, **kwargs):
-        super().__init__(kwargs['url'] or '')
+        super().__init__(kwargs.get('url',''))
         for k,v in self.db_fields.items():
             setattr(self, k, kwargs.get(k, v))
 
@@ -384,7 +384,7 @@ class Source(Webpage):
         if not url:
             raise TypeError("need source url to load Source from db")
         cur = db.dict_cursor()
-        query = "SELECT * FROM sources WHERE url = %s"
+        query = "SELECT * FROM sources WHERE urlhash = MD5(%s)"
         cur.execute(query, (url,))
         debug(5, cur._last_executed)
         sources = cur.fetchall()
@@ -399,11 +399,24 @@ class Source(Webpage):
         if self.source_id:
             cur = db.cursor()
             kwargs['last_checked'] = time.strftime('%Y-%m-%d %H:%M:%S') 
-            query = "UPDATE sources SET {} WHERE source_id = %s".format(
+            query = "UPDATE sources SET urlhash=MD5(url),{} WHERE source_id = %s".format(
                 ",".join(k+"=%s" for k in kwargs.keys()))
             cur.execute(query, tuple(kwargs.values()) + (self.source_id,))
             debug(3, cur._last_executed)
             db.commit()
+    
+    def save_to_db(self):
+        """write object to db"""
+        cur = db.cursor()
+        fields = [f for f in self.db_fields.keys()
+                  if f != 'link_id' and getattr(self, f) != None]
+        values = [getattr(self, f) for f in fields]
+        query = "INSERT INTO sources ({}, urlhash) VALUES ({}, MD5(url))".format(
+            ",".join(fields), ",".join(("%s",)*len(fields)))
+        cur.execute(query, values)
+        debug(3, cur._last_executed)
+        db.commit()
+        self.source_id = cur.lastrowid
     
     def set_html(self, html):
         debug(5, "\n====== %s ======\n%s\n======\n", self.url, html)
@@ -633,7 +646,7 @@ class Link():
             raise TypeError("need url and source_id to load Link from db")
         
         cur = db.dict_cursor()
-        query = "SELECT * FROM links WHERE url = %s AND source_id = %s LIMIT 1"
+        query = "SELECT * FROM links WHERE urlhash = MD5(%s) AND source_id = %s LIMIT 1"
         cur.execute(query, (url, source_id))
         debug(5, cur._last_executed)
         links = cur.fetchall()
@@ -656,11 +669,11 @@ class Link():
                   if f != 'link_id' and getattr(self, f) != None]
         values = [getattr(self, f) for f in fields]
         if self.link_id:
-            query = "UPDATE links SET {} WHERE link_id = %s".format(
+            query = "UPDATE links SET {},urlhash=MD5(url) WHERE link_id = %s".format(
                 ",".join(k+"=%s" for k in fields))
             cur.execute(query, values + [self.link_id])
         else:
-            query = "INSERT INTO links ({}) VALUES ({})".format(
+            query = "INSERT INTO links ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             cur.execute(query, values)
             self.link_id = cur.lastrowid
@@ -712,7 +725,8 @@ class Doc():
         'source_url': '',
         'source_name': '',
         'meta_confidence': 0, # 0-100
-        'spamminess': 0, # 0-100
+        'is_paper': 0, # 0-100
+        'is_philosophy': 0, # 0-100
         'content': ''
     }
 
@@ -739,7 +753,7 @@ class Doc():
             query = "SELECT * FROM docs WHERE doc_id = %s"
             cur.execute(query, (doc_id,))
         elif url:
-            query = "SELECT * FROM docs WHERE url = %s"
+            query = "SELECT * FROM docs WHERE urlhash = MD5(%s)"
             cur.execute(query, (url,))
         else:
             raise TypeError("need doc_id or url to load doc from db")
@@ -760,11 +774,11 @@ class Doc():
                   if f != 'doc_id' and getattr(self, f) != None]
         values = [getattr(self, f) for f in fields]
         if self.doc_id:
-            query = "UPDATE docs SET {} WHERE doc_id = %s".format(
+            query = "UPDATE docs SET {},urlhash=MD5(url) WHERE doc_id = %s".format(
                 ",".join(k+"=%s" for k in fields))
             cur.execute(query, values + [self.doc_id])
         else:
-            query = "INSERT INTO docs ({}) VALUES ({})".format(
+            query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             cur.execute(query, values)
             self.doc_id = cur.lastrowid

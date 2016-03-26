@@ -21,10 +21,15 @@ def testdb():
     for t in ('sources', 'links', 'docs'):
         cur.execute('DELETE FROM {}'.format(t))
     db.commit()
-    query = "INSERT IGNORE INTO sources (sourcetype, url, status, last_checked) VALUES (%s, %s, %s, %s)"
-    cur.execute(query, ('personal', 'http://umsu.de/papers/', 0, '2016-01-01 12:34'))
-    cur.execute(query, ('personal', 'http://consc.net/papers.html', 1, None))
-    db.commit()
+    scraper.Source(
+        url='http://umsu.de/papers/',
+        sourcetype='personal',
+        status=0,
+        last_checked='2016-01-01 12:34').save_to_db()
+    scraper.Source(
+        url='http://consc.net/papers.html',
+        sourcetype='personal',
+        status=1).save_to_db()
 
 def test_debug(caplog):
     scraper.debuglevel(4)
@@ -37,11 +42,10 @@ def test_debug(caplog):
 def test_Source(testdb):
     src = scraper.Source(url='http://umsu.de/papers/')
     src.load_from_db()
-    src.name = "wo's weblog"
-    src.update_db()
+    src.update_db(name="wo's weblog")
     src2 = scraper.Source(url='http://umsu.de/papers/')
     src2.load_from_db()
-    assert src.name == "wo's weblog"
+    assert src2.name == "wo's weblog"
 
 def test_Link(testdb):
     li = scraper.Link(source_id=1, url='http://umsu.de/papers/magnetism2.pdf')
