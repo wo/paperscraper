@@ -115,13 +115,13 @@ def test_context_suggests_published(context, published, caplog):
     res = scraper.context_suggests_published(context)
     assert res == published
 
-def xxxtest_process(testdb, caplog):
+def test_process(testdb, caplog):
     source = scraper.Source(url='http://umsu.de/papers/')
     source.load_from_db()
     browser = scraper.Browser(use_virtual_display=False)
     browser.goto(source.url)
     source.set_html(browser.page_source)
-    link = 'magnetism2.pdf'
+    link = 'options.pdf'
     el = browser.find_element_by_xpath("//a[@href='{}']".format(link))
     url = source.make_absolute(link)
     li = scraper.Link(url=url, source=source, element=el)
@@ -129,8 +129,8 @@ def xxxtest_process(testdb, caplog):
     scraper.debuglevel(2)
     scraper.process_link(li, force_reprocess=True, keep_tempfiles=True)
     scraper.debuglevel(5)
-    assert 'Against Magnetism' in caplog.text()
-    assert 'is the view that' in caplog.text()
+    assert 'Options and Actions' in caplog.text()
+    assert 'But even if we know' in caplog.text()
 
 #def test_scrape(testdb):
 #    src = scraper.Source(url='http://umsu.de/papers/')

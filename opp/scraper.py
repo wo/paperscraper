@@ -179,7 +179,7 @@ def scrape(source, keep_tempfiles=False):
     # new links to paper => mark as 404.
 
 
-MAX_SPAMMINESS = 50
+MIN_ISPAPER = 50
 
 def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
                  recurse=0):
@@ -310,13 +310,13 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
             li.update_db(status=error.code['parser error'])
             return 0
             
-        # estimate spamminess:
-        import doctyper.spamfilter as spamfilter
-        paperprob = spamfilter.evaluate(doc)
-        doc.spamminess = int((1-paperprob) * 100)
-        if doc.spamminess > MAX_SPAMMINESS:
+        # estimate whether doc is not a handout, cv etc.:
+        import doctyper.paperfilter as paperfilter
+        paperprob = paperfilter.evaluate(doc)
+        doc.is_paper = int(paperprob * 100)
+        if doc.is_paper < MIN_ISPAPER:
             li.update_db(status=1)
-            debug(1, "spam: score %s > %s", doc.spamminess, MAX_SPAMMINESS)
+            debug(1, "spam: paper score %s < %s", doc.is_paper, MIN_ISPAPER)
             return 0
 
         # TODO: classify for main topics?
