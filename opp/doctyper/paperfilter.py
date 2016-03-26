@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-import logging
 import re
 from statistics import median
 from scipy.stats import nbinom
-import sys, os.path
-curpath = os.path.abspath(os.path.dirname(__file__))
-libpath = os.path.join(curpath, os.path.pardir)
-sys.path.insert(0, libpath)
+#import sys, os.path
+#curpath = os.path.abspath(os.path.dirname(__file__))
+#libpath = os.path.join(curpath, os.path.pardir)
+#sys.path.insert(0, libpath)
 from subjectivebayes import BinaryNaiveBayes
+from debug import debug
 
-logger = logging.getLogger('opp')
-        
-"""classifier to evaluate whether a document is a paper (yes=paper,
-no=spam)"""
-        
+"""
+classifier to evaluate whether a pdf/word document is a paper (or
+book etc.), as opposed to a handout, a cv, lecture slides etc.
+"""
+
 classifier = BinaryNaiveBayes(prior_yes=0.6)
 
 def bad_url(doc):

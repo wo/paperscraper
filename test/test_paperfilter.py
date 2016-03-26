@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pytest
 import os.path
-from doctyper import spamfilter
+from doctyper import paperfilter
 import scraper
 
 curpath = os.path.abspath(os.path.dirname(__file__))
@@ -16,7 +16,7 @@ def test_gooddoc():
     doc.numwords = 10200
     doc.numpages = 22
     doc.meta_confidence = 92
-    assert spamfilter.evaluate(doc, debug=1) > 0.98
+    assert paperfilter.evaluate(doc, debug=1) > 0.98
 
 def test_gooddoc_badlink():
     doc = scraper.Doc(url='http://umsu.de/papers/variations.pdf')
@@ -27,7 +27,7 @@ def test_gooddoc_badlink():
     doc.numwords = 10200
     doc.numpages = 22
     doc.meta_confidence = 92
-    assert spamfilter.evaluate(doc, debug=1) < 0.6
+    assert paperfilter.evaluate(doc, debug=1) < 0.6
 
 def test_cv():
     doc = scraper.Doc(url='http://umsu.de/papers/cv.pdf')
@@ -38,7 +38,7 @@ def test_cv():
     doc.numwords = 10200
     doc.numpages = 22
     doc.meta_confidence = 92
-    assert spamfilter.evaluate(doc, debug=1) < 0.4
+    assert paperfilter.evaluate(doc, debug=1) < 0.4
     
 def readfile(path):
     with open(path, 'r', encoding='utf-8') as f:
