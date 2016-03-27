@@ -5,10 +5,10 @@ import re
 import lxml.etree
 import lxml.html
 import os.path
-from docparser import ocr2xml
+from debug import debuglevel
+from pdftools import ocr2xml
 
-
-ocr2xml.debug.debug_level = 4
+debuglevel(4)
 
 def test_tidy_hocr_line(caplog):
     html = ("<html><body><text>"
@@ -52,7 +52,7 @@ class PDFTest():
     def __init__(self, pdffile):
         """call ocr2xml and read output into etree document self.xml"""
         xmlfile = pdffile.replace('.pdf', '.ocr.xml')
-        ocr2xml.ocr2xml(pdffile, xmlfile, debug_level=2, keep_tempfiles=True)
+        ocr2xml.ocr2xml(pdffile, xmlfile, keep_tempfiles=True)
         with open(xmlfile, 'rb') as f:
             xml = f.read()
         self.xml = lxml.etree.fromstring(xml)

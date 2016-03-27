@@ -6,12 +6,12 @@ import os, sys, shutil
 import json
 
 import scraper
-import docparser.pdfparser as pdfparser
+import docparser.paperparser as paperparser
 
 def test_enrich_xml():
     curpath = os.path.abspath(os.path.dirname(__file__))
     testdir = os.path.join(curpath, 'testdocs')
-    xmlfile = os.path.join(testdir, 'test.pdf.xml')
+    xmlfile = os.path.join(testdir, 'simple.xml')
     xmlfile2 = xmlfile+'2'
     shutil.copyfile(xmlfile, xmlfile2)
     
@@ -22,7 +22,7 @@ def test_enrich_xml():
     doc.link.anchortext = 'Example'
     doc.link.context = 'Example context'
 
-    pdfparser.enrich_xml(xmlfile2, doc)
+    paperparser.enrich_xml(xmlfile2, doc)
     with open(xmlfile2, 'r') as f:
         xml = f.read()
         assert '<anchortext>Example</anchortext>' in xml
