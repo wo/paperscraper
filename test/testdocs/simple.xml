@@ -10,8 +10,7 @@
 <text top="247" left="314" width="288" height="23" font="0">Lorem ipsum dolor sit amet</text>
 <text top="296" left="396" width="126" height="16" font="1">John J. Johnson</text>
 <text top="331" left="404" width="109" height="16" font="1">April 12, 2010</text>
-<text top="393" left="201" width="12" height="19" font="2">1</text>
-<text top="393" left="237" width="133" height="19" font="2">Introduction</text>
+<text top="393" left="201" width="169" height="19" font="2">1 Introduction</text>
 <text top="430" left="201" width="516" height="13" font="3">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy</text>
 <text top="448" left="201" width="516" height="13" font="3">nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi</text>
 <text top="466" left="201" width="516" height="13" font="3">enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis</text>
@@ -28,5 +27,6 @@
 <text top="663" left="201" width="516" height="13" font="3">arum formas humanitatis per seacula quarta decima et quinta decima. Eodem</text>
 <text top="681" left="201" width="497" height="13" font="3">modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.</text>
 <text top="1044" left="455" width="7" height="13" font="3">1</text>
+
 </page>
 </pdf2xml>

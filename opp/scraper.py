@@ -268,28 +268,25 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
             return li.update_db(status=error.code['pdfinfo failed'])
         debug(2, 'pdf has %s pages', doc.numpages)
 
-        # convert to xml, first trying pdftohtml:
+        # convert to xml:
         doc.xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
-        if pdf2xml(doc.tempfile, doc.xmlfile, use_ocr=False):
-            # TODO: strip coverpages...
-            doc.content = util.strip_xml(readfile(doc.xmlfile))
-            doc.numwords = len(doc.content.split())
-            # TODO: check quality to see if ocr is needed?
+        if doc.numpages > 10:
+            # ocr only first 7 + last 3 pages if necessary:
+            ocr_ranges = [(1,7), (doc.numpages-2,doc.numpages)]
         else:
-            # use ocr:
-            if doc.numpages > 10:
-                # ocr only first 7 + last 3 pages:
-                pageranges = [(1,7), (doc.numpages-2,doc.numpages)]
-                shortened_pdf = doc.tempfile.rsplit('.')[0] + '-short.pdf'
-                try:
-                    pdfcut(doc.tempfile, shortened_pdf, pageranges)
-                except:
-                    return li.update_db(status=error.code['pdfcut failed'])
-                doc.tempfile = shortened_pdf
-            if not pdf2xml(doc.tempfile, doc.xmlfile, use_ocr=True):
-                return li.update_db(status=error.code['ocr failed'])
+            ocr_ranges = None
+        try:
+            engine = pdf2xml(doc.tempfile, doc.xmlfile, 
+                             keep_tempfiles=keep_tempfiles,
+                             ocr_ranges=ocr_ranges)
+        except Exception as e:
+            debug(1, "converting pdf to xml failed: %s", e)
+            return li.update_db(status=error.code['pdf conversion failed'])
+        doc.content = util.strip_xml(readfile(doc.xmlfile))
+        if engine == 'pdftohtml':
+            doc.numwords = len(doc.content.split())
+        else:
             doc.ocr = True
-            doc.content = util.strip_xml(readfile(doc.xmlfile))
             if doc.numpages > 10:
                 # extrapolate numwords from numpages and the number of words
                 # on the ocr'ed pages:
@@ -317,7 +314,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
             debug(1, "spam: paper score %s < 50", doc.is_paper)
             return 0
         
-        # estimate whether doc is on philsophy:
+        # estimate whether doc is on philosophy:
         import doctyper.philosophyfilter as philosophyfilter
         philprob = philosophyfilter.evaluate(doc)
         doc.is_philosophy = int(philprob * 100)        

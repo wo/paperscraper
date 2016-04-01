@@ -5,43 +5,43 @@ import os
 from os.path import abspath, dirname, join, exists
 import shutil
 import subprocess
-import logging
 from debug import debug, debuglevel
-from .ocr2xml import ocr2xml
-from .exceptions import *
+from pdftools.ocr2xml import ocr2xml
+from pdftools.doctidy import doctidy
+from pdftools.exceptions import *
 
 PDFTOHTML = '/usr/bin/pdftohtml'
 PERL = '/usr/bin/perl'
 
 PATH = abspath(dirname(__file__))
 
-logger = logging.getLogger('opp')
-
-def pdf2xml(pdffile, xmlfile, use_ocr=False, keep_tempfiles=False):
+def pdf2xml(pdffile, xmlfile, keep_tempfiles=False, ocr_ranges=None):
+    """
+    converts pdf to xml using pdftohtml or, if that fails, ocr2xml;
+    returns 'pdftohtml' or 'ocr2xml' depending on which process was
+    used. ocr_ranges (optional) is a list of pairs such as
+    [(1,3),(7,10)] which would specify that only pages 1-3 and 7-10
+    should get ocr'ed.
+            
+    TODO: check quality to see if ocr is needed?
+    """
     if not exists(pdffile):
         raise FileNotFoundError('{} not found'.format(pdffile))
-    if not use_ocr:
-        try:
-            pdftohtml(pdffile, xmlfile)
-        except NoTextInPDFException:
-            return None
-        except Exception as e:
-            logger.warning("pdftohtml failed: %s -- %s", pdffile, str(e))
-            return None
-    else:
-        try:
-            ocr2xml(pdffile, xmlfile, keep_tempfiles=keep_tempfiles)
-        except NoTextInPDFException:
-            return None
-        except MalformedPDFError:
-            logger.warning("MalformedPDFError: %s", pdffile)
-        except Ocr2xmlFailedException:
-            logger.warning("ocr2xml failed on %s", pdffile)
-        except Exception as e:
-            logger.warning("ocr2xml failed: %s -- %s", pdffile, str(e))
-            return None
-    doctidy(xmlfile)
-    return True
+    # first try pdftohtml
+    try:
+        pdftohtml(pdffile, xmlfile)
+        return 'pdftohtml'
+    except NoTextInPDFException:
+        debug(2, "no text in xml produced by pdftohtml")
+    except Exception as e:
+        debug(2, "pdftohtml failed: %s -- %s", pdffile, str(e))
+    # then try ocr2xml (not catching exceptions here)
+    if ocr_ranges:
+        shortened_pdf = pdffile.rsplit('.')[0] + '-short.pdf'
+        pdfcut(pdffile, shortened_pdf, ocr_ranges)
+        pdffile = shortened_pdf
+    ocr2xml(pdffile, xmlfile, keep_tempfiles=keep_tempfiles)
+    return 'ocr2xml'
 
 def pdftohtml(pdffile, xmlfile):
     cmd = [PDFTOHTML, 
@@ -64,20 +64,8 @@ def pdftohtml(pdffile, xmlfile):
         debug(4, "No text in pdf: %s", xml)
         raise NoTextInPDFException
     writefile(xmlfile, fix_pdftohtml(xml))
+    doctidy(xmlfile)
     
-def doctidy(xmlfile):
-    cmd = [PERL, join(PATH, 'Doctidy.pm'), xmlfile]
-    if debuglevel() > 4:
-        cmd.insert(2, '-v')
-    debug(2, ' '.join(cmd))
-    try:
-        stdout = subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=10)
-    except subprocess.CalledProcessError as e:
-        debug(1, e.output)
-        raise
-    if debuglevel() > 4:
-        debug(5, stdout.decode('utf-8'))
-
 def xml_ok(xml):
     if not xml:
         return False
@@ -106,14 +94,6 @@ def fix_pdftohtml(xml):
     # strip anchor tags inserted by pdftohtml for footnotes:
     xml = re.sub('<a[^>]+>(.+?)</a>', r'\1', xml)
     return xml;
-
-def fix_ocr(xml):
-    # fix some common OCR mistakes:
-    xml = re.sub('(?<=[a-z])0(?=[a-z])', 'o', xml) # 0 => o
-    xml = re.sub('(?<=[A-Z])0(?=[A-Z])', 'o', xml) # 0 => O
-    xml = re.sub('(?<=[a-z])1(?=[a-z])', 'i', xml) # 1 => i
-    xml = re.sub('. .u \&\#174\;', '', xml)        # the JSTOR logo
-    return xml
 
 def readfile(path):
     with open(path, 'r', encoding='utf-8') as f:

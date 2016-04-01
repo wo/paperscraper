@@ -57,8 +57,10 @@ def parse(doc, keep_tempfiles=False):
         debug(1, 'pdfcut failed, sticking with pdftohtml results: %s', e)
         # stick with pdftohtml results, so return value is True
         return True
-    if not pdf2xml(shortened_pdf, shortened_xml, use_ocr=True, keep_tempfiles=keep_tempfiles):
-        debug(1, 'ocr failed, sticking with pdftohtml results')
+    try:
+        ocr2xml(shortened_pdf, shortened_xml, keep_tempfiles=keep_tempfiles)
+    except Exception as e:
+        debug(1, 'ocr failed, sticking with pdftohtml results: %s', e)
         if not keep_tempfiles:
             os.remove(shortened_pdf)
         return True

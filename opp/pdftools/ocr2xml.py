@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import logging
 import re
 import os
 from os.path import join, basename
@@ -12,9 +11,14 @@ from statistics import median, stdev
 import lxml.html
 import lxml.etree
 from timeit import default_timer as timer
+# for command-line usage:
+curpath = os.path.abspath(os.path.dirname(__file__))
+libpath = os.path.join(curpath, os.path.pardir)
+sys.path.insert(0, libpath)
 from debug import debug, debuglevel
-from .exceptions import *
-from .pdfinfo import pdfinfo
+from pdftools.pdfinfo import pdfinfo
+from pdftools.doctidy import doctidy
+from pdftools.exceptions import *
 
 PDFSEPARATE = '/usr/bin/pdfseparate'
 PDFTOPPM = '/usr/bin/pdftoppm'
@@ -53,8 +57,13 @@ def ocr2xml(pdffile, xmlfile, keep_tempfiles=False, write_hocr=False):
 
     xmlstr = lxml.etree.tostring(xml, encoding='utf-8', pretty_print=True,
                                  xml_declaration=True)
-    with open(xmlfile, 'wb') as f:
-        f.write(hocr if write_hocr else xmlstr)
+    if write_hocr:
+        with open(xmlfile, 'wb') as f:
+            f.write(hocr)
+    else:
+        with open(xmlfile, 'wb') as f:
+            f.write(xmlstr)
+        doctidy(xmlfile)
 
     end_time = timer()
     if not keep_tempfiles:
@@ -116,7 +125,7 @@ def xml_add_page(xml, page_hocr):
     try:
         hocr_page = hocr.xpath('//div[@class="ocr_page"]')[0]
     except IndexError:
-        logger.debug("no ocr_page element in hocr output!")
+        debug(2, "no ocr_page element in hocr output!")
         return xml
     m = re_bbox.search(hocr_page.xpath('@title')[0])
     (page_width, page_height) = (m.group(3), m.group(4)) if m else (0,0)
@@ -173,6 +182,7 @@ def tidy_hocr_line(line):
     # The following operations are much easier on strings than on
     # etree xml trees.
     linestr = lxml.etree.tostring(line, encoding=str)
+    debug(5, "tidying hocr line %s", linestr)
     m = re.match('(<text.*?>)(.*)(</text>)', linestr, flags=re.DOTALL)
     if not m:
         return line
@@ -181,15 +191,28 @@ def tidy_hocr_line(line):
     content = content.replace('strong>', 'b>')
     content = content.replace('em>', 'i>')
     # merge consecutive:
+    debug(5, content)
     content = re.sub('</b>(.{0,4})<b>', r'\1', content)
+    debug(5, content)
     content = re.sub('</i>(.{0,4})<i>', r'\1', content)
+    debug(5, content)
     # if most of a line is bold, make whole line bold (important for
     # title extraction):
     bpart = ''.join(re.findall('<b>.+?</b>', content))
     if len(bpart) > len(content)*2/3:
         content = '<b>'+re.sub('</?b>', '', content)+'</b>'
     linestr = start + content + end
+    linestr = fix_ocr(linestr)
+    debug(5, "tidied hocr: %s", linestr)
     return lxml.etree.fromstring(linestr)
+
+def fix_ocr(string):
+    # fix some common OCR mistakes:
+    string = re.sub('(?<=[a-z])0(?=[a-z])', 'o', string) # 0 => o
+    string = re.sub('(?<=[A-Z])0(?=[A-Z])', 'o', string) # 0 => O
+    string = re.sub('(?<=[a-z])1(?=[a-z])', 'i', string) # 1 => i
+    string = re.sub('. .u \&\#174\;', '', string)        # the JSTOR logo
+    return string
 
 def scale(x):
     # A4 documents are 210 x 297 mm = 8.27 x 11.69 in = approx 595
@@ -298,13 +321,16 @@ def line_attribs(line):
     return ret
 
 if __name__ == "__main__":
+    
+    import logging
+    import argparse
 
+    logger = logging.getLogger('opp')
     logger.setLevel(logging.DEBUG)
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.DEBUG)
     logger.addHandler(ch)
 
-    import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument('infile', help='filename of pdf to ocr')
     ap.add_argument('outfile', help='filename for xml output')
@@ -313,8 +339,10 @@ if __name__ == "__main__":
     ap.add_argument('--hocr', action='store_true', help='write hocr output to outfile')
     args = ap.parse_args()
 
+    debuglevel(args.debug_level)
+
     ocr2xml(args.infile, args.outfile, 
-            debug_level=args.debug_level,
             keep_tempfiles=args.keep,
             write_hocr=args.hocr)
+
 
