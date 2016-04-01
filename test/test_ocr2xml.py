@@ -20,21 +20,21 @@ def tidy_hocr_line_string2string(linehtml):
     line = hocr.xpath('//text')[0]
     nline = ocr2xml.tidy_hocr_line(line)
     nlinehtml = lxml.etree.tostring(nline, encoding=str)
-    return nlinehtml
+    return nlinehtml[6:-7]
 
 def test_tidy_hocr_line1(caplog):
     line = ("<span class='ocrx_word' id='word_1_1' title='bbox 465 463 520 485; x_wconf 72' lang='eng' dir='ltr'><strong>Ene</strong></span> "
             "<span class='ocrx_word' id='word_1_2' title='bbox 532 463 645 485; x_wconf 74' lang='eng' dir='ltr'><strong><em>mene</em></strong></span> "
             "<span class='ocrx_word' id='word_1_3' title='bbox 662 469 691 484; x_wconf 75' lang='eng' dir='ltr'>mu</span>")
     tidied = tidy_hocr_line_string2string(line) 
-    assert tidied == '<text><b>Ene <i>mene</i> mu</b></text>'
+    assert tidied == '<b>Ene <i>mene</i> mu</b>'
 
 def test_tidy_hocr_line2(caplog):
     line = ("<span class='ocrx_word' id='word_1_1' title='bbox 465 463 520 485; x_wconf 72' lang='eng' dir='ltr'><strong>Ene</strong></span> "
             "<span class='ocrx_word' id='word_1_2' title='bbox 532 463 645 485; x_wconf 74' lang='eng' dir='ltr'><strong>mene <em>miste</em> es</strong> rappelt</span> "
             "<span class='ocrx_word' id='word_1_3' title='bbox 662 469 691 484; x_wconf 75' lang='eng' dir='ltr'>in der Kiste</span>")
     tidied = tidy_hocr_line_string2string(line) 
-    assert tidied == '<text><b>Ene mene <i>miste</i> es</b> rappelt in der Kiste</text>'
+    assert tidied == '<b>Ene mene <i>miste</i> es</b> rappelt in der Kiste'
 
 def test_tidy_hocr_line3(caplog):
     # just cheking that empty lines are handled gracefully
@@ -45,7 +45,7 @@ def test_tidy_hocr_line3(caplog):
 def test_tidy_hocr_line4():
     line = '<em>Ce</em> <em>travail</em> <em>reexamine</em> <em>la</em> <em>a</em> <em>méthode</em> <em>axiomatique</em> <strong><em>»</em></strong> <em>avant</em> <em>de</em> <em>montrer</em> <em>comment</em>'
     tidied = tidy_hocr_line_string2string(line) 
-    assert tidied == '<i>Ce travail reexamine la a méthode axiomatique <b>»</b> avant de montrer comment</i>'
+    assert tidied == '<i>Ce travail reexamine la a méthode axiomatique</i> <b><i>»</i></b> <i>avant de montrer comment</i>'
 
 
 

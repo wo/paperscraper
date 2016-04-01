@@ -190,12 +190,9 @@ def tidy_hocr_line(line):
     content = content.rstrip()
     content = content.replace('strong>', 'b>')
     content = content.replace('em>', 'i>')
-    # merge consecutive:
-    debug(5, content)
-    content = re.sub('</b>(.{0,4})<b>', r'\1', content)
-    debug(5, content)
-    content = re.sub('</i>(.{0,4})<i>', r'\1', content)
-    debug(5, content)
+    # merge consecutive (careful of </i><b><i>):
+    content = re.sub('</b>([^<]{0,4})<b>', r'\1', content)
+    content = re.sub('</i>([^<]{0,4})<i>', r'\1', content)
     # if most of a line is bold, make whole line bold (important for
     # title extraction):
     bpart = ''.join(re.findall('<b>.+?</b>', content))
