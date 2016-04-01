@@ -8,6 +8,7 @@ import subprocess
 from debug import debug, debuglevel
 from pdftools.ocr2xml import ocr2xml
 from pdftools.doctidy import doctidy
+from pdftools.pdftools import pdfcut
 from pdftools.exceptions import *
 
 PDFTOHTML = '/usr/bin/pdftohtml'
@@ -63,6 +64,8 @@ def pdftohtml(pdffile, xmlfile):
     if not xml_ok(xml):
         debug(4, "No text in pdf: %s", xml)
         raise NoTextInPDFException
+    else:
+        debug(3, "pdftohtml output ok")
     writefile(xmlfile, fix_pdftohtml(xml))
     doctidy(xmlfile)
     
@@ -72,7 +75,7 @@ def xml_ok(xml):
     text_pattern = re.compile('<text.+?>.*[a-z]{5}.*<')
     if not text_pattern.search(xml):
         return False
-    m = re.search('<page number="2".+?</page', xml)
+    m = re.search('<page number="2".+?</page', xml, re.DOTALL)
     if not m:
         # one-page document with text: OK
         return True
@@ -82,7 +85,7 @@ def xml_ok(xml):
     if text_pattern.search(m.group(0)):
         return True
     # no text on page 2, must be text on page 3:
-    m = re.search('<page number="3".+?</page', xml)
+    m = re.search('<page number="3".+?</page', xml, re.DOTALL)
     if not m:
         # two-page document with no text on page 2: not OK
         return False
