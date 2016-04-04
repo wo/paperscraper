@@ -7,6 +7,7 @@ import subprocess
 import json
 from pdftools.pdftools import pdfcut
 from pdftools.pdf2xml import pdf2xml
+from pdftools.ocr2xml import ocr2xml
 from debug import debug, debuglevel
 
 PERL = '/usr/bin/perl'

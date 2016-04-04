@@ -927,7 +927,7 @@ def context_suggests_published(context):
     """
     
     # uncomment to test paper processing:
-    #return False
+    return False
 
     if re.search('forthcoming|unpublished', context, re.I):
         debug(4, 'forthcoming/unpublished in context suggests not yet published')
