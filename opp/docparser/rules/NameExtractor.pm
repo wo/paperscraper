@@ -32,7 +32,7 @@ sub parse {
     # remove footnote stars *, crosses, etc.: 
     $str =~ s/[\*\x{2217}†‡§]/ /g;
     my %res; # name => probability
-    print "--parsing name $str\n" if $verbose;
+    print "--parsing name(s) $str\n" if $verbose;
     my @parts = split($re_name_separator, $str);
     my $skipped = 0;
     while (my ($i, $part) = each @parts) {

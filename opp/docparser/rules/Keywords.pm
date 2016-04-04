@@ -140,7 +140,7 @@ our $re_name_separator = qr/
     \s*(?:
         ,?\s?\band\b|&amp;|,|
         :|                            # author: title
-        \s[^\p{isAlpha}\d\.\s\@<>\/]| # weird symbol
+        \s[^\p{isAlpha}\d\s\@<>\/]|   # weird symbol
         \s\s        # hack: leftover space from supscript removal in plaintext() 
        )
     \s*
