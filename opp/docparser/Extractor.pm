@@ -317,7 +317,7 @@ sub strip_coverpages {
         );
 
     foreach my $page (@{$res->{COVERPAGE}}) {
-        say(4, "stripping cover page $page->{number}");
+        say(3, "stripping cover page $page->{number}");
         remove_page($page);
     }
 }
@@ -517,7 +517,7 @@ sub get_doctype {
 
 sub decr_confidence {
     my ($self, $percent, $reason) = @_;
-    say(4, "reducing confidence by $percent because $reason");
+    say(3, "reducing confidence by $percent because $reason");
     $self->{confidence} *= $percent;
 }
 
@@ -572,6 +572,7 @@ sub extract {
         $done{$task} = 1;
     }
     $self->adjust_confidence();
+    say(2, "adjusted confidence: ", $self->{confidence});
 }
 
 sub merge {

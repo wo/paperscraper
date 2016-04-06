@@ -8,12 +8,13 @@ clf = DocClassifier('data/philosophy.pk')
 clf.load()
 
 def evaluate(*docs):
-   debug(4, 'trying to guess if documents are about philosophy')
    probs = clf.classify(docs)
    if len(probs) > 1:
-       return probs
+      debug(4, 'probability that documents are about philosophy: %s', ','.join(probs))
+      return probs
    else:
-       return probs[0]
+      debug(4, 'probability that document is about philosophy: %s', probs[0])
+      return probs[0]
 
 def update():
     """

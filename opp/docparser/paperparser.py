@@ -84,7 +84,7 @@ def parse(doc, keep_tempfiles=False):
             # go with the ocr result and significantly lower
             # meta_confidence to flag the fact that either pdftohtml
             # or pdfocr produced false metadata.
-            debug(1, "pdftohtml and pdfocr results disagree")
+            debug(1, "pdftohtml and pdfocr results disagree, using ocr results")
             if not same_authors:
                 debug(1, "authors: '%s' vs '%s'", parse1['authors'], parse2['authors'])
                 doc.meta_confidence *= 0.8
@@ -94,6 +94,7 @@ def parse(doc, keep_tempfiles=False):
             if not same_abstract: 
                 debug(1, "abstract: '%s' vs '%s'", parse1['abstract'], parse2['abstract'])
                 doc.meta_confidence *= 0.9
+            debug(1, "confidence reduced to %s", doc.meta_confidence)
         enrich_doc(doc, parse2)
     else:
         # This should never happen
@@ -156,7 +157,6 @@ def enrich_doc(doc, extractor_res, preserve_fields=None):
         if k not in preserve_fields:
             setattr(doc, k, v)
     doc.meta_confidence = int(100*float(extractor_res['meta_confidence']))
-    debug(2, 'confidence %s', doc.meta_confidence)
 
 def strip_markup(string):
     '''strip <b>, <i>, <sub>, <sup> tags from extracted titles or abstractes'''
