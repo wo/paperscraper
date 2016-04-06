@@ -8,6 +8,7 @@ clf = DocClassifier('data/philosophy.pk')
 clf.load()
 
 def evaluate(*docs):
+   debug(4, 'trying to guess if documents are about philosophy')
    probs = clf.classify(docs)
    if len(probs) > 1:
        return probs

@@ -7,7 +7,7 @@ from scipy.stats import nbinom
 #libpath = os.path.join(curpath, os.path.pardir)
 #sys.path.insert(0, libpath)
 from subjectivebayes import BinaryNaiveBayes
-from debug import debug
+from debug import debug, debuglevel
 
 """
 classifier to evaluate whether a pdf/word document is a paper (or
@@ -114,8 +114,10 @@ def confidence(doc):
 classifier.likelihood('confidence', confidence, 
                       p_ifyes=nbinom(6, 0.1), p_ifno=nbinom(3, 0.1))
 
-def evaluate(doc, debug=False):
-    return classifier.test(doc, debug=debug, smooth=True)
+def evaluate(doc):
+    debug(4, 'trying to guess if document is a paper')
+    debugflag = debuglevel() > 3
+    return classifier.test(doc, debug=debugflag, smooth=True)
 
 if __name__ == '__main__':
     # graphical output for choosing distributions

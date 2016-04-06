@@ -10,6 +10,7 @@ from subjectivebayes import BinaryNaiveBayes
 from debug import debug, debuglevel
 
 def evaluate(doc):
+    debug(4, 'trying to guess document type')
     probs = {
         'book': bookfilter.test(doc, debug=debuglevel()>3, smooth=False),
         'chapter': chapterfilter.test(doc, debug=debuglevel()>3, smooth=True),

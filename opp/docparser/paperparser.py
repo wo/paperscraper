@@ -156,6 +156,7 @@ def enrich_doc(doc, extractor_res, preserve_fields=None):
         if k not in preserve_fields:
             setattr(doc, k, v)
     doc.meta_confidence = int(100*float(extractor_res['meta_confidence']))
+    debug(2, 'confidence %s', doc.meta_confidence)
 
 def strip_markup(string):
     '''strip <b>, <i>, <sub>, <sup> tags from extracted titles or abstractes'''

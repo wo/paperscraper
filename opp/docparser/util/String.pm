@@ -147,8 +147,10 @@ sub tidy_text {
     } while ($txt ne $otxt);
     # put closing tags before space ("<i>foo </i>" => "<i>foo</i> "):
     $txt =~ s| </([^>]+)>|</$1> |g;
-    # replace allcaps (note: string may contain e.g. '&amp;'):
-    if ($txt !~ /[[:lower:]]/ or $txt =~ /\b[[:upper:]]{3,}\s[[:upper:]]{3,}/) {
+    # replace allcaps (note: string may contain e.g. '&amp;' or <i>):
+    my $stxt = $txt;
+    $stxt =~ s/<\/?\w>|&.+?;//g;
+    if ($stxt !~ /[[:lower:]]/ or $stxt =~ /\b[[:upper:]]{3,}\s[[:upper:]]{3,}/) {
         $txt = capitalize_title($txt);
     }
     return $txt;
