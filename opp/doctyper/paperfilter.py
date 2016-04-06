@@ -63,7 +63,7 @@ classifier.likelihood('numwords', length,
                       p_ifyes=nbinom(3, 0.0002), p_ifno=nbinom(1, 0.0002))
 
 def contains_bib(doc):
-    pat = re.compile('(?:references|bibliography|\ws\s+cited)\s*\n', re.I)
+    pat = re.compile(r'(?:\breferences|bibliography|\ws\s+cited)(?:</\w>|\s)*\n', re.I)
     return pat.search(doc.content)
 classifier.likelihood('contains bibliography', contains_bib, p_ifyes=0.8, p_ifno=0.2)
 
