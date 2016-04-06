@@ -1057,6 +1057,7 @@ sub extract_abstract {
     $self->{abstract} = tidy_text($abstract);
 
     say(1, "abstract: '", $self->{abstract}, "'");
+    say(2, "confidence: ", $self->{confidence});
 }
 
 sub extract_bibliography {
