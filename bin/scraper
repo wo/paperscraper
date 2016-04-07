@@ -3,6 +3,7 @@ import sys
 import logging
 import argparse
 import findmodules
+import db
 import scraper
 
 logger = logging.getLogger('opp')
@@ -12,7 +13,7 @@ ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
 ap = argparse.ArgumentParser()
-ap.add_argument('url', help='url of source page to scrape')
+ap.add_argument('url', help='(part of) url of source page to scrape')
 ap.add_argument('-d', '--debug_level', default=1, type=int)
 ap.add_argument('-k', '--keep', action='store_true', help='keep temporary files')
 ap.add_argument('-l', '--link', type=str, help='only process this link')
@@ -20,10 +21,14 @@ args = ap.parse_args()
 
 scraper.debuglevel(args.debug_level)
 
-source = scraper.Source(url=args.url)
-source.load_from_db()
-if not source.source_id:
-   raise Exception(args.url+' not a known source')
+cur = db.dict_cursor()
+query = "SELECT * FROM sources WHERE url LIKE %s LIMIT 1"
+cur.execute(query, ('%'+args.url+'%',))
+sources = cur.fetchall()
+if not sources:
+   raise Exception(args.url+' not in sources table')
+source = scraper.Source(**sources[0])
+
 if args.link:
     browser = scraper.Browser(use_virtual_display=True)
     browser.goto(source.url)
