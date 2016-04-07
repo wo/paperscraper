@@ -153,6 +153,8 @@ def scrape(source, keep_tempfiles=False):
         for li in new_links.values():
             debug(1, '\nprocessing new link to %s', li.url)
             process_link(li)
+            # for testing: one link only
+            return 1
     else:
         debug(1, "no new links")
 
@@ -792,7 +794,7 @@ class Doc():
 
 def is_bad_url(url):
     re_bad_url = re.compile("""
-                \#|
+                ^\#|
                 ^mailto|
                 ^data|
                 ^javascript|
