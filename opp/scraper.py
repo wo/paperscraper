@@ -789,7 +789,7 @@ class Doc():
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             cur.execute(query, values)
             self.doc_id = cur.lastrowid
-        debug(3, cur._last_executed)
+        debug(4, cur._last_executed)
         db.commit()
 
 def is_bad_url(url):
