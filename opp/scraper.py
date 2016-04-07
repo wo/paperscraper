@@ -225,7 +225,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
     if r.filetype == 'html':
         r.encoding = 'utf-8'
         doc.page = Webpage(url, html=r.text)
-        debug(5, "\n====== %s ======\n%s\n======\n", url, r.text)
+        debug(6, "\n====== %s ======\n%s\n======\n", url, r.text)
 
         # check for steppingstone pages with link to a paper:
         target_url = check_steppingstone(doc.page)
@@ -426,7 +426,7 @@ class Source(Webpage):
         self.source_id = cur.lastrowid
     
     def set_html(self, html):
-        debug(5, "\n====== %s ======\n%s\n======\n", self.url, html)
+        debug(6, "\n====== %s ======\n%s\n======\n", self.url, html)
         self.html = html
     
     def old_link(self, url):
@@ -807,7 +807,7 @@ def is_bad_url(url):
     return re_bad_url.search(url) is not None
 
 def check_steppingstone(page):
-    debug(2, "checking: intermediate page leading to article?")
+    debug(3, "checking: intermediate page leading to article?")
 
     # steppingstone pages from known repositories:
     redir_patterns = [
@@ -836,15 +836,15 @@ def check_steppingstone(page):
             target = util.normalize_url(retr_target(m))
             if target == page.url:
                 return None
-            debug(2, "repository page for %s", target)
+            debug(3, "yes: repository page for %s", target)
             return target
     
     # other steppingstone pages must have link(s) to a single pdf file:
     targets = set(u for u in page.xpath('//a/@href') if re.search('.pdf$', u, re.I))
     if len(targets) != 1:
-        debug(4, "no: %s links to pdf files", len(targets))
+        debug(3, "no: %s links to pdf files", len(targets))
         return None
-    debug(4, "looks good: single link to pdf file %s", targets[0])
+    debug(3, "yes: single link to pdf file %s", targets[0])
     target = util.normalize_url(page.make_absolute(targets[0]))
     return target
     
