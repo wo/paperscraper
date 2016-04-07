@@ -154,7 +154,7 @@ def scrape(source, keep_tempfiles=False):
             debug(1, '\nprocessing new link to %s', li.url)
             process_link(li)
             # for testing: one link only
-            return 1
+            # return 1
     else:
         debug(1, "no new links")
 
