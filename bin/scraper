@@ -33,7 +33,10 @@ if args.link:
     browser = scraper.Browser(use_virtual_display=True)
     browser.goto(source.url)
     source.set_html(browser.page_source)
-    el = browser.find_element_by_xpath("//a[@href='{}']".format(args.link))
+    try:
+        el = browser.find_element_by_xpath("//a[contains(@href, '{}')]".format(args.link))
+    except Exception:
+        raise Exception('no link to '+args.link+' on '+source.url) 
     url = source.make_absolute(args.link)
     li = scraper.Link(url=url, source=source, element=el)
     li.load_from_db()
