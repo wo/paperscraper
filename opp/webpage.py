@@ -16,17 +16,28 @@ class Webpage():
         self._text = None
         self._base_href = None
         self._session_vars = None
-    
+   
+    def lxmldoc(self, cache=True):
+        """returns lxml representation of the page"""
+        if cache and self._lxmldoc:
+            return self._lxmldoc
+        # self.html is a python unicode string, not e.g. a utf-8
+        # bytestring; so if the html code contains an encoding
+        # declaration, that declaration will be a lie, which makes
+        # lxml's document_fromstring complain. So here's an ugly hack
+        # to strip the encoding declaration.
+        html_undeclared = self.html.replace('encoding=', 'gnidocne=')
+        self._lxmldoc = lxml.html.document_fromstring(html_undeclared)
+        return self._lxmldoc
+ 
     def xpath(self, xp):
-        if self._lxmldoc is None:
-            self._lxmldoc = lxml.html.document_fromstring(self.html)
-        return self._lxmldoc.xpath(xp)
+        return self.lxmldoc().xpath(xp)
 
     def text(self):
         """returns plain text content"""
         if self._text is None:
-            # need copy of _lxmldoc because Cleaner modifies it:
-            doc = lxml.html.document_fromstring(self.html)
+            # need new copy of lxmldoc because Cleaner modifies it:
+            doc = self.lxmldoc(cache=False)
             Cleaner(kill_tags=['noscript'], style=True)(doc)
             self._text = " ".join(lxml.etree.XPath("//text()")(doc))
         return self._text

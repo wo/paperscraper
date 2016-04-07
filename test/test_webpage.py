@@ -21,3 +21,9 @@ def test_mongin(caplog):
     testurl = 'https://studies2.hec.fr/jahia/webdav/site/hec/shared/sites/mongin/foo.pdf;jsessionid=123456'
     stripped = page.strip_session_variables(testurl)
     assert stripped == 'https://studies2.hec.fr/jahia/webdav/site/hec/shared/sites/mongin/foo.pdf;'
+
+def test_utf8(caplog):
+    pagename = 'philpapers-rec.html'
+    url = 'https://blah.org'
+    page = Webpage(url, html=source(pagename))
+    assert 'Analytic' in page.text()
