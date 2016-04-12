@@ -35,8 +35,8 @@ if args.link:
     source.set_html(browser.page_source)
     try:
         el = browser.find_element_by_xpath("//a[contains(@href, '{}')]".format(args.link))
-    except Exception:
-        raise Exception('no link to '+args.link+' on '+source.url) 
+    except Exception as e:
+        sys.exit('no link containing '+args.link+' on '+source.url)
     url = source.make_absolute(el.get_attribute('href'))
     li = scraper.Link(url=url, source=source, element=el)
     li.load_from_db()
