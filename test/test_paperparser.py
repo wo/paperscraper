@@ -4,13 +4,13 @@ import logging
 import os.path
 import os, sys, shutil
 import json
-
 import scraper
 import docparser.paperparser as paperparser
 
+curpath = os.path.abspath(os.path.dirname(__file__))
+testdir = os.path.join(curpath, 'testdocs')
+
 def test_enrich_xml():
-    curpath = os.path.abspath(os.path.dirname(__file__))
-    testdir = os.path.join(curpath, 'testdocs')
     xmlfile = os.path.join(testdir, 'simple.xml')
     xmlfile2 = xmlfile+'2'
     shutil.copyfile(xmlfile, xmlfile2)
@@ -31,3 +31,7 @@ def test_enrich_xml():
         assert 'example.org/test.pdf' in xml
         assert 'Hans Kamp' in xml
 
+def test_extractor():
+    xmlfile = os.path.join(testdir, 'simple.xml')
+    jsonres = paperparser.extractor(xmlfile)
+    assert jsonres and 'authors' in jsonres
