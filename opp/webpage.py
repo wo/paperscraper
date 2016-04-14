@@ -19,7 +19,7 @@ class Webpage():
    
     def lxmldoc(self, cache=True):
         """returns lxml representation of the page"""
-        if cache and self._lxmldoc:
+        if cache and self._lxmldoc is not None:
             return self._lxmldoc
         # self.html is a python unicode string, not e.g. a utf-8
         # bytestring; so if the html code contains an encoding
