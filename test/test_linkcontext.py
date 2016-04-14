@@ -4,6 +4,9 @@ import logging
 import os.path
 import sys
 import scraper
+from browser import Browser
+
+VDISPLAY = True
 
 @pytest.mark.parametrize("page,link,context", [
 
@@ -57,9 +60,12 @@ Download'''),
      'http://consc.net/papers/revisability.pdf',
      'Revisability and Conceptual Change in "Two Dogmas of Empiricism".  Journal of Philosophy 108:387-415, 2011.'),
 
-    ('mongin.html',
-     'https://studies2.hec.fr/jahia/webdav/site/hec/shared/sites/mongin/acces_anonyme/page%20internet/O12.MonginExpectedHbk97.pdf',
-     '(O12) "Expected Utility Theory " , Handbook of Economic Methodology, J. Davis, W. Hands and U. Mäk (eds), London, Elgar, 1997, p. 342-350.'),
+# The following test isn't very meaningful because the source page
+# contains insane <span>s that cut across entries.
+#
+#    ('mongin.html',
+#     'https://studies2.hec.fr/jahia/webdav/site/hec/shared/sites/mongin/acces_anonyme/page%20internet/O12.MonginExpectedHbk97.pdf',
+#     '(O12) "Expected Utility Theory " , Handbook of Economic Methodology, J. Davis, W. Hands and U. Mäk (eds), London, Elgar, 1997, p. 342-350.'),
     
 ])
 def test_linkcontext(page, link, context, caplog):
@@ -68,7 +74,7 @@ def test_linkcontext(page, link, context, caplog):
     scraper.debuglevel(5)
     curpath = os.path.abspath(os.path.dirname(__file__))
     testdir = os.path.join(curpath, 'sourcepages')
-    browser = scraper.Browser(reuse_browser=True)
+    browser = Browser(reuse_browser=True, use_virtual_display=VDISPLAY)
     src = 'file://'+testdir+'/'+page
     browser.goto(src)
     el = browser.find_elements_by_xpath('//a[@href="{}"]'.format(link))[0]
