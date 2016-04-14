@@ -19,6 +19,7 @@ from webpage import Webpage
 from pdftools.pdftools import pdfinfo, pdfcut
 from pdftools.pdf2xml import pdf2xml
 from config import config
+from exceptions import *
 
 logger = logging.getLogger('opp')
 
@@ -319,7 +320,10 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         
         # estimate whether doc is on philosophy:
         import doctyper.philosophyfilter as philosophyfilter
-        philprob = philosophyfilter.evaluate(doc)
+        try:
+            philprob = philosophyfilter.evaluate(doc)
+        except UntrainedClassifierException as e:
+            philprob = 0.9
         doc.is_philosophy = int(philprob * 100)        
         if doc.is_philosophy < 50:
             li.update_db(status=1)

@@ -10,3 +10,6 @@ class Ocr2xmlFailedException(Exception):
 
 class PdftohtmlFailedException(Exception):
     pass
+
+class UntrainedClassifierException(Exception):
+    pass

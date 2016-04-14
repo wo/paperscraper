@@ -16,9 +16,9 @@ curpath = os.path.abspath(os.path.dirname(__file__))
 libpath = os.path.join(curpath, os.path.pardir)
 sys.path.insert(0, libpath)
 from debug import debug, debuglevel
-from pdftools.pdfinfo import pdfinfo
+from pdftools.pdftools import pdfinfo
 from pdftools.doctidy import doctidy
-from pdftools.exceptions import *
+from exceptions import *
 
 PDFSEPARATE = '/usr/bin/pdfseparate'
 PDFTOPPM = '/usr/bin/pdftoppm'
