@@ -585,7 +585,7 @@ class Link():
             lsib_outerHTML = lsib.get_attribute('outerHTML')
             debug(5, "add left sibling?: %s", lsib_outerHTML)
             if re.search(r'\.(?:pdf|docx?)\b', lsib_outerHTML, flags=re.I):
-                debug(5, "no: contains paper link %s")
+                debug(5, "no: contains link to pdf or doc")
                 return ''
             lsib_height = int(lsib.get_attribute('offsetHeight'))
             lsib_text = lsib.get_attribute('textContent')
@@ -608,7 +608,7 @@ class Link():
             rsib_outerHTML = rsib.get_attribute('outerHTML')
             debug(5, "add right sibling?: %s", rsib_outerHTML)
             if re.search(r'\.(?:pdf|docx?)\b', rsib_outerHTML, flags=re.I):
-                debug(5, "no: contains paper link")
+                debug(5, "no: contains link to pdf or doc")
                 return ''
             if (len(context) > 20 
                 and not re.search(r'\d{4}|draft|forthcoming', rsib_outerHTML, flags=re.I)):
