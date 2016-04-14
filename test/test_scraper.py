@@ -116,7 +116,8 @@ def test_get_duplicate(testdb):
     (1, 'A Conception of Tarskian Logic. Pacific Philosophical Quarterly 70 (1989): 341-68.'),
     (0, 'Massimi, M. (forthcoming) "Grounds, modality and nomic necessity in the Critical Kant", in Massimi and Breitenbach (eds.) Kant and the Laws of Nature (Cambridge University Press). [PDF]'),
     (0, 'A lonelier contractualism'),
-    (0,  'Counterpart Semantics. Unpublished Manuscript, 2011')
+    (0,  'Counterpart Semantics. Unpublished Manuscript, 2011'),
+    (1,  ' Review of Tychomancy\nIn Philosophy of Science 82 (2015): 313--320. (On JSTOR.)')
     ])
 def test_context_suggests_published(context, published, caplog):
     res = scraper.context_suggests_published(context)

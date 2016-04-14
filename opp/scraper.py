@@ -946,7 +946,7 @@ def context_suggests_published(context):
         return False
 
     # See https://github.com/wo/opp-tools/issues/54
-    pubterms = [r'\beds?\b', r'edited', r'\d-\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
+    pubterms = [r'\beds?\b', r'edited', r'\d-+\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
     for t in pubterms:
         if re.search(t, context, re.I):
             debug(1, "ignoring paper published in %s ('%s' in context)", year, t)
