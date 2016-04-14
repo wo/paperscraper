@@ -7,6 +7,13 @@ import json
 import scraper
 import db
 
+"""
+To run these tests, create a test database called test_opp and
+give the standard mysql user access to it.
+"""
+
+VDISPLAY = True
+
 scraper.debuglevel(5)
 
 curpath = os.path.abspath(os.path.dirname(__file__))
@@ -119,7 +126,7 @@ def test_context_suggests_published(context, published, caplog):
 def test_process(testdb, caplog):
     source = scraper.Source(url='http://umsu.de/papers/')
     source.load_from_db()
-    browser = scraper.Browser(use_virtual_display=False)
+    browser = scraper.Browser(use_virtual_display=VDISPLAY)
     browser.goto(source.url)
     source.set_html(browser.page_source)
     link = 'options.pdf'

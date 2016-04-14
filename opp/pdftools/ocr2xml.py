@@ -16,9 +16,9 @@ curpath = os.path.abspath(os.path.dirname(__file__))
 libpath = os.path.join(curpath, os.path.pardir)
 sys.path.insert(0, libpath)
 from debug import debug, debuglevel
-from pdftools.pdfinfo import pdfinfo
+from pdftools.pdftools import pdfinfo
 from pdftools.doctidy import doctidy
-from pdftools.exceptions import *
+from exceptions import *
 
 PDFSEPARATE = '/usr/bin/pdfseparate'
 PDFTOPPM = '/usr/bin/pdftoppm'
@@ -87,12 +87,12 @@ def ocr_page(pdffile, pagenum):
     cmd = [PDFTOPPM, '-r', str(OCR_DPI), pagepdf]
     debug(3, '%s > %s', ' '.join(cmd), pageppm)
     with open(pageppm, 'wb') as f:
-        subprocess.check_call(cmd, stdout=f, timeout=2)
+        subprocess.check_call(cmd, stdout=f, timeout=5)
     
     debug(2, 'ocr-ing image') 
     cmd = [TESSERACT, pageppm, 'stdout', '-l', 'eng', 'hocr']
     debug(3, ' '.join(cmd))
-    output = subprocess.check_output(cmd, timeout=20)
+    output = subprocess.check_output(cmd, timeout=30)
     return output
 
 def init_xml():

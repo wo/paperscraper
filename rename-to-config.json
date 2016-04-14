@@ -5,7 +5,6 @@
         "user": "user",
         "pass": "pass"
     },
-    "tempdir": "/home/wo/programming/opp-tools/temp",
     "loglevel": 3,
-    "logfile": "/home/wo/programming/opp-tools/log/scraper.log"
+    "logfile": "/home/wo/opp-tools/log/scraper.log"
 }

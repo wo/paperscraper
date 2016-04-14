@@ -10,6 +10,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
 from debug import debug
+from exceptions import UntrainedClassifierException
 
 class DocClassifier:
     """
@@ -72,13 +73,13 @@ class DocClassifier:
 
     def classify(self, docs):
         """
-        takes list of Doc objects and returns list of probabilities
+        takes list of Doc objects and returns list of probabilities;
+        raises Exception if classifier isn't trained.
         """
         if self.classifier is None:
             self.load()
         if not self.ready:
-            debug(1, "classifier not ready, returning dummy value 0.5")
-            return [0.5 for docs in docs]
+            raise UntrainedClassifierException("classifier is not trained")
         texts = [self.doc2text(doc) for doc in docs]
         tfidfs = self.vectorizer.transform(texts)
         probs = self.classifier.predict_proba(tfidfs)

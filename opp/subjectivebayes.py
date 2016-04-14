@@ -12,11 +12,12 @@ class BinaryNaiveBayes:
 
     Exampe usage:
     
+    from scipy.stats import nbinom
     spamfilter = BinaryNaiveBayes(prior_yes=0.4)
     spamfilter.likelihood("contains 'viagra'", lambda s: 'viagra' in s,
                           p_ifyes=0.5, p_ifno=0.001)
     spamfilter.likelihood("length", lambda s: len(s),
-                          p_ifyes=N(100,30), p_ifno=N(200,50))
+                          p_ifyes=nbinom(1,0.1), p_ifno=nbinom(2,0.01))
     spamfilter.test('Buy viagra now')
 
     There are two ways of specifying likelihoods, depending on whether

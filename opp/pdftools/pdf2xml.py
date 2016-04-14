@@ -9,7 +9,7 @@ from debug import debug, debuglevel
 from pdftools.ocr2xml import ocr2xml
 from pdftools.doctidy import doctidy
 from pdftools.pdftools import pdfcut
-from pdftools.exceptions import *
+from exceptions import *
 
 PDFTOHTML = '/usr/bin/pdftohtml'
 PERL = '/usr/bin/perl'

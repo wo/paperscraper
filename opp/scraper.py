@@ -19,6 +19,7 @@ from webpage import Webpage
 from pdftools.pdftools import pdfinfo, pdfcut
 from pdftools.pdf2xml import pdf2xml
 from config import config
+from exceptions import *
 
 logger = logging.getLogger('opp')
 
@@ -319,7 +320,10 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         
         # estimate whether doc is on philosophy:
         import doctyper.philosophyfilter as philosophyfilter
-        philprob = philosophyfilter.evaluate(doc)
+        try:
+            philprob = philosophyfilter.evaluate(doc)
+        except UntrainedClassifierException as e:
+            philprob = 0.9
         doc.is_philosophy = int(philprob * 100)        
         if doc.is_philosophy < 50:
             li.update_db(status=1)
@@ -585,7 +589,7 @@ class Link():
             lsib_outerHTML = lsib.get_attribute('outerHTML')
             debug(5, "add left sibling?: %s", lsib_outerHTML)
             if re.search(r'\.(?:pdf|docx?)\b', lsib_outerHTML, flags=re.I):
-                debug(5, "no: contains paper link %s")
+                debug(5, "no: contains link to pdf or doc")
                 return ''
             lsib_height = int(lsib.get_attribute('offsetHeight'))
             lsib_text = lsib.get_attribute('textContent')
@@ -608,7 +612,7 @@ class Link():
             rsib_outerHTML = rsib.get_attribute('outerHTML')
             debug(5, "add right sibling?: %s", rsib_outerHTML)
             if re.search(r'\.(?:pdf|docx?)\b', rsib_outerHTML, flags=re.I):
-                debug(5, "no: contains paper link")
+                debug(5, "no: contains link to pdf or doc")
                 return ''
             if (len(context) > 20 
                 and not re.search(r'\d{4}|draft|forthcoming', rsib_outerHTML, flags=re.I)):
@@ -930,7 +934,7 @@ def context_suggests_published(context):
     """
     
     # uncomment to test paper processing:
-    return False
+    # return False
 
     if re.search('forthcoming|unpublished', context, re.I):
         debug(4, 'forthcoming/unpublished in context suggests not yet published')
@@ -942,7 +946,7 @@ def context_suggests_published(context):
         return False
 
     # See https://github.com/wo/opp-tools/issues/54
-    pubterms = [r'\beds?\b', r'edited', r'\d-\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
+    pubterms = [r'\beds?\b', r'edited', r'\d-+\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
     for t in pubterms:
         if re.search(t, context, re.I):
             debug(1, "ignoring paper published in %s ('%s' in context)", year, t)
