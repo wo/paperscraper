@@ -362,7 +362,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         # pages in news feed:
         if doc.source.status == 0:
             debug(2, "new source page: setting found_date to 1970")
-            doc.found_date = '1970-01-01 12:00:00'
+            doc.found_date = datetime(1970, 1, 1)
         
     doc.update_db()
     li.update_db(status=1, doc_id=doc.doc_id)
@@ -376,8 +376,8 @@ class Source(Webpage):
         'url': '',
         'sourcetype': 'personal', # (alt: repository, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'found_date': None,
-        'last_checked': None,
+        'found_date': None, # datetime
+        'last_checked': None, # datetime
         'default_author': '',
         'name': '' # e.g. "Australasian Journal of Logic"
     }
@@ -469,8 +469,8 @@ class Link():
         'url': '',
         'source_id': 0,
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'found_date': None,
-        'last_checked': None,
+        'found_date': None, # datetime
+        'last_checked': None, # datetime
         'etag': None,
         'filesize': None,
         'doc_id': None
@@ -672,7 +672,7 @@ class Link():
         for k,v in kwargs.items():
             setattr(self, k, v)
         cur = db.cursor()
-        self.last_checked = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_checked = datetime.now()
         fields = [f for f in self.db_fields.keys()
                   if f != 'link_id' and getattr(self, f) != None]
         values = [getattr(self, f) for f in fields]
@@ -683,7 +683,9 @@ class Link():
         else:
             query = "INSERT INTO links ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
-            cur.execute(query, values)
+            query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
+                ",".join(k+"=%s" for k in fields))
+            cur.execute(query, values * 2)
             self.link_id = cur.lastrowid
         debug(3, cur._last_executed)
         db.commit()

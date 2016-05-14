@@ -4,6 +4,7 @@ import logging
 import os.path
 import sys
 import json
+from datetime import datetime
 from opp import scraper
 from opp import db
 
@@ -32,7 +33,7 @@ def testdb():
         url='http://umsu.de/papers/',
         sourcetype='personal',
         status=0,
-        last_checked='2016-01-01 12:34').save_to_db()
+        last_checked=datetime.now()).save_to_db()
     scraper.Source(
         url='http://consc.net/papers.html',
         sourcetype='personal',
@@ -49,6 +50,8 @@ def test_debug(caplog):
 def test_Source(testdb):
     src = scraper.Source(url='http://umsu.de/papers/')
     src.load_from_db()
+    assert type(src.last_checked) is datetime
+    assert type(src.found_date) is datetime
     src.update_db(name="wo's weblog")
     src2 = scraper.Source(url='http://umsu.de/papers/')
     src2.load_from_db()
