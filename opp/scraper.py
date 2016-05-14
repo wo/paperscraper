@@ -282,7 +282,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         except Exception as e:
             debug(1, "converting pdf to xml failed: %s", e)
             return li.update_db(status=error.code['pdf conversion failed'])
-        doc.content = util.strip_xml(readfile(doc.xmlfile))
+        doc.content = util.text_content(doc.xmlfile)
         debug(5, "text content:\n%s", doc.content)
         if engine == 'pdftohtml':
             doc.numwords = len(doc.content.split())

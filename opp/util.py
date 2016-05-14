@@ -78,10 +78,19 @@ def strip_tags(text, keep_italics=False):
         text = re.sub(r'{(/?su[bp])}', r'<\1>', text)
     return text
 
-def strip_xml(text):
-    '''remove pdf2xml markup'''
-    res = ''
-    reg = re.compile('<text.+?>(.+?)</text', re.DOTALL)
-    for m in reg.finditer(text):
-        res += m.group(1) + '\n'
-    return res
+def text_content(xmlfile):
+    '''
+    return sanitized paper content from pdf2xml output: xml tags
+    stripped, words broken ataround line-ends joined.
+    '''
+    with open(xmlfile, 'r', encoding='utf-8') as f:
+        xml = f.read()
+        text = ''
+        textre = re.compile('<text.+?>(.+?)</text>', re.DOTALL)
+        for m in textre.finditer(xml):
+            text += m.group(1) + '\n'
+        # strip <sub>, <b>, etc.:
+        text = re.sub('</?\w.*?>', '', text)
+        # join hyphenated words:
+        text = re.sub('[-—]\n(\w\S+)\s', r'\1\n', text)
+        return text
