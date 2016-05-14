@@ -242,9 +242,6 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         # articles on medium or in plain HTML, we might return to the
         # old procedure of converting the page to pdf and treating it
         # like any candidate paper.
-        doc.content = doc.page.text()
-        doc.numwords = len(doc.content.split())
-        doc.numpages = 1
         import docparser.webpageparser as htmlparser
         if not htmlparser.parse(doc):
             debug(1, "page ignored")
@@ -275,7 +272,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         doc.xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
         if doc.numpages > 10:
             # ocr only first 7 + last 3 pages if necessary:
-            ocr_ranges = [(1,7), (doc.numpages-2,doc.numpages)]
+            ocr_ranges = [(1,3), (doc.numpages-2,doc.numpages)]
         else:
             ocr_ranges = None
         try:
@@ -309,28 +306,28 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
             li.update_db(status=error.code['parser error'])
             return 0
             
-        # estimate whether doc is not a handout, cv etc.:
-        import doctyper.paperfilter as paperfilter
-        paperprob = paperfilter.evaluate(doc)
-        doc.is_paper = int(paperprob * 100)
-        if doc.is_paper < 50:
-            li.update_db(status=1)
-            debug(1, "spam: paper score %s < 50", doc.is_paper)
-            return 0
+    # estimate whether doc is a handout, cv etc.:
+    import doctyper.paperfilter as paperfilter
+    paperprob = paperfilter.evaluate(doc)
+    doc.is_paper = int(paperprob * 100)
+    if doc.is_paper < 50:
+        li.update_db(status=1)
+        debug(1, "spam: paper score %s < 50", doc.is_paper)
+        return 0
         
-        # estimate whether doc is on philosophy:
-        import doctyper.philosophyfilter as philosophyfilter
-        try:
-            philprob = philosophyfilter.evaluate(doc)
-        except UntrainedClassifierException as e:
-            philprob = 0.9
-        doc.is_philosophy = int(philprob * 100)        
-        if doc.is_philosophy < 50:
-            li.update_db(status=1)
-            debug(1, "spam: philosophy score %s < 50", doc.is_philosophy)
-            return 0
+    # estimate whether doc is on philosophy:
+    import doctyper.philosophyfilter as philosophyfilter
+    try:
+        philprob = philosophyfilter.evaluate(doc)
+    except UntrainedClassifierException as e:
+        philprob = 0.9
+    doc.is_philosophy = int(philprob * 100)        
+    if doc.is_philosophy < 50:
+        li.update_db(status=1)
+        debug(1, "spam: philosophy score %s < 50", doc.is_philosophy)
+        return 0
 
-        # TODO: classify for main topics?
+    # TODO: classify for main topics?
             
     if li.doc_id:
         # check for revisions:
@@ -791,7 +788,9 @@ class Doc():
         else:
             query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
-            cur.execute(query, values)
+            query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
+                ",".join(k+"=%s" for k in fields))
+            cur.execute(query, values * 2)
             self.doc_id = cur.lastrowid
         debug(4, cur._last_executed)
         db.commit()
@@ -848,8 +847,9 @@ def check_steppingstone(page):
     if len(targets) != 1:
         debug(3, "no: %s links to pdf files", len(targets))
         return None
-    debug(3, "yes: single link to pdf file %s", targets[0])
-    target = util.normalize_url(page.make_absolute(targets[0]))
+    target = targets.pop()
+    debug(3, "yes: single link to pdf file %s", target)
+    target = util.normalize_url(page.make_absolute(target))
     return target
     
 def save_local(r):
@@ -905,8 +905,11 @@ def get_duplicate(doc):
     # different authors and abstracts (due to parser mistakes,
     # author name variants, etc.).
     debug(5, "checking for duplicates")
-    titlefrag = re.sub('(\w+)', r'\1', doc.title) # first title word
-    authorfrag = re.sub('(\w+)(?:,|$)', r'\1', doc.authors) # first author surname
+    try:
+        titlefrag = re.sub('(\w+)', r'\1', doc.title) # first title word
+        authorfrag = re.sub('(\w+)(?:,|$)', r'\1', doc.authors) # first author surname
+    except Exception:
+        return None
     cur = db.dict_cursor()
     query = ("SELECT * FROM docs WHERE doc_id != %s "
              "AND title LIKE %s and authors LIKE %s")

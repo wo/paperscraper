@@ -79,8 +79,8 @@ class BinaryNaiveBayes:
                 pos = p_ifyes if res else 1-p_ifyes
                 neg = p_ifno if res else 1-p_ifno
             else:
-                pos = p_ifyes.pmf(res)
-                neg = p_ifno.pmf(res)
+                pos = max(p_ifyes.pmf(res), 1.e-10)
+                neg = max(p_ifno.pmf(res), 1.e-10)
                 if smooth:
                     if pos > neg:
                         neg = max((neg+pos)/2, pos/10)

@@ -44,20 +44,20 @@ def parse(doc):
     copyright_html = re.sub('<a.+Copyright.+', '', copyright_html)
     copyright_html = re.sub('&lt;.+?&gt;', '', copyright_html)
     authors = [strip_tags(frag).strip() for frag in copyright_html.split('<br/>')]
-    doc.authors = [a for a in authors if a]
+    doc.authors = ', '.join([a for a in authors if a])
 
     # text content:
-    words = page.xpath("//div[@id='article-content']//text()")
-    if not words:
-        debug(2, "page is not a Stanford Encyclopedia entry")
-        return False
-    doc.content = ' '.join([w.strip() for w in words if w.strip()])
+    #textnodes = page.xpath("//div[@id='article-content']//text()")
+    #if not textnodes:
+    #    debug(2, "page is not a Stanford Encyclopedia entry")
+    #    return False
+    #doc.content = ' '.join([n.strip() for n in textnodes if n.strip()])
 
-    # numwords:
-    doc.numwords = len(words)
-
-    # doctype:
+    doc.content = page.text()
+    doc.numwords = len(doc.content.split())
+    doc.numpages = 1
     doc.doctype = 'article'
+    doc.meta_confidence = 0.9
 
     return True
 

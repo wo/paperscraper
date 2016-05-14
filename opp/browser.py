@@ -10,7 +10,7 @@ _display = None
 _browser = None
 
 # allow for singletons:
-def Browser(use_virtual_display=False, reuse_browser=False):
+def Browser(use_virtual_display=False, reuse_browser=True):
     global _display
     global _browser
     if use_virtual_display and not _display:
