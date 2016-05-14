@@ -84,18 +84,6 @@ CREATE TABLE docs2cats (
   KEY (cat_id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
-DROP TABLE IF EXISTS users2cats;
-CREATE TABLE users2cats (
-  user2cat_id INT(11) UNSIGNED NOT NULL auto_increment,
-  user_id INT(11) UNSIGNED NOT NULL,
-  cat_id INT(11) UNSIGNED NOT NULL,
-  strength TINYINT UNSIGNED DEFAULT NULL,
-  is_training TINYINT(1) UNSIGNED DEFAULT 0,
-  PRIMARY KEY (user2cat_id),
-  KEY (user_id),
-  KEY (cat_id)
-) ENGINE=InnoDB CHARACTER SET utf8;
-
 INSERT INTO cats (label) VALUES ('philosophy');
 
 INSERT INTO cats (label, is_default) VALUES ('Metaphysics', 1);
