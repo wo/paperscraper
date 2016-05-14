@@ -3,7 +3,7 @@ SET NAMES 'utf8';
 DROP TABLE IF EXISTS sources;
 CREATE TABLE sources (
   source_id INT(11) UNSIGNED NOT NULL auto_increment,
-  sourcetype VARCHAR(32) NOT NULL DEFAULT 'personal',
+  sourcetype VARCHAR(16) NOT NULL DEFAULT 'personal',
   url VARCHAR(512) NOT NULL,
   urlhash CHAR(32) NOT NULL,
   status SMALLINT(6) DEFAULT 0,
@@ -39,7 +39,7 @@ DROP TABLE IF EXISTS docs;
 CREATE TABLE docs (
   doc_id INT(11) UNSIGNED NOT NULL auto_increment,
   status SMALLINT(6) DEFAULT 1,
-  doctype VARCHAR(32) NOT NULL,
+  doctype VARCHAR(16) NOT NULL,
   url VARCHAR(512) NOT NULL,
   urlhash CHAR(32) NOT NULL,
   filetype VARCHAR(8) DEFAULT NULL,
@@ -74,12 +74,25 @@ CREATE TABLE cats (
 
 DROP TABLE IF EXISTS docs2cats;
 CREATE TABLE docs2cats (
+  doc2cat_id INT(11) UNSIGNED NOT NULL auto_increment,
   doc_id INT(11) UNSIGNED NOT NULL,
   cat_id INT(11) UNSIGNED NOT NULL,
-  strength FLOAT(4,3) UNSIGNED DEFAULT NULL,
+  strength TINYINT UNSIGNED DEFAULT NULL,
   is_training TINYINT(1) UNSIGNED DEFAULT 0,
-  PRIMARY KEY (doc_id, cat_id),
+  PRIMARY KEY (doc2cat_id),
   KEY (doc_id),
+  KEY (cat_id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+
+DROP TABLE IF EXISTS users2cats;
+CREATE TABLE users2cats (
+  user2cat_id INT(11) UNSIGNED NOT NULL auto_increment,
+  user_id INT(11) UNSIGNED NOT NULL,
+  cat_id INT(11) UNSIGNED NOT NULL,
+  strength TINYINT UNSIGNED DEFAULT NULL,
+  is_training TINYINT(1) UNSIGNED DEFAULT 0,
+  PRIMARY KEY (user2cat_id),
+  KEY (user_id),
   KEY (cat_id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
