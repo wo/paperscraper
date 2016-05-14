@@ -119,11 +119,8 @@ class Daemon():
                 pid = int(f.read().strip())
         except IOError as e:
             message = str(e) + "\nDaemon not running?\n"
-            if quiet:
-                return
-            else:
-                sys.stderr.write(message)
-                sys.exit(1)
+            sys.stderr.write(message)
+            sys.exit(1)
 
         # Try killing daemon process.
         try:
