@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import pytest
 import os.path
-from doctyper.classifier import DocClassifier
-import scraper
-from debug import debuglevel
+from opp.doctyper.classifier import DocClassifier
+from opp import scraper
+from opp.debug import debuglevel
 
 debuglevel(5)
 

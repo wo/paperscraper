@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import re
 import requests
-import error
+from . import error
 
 def normalize_url(url):
     """normalize ~ vs %7e etc."""

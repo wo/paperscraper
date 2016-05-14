@@ -4,8 +4,8 @@ import logging
 import os.path
 import sys
 import json
-import scraper
-import db
+from opp import scraper
+from opp import db
 
 """
 To run these tests, create a test database called test_opp and

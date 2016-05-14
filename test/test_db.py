@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import pytest
-import db
+from opp import db
 
 def test_connect():
     conn = db.connection()

@@ -9,8 +9,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
-from debug import debug
-from exceptions import UntrainedClassifierException
+from ..debug import debug
+from ..exceptions import UntrainedClassifierException
 
 class DocClassifier:
     """

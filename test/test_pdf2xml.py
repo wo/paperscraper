@@ -4,8 +4,8 @@ import logging
 import os.path
 import os, sys, shutil
 import json
-import pdftools.pdf2xml as pdf2xml
-from debug import debuglevel
+from opp.pdftools import pdf2xml
+from opp.debug import debuglevel
 
 debuglevel(4)
 

@@ -10,16 +10,16 @@ import os.path
 import subprocess
 import shutil
 import tempfile
-import db
-import error
-import util
-from debug import debug, debuglevel
-from browser import Browser
-from webpage import Webpage
-from pdftools.pdftools import pdfinfo, pdfcut
-from pdftools.pdf2xml import pdf2xml
-from config import config
-from exceptions import *
+from . import db
+from . import error
+from . import util
+from .debug import debug, debuglevel
+from .browser import Browser
+from .webpage import Webpage
+from .pdftools.pdftools import pdfinfo, pdfcut
+from .pdftools.pdf2xml import pdf2xml
+from .config import config
+from .exceptions import *
 
 logger = logging.getLogger('opp')
 
@@ -182,7 +182,7 @@ def scrape(source, keep_tempfiles=False):
     # new links to paper => mark as 404.
 
 
-def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
+def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
                  recurse=0):
     """
     Fetch url, check for http errors and steppingstones, filter spam,
@@ -242,7 +242,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         # articles on medium or in plain HTML, we might return to the
         # old procedure of converting the page to pdf and treating it
         # like any candidate paper.
-        import docparser.webpageparser as htmlparser
+        from .docparser import webpageparser as htmlparser
         if not htmlparser.parse(doc):
             debug(1, "page ignored")
             li.update_db(status=1)
@@ -296,18 +296,18 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
                 doc.numwords = len(doc.content.split())
 
         # guess doc type (paper, book, review, etc.):
-        import doctyper.doctyper as doctyper
+        from .doctyper import doctyper
         doc.doctype = doctyper.evaluate(doc)
 
         # extract metadata:
-        import docparser.paperparser as paperparser
+        from .docparser import paperparser
         if not paperparser.parse(doc, keep_tempfiles=keep_tempfiles):
             logger.warning("metadata extraction failed for %s", url)
             li.update_db(status=error.code['parser error'])
             return 0
             
     # estimate whether doc is a handout, cv etc.:
-    import doctyper.paperfilter as paperfilter
+    from .doctyper import paperfilter
     paperprob = paperfilter.evaluate(doc)
     doc.is_paper = int(paperprob * 100)
     if doc.is_paper < 50:
@@ -316,7 +316,7 @@ def process_link (li, force_reprocess=False, redir_url=None, keep_tempfiles=Fals
         return 0
         
     # estimate whether doc is on philosophy:
-    import doctyper.philosophyfilter as philosophyfilter
+    from .doctyper import philosophyfilter
     try:
         philprob = philosophyfilter.evaluate(doc)
     except UntrainedClassifierException as e:
@@ -979,7 +979,7 @@ def paper_is_old(doc):
 
 def scholarquery(author, title):
     """ TODO: check if we're locked out of google scholar."""
-    import scholar
+    from . import scholar
     time.sleep(1)
     scholar.ScholarConf.COOKIE_JAR_FILE = os.path.join(tempdir(), 'scholar.cookie')
     querier = scholar.ScholarQuerier()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import pytest
-from subjectivebayes import BinaryNaiveBayes
+from opp.subjectivebayes import BinaryNaiveBayes
 from scipy.stats import binom
 
 def test_basic():

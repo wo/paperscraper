@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pytest
 import os
-import util
+from opp import util
 
 def test_text_content():
     curpath = os.path.abspath(os.path.dirname(__file__))

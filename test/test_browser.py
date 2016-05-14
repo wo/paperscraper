@@ -4,7 +4,7 @@ import logging
 import os.path
 import sys
 import subprocess
-from browser import Browser
+from opp.browser import Browser
 
 VDISPLAY = True
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import pytest
 import os.path
-from doctyper import doctyper
-import scraper
-from debug import debuglevel
+from opp.doctyper import doctyper
+from opp import scraper
+from opp.debug import debuglevel
 
 debuglevel(3)
 

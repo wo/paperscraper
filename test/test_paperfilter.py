@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import pytest
 import os.path
-from doctyper import paperfilter
-import scraper
+from opp.doctyper import paperfilter
+from opp import scraper
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'testdocs')

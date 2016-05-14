@@ -4,8 +4,8 @@ import logging
 import os.path
 import os, sys, shutil
 import json
-import scraper
-import docparser.paperparser as paperparser
+from opp import scraper
+from opp.docparser import paperparser
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'testdocs')

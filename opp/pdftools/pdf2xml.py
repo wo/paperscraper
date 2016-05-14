@@ -5,11 +5,11 @@ import os
 from os.path import abspath, dirname, join, exists
 import shutil
 import subprocess
-from debug import debug, debuglevel
-from pdftools.ocr2xml import ocr2xml
-from pdftools.doctidy import doctidy
-from pdftools.pdftools import pdfcut
-from exceptions import *
+from ..debug import debug, debuglevel
+from .ocr2xml import ocr2xml
+from .doctidy import doctidy
+from .pdftools import pdfcut
+from ..exceptions import *
 
 PDFTOHTML = '/usr/bin/pdftohtml'
 PERL = '/usr/bin/perl'

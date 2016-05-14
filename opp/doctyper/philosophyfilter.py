@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-from doctyper.classifier import DocClassifier
-import db
-from scraper import Doc
-from debug import debug
+from .classifier import DocClassifier
+from .. import db
+from ..scraper import Doc
+from ..debug import debug
 
 clf = DocClassifier('data/philosophy.pk')
 clf.load()

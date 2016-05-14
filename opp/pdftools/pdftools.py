@@ -5,7 +5,7 @@ import os
 from os.path import abspath, dirname, join
 import subprocess
 from functools import lru_cache
-from debug import debug
+from ..debug import debug
 
 PDFINFO = '/usr/bin/pdfinfo'
 PDFSEPARATE = '/usr/bin/pdfseparate'

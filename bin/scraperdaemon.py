@@ -3,10 +3,10 @@ import sys
 import time
 import logging
 import findmodules
-from config import config
-import scraper
-from daemon import Daemon
-from debug import debug, debuglevel
+from opp.config import config
+from opp import scraper
+from opp.daemon import Daemon
+from opp.debug import debug, debuglevel
 
 logger = logging.getLogger('opp')
 logger.setLevel(logging.DEBUG if config['loglevel'] > 1 else logging.INFO)

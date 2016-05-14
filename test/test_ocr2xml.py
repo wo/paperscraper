@@ -5,8 +5,8 @@ import re
 import lxml.etree
 import lxml.html
 import os.path
-from debug import debuglevel
-from pdftools import ocr2xml
+from opp.debug import debuglevel
+from opp.pdftools import ocr2xml
 
 debuglevel(5)
 

@@ -3,8 +3,8 @@ import pytest
 import logging
 import os.path
 import sys
-import scraper
-from browser import Browser
+from opp import scraper
+from opp.browser import Browser
 
 VDISPLAY = True
 
