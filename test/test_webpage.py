@@ -3,6 +3,7 @@ import pytest
 import logging
 import os.path
 import sys
+import re
 from webpage import Webpage
 
 def source(pagename):
@@ -27,3 +28,10 @@ def test_utf8(caplog):
     url = 'https://blah.org'
     page = Webpage(url, html=source(pagename))
     assert 'Analytic' in page.text()
+
+def test_broken_html():
+    pagename = 'healey.html'
+    url = 'https://blah.org'
+    page = Webpage(url, html=source(pagename))
+    targets = set(u for u in page.xpath('//a/@href') if re.search('.pdf$', u, re.I))
+    assert targets
