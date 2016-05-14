@@ -563,7 +563,7 @@ class Link():
         if len(el._text) - len(self.element._text) < 5:
             par._outerHTML = par.get_attribute('outerHTML')
             el._outerHTML = el.get_attribute('outerHTML')
-            l,r = par._outerHTML.split(el._outerHTML, 2)
+            l,r = par._outerHTML.split(el._outerHTML, 1)
             if re.search(r'\w\s*$', l) or re.search(r'^\s*\w', r):
                 debug(5, 'argh: case (3)')
                 for pat in (r'<h\d.*?>', r'<br>\s*<br>', r'<br>'):

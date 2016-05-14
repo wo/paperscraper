@@ -60,6 +60,10 @@ Download'''),
      'http://consc.net/papers/revisability.pdf',
      'Revisability and Conceptual Change in "Two Dogmas of Empiricism".  Journal of Philosophy 108:387-415, 2011.'),
 
+    ('cath-broken.html',
+     'http://philrsss.anu.edu.au/people-defaults/yuricath/function.require',
+     'Warning: require() [function.require]: URL file-access is disabled in the server configuration in /var/www/philosophy/public_html/people-defaults/yuricath/index.php3 on line 1'),
+     
 # The following test isn't very meaningful because the source page
 # contains insane <span>s that cut across entries.
 #
