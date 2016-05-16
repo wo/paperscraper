@@ -133,7 +133,7 @@ sub init {
     say(3, "collecting text chunks");
 
     my %fontsizes;
-    my @pages = split /<page number=/, $xml;
+    my @pages = split /<page/, $xml;
     my @chunks;
     my $pageno = 0; # first element of @pages isn't a page
     my $charno = 1;
@@ -205,7 +205,6 @@ sub xml2chunk {
     $chunk->{right} = $chunk->{left} + $chunk->{width};
     $chunk->{bottom} = $chunk->{top} + $chunk->{height};
     $chunk->{plaintext} = plaintext($chunk->{text});
-    #say(2, "\n\nxxxxxxxxx\n".$str."\n\n=>\n".($chunk->{text}));
     return $chunk;
 }
 
