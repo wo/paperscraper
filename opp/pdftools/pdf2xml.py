@@ -3,7 +3,6 @@ import re
 import sys
 import os
 from os.path import abspath, dirname, join, exists
-import shutil
 import subprocess
 from ..debug import debug, debuglevel
 from .ocr2xml import ocr2xml
@@ -42,6 +41,11 @@ def pdf2xml(pdffile, xmlfile, keep_tempfiles=False, ocr_ranges=None):
         pdfcut(pdffile, shortened_pdf, ocr_ranges)
         pdffile = shortened_pdf
     ocr2xml(pdffile, xmlfile, keep_tempfiles=keep_tempfiles)
+    if not keep_tempfiles and ocr_ranges:
+        try:
+            os.remove(shortened_pdf)
+        except:
+            pass
     return 'ocr2xml'
 
 def pdftohtml(pdffile, xmlfile):

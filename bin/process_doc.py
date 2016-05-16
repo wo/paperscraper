@@ -38,4 +38,4 @@ doc.source = scraper.Source(url='foo', html=(args.sourcehtml or 'foo'))
 doc.tempfile = args.filename
 
 # process
-scraper.process_file(doc)
+scraper.process_file(doc, keep_tempfiles=args.keep)

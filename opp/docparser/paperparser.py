@@ -18,7 +18,7 @@ path = abspath(dirname(__file__))
 def parse(doc, keep_tempfiles=False):
     """
     tries to enrich Doc object by metadata (authors, title, abstract),
-    extracted from the associated xml file; may crate tempfiles for ocr
+    extracted from the associated xml file; may create tempfiles for ocr
     """
     xmlfile = doc.xmlfile
     # We have to pass all relevant information about the Doc object to
