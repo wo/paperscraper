@@ -205,6 +205,7 @@ sub xml2chunk {
     $chunk->{right} = $chunk->{left} + $chunk->{width};
     $chunk->{bottom} = $chunk->{top} + $chunk->{height};
     $chunk->{plaintext} = plaintext($chunk->{text});
+    #say(2, "\n\nxxxxxxxxx\n".$str."\n\n=>\n".($chunk->{text}));
     return $chunk;
 }
 

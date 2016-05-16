@@ -33,8 +33,9 @@ def tempdir():
     return tempdir.dirname
 
 def remove_tempdir():
-    shutil.rmtree(tempdir())
-    del tempdir.dirname
+    if hasattr(tempdir, 'dirname'):
+        shutil.rmtree(tempdir())
+        del tempdir.dirname
 
 def ocr2xml(pdffile, xmlfile, keep_tempfiles=False, write_hocr=False):
     """ocr pdffile and write pdftohtml-type parsing to xmlfile"""
@@ -161,7 +162,8 @@ def xml_add_page(xml, page_hocr):
             fontnumbers.append(fontsize)
         line.set('font', str(fontnumbers.index(fontsize)))
         line = tidy_hocr_line(line)
-        texts.append(line)
+        if line.text: # skip empty elements
+            texts.append(line)
     xml_page.text='\n   '
     for i,fs in enumerate(fontnumbers):
         fsp = lxml.etree.Element('fontspec', id=str(i), size=str(fs), family='Times', color='#000')
