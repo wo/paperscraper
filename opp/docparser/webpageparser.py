@@ -55,7 +55,7 @@ def parse(doc):
 
     doc.content = page.text()
     doc.numwords = len(doc.content.split())
-    doc.numpages = int(doc.numword/300) # rough guess, just for classifiers
+    doc.numpages = int(doc.numwords/300) # rough guess, just for classifiers
     doc.doctype = 'article'
     doc.meta_confidence = 90
 
