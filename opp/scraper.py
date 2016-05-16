@@ -257,7 +257,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
             process_file(doc, keep_tempfiles=keep_tempfiles)
         except Exception as e:
             debug(1, 'could not process %s: %s', doc.tempfile, e)
-            return li.update(status=error.code.get(str(e), 10))
+            return li.update_db(status=error.code.get(str(e), 10))
             
     # estimate whether doc is a handout, cv etc.:
     from .doctyper import paperfilter
