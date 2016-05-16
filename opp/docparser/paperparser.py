@@ -26,7 +26,7 @@ def parse(doc, keep_tempfiles=False):
     # file. (This is a hopefully temporary hack that makes the xml
     # invalid.)
     enrich_xml(xmlfile, doc)
-    OCR_IF_CONFIDENCE_BELOW = 0.6
+    OCR_IF_CONFIDENCE_BELOW = 0.1 # xxx
     parse1 = extractor(xmlfile)
     if parse1:
         # add the Perl output to the Doc object:
