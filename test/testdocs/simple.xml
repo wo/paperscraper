@@ -2,11 +2,6 @@
 <!DOCTYPE pdf2xml SYSTEM "pdf2xml.dtd">
 
 <pdf2xml producer="poppler" version="0.24.5">
-<url></url>
-<anchortext>foo</anchortext>
-<linkcontext>foo</linkcontext>
-<sourceauthor></sourceauthor>
-<sourcecontent>foo</sourcecontent>
 <page number="1" position="absolute" top="0" left="0" height="1262" width="892">
 	<fontspec id="0" size="23" family="Times" color="#000000"/>
 	<fontspec id="1" size="15" family="Times" color="#000000"/>

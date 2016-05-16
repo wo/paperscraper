@@ -143,7 +143,7 @@ def xml_add_page(xml, page_hocr):
         debug(5, 'hocr line:%s', lxml.etree.tostring(line, encoding='utf-8'))
         attribs = line_attribs(line)
         if not attribs['height']:
-            debug(2, "ignoring line without height!")
+            debug(2, "ignoring line without height")
             continue
         line.tag = 'text'
         line.attrib.clear()
@@ -162,7 +162,7 @@ def xml_add_page(xml, page_hocr):
             fontnumbers.append(fontsize)
         line.set('font', str(fontnumbers.index(fontsize)))
         line = tidy_hocr_line(line)
-        if line.text: # skip empty elements
+        if line is not None: # skip empty elements
             texts.append(line)
     xml_page.text='\n   '
     for i,fs in enumerate(fontnumbers):
@@ -185,9 +185,9 @@ def tidy_hocr_line(line):
     # etree xml trees.
     linestr = lxml.etree.tostring(line, encoding=str)
     debug(5, "tidying hocr line %s", linestr)
-    m = re.match('(<text.*?>)(.*)(</text>)', linestr, flags=re.DOTALL)
+    m = re.match('(<text.*?>)(.+)(</text>)', linestr, flags=re.DOTALL)
     if not m:
-        return line
+        return None
     (start, content, end) = m.groups()
     content = content.rstrip()
     content = content.replace('strong>', 'b>')
