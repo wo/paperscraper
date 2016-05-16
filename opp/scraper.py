@@ -106,11 +106,15 @@ def scrape(source, keep_tempfiles=False):
         # caused by pages having disappeared; the redirect can then
         # take us e.g. to CMU's general document archive; we don't
         # want that. So here we wait for manual approval of the new
-        # url.
+        # url, except if the new url is a trivial variant of the old
+        # one, e.g. 'https' instead of 'http'.
         if source.sourcetype == 'personal':
-            logger.warning('%s redirects to %s', source.url, browser.current_url)
-            source.update_db(status=301)
-            return 0
+            if trivial_url_variant(browser.current_url, source.url):
+                source.update_db(url=browser.current_url)
+            else:
+                logger.warning('%s redirects to %s', source.url, browser.current_url)
+                source.update_db(status=301)
+                return 0
         else:
             debug(2, '%s redirected to %s', source.url, browser.current_url)
 
@@ -416,7 +420,7 @@ class Source(Webpage):
         if self.source_id:
             cur = db.cursor()
             kwargs['last_checked'] = time.strftime('%Y-%m-%d %H:%M:%S') 
-            query = "UPDATE sources SET urlhash=MD5(url),{} WHERE source_id = %s".format(
+            query = "UPDATE sources SET {},urlhash=MD5(url) WHERE source_id = %s".format(
                 ",".join(k+"=%s" for k in kwargs.keys()))
             cur.execute(query, tuple(kwargs.values()) + (self.source_id,))
             debug(3, cur._last_executed)
@@ -940,7 +944,20 @@ def get_duplicate(doc):
         debug(4, "duplicate: %s, '%s'", dupe['authors'], dupe['title'])
         return Doc(**dupe)
     return None
-    
+
+def trivial_url_variant(url1, url2):
+    """
+    returns True if the two urls are almost identical so that we don't
+    have to manual approve a cource page redirect.
+    """
+    if url1.split(':',1)[1] == url2.split(':',1)[1]:
+        # https vs http
+        return True
+    if url1.replace('www.', '') == url2.replace('www.', ''):
+        # 'www.example.com' vs 'example.com'
+        return True
+    return False
+
 def context_suggests_published(context):
     """
     returns True if the link context makes it fairly certain that the
