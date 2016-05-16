@@ -33,6 +33,8 @@ def request_url(url, if_modified_since=None, etag=None):
         return 902, None
     except requests.exceptions.RequestException as e:
         return 900, None
+    except Exception:
+        return 900, None
 
 def request_filetype(r):
     def normalize(ft):

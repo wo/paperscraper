@@ -249,62 +249,15 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
             return 0
 
     else:
-        # save as pdf:
         try:
             doc.tempfile = save_local(r)
         except:
             return li.update_db(status=error.code['cannot save local file'])
-        if r.filetype != 'pdf':
-            try:
-                doc.tempfile = convert_to_pdf(doc.tempfile)
-            except:
-                debug(1, 'pdf conversion failed!')
-                return li.update_db(status=error.code['pdf conversion failed'])
         try:
-            pdfmeta = pdfinfo(doc.tempfile)
-            doc.numpages = int(pdfmeta['Pages'])
-        except:
-            debug(1, 'pdfinfo failed!')
-            return li.update_db(status=error.code['pdfinfo failed'])
-        debug(2, 'pdf has %s pages', doc.numpages)
-
-        # convert to xml:
-        doc.xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
-        if doc.numpages > 10:
-            # ocr only first 7 + last 3 pages if necessary:
-            ocr_ranges = [(1,3), (doc.numpages-2,doc.numpages)]
-        else:
-            ocr_ranges = None
-        try:
-            engine = pdf2xml(doc.tempfile, doc.xmlfile, 
-                             keep_tempfiles=keep_tempfiles,
-                             ocr_ranges=ocr_ranges)
+            process_file(doc, keep_tempfiles=keep_tempfiles)
         except Exception as e:
-            debug(1, "converting pdf to xml failed: %s", e)
-            return li.update_db(status=error.code['pdf conversion failed'])
-        doc.content = util.text_content(doc.xmlfile)
-        debug(5, "text content:\n%s", doc.content)
-        if engine == 'pdftohtml':
-            doc.numwords = len(doc.content.split())
-        else:
-            doc.ocr = True
-            if doc.numpages > 10:
-                # extrapolate numwords from numpages and the number of words
-                # on the ocr'ed pages:
-                doc.numwords = len(doc.content.split()) * doc.numpages/10
-            else:
-                doc.numwords = len(doc.content.split())
-
-        # guess doc type (paper, book, review, etc.):
-        from .doctyper import doctyper
-        doc.doctype = doctyper.evaluate(doc)
-
-        # extract metadata:
-        from .docparser import paperparser
-        if not paperparser.parse(doc, keep_tempfiles=keep_tempfiles):
-            logger.warning("metadata extraction failed for %s", url)
-            li.update_db(status=error.code['parser error'])
-            return 0
+            debug(1, 'could not process %s: %s', doc.tempfile, e)
+            return li.update(status=error.code.get(str(e), 10))
             
     # estimate whether doc is a handout, cv etc.:
     from .doctyper import paperfilter
@@ -367,6 +320,62 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     doc.update_db()
     li.update_db(status=1, doc_id=doc.doc_id)
 
+def process_file(doc, keep_tempfiles=False):
+    """converts document to pdf, then xml, then extracts metadata"""
+    
+    if doc.filetype != 'pdf':
+        # convert to pdf
+        try:
+            doc.tempfile = convert_to_pdf(doc.tempfile)
+        except:
+            raise Exception("pdf conversion failed")
+
+    # get pdf info:
+    try:
+        pdfmeta = pdfinfo(doc.tempfile)
+        doc.numpages = int(pdfmeta['Pages'])
+    except:
+        raise Exception('pdfinfo failed')
+    debug(2, 'pdf has %s pages', doc.numpages)
+
+    # convert to xml:
+    doc.xmlfile = doc.tempfile.rsplit('.')[0] + '.xml'
+    if doc.numpages > 10:
+        # ocr only first 7 + last 3 pages if necessary:
+        ocr_ranges = [(1,3), (doc.numpages-2,doc.numpages)]
+    else:
+        ocr_ranges = None
+    try:
+        engine = pdf2xml(doc.tempfile, doc.xmlfile, 
+                         keep_tempfiles=keep_tempfiles,
+                         ocr_ranges=ocr_ranges)
+    except Exception as e:
+        debug(1, "converting pdf to xml failed: %s", e)
+        raise Exception('pdf conversion failed')
+
+    # read some basic metadata from xml file: 
+    doc.content = util.text_content(doc.xmlfile)
+    debug(5, "text content:\n%s", doc.content)
+    if engine == 'pdftohtml':
+        doc.numwords = len(doc.content.split())
+    else:
+        doc.ocr = True
+        if doc.numpages > 10:
+            # extrapolate numwords from numpages and the number of words
+            # on the ocr'ed pages:
+            doc.numwords = len(doc.content.split()) * doc.numpages/10
+        else:
+            doc.numwords = len(doc.content.split())
+
+    # guess doc type (paper, book, review, etc.):
+    from .doctyper import doctyper
+    doc.doctype = doctyper.evaluate(doc)
+
+    # extract metadata:
+    from .docparser import paperparser
+    if not paperparser.parse(doc, keep_tempfiles=keep_tempfiles):
+        raise Exception('parser error')
+        return 0
 
 class Source(Webpage):
     """ represents a source page with links to papers """
@@ -383,7 +392,7 @@ class Source(Webpage):
     }
 
     def __init__(self, **kwargs):
-        super().__init__(kwargs.get('url',''))
+        super().__init__(kwargs.get('url',''), html=kwargs.get('html',''))
         for k,v in self.db_fields.items():
             setattr(self, k, kwargs.get(k, v))
 

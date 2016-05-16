@@ -89,11 +89,11 @@ message = {
     501: 'Not Implemented',
     502: 'Bad Gateway',
     503: 'Service Unavailable',
-    504 : 'Gateway Timeout',
-    505 : 'HTTP Version Not Supported',
-    507 : 'Insufficient Storage',
+    504: 'Gateway Timeout',
+    505: 'HTTP Version Not Supported',
+    507: 'Insufficient Storage',
 
-    900 : 'connection failed',
+    900: 'connection failed',
     901: 'document is empty',
     902: 'too many redirects',
 

@@ -49,7 +49,7 @@ def parse(doc, keep_tempfiles=False):
     else:
         # may need to skip lengthy toc, table of figures, etc. before
         # reaching normal content to figure out default fontsize etc.: 
-        ocr_ranges = [(1,4),(20,24)]
+        ocr_ranges = [(1,4),(20,23)]
     shortened_pdf = doc.tempfile.rsplit('.')[0] + '-short.pdf'
     shortened_xml = doc.tempfile.rsplit('.')[0] + '-short.xml'
     try:

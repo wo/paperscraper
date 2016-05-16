@@ -111,7 +111,6 @@ def test_get_duplicate(testdb):
     dupe = scraper.get_duplicate(doc2)
     assert dupe.doc_id == doc.doc_id
 
-
 @pytest.mark.parametrize(('published','context'), [
     (1, 'Basic structure and the value of equality, Philosophy and public affairs, 31: 4, 2003'),
     (1, 'Massimi, M. (2014) "Prescribing laws to nature", Kant-Studien 105, 491-508. [PDF] [journal link]'),
@@ -126,7 +125,17 @@ def test_context_suggests_published(context, published, caplog):
     res = scraper.context_suggests_published(context)
     assert res == published
 
-def test_process(testdb, caplog):
+def test_process_file():
+    doc = scraper.Doc(filetype='pdf')
+    doc.link = scraper.Link(url='foo')
+    doc.link.context = 'Lorem ipsum dolor sit amet'
+    doc.link.anchortext = 'Lorem ipsum dolor sit amet'
+    doc.source = scraper.Source(url='foo', html='<b>Lorem ipsum dolor sit amet</b>')
+    doc.tempfile = os.path.join(testdir, 'simple.pdf')
+    scraper.process_file(doc)
+    assert doc.title == 'Lorem ipsum dolor sit amet'
+
+def test_process_link(testdb, caplog):
     source = scraper.Source(url='http://umsu.de/papers/')
     source.load_from_db()
     browser = scraper.Browser(use_virtual_display=VDISPLAY)
