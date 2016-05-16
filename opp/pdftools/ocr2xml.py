@@ -200,6 +200,9 @@ def tidy_hocr_line(line):
     bpart = ''.join(re.findall('<b>.+?</b>', content))
     if len(bpart) > len(content)*2/3:
         content = '<b>'+re.sub('</?b>', '', content)+'</b>'
+    elif bpart:
+        # strip all bold tags, because tesseract finds too many
+        content = re.sub('</?b>', '', content)
     linestr = start + content + end
     linestr = fix_ocr(linestr)
     debug(5, "tidied hocr: %s", linestr)
