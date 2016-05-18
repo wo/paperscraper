@@ -118,32 +118,15 @@ def scrape(source, keep_tempfiles=False):
         else:
             debug(2, '%s redirected to %s', source.url, browser.current_url)
 
-    # look for new links:
+    # extract links:
     source.set_html(browser.page_source)
-    new_links = {} # url => Link
-    old_links = {} # url => Link
-    for li in browser.find_elements_by_tag_name("a"):
-        if not li.is_displayed() or not li.get_attribute('href'):
-            continue
-        href = li.get_attribute('href')
-        if is_bad_url(href):
-            debug(3, 'ignoring link to %s (bad url)', href)
-            continue
-        href = util.normalize_url(source.make_absolute(href))
-        old_link = source.old_link(href)
-        if old_link:
-            debug(3, 'link to %s is old: %s', href, old_link.url)
-            old_links[href] = old_link
-            old_links[href].element = li
-        else:
-            debug(1, 'new link: "%s" %s', li.text, href)
-            new_links[href] = Link(url=href, source=source, element=li)
+    source.extract_links(browser)
     
     # Selenium doesn't tell us when a site yields a 404, 401, 500
     # etc. error. But we can usually tell from the fact that there are
     # few known links on the error page:
-    debug(1, 'status {}, old links: {}'.format(source.status, len(old_links.keys())))
-    if source.status > 0 and len(old_links.keys()) <= 1:
+    debug(1, 'status {}, old links: {}'.format(source.status, len(source.old_links)))
+    if source.status > 0 and len(source.old_links) <= 1:
         debug(1, 'suspiciously few old links, checking status code')
         status, r = util.request_url(source.url)
         if status != 200:
@@ -154,8 +137,8 @@ def scrape(source, keep_tempfiles=False):
     source.update_db(status=1)
     
     # process new links:
-    if new_links:
-        for li in new_links.values():
+    if source.new_links:
+        for li in source.new_links:
             debug(1, '\nprocessing new link to %s', li.url)
             process_link(li)
             # for testing: one link only
@@ -164,7 +147,7 @@ def scrape(source, keep_tempfiles=False):
         debug(1, "no new links")
 
     # re-process recently found old links that generated errors:
-    for li in old_links.values():
+    for li in source.old_links:
         if li.status > 9:
             tdelta = datetime.now() - li.found_date
             if tdelta.days < 5:
@@ -173,7 +156,7 @@ def scrape(source, keep_tempfiles=False):
     
     # re-check old links to papers for revisions:
     MAX_REVCHECK = 3
-    goodlinks = [li for li in old_links.values() if li.doc_id]
+    goodlinks = (li for li in source.old_links if li.doc_id)
     for li in sorted(goodlinks, key=lambda x:x.last_checked)[:MAX_REVCHECK]:
         debug(1, 're-checking old link to paper %s for revisions', li.url)
         process_link(li)
@@ -442,7 +425,47 @@ class Source(Webpage):
     def set_html(self, html):
         debug(6, "\n====== %s ======\n%s\n======\n", self.url, html)
         self.html = html
-    
+   
+    def extract_links(self, browser):
+        """
+        extracts links from source page; sets self.new_links and
+        self.old_links, both lists of Link objects.
+        """
+        new_links = {} # url => Link
+        old_links = {} # url => Link
+        
+        # lots of try/except because selenium easily crashes:
+        try:
+            els = browser.find_elements_by_tag_name("a")
+        except:
+            debug(1, "cannot retrieve links from page %s", self.url)
+            return [],[]
+        for el in els:
+            try:
+                if not el.is_displayed():
+                    continue
+                href = el.get_attribute('href')
+                anchortext = el.text
+                if not href:
+                    continue
+            except:
+                continue
+            if is_bad_url(href):
+                debug(3, 'ignoring link to %s (bad url)', href)
+                continue
+            href = util.normalize_url(self.make_absolute(href))
+            old_link = self.old_link(href)
+            if old_link:
+                debug(3, 'link to %s is old: %s', href, old_link.url)
+                old_links[href] = old_link
+                old_links[href].element = el
+            else:
+                debug(1, 'new link: "%s" %s', anchortext, href)
+                new_links[href] = Link(url=href, source=self, element=el)
+
+        self.new_links = new_links.values()
+        self.old_links = old_links.values()
+ 
     def old_link(self, url):
         """
         If a link to (a session variant of) url is already known on this
@@ -950,6 +973,9 @@ def trivial_url_variant(url1, url2):
     returns True if the two urls are almost identical so that we don't
     have to manual approve a cource page redirect.
     """
+    # ignore trailing slashes:
+    url1 = url1.rstrip('/')
+    url2 = url2.rstrip('/')
     if url1.split(':',1)[1] == url2.split(':',1)[1]:
         # https vs http
         return True
