@@ -118,14 +118,17 @@ def test_get_duplicate(testdb):
     (1, 'A Conception of Tarskian Logic. Pacific Philosophical Quarterly 70 (1989): 341-68.'),
     (0, 'Massimi, M. (forthcoming) "Grounds, modality and nomic necessity in the Critical Kant", in Massimi and Breitenbach (eds.) Kant and the Laws of Nature (Cambridge University Press). [PDF]'),
     (0, 'A lonelier contractualism'),
-    (0,  'Counterpart Semantics. Unpublished Manuscript, 2011'),
-    (1,  ' Review of Tychomancy\nIn Philosophy of Science 82 (2015): 313--320. (On JSTOR.)')
+    (0, 'Counterpart Semantics. Unpublished Manuscript, 2011'),
+    (1, ' Review of Tychomancy\nIn Philosophy of Science 82 (2015): 313--320. (On JSTOR.)'),
+    (1, 'Bertrand Russell,\nHerbrand\'s Theorem, and the assignment statement,\nArtificial Intelligence and Symbolic Computation, Springer Lecture Notes in Artificial Intelligence 1476, pp 14--28, 1998.'),
+    (1, 'The Language of Thought, for The Routledge Companion to Philosophy of Psychology, John Symons and Paco Calvo, editors, 2009.'),
+    (1, 'Science Fiction and Philosophy. Oxford: Wiley-Blackwell, 2009. 2nd Edition.'),
     ])
 def test_context_suggests_published(context, published, caplog):
     res = scraper.context_suggests_published(context)
     assert res == published
 
-def test_process_file():
+def xtest_process_file():
     doc = scraper.Doc(filetype='pdf')
     doc.link = scraper.Link(url='foo')
     doc.link.context = 'Lorem ipsum dolor sit amet'
@@ -135,7 +138,7 @@ def test_process_file():
     scraper.process_file(doc)
     assert doc.title == 'Lorem ipsum dolor sit amet'
 
-def test_process_link(testdb, caplog):
+def xtest_process_link(testdb, caplog):
     source = scraper.Source(url='http://umsu.de/papers/')
     source.load_from_db()
     browser = scraper.Browser(use_virtual_display=VDISPLAY)

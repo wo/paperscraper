@@ -431,6 +431,8 @@ class Source(Webpage):
         extracts links from source page; sets self.new_links and
         self.old_links, both lists of Link objects.
         """
+        self.new_links = []
+        self.old_links = []
         new_links = {} # url => Link
         old_links = {} # url => Link
         
@@ -996,17 +998,18 @@ def context_suggests_published(context):
     if re.search('forthcoming|unpublished', context, re.I):
         debug(4, 'forthcoming/unpublished in context suggests not yet published')
         return False
-    m = re.search(r'\b(\d{4})\b', context)
-    year = m and int(m.group(1))
-    if not year or year < 1950 or year >= datetime.today().year:
+    for m in re.finditer(r'\b\d{4}\b', context):
+        if 1950 < int(m.group(0)) <= datetime.today().year:
+            break
+    else:
         debug(4, 'no suitable year in context suggests not yet published')
         return False
 
     # See https://github.com/wo/opp-tools/issues/54
-    pubterms = [r'\beds?\b', r'edited', r'\d-+\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
+    pubterms = [r'\beds?\b', r'edit(?:ed|ors?)', r'\d-+\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
     for t in pubterms:
         if re.search(t, context, re.I):
-            debug(1, "ignoring paper published in %s ('%s' in context)", year, t)
+            debug(1, "ignoring published in %s ('%s' in context)", t)
             return True
     debug(4, 'no publication keywords, assuming not yet published')
     return False
