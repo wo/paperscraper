@@ -1009,7 +1009,7 @@ def context_suggests_published(context):
     pubterms = [r'\beds?\b', r'edit(?:ed|ors?)', r'\d-+\d\d', r'\d:\s*\d', 'journal', r'philosophical\b']
     for t in pubterms:
         if re.search(t, context, re.I):
-            debug(1, "ignoring published in %s ('%s' in context)", t)
+            debug(1, "ignoring published paper ('%s' in context)", t)
             return True
     debug(4, 'no publication keywords, assuming not yet published')
     return False
