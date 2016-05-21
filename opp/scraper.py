@@ -150,7 +150,7 @@ def scrape(source, keep_tempfiles=False):
     # process new links:
     if source.new_links:
         for li in source.new_links:
-            debug(1, '\nprocessing new link to %s', li.url)
+            debug(1, '\nprocessing new link to %s on %s', li.url, source.url)
             process_link(li)
             # for testing: one link only
             # return 1
@@ -162,14 +162,15 @@ def scrape(source, keep_tempfiles=False):
         if li.status > 9:
             tdelta = datetime.now() - li.found_date
             if tdelta.days < 5:
-                debug(1, 're-checking recent link %s with status %s', li.url, li.status)
+                debug(1, 're-checking recent link %s on %s with status %s', 
+                      li.url, source.url, li.status)
                 process_link(li, force_reprocess=True)
     
     # re-check old links to papers for revisions:
     MAX_REVCHECK = 3
     goodlinks = (li for li in source.old_links if li.doc_id)
     for li in sorted(goodlinks, key=lambda x:x.last_checked)[:MAX_REVCHECK]:
-        debug(1, 're-checking old link to paper %s for revisions', li.url)
+        debug(1, 're-checking old link to paper %s on %s for revisions', li.url, source.url)
         process_link(li)
 
     if not keep_tempfiles:
