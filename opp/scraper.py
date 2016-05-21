@@ -869,7 +869,7 @@ class Doc():
         cur = db.cursor()
         query = ("INSERT INTO docs2cats (cat_id, doc_id, strength) VALUES (%s,%s,%s)"
                  " ON DUPLICATE KEY UPDATE strength=%s")
-        cur.execute(query, cat_id, self.doc_id, strength, strength)
+        cur.execute(query, (cat_id, self.doc_id, strength, strength))
         debug(4, cur._last_executed)
         db.commit()
 
