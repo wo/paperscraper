@@ -11,6 +11,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
 from .. import db
 from ..debug import debug
+from ..scraper import Doc
 from ..exceptions import UntrainedClassifierException
 
 PICKLE_DIRECTORY = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'data')
@@ -143,15 +144,16 @@ def update_classifier(category):
     re-train classifier; training corpus is taken from the database.
     """
     debug(3, "re-training %s classifier", category)
-    cur = db.cursor()
+    clf = get_classifier(category)
+    cur = db.dict_cursor()
     query = "SELECT cat_id FROM cats WHERE label=%s LIMIT 1"
     cur.execute(query, (category,))
-    cat_id = cur.fetchall()[0]
+    cat_id = cur.fetchall()[0]['cat_id']
     query = ("SELECT D.*, M.strength"
              " FROM docs D, docs2cats M"
              " WHERE M.doc_id = D.doc_id AND M.cat_id = %s AND M.is_training = 1")
     cur.execute(query, (cat_id,))
-    debug(4, cur._last_executed)
+    debug(5, cur._last_executed)
     rows = cur.fetchall()
     if not rows:
         raise Exception('no training documents for classifier')
