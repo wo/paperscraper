@@ -41,6 +41,17 @@ def next_source():
         debug(1, "all pages recently checked")
         return None
 
+def categories():
+    """returns list of (cat_id,cat_label) pairs from db"""
+    try:
+        return categories.cats
+    except AttributeError:
+        cur = db.cursor()
+        query = ("SELECT cat_id, label FROM cats WHERE label != 'philosophy'")
+        cur.execute(query)
+        categories.cats = list(cur.fetchall())
+        return categories.cats
+
 def scrape(source, keep_tempfiles=False):
     """
     Look for new papers linked to on the source page (and check for
@@ -256,19 +267,17 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         return 0
         
     # estimate whether doc is on philosophy:
-    from .doctyper import philosophyfilter
+    from .doctyper import classifier
+    philosophyfilter = classifier.get_classifier('philosophy')
     try:
-        philprob = philosophyfilter.evaluate(doc)
+        doc.is_philosophy = int(philosophyfilter.classify(doc) * 100)
     except UntrainedClassifierException as e:
-        philprob = 0.9
-    doc.is_philosophy = int(philprob * 100)        
+        doc.is_philosophy = 90
     if doc.is_philosophy < 50:
         li.update_db(status=1)
         debug(1, "spam: philosophy score %s < 50", doc.is_philosophy)
         return 0
 
-    # TODO: classify for main topics?
-            
     if li.doc_id:
         # check for revisions:
         olddoc = Doc(doc_id=li.doc_id)
@@ -306,6 +315,18 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         
     doc.update_db()
     li.update_db(status=1, doc_id=doc.doc_id)
+    
+    # categorize:
+    for (cat_id, cat) in categories():
+        clf = classifier.get_classifier(cat)
+        try:
+            strength = int(clf.classify(doc) * 100)
+            debug(3, "%s score %s", cat, strength)
+        except UntrainedClassifierException as e:
+            continue 
+        doc.assign_category(cat_id, strength)
+
+    return 1
 
 def process_file(doc, keep_tempfiles=False):
     """converts document to pdf, then xml, then extracts metadata"""
@@ -834,6 +855,17 @@ class Doc():
             self.doc_id = cur.lastrowid
         debug(4, cur._last_executed)
         db.commit()
+        
+    def assign_category(self, cat_id, strength):
+        """inserts or updates a docs2cats entry in the db"""
+        if not self.doc_id:
+            raise Exception("cannot assign category: document has no id")
+        cur = db.cursor()
+        query = ("INSERT INTO docs2cats (cat_id, doc_id, strength) VALUES (%s,%s,%s)"
+                 " ON DUPLICATE KEY UPDATE strength=%s")
+        cur.execute(query, cat_id, self.doc_id, strength, strength)
+        debug(4, cur._last_executed)
+        db.commit()
 
 def is_bad_url(url):
     re_bad_url = re.compile("""
@@ -1013,6 +1045,15 @@ def context_suggests_published(context):
             return True
     debug(4, 'no publication keywords, assuming not yet published')
     return False
+
+def journal_names():
+    try:
+        return journal_names.res
+    except AttributeError:
+        cur = db.cursor()
+        cur.execute("SELECT name FROM journals")
+        journal_names.res = cur.fetchall()
+        return journal_names.res
 
 def paper_is_old(doc):
     """

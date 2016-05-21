@@ -122,13 +122,13 @@ def test_get_duplicate(testdb):
     (1, ' Review of Tychomancy\nIn Philosophy of Science 82 (2015): 313--320. (On JSTOR.)'),
     (1, 'Bertrand Russell,\nHerbrand\'s Theorem, and the assignment statement,\nArtificial Intelligence and Symbolic Computation, Springer Lecture Notes in Artificial Intelligence 1476, pp 14--28, 1998.'),
     (1, 'The Language of Thought, for The Routledge Companion to Philosophy of Psychology, John Symons and Paco Calvo, editors, 2009.'),
-    (1, 'Science Fiction and Philosophy. Oxford: Wiley-Blackwell, 2009. 2nd Edition.'),
+    (1, 'The Mind is not the Software of the Brain (Even if it is Computational)” - on ideas that motivate the ethics of futuristic brain enhancements, as well as computationalism in cognitve science.\n•The Metaphysics of Uploading, forthcoming in a special issue of the Journal of Consciousness Studies. (Symposium on a piece by David Chalmers, with his response.)  Reprinted in Uploaded Minds (with postscript), Russell Blackford (ed.) Wiley-Blackwell, 2014.'),
     ])
 def test_context_suggests_published(context, published, caplog):
     res = scraper.context_suggests_published(context)
     assert res == published
 
-def xtest_process_file():
+def test_process_file():
     doc = scraper.Doc(filetype='pdf')
     doc.link = scraper.Link(url='foo')
     doc.link.context = 'Lorem ipsum dolor sit amet'
@@ -138,7 +138,7 @@ def xtest_process_file():
     scraper.process_file(doc)
     assert doc.title == 'Lorem ipsum dolor sit amet'
 
-def xtest_process_link(testdb, caplog):
+def test_process_link(testdb, caplog):
     source = scraper.Source(url='http://umsu.de/papers/')
     source.load_from_db()
     browser = scraper.Browser(use_virtual_display=VDISPLAY)
@@ -155,10 +155,10 @@ def xtest_process_link(testdb, caplog):
     assert 'Options and Actions' in caplog.text()
     assert 'But even if we know' in caplog.text()
 
-#def test_scrape(testdb):
-#    src = scraper.Source(url='http://umsu.de/papers/')
-#    src.load_from_db()
-#    scraper.scrape(src)
+def test_scrape(testdb):
+    src = scraper.Source(url='http://umsu.de/papers/')
+    src.load_from_db()
+    scraper.scrape(src)
 
 
 def readfile(path):

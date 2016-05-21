@@ -1,4 +1,4 @@
-from os.path import isfile, abspath, dirname, join
+import os.path
 import logging
 import re
 import pickle
@@ -9,8 +9,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
+from .. import db
 from ..debug import debug
 from ..exceptions import UntrainedClassifierException
+
+PICKLE_DIRECTORY = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'data')
 
 class DocClassifier:
     """
@@ -19,10 +22,11 @@ class DocClassifier:
     
     mc = DocClassifier('/tmp/metaphysics.pk')
     mc.load()
+    mc.classify(doc4,doc5,doc6)
+    ...
     mc.train([doc1,doc2,doc3], [True, True, False])
     mc.save()
     ...
-    mc.classify([doc4,doc5,doc6])
     """
     
     def __init__(self, picklefile):
@@ -33,7 +37,7 @@ class DocClassifier:
         self.ready = False
 
     def load(self):
-        if isfile(self.picklefile):
+        if os.path.isfile(self.picklefile):
             debug(4, "loading classifier model from disk")
             with open(self.picklefile, 'rb') as f:
                 (vect,clf) = pickle.load(f)
@@ -71,9 +75,10 @@ class DocClassifier:
         debug(5, 'classes: %s', self.classifier.classes_)
         self.ready = True
 
-    def classify(self, docs):
+    def classify(self, *docs):
         """
-        takes list of Doc objects and returns list of probabilities;
+        takes one or more Doc objects and returns list of probabilities
+        (or single probablity if only one Doc object was given);
         raises Exception if classifier isn't trained.
         """
         if self.classifier is None:
@@ -84,7 +89,7 @@ class DocClassifier:
         tfidfs = self.vectorizer.transform(texts)
         probs = self.classifier.predict_proba(tfidfs)
         yes_index = 0 if self.classifier.classes_[0] else 1
-        return [p[yes_index] for p in probs]
+        return [p[yes_index] for p in probs] if len(probs) > 1 else probs[0][yes_index]
 
     @staticmethod
     def doc2text(doc):
@@ -119,4 +124,39 @@ class DocClassifier:
 
         debug(5, "doc text for classification:\n%s\n", text)
         return text
+
+def get_classifier(category):
+    """
+    returns DocClassifier for <category>
+    """
+    try:
+        return get_classifier.classifiers[category]
+    except KeyError:
+        picklefile = os.path.join(PICKLE_DIRECTORY, category+'.pk')
+        get_classifier.classifiers[category] = DocClassifier(picklefile)
+        return get_classifier.classifiers[category]
+
+get_classifier.classifiers = {}
+
+def update_classifier(category):
+    """
+    re-train classifier; training corpus is taken from the database.
+    """
+    debug(3, "re-training %s classifier", category)
+    cur = db.cursor()
+    query = "SELECT cat_id FROM cats WHERE label=%s LIMIT 1"
+    cur.execute(query, (category,))
+    cat_id = cur.fetchall()[0]
+    query = ("SELECT D.*, M.strength"
+             " FROM docs D, docs2cats M"
+             " WHERE M.doc_id = D.doc_id AND M.cat_id = %s AND M.is_training = 1")
+    cur.execute(query, (cat_id,))
+    debug(4, cur._last_executed)
+    rows = cur.fetchall()
+    if not rows:
+        raise Exception('no training documents for classifier')
+    docs = [Doc(**row) for row in rows]
+    classes = [row['strength'] for row in rows]
+    clf.train(docs, classes)
+    clf.save()
 

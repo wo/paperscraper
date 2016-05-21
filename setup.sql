@@ -66,10 +66,8 @@ DROP TABLE IF EXISTS cats;
 CREATE TABLE cats (
   cat_id INT(11) UNSIGNED NOT NULL auto_increment,
   label VARCHAR(255) DEFAULT NULL,
-  is_default TINYINT(1) UNSIGNED DEFAULT 0,
   PRIMARY KEY (cat_id),
   UNIQUE KEY (label),
-  KEY (is_default)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
 DROP TABLE IF EXISTS docs2cats;
@@ -81,7 +79,8 @@ CREATE TABLE docs2cats (
   is_training TINYINT(1) UNSIGNED DEFAULT 0,
   PRIMARY KEY (doc2cat_id),
   KEY (doc_id),
-  KEY (cat_id)
+  KEY (cat_id),
+  UNIQUE KEY (cat_id, doc_id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 
 INSERT INTO cats (label) VALUES ('philosophy');
