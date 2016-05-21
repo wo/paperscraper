@@ -223,7 +223,12 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     
     if r.filetype == 'html':
         r.encoding = 'utf-8'
-        doc.page = Webpage(url, html=r.text)
+        try:
+            doc.page = Webpage(url, html=r.text)
+        except UnparsableHTMLException:
+            li.update_db(status=error.code['unsupported filetype'])
+            return debug(1, "unparsable html")
+
         debug(6, "\n====== %s ======\n%s\n======\n", url, r.text)
 
         # check for steppingstone pages with link to a paper:

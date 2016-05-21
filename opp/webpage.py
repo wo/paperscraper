@@ -6,6 +6,7 @@ import lxml.html
 import lxml.etree
 from lxml.html.clean import Cleaner
 from functools import lru_cache
+from .exceptions import UnparsableHTMLException
 
 class Webpage():
 
@@ -16,7 +17,12 @@ class Webpage():
         self._text = None
         self._base_href = None
         self._session_vars = None
-   
+        if html:
+            try:
+                self.lxmldoc()
+            except Exception:
+                raise UnparsableHTMLException
+
     def lxmldoc(self, cache=True):
         """returns lxml representation of the page"""
         if cache and self._lxmldoc is not None:

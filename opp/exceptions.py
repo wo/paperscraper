@@ -13,3 +13,6 @@ class PdftohtmlFailedException(Exception):
 
 class UntrainedClassifierException(Exception):
     pass
+
+class UnparsableHTMLException(Exception):
+    pass
