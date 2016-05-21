@@ -797,6 +797,8 @@ class Doc():
         'abstract': '',
         'numwords': 0,
         'numpages': 0,
+        'source_url': '',
+        'source_name': '',
         'source_id': 0,
         'meta_confidence': 0, # 0-100
         'is_paper': 0, # 0-100
@@ -815,6 +817,8 @@ class Doc():
             self.filesize = kwargs.get('filesize', self.link.filesize)
         self.source = kwargs.get('source', self.link.source if self.link else None)
         if self.source:
+            self.source_url = kwargs.get('source_url', self.source.url)
+            self.source_name = kwargs.get('source_name', self.source.name)
             self.source_id = kwargs.get('source_id', self.source.source_id)
         self.ocr = False
     
