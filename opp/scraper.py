@@ -235,7 +235,6 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         # check for steppingstone pages with link to a paper:
         target_url = check_steppingstone(doc.page)
         if target_url and recurse < 3:
-            if 
             debug(1, "steppingstone to %s", target_url)
             return process_link(li, redir_url=target_url, 
                                 force_reprocess=force_reprocess, recurse=recurse+1)
