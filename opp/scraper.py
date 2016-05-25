@@ -235,6 +235,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         # check for steppingstone pages with link to a paper:
         target_url = check_steppingstone(doc.page)
         if target_url and recurse < 3:
+            if 
             debug(1, "steppingstone to %s", target_url)
             return process_link(li, redir_url=target_url, 
                                 force_reprocess=force_reprocess, recurse=recurse+1)
@@ -750,7 +751,11 @@ class Link():
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
                 ",".join(k+"=%s" for k in fields))
-            cur.execute(query, values * 2)
+            try:
+                cur.execute(query, values * 2)
+            except:
+                debug(1, "oops, duplocate entry for source %s and url %s", self.source_id, self.url)
+                raise
             self.link_id = cur.lastrowid
         debug(3, cur._last_executed)
         db.commit()
@@ -890,6 +895,12 @@ def is_bad_url(url):
     return re_bad_url.search(url) is not None
 
 def check_steppingstone(page):
+    """
+    checks wether Webpage <page> is a cover page for a single paper,
+    as repositories, journals etc. often have; if yes, returns the url
+    of the actual paper.
+    """
+
     debug(3, "checking: intermediate page leading to article?")
 
     # steppingstone pages from known repositories:
