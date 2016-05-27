@@ -754,7 +754,7 @@ class Link():
                 cur.execute(query, values * 2)
             except:
                 debug(1, "oops, duplicate entry for source %s and url %s", self.source_id, self.url)
-                debug(1, "{}: {}".format(query, ','.join(values * 2)))
+                debug(1, "%s: %s", query, ','.join(map(str, values) * 2)))
                 raise
             self.link_id = cur.lastrowid
         debug(3, cur._last_executed)
