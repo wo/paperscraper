@@ -203,14 +203,15 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     li.context = li.html_context()
     debug(2, "link context: %s", li.context)
     if context_suggests_published(li.context):
-        li.update_db(status=1, doc_id=None)
-        return 0
+        return li.update_db(status=1, doc_id=None)
     
     # fetch url and handle errors, redirects, etc.:
     url = redir_url or li.url
     r = li.fetch(url=url, only_if_modified=not(force_reprocess))
-    if not r: 
-        return 0
+    if not r:
+        return li.update_db(status=error.code['connection failed'])
+    if not r.text:
+        return li.update_db(status=error.code['document is empty'])
         
     if r.url != url: # redirected
         url = util.normalize_url(r.url)
@@ -587,10 +588,13 @@ class Link():
         link to a paper? etc.
         """
 
-        if not self.element:
-            raise Exception("need link element to extract html_context")
-        self.anchortext = self.element.get_attribute('textContent').strip()
         debug(5, 'trying to find link context')
+        try:
+            self.anchortext = self.element.get_attribute('textContent').strip()
+        except Exception as e:
+            debug(1, "cannot retrieve link context: %s", str(e))
+            self.context = ''
+            return self.context
 
         # First climb up DOM until we reach an element (par) that's
         # too large:
@@ -754,7 +758,7 @@ class Link():
                 cur.execute(query, values * 2)
             except:
                 debug(1, "oops, duplicate entry for source %s and url %s", self.source_id, self.url)
-                debug(1, "%s: %s", query, ','.join(map(str, values) * 2)))
+                debug(1, "%s: %s", query, ','.join(list(map(str, values)) * 2))
                 raise
             self.link_id = cur.lastrowid
         debug(3, cur._last_executed)
