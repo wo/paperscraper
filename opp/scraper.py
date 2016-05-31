@@ -210,10 +210,10 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     r = li.fetch(url=url, only_if_modified=not(force_reprocess))
     if not r:
         li.update_db(status=error.code['connection failed'])
-        return debug('connection failed')
+        return debug(1, 'connection failed')
     if not r.text:
         li.update_db(status=error.code['document is empty'])
-        return debug('document is empty')
+        return debug(1, 'document is empty')
         
     if r.url != url: # redirected
         url = util.normalize_url(r.url)
