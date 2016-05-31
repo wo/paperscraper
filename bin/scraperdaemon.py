@@ -31,7 +31,7 @@ class ScraperDaemon(Daemon):
             source = scraper.next_source()
             if source:
                 scraper.scrape(source)
-                time.sleep(60)
+                time.sleep(10)
             else:
                 time.sleep(60)
 

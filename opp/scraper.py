@@ -400,8 +400,8 @@ class Source(Webpage):
         'url': '',
         'sourcetype': 'personal', # (alt: repository, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'found_date': None, # datetime
-        'last_checked': None, # datetime
+        'found_date': datetime.now()
+        'last_checked': datetime.now()
         'default_author': '',
         'name': '' # e.g. "Australasian Journal of Logic"
     }
@@ -535,8 +535,8 @@ class Link():
         'url': '',
         'source_id': 0,
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'found_date': None, # datetime
-        'last_checked': None, # datetime
+        'found_date': datetime.now(),
+        'last_checked': datetime.now(),
         'etag': None,
         'filesize': None,
         'doc_id': None
@@ -799,8 +799,8 @@ class Doc():
         'status': 1,
         'filetype': None,
         'filesize': 0,
-        'found_date': None,
-        'earlier_id': None,
+        'found_date': datetime.now(),
+        'earlier_id': datetime.now(),
         'authors': '',
         'title': '',
         'abstract': '',
