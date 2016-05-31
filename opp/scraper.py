@@ -209,9 +209,11 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     url = redir_url or li.url
     r = li.fetch(url=url, only_if_modified=not(force_reprocess))
     if not r:
-        return li.update_db(status=error.code['connection failed'])
+        li.update_db(status=error.code['connection failed'])
+        return debug('connection failed')
     if not r.text:
-        return li.update_db(status=error.code['document is empty'])
+        li.update_db(status=error.code['document is empty'])
+        return debug('document is empty')
         
     if r.url != url: # redirected
         url = util.normalize_url(r.url)
@@ -222,6 +224,10 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         return debug(1, "unsupported filetype: %s", r.filetype)
 
     doc = Doc(url=url, r=r, link=li, source=li.source)
+
+    if doc.load_from_db():
+        li.update_db(status=1, doc_id=doc.doc_id)
+        return debug(1, "%s is already in docs table", url)
     
     if r.filetype == 'html':
         r.encoding = 'utf-8'
@@ -441,7 +447,7 @@ class Source(Webpage):
         """write object to db"""
         cur = db.cursor()
         fields = [f for f in self.db_fields.keys()
-                  if f != 'link_id' and getattr(self, f) != None]
+                  if f != 'link_id' and getattr(self, f) is not None]
         values = [getattr(self, f) for f in fields]
         query = "INSERT INTO sources ({}, urlhash) VALUES ({}, MD5(url))".format(
             ",".join(fields), ",".join(("%s",)*len(fields)))
@@ -743,7 +749,7 @@ class Link():
         cur = db.cursor()
         self.last_checked = datetime.now()
         fields = [f for f in self.db_fields.keys()
-                  if f != 'link_id' and getattr(self, f) != None]
+                  if f != 'link_id' and getattr(self, f) is not None]
         values = [getattr(self, f) for f in fields]
         if self.link_id:
             query = "UPDATE links SET {},urlhash=MD5(url) WHERE link_id = %s".format(
@@ -752,16 +758,16 @@ class Link():
         else:
             query = "INSERT INTO links ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
-            query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
-                ",".join(k+"=%s" for k in fields))
+            #query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
+            #    ",".join(k+"=%s" for k in fields))
             try:
-                cur.execute(query, values * 2)
+                cur.execute(query, values)
             except:
-                debug(1, "oops, duplicate entry for source %s and url %s", self.source_id, self.url)
-                debug(1, "%s: %s", query, ','.join(list(map(str, values)) * 2))
+            #    debug(1, "oops, duplicate entry for source %s and url %s", self.source_id, self.url)
+            #    debug(1, "%s: %s", query, ','.join(list(map(str, values)) * 2))
                 raise
             self.link_id = cur.lastrowid
-        debug(3, cur._last_executed)
+        debug(4, cur._last_executed)
         db.commit()
 
     def fetch(self, url=None, only_if_modified=True):
@@ -831,7 +837,7 @@ class Doc():
             self.source_id = kwargs.get('source_id', self.source.source_id)
         self.ocr = False
     
-    def load_from_db(self, doc_id=0, url=''):
+    def load_from_db(self, doc_id=None, url=None):
         doc_id = doc_id or self.doc_id
         url = url or self.url
         cur = db.dict_cursor()
@@ -848,8 +854,10 @@ class Doc():
         if docs:
             for k,v in docs[0].items():
                 setattr(self, k, v)
+            return True
         else:
             debug(4, "no doc with id %s in database", doc_id)
+            return False
 
     def update_db(self, **kwargs):
         """update self.**kwargs and write present state to db"""
@@ -857,7 +865,7 @@ class Doc():
             setattr(self, k, v)
         cur = db.cursor()
         fields = [f for f in self.db_fields.keys()
-                  if f != 'doc_id' and getattr(self, f) != None]
+                  if f != 'doc_id' and getattr(self, f) is not None]
         values = [getattr(self, f) for f in fields]
         if self.doc_id:
             query = "UPDATE docs SET {},urlhash=MD5(url) WHERE doc_id = %s".format(
@@ -866,9 +874,9 @@ class Doc():
         else:
             query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
-            query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
-                ",".join(k+"=%s" for k in fields))
-            cur.execute(query, values * 2)
+            #query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
+            #    ",".join(k+"=%s" for k in fields))
+            cur.execute(query, values)
             self.doc_id = cur.lastrowid
         debug(4, cur._last_executed)
         db.commit()
@@ -1028,7 +1036,7 @@ def get_duplicate(doc):
 def trivial_url_variant(url1, url2):
     """
     returns True if the two urls are almost identical so that we don't
-    have to manual approve a cource page redirect.
+    have to manual approve a source page redirect.
     """
     # ignore trailing slashes:
     url1 = url1.rstrip('/')
