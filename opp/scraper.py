@@ -208,12 +208,9 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     # fetch url and handle errors, redirects, etc.:
     url = redir_url or li.url
     r = li.fetch(url=url, only_if_modified=not(force_reprocess))
+    # note: li.fetch() updates the link entry in case of errors
     if not r:
-        li.update_db(status=error.code['connection failed'])
-        return debug(1, 'connection failed')
-    if not r.text:
-        li.update_db(status=error.code['document is empty'])
-        return debug(1, 'document is empty')
+        return 0
         
     if r.url != url: # redirected
         url = util.normalize_url(r.url)
@@ -790,6 +787,10 @@ class Link():
         if status != 200:
             self.update_db(status=status)
             debug(1, "error status %s", status)
+            return None
+        if not r.text:
+            self.update_db(status=error.code['document is empty'])
+            debug(1, 'document is empty')
             return None
         self.etag = r.headers.get('etag')
         self.filesize = r.headers.get('content-length')
