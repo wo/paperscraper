@@ -406,8 +406,8 @@ class Source(Webpage):
         'url': '',
         'sourcetype': 'personal', # (alt: repository, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'found_date': datetime.now()
-        'last_checked': datetime.now()
+        'found_date': datetime.now(),
+        'last_checked': datetime.now(),
         'default_author': '',
         'name': '' # e.g. "Australasian Journal of Logic"
     }
