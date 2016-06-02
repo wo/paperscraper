@@ -100,6 +100,7 @@ def scrape(source, keep_tempfiles=False):
     1970.
     """
 
+    debug(1, '*'*50)
     debug(1, "checking links on %s", source.url)
 
     # go to page:
@@ -136,7 +137,7 @@ def scrape(source, keep_tempfiles=False):
     # Selenium doesn't tell us when a site yields a 404, 401, 500
     # etc. error. But we can usually tell from the fact that there are
     # few known links on the error page:
-    debug(1, 'status {}, old links: {}'.format(source.status, len(source.old_links)))
+    debug(1, 'old status {}, old links: {}'.format(source.status, len(source.old_links)))
     if source.status > 0 and len(source.old_links) <= 1:
         debug(1, 'suspiciously few old links, checking status code')
         status, r = util.request_url(source.url)
@@ -150,7 +151,7 @@ def scrape(source, keep_tempfiles=False):
     # process new links:
     if source.new_links:
         for li in source.new_links:
-            debug(1, '\nprocessing new link to %s on %s', li.url, source.url)
+            debug(1, '*** processing new link to %s on %s ***', li.url, source.url)
             process_link(li)
             # for testing: one link only
             # return 1
@@ -403,8 +404,8 @@ class Source(Webpage):
         'url': '',
         'sourcetype': 'personal', # (alt: repository, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'found_date': datetime.now(),
-        'last_checked': datetime.now(),
+        'found_date': None,
+        'last_checked': None,
         'default_author': '',
         'name': '' # e.g. "Australasian Journal of Logic"
     }
@@ -413,6 +414,10 @@ class Source(Webpage):
         super().__init__(kwargs.get('url',''), html=kwargs.get('html',''))
         for k,v in self.db_fields.items():
             setattr(self, k, kwargs.get(k, v))
+        if not self.found_date:
+            self.found_date = datetime.now()
+        if not self.last_checked:
+            self.last_checked = datetime.now()
 
     def load_from_db(self, url=''):
         url = url or self.url
@@ -511,6 +516,7 @@ class Source(Webpage):
             cur.execute(query, (self.source_id,))
             debug(5, cur._last_executed)
             self._links = [ Link(source=self, **li) for li in cur.fetchall() ]
+            debug(2, 'xxx old links:\n%s', '\n'.join([li.url for li in self._links]))
 
         for li in self._links:
             if li.url == url:
@@ -538,8 +544,8 @@ class Link():
         'url': '',
         'source_id': 0,
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'found_date': datetime.now(),
-        'last_checked': datetime.now(),
+        'found_date': None,
+        'last_checked': None,
         'etag': None,
         'filesize': None,
         'doc_id': None
@@ -548,6 +554,10 @@ class Link():
     def __init__(self, **kwargs):
         for k,v in self.db_fields.items():
             setattr(self, k, kwargs.get(k, v))
+        if not self.found_date:
+            self.found_date = datetime.now()
+        if not self.last_checked:
+            self.last_checked = datetime.now()
         self.source = kwargs.get('source')
         self.element = kwargs.get('element') # the dom element from Browser
         if self.source:
@@ -755,13 +765,10 @@ class Link():
         else:
             query = "INSERT INTO links ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
-            #query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
-            #    ",".join(k+"=%s" for k in fields))
             try:
                 cur.execute(query, values)
             except:
-            #    debug(1, "oops, duplicate entry for source %s and url %s", self.source_id, self.url)
-            #    debug(1, "%s: %s", query, ','.join(list(map(str, values)) * 2))
+                debug(1, "oops, %s: %s", query, ','.join(map(str, values)))
                 raise
             self.link_id = cur.lastrowid
         debug(4, cur._last_executed)
@@ -781,7 +788,7 @@ class Link():
                 status == 200 and r.headers.get('content-length') == self.filesize):
                 self.update_db()
                 debug(1, "not modified")
-            return None
+                return None
         else:
             status,r = util.request_url(url)
         if status != 200:
@@ -875,8 +882,6 @@ class Doc():
         else:
             query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
-            #query += " ON DUPLICATE KEY UPDATE {},urlhash=MD5(url)".format(
-            #    ",".join(k+"=%s" for k in fields))
             cur.execute(query, values)
             self.doc_id = cur.lastrowid
         debug(4, cur._last_executed)
@@ -894,6 +899,9 @@ class Doc():
         db.commit()
 
 def is_bad_url(url):
+    if len(url) > 512:
+        debug(1, 'url %s is too long', url)
+        return True
     re_bad_url = re.compile("""
                 ^\#|
                 ^mailto|
