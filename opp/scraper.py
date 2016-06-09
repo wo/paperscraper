@@ -30,6 +30,7 @@ def next_source():
     cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE"
              " sourcetype != 'blog'" # ignore rss feeds
+             " AND status = 1" # xxx hack: don't turn 410s back into 301s. 
              " AND (last_checked IS NULL OR last_checked < %s)"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
@@ -272,7 +273,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     from .doctyper import paperfilter
     paperprob = paperfilter.evaluate(doc)
     doc.is_paper = int(paperprob * 100)
-    if doc.is_paper < 50:
+    if doc.is_paper < 25:
         li.update_db(status=1)
         debug(1, "spam: paper score %s < 50", doc.is_paper)
         return 0
@@ -284,11 +285,11 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         doc.is_philosophy = int(philosophyfilter.classify(doc) * 100)
     except UntrainedClassifierException as e:
         doc.is_philosophy = 90
-    if doc.is_philosophy < 50:
+    if doc.is_philosophy < 25:
         li.update_db(status=1)
         debug(1, "spam: philosophy score %s < 50", doc.is_philosophy)
         return 0
-
+        
     if li.doc_id:
         # check for revisions:
         olddoc = Doc(doc_id=li.doc_id)
@@ -317,6 +318,11 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
             li.update_db(status=1, doc_id=None)
             debug(1, "ignoring already published paper")
             return 0
+
+        # flag for manual approval if confidence low or dubious relevance:
+        if doc.is_paper < 60 or doc.is_philosophy < 60 or doc.meta_confidence < 60:
+            debug(1, "flagging for manual approval")
+            doc.hidden = True
 
         # don't show papers (incl HTML pages) from newly added source
         # pages in news feed:
@@ -416,8 +422,6 @@ class Source(Webpage):
             setattr(self, k, kwargs.get(k, v))
         if not self.found_date:
             self.found_date = datetime.now()
-        if not self.last_checked:
-            self.last_checked = datetime.now()
 
     def load_from_db(self, url=''):
         url = url or self.url
@@ -556,8 +560,6 @@ class Link():
             setattr(self, k, kwargs.get(k, v))
         if not self.found_date:
             self.found_date = datetime.now()
-        if not self.last_checked:
-            self.last_checked = datetime.now()
         self.source = kwargs.get('source')
         self.element = kwargs.get('element') # the dom element from Browser
         if self.source:
@@ -813,8 +815,8 @@ class Doc():
         'status': 1,
         'filetype': None,
         'filesize': 0,
-        'found_date': datetime.now(),
-        'earlier_id': datetime.now(),
+        'found_date': None,
+        'earlier_id': None,
         'authors': '',
         'title': '',
         'abstract': '',
@@ -826,12 +828,15 @@ class Doc():
         'meta_confidence': 0, # 0-100
         'is_paper': 0, # 0-100
         'is_philosophy': 0, # 0-100
+        'hidden': False,
         'content': ''
     }
 
     def __init__(self, **kwargs):
         for k,v in self.db_fields.items():
             setattr(self, k, kwargs.get(k, v))
+        if not self.found_date:
+            self.found_date = datetime.now()
         self.r = kwargs.get('r', None)
         if self.r:
             self.filetype = kwargs.get('filetype', self.r.filetype)
