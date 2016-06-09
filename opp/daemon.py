@@ -64,7 +64,10 @@ class Daemon():
         atexit.register(self.delpid)
 
     def delpid(self):
-        os.remove(self.pidfile)
+        try:
+            os.remove(self.pidfile)
+        except FileNotFoundError:
+            pass
 
     def start(self):
         """
