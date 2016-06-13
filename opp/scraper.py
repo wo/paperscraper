@@ -1021,27 +1021,27 @@ def get_duplicate(doc):
     # filesize and wordcount (manuscript vs published version),
     # different authors and abstracts (due to parser mistakes,
     # author name variants, etc.).
-    debug(2, "checking for duplicates")
+    debug(5, "checking for duplicates")
     try:
-        titlefrag = re.sub('(\w+)', r'\1', doc.title) # first title word
-        authorfrag = re.sub('(\w+)(?:,|$)', r'\1', doc.authors) # first author surname
+        titlefrag = re.search('\w+', doc.title).group() # first title word
+        authorfrag = re.search('(\w+)(?:,|$)', doc.authors).group(1) # first author surname
     except Exception:
         return None
     cur = db.dict_cursor()
     query = ("SELECT * FROM docs WHERE doc_id != %s "
              "AND title LIKE %s and authors LIKE %s")
     cur.execute(query, (doc.doc_id, '%'+titlefrag+'%', '%'+authorfrag+'%'))
-    debug(2, cur._last_executed)
+    debug(5, cur._last_executed)
     dupes = cur.fetchall()
     for dupe in dupes:
-        debug(2, "candidate: %s, '%s'", dupe['authors'], dupe['title'])
+        debug(5, "candidate: %s, '%s'", dupe['authors'], dupe['title'])
         if abs(doc.numwords - dupe['numwords']) / doc.numwords > 0.2:
-            debug(2, "length not close enough")
+            debug(5, "length not close enough")
             continue
         sm = SequenceMatcher(None, doc.content, dupe['content'])
         match_ratio = sm.ratio()
         if match_ratio < 0.1: # sic
-            debug(2, "content too different, ratio %s", match_ratio)
+            debug(5, "content too different, ratio %s", match_ratio)
             continue
         debug(4, "duplicate: %s, '%s'", dupe['authors'], dupe['title'])
         return Doc(**dupe)
