@@ -6,6 +6,7 @@ import logging
 import findmodules
 from opp.config import config
 from opp import scraper
+from opp import blogpostprocessor
 from opp.daemon import Daemon
 from opp.debug import debug, debuglevel
 
@@ -40,6 +41,9 @@ class ScraperDaemon(Daemon):
         killer = GracefulKiller()
         pause_secs = 10
         while True:
+            # process new blog posts:
+            blogpostprocessor.run()
+            # look for new papers:
             source = scraper.next_source()
             if source:
                 scraper.scrape(source)

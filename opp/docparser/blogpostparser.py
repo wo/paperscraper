@@ -17,12 +17,15 @@
 # clean-up on the html; I also look for 'by [names]' strings in the
 # vicinity of the start of the blog post to identify authors.
 #
+# Update 2016-06-13: Goose requires Python 2, so I'm currently always
+# falling back on the rss feed content
 
-import logging
 import re
-from requests import get
-from goose import Goose
+import requests
+#from goose import Goose
 from nltk.tokenize import sent_tokenize
+from ..debug import debug
+
 # To install nltk.tokenize:
 # pip install nltk
 # python
@@ -30,58 +33,63 @@ from nltk.tokenize import sent_tokenize
 #    nltk.import('punkt')
 # sudo mv ~/nltk_data /usr/lib/
 
-logger = logging.getLogger(__name__)
-
-def parse(url, feed_content):
-    logger.debug("parsing blog post {}".format(url))
-    html = get(url).content
-    #logger.debug("\nsite html: %s\n", html)
-    html = html.decode('utf-8', 'ignore')
-    goose = Goose()
-    article = goose.extract(raw_html=html)
-    goose_text = article.cleaned_text
-    logger.debug("\ngoose text: %s\n", goose_text)
-    if not goose_text:
-        logger.info("goose-extract failed, using feed content")
-        goose_text = strip_tags(feed_content)
-    post_html = match_text_in_html(goose_text, html)
-    doc = {}
-    doc['content'] = strip_tags(post_html)
-    logger.debug("\npost content: %s\n", doc['content'])
-    doc['numwords'] = len(doc['content'].split())
-    doc['abstract'] = get_abstract(post_html)
-    logger.debug("\npost abstract: %s\n", doc['abstract'])
-    doc['authors'] = get_authors(html, post_html, doc['content'])
-    logger.debug("\npost authors: %s\n", doc['authors'])
-    return doc
+def parse(doc):
+    """
+    tries to enrich doc by metadata (authors, title, abstract,
+    numwords, content)
+    """
+    debug(3, "fetching blog post %s", doc.url)
+    html = requests.get(doc.url).content.decode('utf-8', 'ignore')
+    #goose = Goose()
+    #article = goose.extract(raw_html=html)
+    #goose_text = article.cleaned_text
+    #debug(5, "\ngoose text: %s\n", goose_text)
+    #if not goose_text:
+    #    debug(3, "goose-extract failed, using feed content")
+    #    goose_text = strip_tags(feed_content)
+    #post_html = match_text_in_html(goose_text, html)
+    #post_html = match_text_in_html(strip_tags(doc.content), html)
+    #if post_html:
+    #    doc.content = strip_tags(post_html)
+    #    debug(5, "\npost content: %s\n", doc.content)
+    doc.content = strip_tags(doc.content, keep_italics=True)
+    doc.numwords = len(doc.content.split())
+    doc.abstract = get_abstract(doc.content)
+    debug(3, "\npost abstract: %s\n", doc.abstract)
+    #if not doc.authors:
+    #    doc.authors = get_authors(html, post_html, doc.content)
+    #    debug(3, "\npost authors: %s\n", doc.authors)
 
 def match_text_in_html(text, html):
+    """
+    returns html fragment in <html> whose plain text content is <text>
+    """
     # avoid matches e.g. in <meta name="description" content="blah blah">):
     html = re.sub(r'^.+<body[^>]+>', '', html, flags=re.DOTALL|re.IGNORECASE)
     start_words = re.findall(r'\b\w+\b', text[:50])[:-1]
     re_str = r'\b.+?\b'.join(start_words)
     m1 = shortest_match(re_str, html)
     if not m1:
-        logger.warning(u"%s not found in html: %s", re_str, html)
-    logger.debug(u"best match for start words %s at: %d", re_str, m1.start(1))
+        return debug(4, "%s not found in html: %s", re_str, html)
+    debug(5, "best match for start words %s at: %d", re_str, m1.start(1))
     end_words = re.findall(r'\b\w+\b', text[-50:])[1:]
     re_str = r'\b.+?\b'.join(end_words)
     m2 = shortest_match(re_str, html)
     if not m2:
-        logger.warning(u"%s not found in html: %s", re_str, html)
-    logger.debug(u"best match for end words %s at: %d", re_str, m2.end(1))
-    #print m2.end(1)
+        return debug(4, "%s not found in html: %s", re_str, html)
+    debug(5, "best match for end words %s at: %d", re_str, m2.end(1))
     return html[m1.start(1):m2.end(1)]
 
 def shortest_match(re_str, string):
+    """
+    returns shortest match of <re_str> in <string>
+    """
     # lookahead to get all matches, including overlapping ones:
     regex = re.compile('(?=({}))'.format(re_str), re.DOTALL)
     ret = None
     for m in regex.finditer(string):
-        #print '\nmatch: {}\n\n'.format(m.group(1))
         if not ret or len(m.group(1)) < len(ret.group(1)):
             ret = m
-    #print '\nshortest match: {}\n\n'.format(ret.group(1))
     return ret
 
 def strip_tags(text, keep_italics=False):
@@ -106,40 +114,30 @@ def get_abstract(html):
     abstract = ''
     for sent in sentences:
         abstract += sent+' '
-        if len(abstract) > 600:
+        if len(abstract) > 200:
             break
     return abstract
 
 def get_authors(full_html, post_html, post_text):
     # look for 'by (Foo Bar)' near the start of the post
     post_start = full_html.find(post_html)
-    #print "post_start: {}".format(post_start)
     tagsoup = r'(?:<[^>]+>|\s)*'
     by = r'[Bb]y\b'+tagsoup
     name = r'[\w\.\-]+(?: (?!and)[\w\.\-]+){0,3}'
     separator = tagsoup+r'(?: and |, )'+tagsoup
     re_str = r'{}({})(?:{}({}))*'.format(by,name,separator,name)
     regex = re.compile(re_str)
-    #print "looking for {} in {}".format(re_str, full_html)
     best_match = None
     for m in regex.finditer(full_html):
-        #print "{} matches {}".format(re_str, m.group(0))
-        #print "({} vs {})".format(m.start(), post_start)
-        # avoid matching "Sadly, so-and-so has been rejected by /British MPs/":
         if post_text.find(m.group(1)) > 20:
-            logger.debug('author candidate "%s" because too far in text', m.group(1))
+            debug(2, 'author candidate "%s" because too far in text', m.group(1))
             continue
         if not best_match or abs(m.start()-post_start) < abs(best_match.start()-post_start):
-            #print "best match ({} vs {})".format(m.start(), post_start)
             best_match = m
     if best_match:
         names = [n for n in best_match.groups() if n]
-        #print ', '.join(names)
         return ', '.join(names)
     return ''
     
-#url = 'http://blog.practicalethics.ox.ac.uk/2015/09/the-moral-limitations-of-in-vitro-meat/'
-#url = 'https://golem.ph.utexas.edu/category/2015/08/wrangling_generators_for_subob.html'
-#parse(url)
 
 

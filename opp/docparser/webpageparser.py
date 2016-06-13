@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-import logging
 import re
 from lxml import etree
 from nltk.tokenize import sent_tokenize
 from ..debug import debug
-
-logger = logging.getLogger(__name__)
 
 def parse(doc):
     """
