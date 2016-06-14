@@ -1,3 +1,11 @@
+import re
+import requests
+import lxml.html
+from lxml import etree
+from lxml.html.clean import Cleaner
+from nltk.tokenize import sent_tokenize
+from opp.debug import debug
+
 #
 # Note (2015-09-11):
 #
@@ -20,39 +28,14 @@
 # Update 2016-06-13: Goose requires Python 2, so I'm currently always
 # falling back on the rss feed content
 
-import re
-import requests
-#from goose import Goose
-from nltk.tokenize import sent_tokenize
-from ..debug import debug
-
-# To install nltk.tokenize:
-# pip install nltk
-# python
-#    import nltk
-#    nltk.import('punkt')
-# sudo mv ~/nltk_data /usr/lib/
-
 def parse(doc):
     """
     tries to enrich doc by metadata (authors, title, abstract,
     numwords, content)
     """
     debug(3, "fetching blog post %s", doc.url)
-    html = requests.get(doc.url).content.decode('utf-8', 'ignore')
-    #goose = Goose()
-    #article = goose.extract(raw_html=html)
-    #goose_text = article.cleaned_text
-    #debug(5, "\ngoose text: %s\n", goose_text)
-    #if not goose_text:
-    #    debug(3, "goose-extract failed, using feed content")
-    #    goose_text = strip_tags(feed_content)
-    #post_html = match_text_in_html(goose_text, html)
-    #post_html = match_text_in_html(strip_tags(doc.content), html)
-    #if post_html:
-    #    doc.content = strip_tags(post_html)
-    #    debug(5, "\npost content: %s\n", doc.content)
-    doc.content = strip_tags(doc.content, keep_italics=True)
+    bytehtml = requests.get(doc.url).content.decode('utf-8', 'ignore')
+    doc.content = extract_content(bytehtml, doc)
     doc.numwords = len(doc.content.split())
     doc.abstract = get_abstract(doc.content)
     debug(2, "\npost abstract: %s\n", doc.abstract)
@@ -60,56 +43,49 @@ def parse(doc):
     #    doc.authors = get_authors(html, post_html, doc.content)
     #    debug(3, "\npost authors: %s\n", doc.authors)
 
-def match_text_in_html(text, html):
+def extract_content(bytehtml, doc):
     """
-    returns html fragment in <html> whose plain text content is <text>
+    extracts blog post content from html
     """
-    # avoid matches e.g. in <meta name="description" content="blah blah">):
-    html = re.sub(r'^.+<body[^>]+>', '', html, flags=re.DOTALL|re.IGNORECASE)
-    start_words = re.findall(r'\b\w+\b', text[:50])[:-1]
-    re_str = r'\b.+?\b'.join(start_words)
-    m1 = shortest_match(re_str, html)
-    if not m1:
-        return debug(4, "%s not found in html: %s", re_str, html)
-    debug(5, "best match for start words %s at: %d", re_str, m1.start(1))
-    end_words = re.findall(r'\b\w+\b', text[-50:])[1:]
-    re_str = r'\b.+?\b'.join(end_words)
-    m2 = shortest_match(re_str, html)
-    if not m2:
-        return debug(4, "%s not found in html: %s", re_str, html)
-    debug(5, "best match for end words %s at: %d", re_str, m2.end(1))
-    return html[m1.start(1):m2.end(1)]
-
-def shortest_match(re_str, string):
-    """
-    returns shortest match of <re_str> in <string>
-    """
-    # lookahead to get all matches, including overlapping ones:
-    regex = re.compile('(?=({}))'.format(re_str), re.DOTALL)
-    ret = None
-    for m in regex.finditer(string):
-        if not ret or len(m.group(1)) < len(ret.group(1)):
-            ret = m
-    return ret
-
-def strip_tags(text, keep_italics=False):
-    if keep_italics:
-        text = re.sub(r'<(/?)(?:i|b|em)>', r'{\1emph}', text, flags=re.IGNORECASE)
-        # also keep sub/supscript tags, e.g. for 'x_1'
-        text = re.sub(r'<(/?su[bp])>', r'{\1}', text, flags=re.IGNORECASE)
-    text = re.sub('<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub('<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub('<.+?>', ' ', text, flags=re.DOTALL)
-    text = re.sub('<', '&lt;', text)
-    text = re.sub('  +', ' ', text)
-    text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
-    if keep_italics:
-        text = re.sub(r'{(/?)emph}', r'<\1i>', text)
-        text = re.sub(r'{(/?su[bp])}', r'<\1>', text)
+    lxmldoc = lxml.html.document_fromstring(bytehtml)
+    cleaner = Cleaner()
+    cleaner.scripts = True
+    cleaner.comments = True
+    cleaner.style = True
+    #cleaner.page_structure = True
+    cleaner.kill_tags = ['head', 'noscript']
+    cleaner.remove_tags = ['p', 'i', 'b', 'strong', 'em']
+    cleaner(lxmldoc)
+    content_el = find_content_element(lxmldoc)
+    text = content_el.text_content().strip()
+    #print(text)
     return text
+    
+def find_content_element(el, best_el=None):
+    """
+    returns the descendent of el with the best text-to-html ratio and
+    text length > MIN_LENGTH
+    """ 
+    MIN_LENGTH = 500
+    for child in el:
+        textlen = len(child.text_content())
+        if textlen < MIN_LENGTH:
+            continue
+        htmllen = len(etree.tostring(child))
+        child._ratio = textlen/htmllen
+        if best_el is None or child._ratio > best_el._ratio:
+            best_el = child
+        best_child = find_content_element(child, best_el=best_el)
+        if best_child != best_el:
+            best_el = best_child
+    return best_el
 
-def get_abstract(html):
-    text = strip_tags(html, keep_italics=True)
+#bytehtml = b'<html><body><div>asdf hahaha</div><p>dddd</p></body></html>'
+#doc = lxml.html.document_fromstring(bytehtml)
+#print(find_content_element(doc))
+
+def get_abstract(string):
+    text = strip_tags(string, keep_italics=True)
     sentences = sent_tokenize(text[:1000])
     abstract = ''
     for sent in sentences:

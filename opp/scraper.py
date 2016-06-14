@@ -2,7 +2,6 @@
 import time, sys, re
 from datetime import datetime, timedelta
 import requests
-from lxml import html
 from difflib import SequenceMatcher
 import statistics
 import logging
