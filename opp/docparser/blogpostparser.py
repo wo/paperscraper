@@ -55,7 +55,7 @@ def parse(doc):
     doc.content = strip_tags(doc.content, keep_italics=True)
     doc.numwords = len(doc.content.split())
     doc.abstract = get_abstract(doc.content)
-    debug(3, "\npost abstract: %s\n", doc.abstract)
+    debug(2, "\npost abstract: %s\n", doc.abstract)
     #if not doc.authors:
     #    doc.authors = get_authors(html, post_html, doc.content)
     #    debug(3, "\npost authors: %s\n", doc.authors)

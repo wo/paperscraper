@@ -30,7 +30,7 @@ def process_blogpost(doc):
     retrieve post info, check if philosophical content, classify
     """
     debug(1, "processing new blog post from %s", doc.source_name)
-    #blogpostparser.parse(doc)
+    blogpostparser.parse(doc)
 
     # estimate whether post is on philosophy:
     philosophyfilter = classifier.get_classifier('philosophy')
@@ -38,7 +38,7 @@ def process_blogpost(doc):
         doc.is_philosophy = int(philosophyfilter.classify(doc) * 100)
     except UntrainedClassifierException as e:
         doc.is_philosophy = 90
-    if doc.is_philosophy < 25:
+    if doc.is_philosophy < 25 and False: # TODO: reactivate once philosophy filter works
         debug(1, "spam: philosophy score %s < 25", doc.is_philosophy)
         remove_from_db(doc)
         return 0
