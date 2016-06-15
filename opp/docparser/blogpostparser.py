@@ -57,7 +57,7 @@ def extract_content(bytehtml, doc):
     cleaner.style = True
     #cleaner.page_structure = True
     cleaner.kill_tags = ['head', 'noscript']
-    cleaner.remove_tags = ['p', 'i', 'b', 'strong', 'em']
+    cleaner.remove_tags = ['p', 'i', 'b', 'strong', 'em', 'blockquote']
     cleaner(lxmldoc)
     content_el = find_content_element(lxmldoc)
     text = content_el.text_content().strip()
@@ -66,22 +66,41 @@ def extract_content(bytehtml, doc):
     
 def find_content_element(el, best_el=None):
     """
-    returns the descendent of el with the best text-to-html ratio and
-    text length > MIN_LENGTH
+    returns the descendent of el with the best combination of
+    text-to-html ratio and text length
     """ 
-    MIN_LENGTH = 500
     for child in el:
-        textlen = len(child.text_content())
-        if textlen < MIN_LENGTH:
+        child._quality = quality(child)
+        if child._quality == 0:
             continue
-        htmllen = len(etree.tostring(child))
-        child._ratio = textlen/htmllen
-        if best_el is None or child._ratio > best_el._ratio:
+        if best_el is None or child._quality > best_el._quality:
             best_el = child
         best_child = find_content_element(child, best_el=best_el)
         if best_child != best_el:
             best_el = best_child
     return best_el
+    
+def quality(el):
+    """
+    gives a numerical score to <el> measuring its plausibility as blog
+    post content, weighing text-to-html ratio and text length
+    """
+    MIN_LENGTH = 200
+    textlen = len(el.text_content())
+    if textlen < MIN_LENGTH:
+        return 0
+    htmllen = len(etree.tostring(el))
+    ratio = textlen/htmllen
+    # A blog post often contains lengthy paragraphs without any tags
+    # and thus perfect textlen/htmllen ratio; we still want to prefer
+    # larger elements with decent ratio. Roughly, if we can add 500
+    # characters (~1 paragraph) of text with 100 characters of tags,
+    # we should do that. The following equation approximates what we
+    # might want: quality = ratio^2 * textlen
+    quality = ratio*ratio*textlen
+    #print(etree.tostring(el)[:100])
+    #print("textlen {}, htmllen {}, ratio {}, quality {}".format(textlen, htmllen, ratio, quality))
+    return max(0, quality)
 
 #bytehtml = b'<html><body><div>asdf hahaha</div><p>dddd</p></body></html>'
 #doc = lxml.html.document_fromstring(bytehtml)

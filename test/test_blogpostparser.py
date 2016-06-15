@@ -15,7 +15,8 @@ testcases = [
     ('contessa', 'Logic versus Rhetoric in Philosophical Argumentation'),
     ('heck', 'Roasted Eggplant with Artichoke Hearts and Salsa Verde'),
     ('pe', 'Three Black Teenagers'),
-    ('brain', 'Diversity of epistemic practices: toward solving the puzzle'),
+    # ('brain', 'Diversity of epistemic practices: toward solving the puzzle'),
+    ('schliesser', 'Isaac Newton and Clarke on Metaphysical Modality'),
 ]
 
 @pytest.mark.parametrize("basefile, title", testcases)
