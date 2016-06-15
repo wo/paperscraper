@@ -35,7 +35,10 @@ def parse(doc):
     """
     debug(3, "fetching blog post %s", doc.url)
     bytehtml = requests.get(doc.url).content.decode('utf-8', 'ignore')
-    doc.content = extract_content(bytehtml, doc)
+    try:
+        doc.content = extract_content(bytehtml, doc) or doc.content
+    except:
+        pass
     doc.numwords = len(doc.content.split())
     doc.abstract = get_abstract(doc.content)
     debug(2, "\npost abstract: %s\n", doc.abstract)
@@ -84,8 +87,7 @@ def find_content_element(el, best_el=None):
 #doc = lxml.html.document_fromstring(bytehtml)
 #print(find_content_element(doc))
 
-def get_abstract(string):
-    text = strip_tags(string, keep_italics=True)
+def get_abstract(text):
     sentences = sent_tokenize(text[:1000])
     abstract = ''
     for sent in sentences:

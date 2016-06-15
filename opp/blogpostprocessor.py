@@ -31,6 +31,10 @@ def process_blogpost(doc):
     """
     debug(1, "processing new blog post from %s", doc.source_name)
     blogpostparser.parse(doc)
+    if len(doc.content) < 500:
+        debug(1, "content too short")
+        remove_from_db(doc)
+        return 0
 
     # estimate whether post is on philosophy:
     philosophyfilter = classifier.get_classifier('philosophy')
