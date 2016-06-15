@@ -17,6 +17,7 @@ testcases = [
     ('pe', 'Three Black Teenagers'),
     # ('brain', 'Diversity of epistemic practices: toward solving the puzzle'),
     ('schliesser', 'Isaac Newton and Clarke on Metaphysical Modality'),
+    ('xphi', 'Knobe Interviewed at Discrimination and Disadvantage'),
 ]
 
 @pytest.mark.parametrize("basefile, title", testcases)

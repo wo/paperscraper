@@ -60,9 +60,13 @@ def extract_content(bytehtml, doc):
     cleaner.remove_tags = ['p', 'i', 'b', 'strong', 'em', 'blockquote']
     cleaner(lxmldoc)
     content_el = find_content_element(lxmldoc)
-    text = content_el.text_content().strip()
-    #print(text)
-    return text
+    if content_el:
+        debug(3, 'content quality {}'.format(content_el._quality))
+        text = content_el.text_content().strip()
+        return text
+    else:
+        debug(2, 'no content found!')
+        return ''
     
 def find_content_element(el, best_el=None):
     """
@@ -70,10 +74,12 @@ def find_content_element(el, best_el=None):
     text-to-html ratio and text length
     """ 
     for child in el:
-        child._quality = quality(child)
-        if child._quality == 0:
+        MIN_LENGTH = 200
+        child._textlen = len(child.text_content())
+        if child._textlen < MIN_LENGTH:
             continue
-        if best_el is None or child._quality > best_el._quality:
+        child._quality = quality(child)
+        if child._quality > 0 and (not best_el or child._quality > best_el._quality):
             best_el = child
         best_child = find_content_element(child, best_el=best_el)
         if best_child != best_el:
@@ -85,10 +91,7 @@ def quality(el):
     gives a numerical score to <el> measuring its plausibility as blog
     post content, weighing text-to-html ratio and text length
     """
-    MIN_LENGTH = 200
-    textlen = len(el.text_content())
-    if textlen < MIN_LENGTH:
-        return 0
+    textlen = el._textlen
     htmllen = len(etree.tostring(el))
     ratio = textlen/htmllen
     # A blog post often contains lengthy paragraphs without any tags
@@ -96,11 +99,13 @@ def quality(el):
     # larger elements with decent ratio. Roughly, if we can add 500
     # characters (~1 paragraph) of text with 100 characters of tags,
     # we should do that. The following equation approximates what we
-    # might want: quality = ratio^2 * textlen
-    quality = ratio*ratio*textlen
-    #print(etree.tostring(el)[:100])
-    #print("textlen {}, htmllen {}, ratio {}, quality {}".format(textlen, htmllen, ratio, quality))
-    return max(0, quality)
+    # might want: quality = ratio^3 * textlen
+    quality = (ratio**3)*textlen
+    print(etree.tostring(el)[:100])
+    print("textlen {}, htmllen {}, ratio {}, quality {}".format(textlen, htmllen, ratio, quality))
+    if quality < 500:
+        return  0
+    return quality
 
 #bytehtml = b'<html><body><div>asdf hahaha</div><p>dddd</p></body></html>'
 #doc = lxml.html.document_fromstring(bytehtml)
