@@ -24,12 +24,11 @@ logger = logging.getLogger('opp')
 
 def next_source():
     """return the next source from db that's due to be checked"""
-    min_age = datetime.now() - timedelta(hours=12)
+    min_age = datetime.now() - timedelta(hours=16)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE"
              " sourcetype != 'blog'" # ignore rss feeds
-             " AND status <= 1" # xxx hack: don't turn 410s back into 301s. 
              " AND (last_checked IS NULL OR last_checked < %s)"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
