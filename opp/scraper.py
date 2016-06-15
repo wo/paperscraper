@@ -167,11 +167,11 @@ def scrape(source, keep_tempfiles=False):
                 process_link(li, force_reprocess=True)
     
     # re-check old links to papers for revisions:
-    MAX_REVCHECK = 3
-    goodlinks = (li for li in source.old_links if li.doc_id)
-    for li in sorted(goodlinks, key=lambda x:x.last_checked)[:MAX_REVCHECK]:
-        debug(1, 're-checking old link to paper %s on %s for revisions', li.url, source.url)
-        process_link(li)
+    #MAX_REVCHECK = 3
+    #goodlinks = (li for li in source.old_links if li.doc_id)
+    #for li in sorted(goodlinks, key=lambda x:x.last_checked)[:MAX_REVCHECK]:
+    #    debug(1, 're-checking old link to paper %s on %s for revisions', li.url, source.url)
+    #    process_link(li)
 
     if not keep_tempfiles:
         remove_tempdir()
