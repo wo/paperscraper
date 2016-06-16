@@ -31,15 +31,18 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
             return 903, None
         size = 0
         start = time.time()
+        content = b''
         for chunk in r.iter_content(1024):
             if time.time() - start > timeout:
                 r.close()
                 raise requests.exceptions.Timeout
             size += len(chunk)
+            content += chunk
             if size > maxsize:
                 r.close()
                 return 903, None
         if r.status_code == 200:
+            r._content = content
             r.filetype = request_filetype(r)
         return r.status_code, r
     except requests.exceptions.Timeout:
@@ -49,6 +52,7 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
     except requests.exceptions.RequestException as e:
         return 900, None
     except Exception:
+        raise
         return 900, None
 
 def request_filetype(r):
