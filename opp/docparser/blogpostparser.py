@@ -30,17 +30,19 @@ from opp.debug import debug
 
 def parse(doc):
     """
-    tries to enrich doc by metadata (authors, title, abstract,
-    numwords, content)
+    fixes title and content of blogpost <doc> and adds authors,
+    abstract, numwords
     """
     debug(3, "fetching blog post %s", doc.url)
     bytehtml = requests.get(doc.url).content.decode('utf-8', 'ignore')
     try:
-        doc.content = extract_content(bytehtml, doc) or doc.content
+        doc.content = extract_content(bytehtml, doc) or strip_tags(doc.content)
     except:
         pass
     doc.numwords = len(doc.content.split())
     doc.abstract = get_abstract(doc.content)
+    if doc.title.isupper():
+        doc.title = doc.title.capitalize()
     debug(2, "\npost abstract: %s\n", doc.abstract)
     #if not doc.authors:
     #    doc.authors = get_authors(html, post_html, doc.content)
@@ -103,7 +105,7 @@ def quality(el):
     quality = (ratio**3)*textlen
     print(etree.tostring(el)[:100])
     print("textlen {}, htmllen {}, ratio {}, quality {}".format(textlen, htmllen, ratio, quality))
-    if quality < 500:
+    if quality < 300:
         return  0
     return quality
 
@@ -118,7 +120,26 @@ def get_abstract(text):
         abstract += sent+' '
         if len(abstract) > 200:
             break
-    return abstract
+    return abstract+'&hellip;'
+
+def strip_tags(text, keep_italics=False):
+    """
+    strip tags from <text> but possibly keep emphasis tags
+    """
+    if keep_italics:
+        text = re.sub(r'<(/?)(?:i|b|em|strong)>', r'{\1emph}', text, flags=re.IGNORECASE)
+        # also keep sub/supscript tags, e.g. for 'x_1'
+        text = re.sub(r'<(/?su[bp])>', r'{\1}', text, flags=re.IGNORECASE)
+    text = re.sub('<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub('<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub('<.+?>', ' ', text, flags=re.DOTALL)
+    text = re.sub('<', '&lt;', text)
+    text = re.sub('  +', ' ', text)
+    text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
+    if keep_italics:
+        text = re.sub(r'{(/?)emph}', r'<\1i>', text)
+        text = re.sub(r'{(/?su[bp])}', r'<\1>', text)
+    return text
 
 def get_authors(full_html, post_html, post_text):
     # look for 'by (Foo Bar)' near the start of the post
