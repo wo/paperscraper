@@ -158,7 +158,7 @@ def update_classifier(category):
     if not rows:
         raise Exception('no training documents for classifier')
     docs = [Doc(**row) for row in rows]
-    classes = [row['strength'] for row in rows]
+    classes = [int(row['strength']/100) for row in rows]
     clf.train(docs, classes)
     clf.save()
 
