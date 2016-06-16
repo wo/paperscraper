@@ -27,7 +27,7 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
         # using stream to respect maxsize and load timeouts, see
         # http://stackoverflow.com/questions/22346158/
         r = requests.get(url, headers=headers, timeout=10, stream=True)
-        if int(r.headers.get('Content-Length')) > maxsize:
+        if int(r.headers.get('Content-Length', 0)) > maxsize:
             return 903, None
         size = 0
         start = time.time()
