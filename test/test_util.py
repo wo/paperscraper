@@ -11,3 +11,12 @@ def test_text_content():
     assert 'sys-' not in content
     assert 'systems' in content
 
+def test_request_url():
+    (status, r) = util.request_url('http://umsu.de/notfound/')
+    assert status == 404
+
+def test_request_url_maxsize():
+    (status, r) = util.request_url('http://umsu.de/papers/generalising.pdf', maxsize=100000)
+    assert status == 903
+
+# TODO: more tests

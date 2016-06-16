@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import re
+import time
 import requests
 from . import error
 
@@ -7,7 +8,7 @@ def normalize_url(url):
     """normalize ~ vs %7e etc."""
     return requests.utils.requote_uri(url)
       
-def request_url(url, if_modified_since=None, etag=None):
+def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=10000000):
     """
     fetches url, returns (status, response_object), where
     response_object has an additional 'filetype' field
@@ -23,7 +24,21 @@ def request_url(url, if_modified_since=None, etag=None):
     if etag:
         headers['if-none-match'] = etag
     try:
-        r = requests.get(url, headers=headers, timeout=10)
+        # using stream to respect maxsize and load timeouts, see
+        # http://stackoverflow.com/questions/22346158/
+        r = requests.get(url, headers=headers, timeout=10, stream=True)
+        if int(r.headers.get('Content-Length')) > maxsize:
+            return 903, None
+        size = 0
+        start = time.time()
+        for chunk in r.iter_content(1024):
+            if time.time() - start > timeout:
+                r.close()
+                raise requests.exceptions.Timeout
+            size += len(chunk)
+            if size > maxsize:
+                r.close()
+                return 903, None
         if r.status_code == 200:
             r.filetype = request_filetype(r)
         return r.status_code, r

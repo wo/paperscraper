@@ -96,6 +96,7 @@ message = {
     900: 'connection failed',
     901: 'document is empty',
     902: 'too many redirects',
+    903: 'document too large',
 
 }
 
