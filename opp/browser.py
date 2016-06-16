@@ -41,8 +41,9 @@ class ActualBrowser(webdriver.Firefox):
             _display = None
         _browser = None
     
-    def goto(self, url):
+    def goto(self, url, timeout=10):
         """sends browser to url, sets (guessed) status code"""
+        self.set_page_load_timeout(timeout)
         self.get(url)
         self.status = 200
         # check for errors:
