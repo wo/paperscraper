@@ -46,7 +46,7 @@ def categories():
         return categories.cats
     except AttributeError:
         cur = db.cursor()
-        query = ("SELECT cat_id, label FROM cats WHERE label != 'philosophy'")
+        query = ("SELECT cat_id, label FROM cats WHERE label != 'philosophy' AND label != 'blogspam'")
         cur.execute(query)
         categories.cats = list(cur.fetchall())
         return categories.cats
@@ -494,12 +494,11 @@ class Source(Webpage):
             if is_bad_url(href):
                 debug(3, 'ignoring link to %s (bad url)', href)
                 continue
-            href = util.normalize_url(self.make_absolute(href))
             if href in old_links.keys() or href in new_links.keys():
                 debug(3, 'ignoring repeated link to %s', href)
             old_link = self.old_link(href)
             if old_link:
-                debug(3, 'link to %s is old: %s', href)
+                debug(3, 'link to %s is old', href)
                 old_links[href] = old_link
                 old_links[href].element = el
             else:
