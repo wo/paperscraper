@@ -6,7 +6,7 @@ import lxml.html
 import lxml.etree
 from lxml.html.clean import Cleaner
 from functools import lru_cache
-from .exceptions import UnparsableHTMLException
+from opp.exceptions import UnparsableHTMLException
 
 class Webpage():
 
@@ -59,8 +59,8 @@ class Webpage():
         return self._base_href
 
     def make_absolute(self, href):
-        """turn relative into absolute links"""
-        return urljoin(self.base_href(), href)
+        """turn relative into absolute links, also strip local anchors #foo"""
+        return urljoin(self.base_href(), href.split('#')[0])
 
     def session_variables(self):
         """return set of possible session variables in links"""

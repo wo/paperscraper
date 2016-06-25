@@ -1,0 +1,10 @@
+if (window['google'] != undefined && window['google']['loader'] != undefined) {
+if (!window['google']['visualization']) {
+window['google']['visualization'] = {};
+google.visualization.Version = '1.0';
+google.visualization.JSHash = 'cc4e780f27c723c0cb35ec1e38ec2bb9';
+google.visualization.LoadArgs = 'file\x3dvisualization\x26v\x3d1\x26packages\x3dcorechart%2Cgeochart';
+}
+google.loader.writeLoadTag("css", google.loader.ServiceBase + "/api/visualization/1.0/cc4e780f27c723c0cb35ec1e38ec2bb9/ui+en.css", false);
+google.loader.writeLoadTag("script", google.loader.ServiceBase + "/api/visualization/1.0/cc4e780f27c723c0cb35ec1e38ec2bb9/format+en,default+en,ui+en,geochart+en,corechart+en.I.js", false);
+}

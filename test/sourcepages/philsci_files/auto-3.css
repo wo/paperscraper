@@ -1,0 +1,4358 @@
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/actions.css */
+
+.ep_login_tools img {
+	vertical-align: middle;
+	margin: 0px 25px;
+}
+
+ul.ep_action_list {
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	display: inline-block;
+}
+
+ul.ep_action_list li {
+	display: inline-block;
+	margin-left: .5em;
+}
+
+ul.ep_action_list li:first-child {
+	margin-left: 0;
+}
+
+dl.ep_action_list {
+	margin: 0;
+	padding: 0;
+}
+
+dl.ep_action_list dt, dl.ep_action_list dd {
+	margin: 0;
+}
+
+dl.ep_action_list dt {
+	margin-top: .5em;
+	width: 15em;
+	text-align: center;
+	line-height: 2em;
+	margin-bottom: -1.5em;
+}
+dl.ep_action_list dt:first-child {
+	margin-top: 0;
+}
+
+dl.ep_action_list dd {
+	position: relative;
+	left: 16em;
+	top: -.5em;
+	margin-right: 16em;
+	overflow: hidden;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/blister.css */
+
+
+/* EPrints 3 blister bar style */
+
+/* ep_blister */
+
+
+
+.ep_blister_bar {
+	margin: auto;
+}
+.ep_blister_join {
+	background-image: url(images/blister_arrow.png);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width: 20px;
+}
+.ep_blister_node, .ep_blister_node_selected {
+	text-align: center;
+	border-style: solid;
+	border-radius: 3px;
+}
+.ep_blister_node {
+	border-width: 1px;
+	padding: 3px 10px;
+}
+.ep_blister_node_selected {
+	border-width: 2px;
+	padding: 2px 10px;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/citations.css */
+
+span.document_filename
+{
+	font-size: 80%;
+        line-height: 20px;
+}
+
+span.document_format
+{
+}
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/colors.css */
+
+/*
+ *
+ * EPrints Default Colour Scheme
+ *
+ */
+
+body {
+	color: #000000;
+	background-color: #ffffff;
+}
+a, .ep_tm_key_tools a:visited {
+	color: #0645ad;
+}
+a:visited {
+	color: #0b0080;
+}
+a:hover, .ep_tm_key_tools a:hover {
+	color: #3366bb;
+}
+a:active, .ep_tm_key_tools a:active {
+	color: red;
+}
+h1, h2, h3, h4 {
+    color: #606060;
+}
+.ep_view_page h2 {
+	border-bottom: solid 1px #606060;
+}
+
+/* template.css */
+
+.ep_tm_header {
+	background-color: #fff;
+	background-image: url(images/logo_background_light.png);
+	background-repeat: repeat-y;
+}
+.ep_tm_menu, .ep_tm_menu li:hover {
+	background-image: url(images/bar_glass.png) ;
+	background-position: 0px 5px;
+}
+.ep_tm_footer {
+	border-color: #204f76;
+}
+.ep_tm_menu, .ep_tm_menu ul {
+	background-color: #204f76;
+}
+.ep_tm_menu {
+	/* fixed to 30px high */
+	border-bottom: 1px solid #fff;
+}
+.ep_tm_menu li:hover {
+	background-color: #279ae2;
+}
+.ep_tm_menu a, .ep_tm_menu a:visited {
+	color: white;
+}
+.ep_tm_searchbar, .ep_columns_title, td.ep_columns_alter, .ep_toolbox_title {
+	color: #606060;
+}
+.ep_tm_searchbar, .ep_columns_title, td.ep_columns_alter {
+	background-color: #ccc;
+	background-image: url(images/bar_24px.png);
+	background-repeat: repeat-x;
+}
+.ep_tm_searchbarbox {
+	border-color: #606060;
+}
+.ep_tm_key_tools li {
+	border-left: 1px solid #e8e8e8;
+	border-right: 1px solid #606060;
+}
+.ep_tm_key_tools li:first-child {
+	border-left: none;
+}
+.ep_tm_key_tools li:last-child {
+	border-right: none;
+}
+
+/* form.css */
+
+.ep_form_action_button, .ep_form_internal_button, .ep_tm_searchbarbutton, .ep_blister_node_selected {
+	border-color: #5b97c7 #13324a #13324a #5287b3;
+	background-image: url(images/bar_12px.png);
+	background-color: #1f4f76;
+	color: white;
+}
+.ep_form_action_button:active, .ep_form_internal_button:active, .ep_tm_searchbarbutton:active, .ep_blister_node_selected:active {
+	border-color: #13324a #5287b3 #5287b3 #13324a;
+	background-color: #276496;
+}
+
+/* blister.css */
+
+.ep_blister_node {
+	border-color: #cccccc;
+	background-color: #e8e8ff;
+	background-image: url(images/bar_solid_12px.png);
+	color: #000000;
+}
+.ep_blister_node:active {
+	border-color: #276496;
+}
+
+/* summary.css surround.css */
+
+.ep_summary_box_title, .ep_summary_box_body, .ep_sr_title_bar, .ep_sr_content, .ep_sr_collapse_bar
+,.ep_tab_panel
+,.ep_toolbox_content /* toolbox.css */
+,.ep_upload_doc /* upload.css */
+,.ep_search_buttons, .ep_search_controls, .ep_search_controls_bottom /* search.css */
+,.ep_view_group_by /* view.css */
+{
+	background-color: #e8e8ff;
+}
+.ep_summary_box_title, .ep_sr_title_bar, .ep_sr_collapse_bar {
+	background-image: url(images/bar_solid_12px.png);
+	background-repeat: repeat-x;
+}
+.ep_sr_content, .ep_summary_box_body,
+.ep_tab_panel,
+.ep_toolbox_content /* toolbox.css */
+,.ep_upload_doc /* upload.css */
+{
+	background-image: url(images/bar_solid_24px.png);
+	background-repeat: repeat-x;
+}
+.ep_summary_box_title, .ep_summary_box_body, .ep_sr_title_bar, .ep_sr_content, .ep_sr_collapse_bar
+,.ep_tab_panel, .ep_tab_bar li, .ep_tab_bar li a
+,.ep_toolbox_content /* toolbox.css */
+,.ep_upload_doc /* upload.css */
+{
+	border-color: #ccc;
+}
+
+/* tabs.css */
+
+.ep_tab_bar li a {
+	background-image: url(images/bar_solid_24px.png);
+	background-repeat: repeat-x;
+}
+
+/* unselected tab */
+.ep_tab_bar li a {
+	background-color: #bbf;
+}
+
+/* selected tab */
+.ep_tab_bar li.ep_tab_selected a {
+	background-color: #fff;
+}
+
+/* general.css */
+
+th.ep_title_row
+{
+	border-color: #808080;
+	background-image: url(images/bar_24px.png);
+	background-color: #ccc;
+	color: #333;
+}
+
+th.ep_row, td.ep_row {
+	border-color: #bbb;
+}
+th.ep_row, td.ep_row {
+	border-bottom-style: dashed;
+}
+td.ep_row {
+	border-left-style: dashed;
+}
+
+/* messages.css */
+
+.ep_msg_message_content, .ep_msg_warning_content, .ep_msg_error_content, .ep_msg_other_content {
+	background-image: url(images/bar_solid_48px.png);
+	background-repeat: repeat-x;
+}
+
+.ep_msg_message_content {
+	background-color: #80ff80;
+	border-color: #80ff80;
+}
+.ep_msg_error_content {
+	background-color: #ffc0c0;
+	border-color: #ffc0c0;
+}
+
+.ep_msg_warning_content {
+	background-color: #ffc080;
+	border-color: #ffc080;
+}
+
+.ep_msg_other_content {
+	background-color: #9999ff;
+	border-color: #9999ff;
+}
+
+/* columns.css */
+
+th.ep_columns_title, td.ep_columns_alter {
+	border-color: #888;
+}
+td.ep_columns_cell {
+	border-color: #888 #ccc;
+}
+
+.ep_search_buttons, .ep_search_controls, .ep_search_controls_bottom /* search.css */
+,.ep_view_group_by /* view.css */
+{
+	border-color: #cccccc;
+	background-image: url(images/bar_24px.png);
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/columns.css */
+
+
+/* paginated columns */
+
+.ep_columns {
+	margin: auto;
+}
+
+td.ep_columns_cell {
+	border-style: none dashed solid none;
+	border-width: 1px;
+}
+td.ep_columns_cell:first-child {
+	border-left-style: dashed;
+}
+
+th.ep_columns_title, td.ep_columns_alter {
+	border-width: 1px;
+	font-weight: normal;
+}
+th.ep_columns_title {
+	border-style: solid solid solid none;
+}
+td.ep_columns_alter {
+	border-style: none solid solid none;
+}
+th.ep_columns_title:first-child, td.ep_columns_alter:first-child {
+	border-left-style: solid;
+}
+th.ep_columns_title a {
+	font-weight: normal;
+}
+
+
+td.ep_columns_no_items {
+	border-bottom: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	padding: 0.5em;
+	text-align: center;
+	font-size: 120%;
+}
+
+.ep_columns_add {
+	text-align: center;
+}
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/drop.css */
+
+
+/* style for ajax suggestion drops */
+
+.ep_drop_target {
+}
+
+.ep_drop_target ul {
+	margin: 0px;
+	padding: 4px;
+	list-style: none;
+	background-color: white;
+	border: 1px dotted #888;
+	z-index: 6;
+}
+	
+.ep_drop_target ul li {
+	margin: 0px;
+	padding: 3px;
+	list-style: none;
+	border-top: 1px dashed #ccc;
+	cursor: pointer;
+	width: 100%;
+}
+.ep_drop_target ul li.ep_first {
+	border-top: none;
+}
+
+.ep_drop_target ul li.selected {
+	background-color: #e0e0ff;
+}
+
+.ep_drop_target ul ul {
+	display: none;
+}
+
+.ep_drop_loading {
+	margin: 0px;
+	padding: 4px;
+	height: 24px;
+	text-align: center;
+	border: 1px dotted #888;
+	z-index: 6;
+	position: absolute;
+	background-color: #fff;
+	background-image: url(images/loading.gif);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.ep_draggable {
+	cursor: move;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/fields.css */
+
+
+/* style for metafields */
+
+dl.ep_field_set_long dt label {
+	margin-bottom: 0.2em;
+	font-weight: bold;
+}
+
+dl.ep_field_set_long dd {
+	margin-bottom: 0.5em;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/fileselector.css */
+
+.ep_fileselector dl {
+	margin: 0px 0px 0px 25px;
+	padding: 0px 0px;
+}
+.ep_fileselector dd {
+	margin: 0px 0px;
+}
+.ep_fileselector input {
+/*	float: left; */
+}
+.ep_fileselector label {
+	cursor: pointer;
+}
+.ep_fileselector dt.ep_fileselector {
+	clear: left; /* clear the floated input */
+	display: block;
+	cursor: pointer;
+	background-image: url(data:image/gif;base64,R0lGODlhEAAQAOMMAJuHDKKNBcCmCu3NEuzTOO/ZU/PhePTjgfTmj/XpmvXqovXtsP///////////////yH5BAEKAA8ALAAAAAAQABAAAARXUIA5xbsYA8SRAVkIHET5UagFGGVZvPALrkM9CEGuSw+A64bEYqEoDmbD5CJhaDYVSKdUCu0tptjETIGdanvcrvMLCIuDM+bZgJh13vADSIKqUyyhfCgCADs=);
+	background-repeat: no-repeat;
+	background-position: 0px 0px;
+	padding-left: 20px;
+	padding-bottom: 2px;
+}
+.ep_fileselector dt.ep_fileselector_open {
+	background-image: url(data:image/gif;base64,R0lGODlhEAAQAOMMAIp5CJqGCrmhCdy+Be3OIe3UP+/YUvLeaPLgdPTlifTolvTro////////////////yH5BAEKAA8ALAAAAAAQABAAAARZUIQ5xbsYh8QTClm4FeRBnYEVIERbHEYsF+Da3rhbH3lPPwFeL7cbGAcBgHIpAQqWgEJisVBYkUCqdpE4eL2K2uJLJoez5XSipkiXz5uOXP55SFD4VGi/jwAAOw==);
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/form.css */
+
+
+/* Form related styles */
+
+form {
+	display: inline;
+}
+
+select, input.ep_form_text, textarea {
+	padding: 1px 2px 1px 2px;
+	margin-right: 4px;
+	border: solid 1px #ccc;
+}
+
+.ep_form_example {
+	font-weight: bold;
+	color: blue;
+}
+
+/* buttons */
+
+.ep_form_button_bar {
+	text-align: center;
+	padding: 4px;
+	clear: both;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.ep_form_action_button, .ep_form_internal_button {
+	text-align: center;
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 3px;
+	padding: 2px 20px;
+	cursor: pointer;
+}
+.ep_form_internal_button {
+	padding: 1px 14px;
+	background-position: 0px -2px;
+}
+
+/* form fields */
+
+.ep_form_field_help {
+        font-size: small ;
+}
+
+.ep_form_field_name {
+        padding-top: 1em;
+	font-weight: bold;
+}
+
+.ep_form_field_input {
+        padding-bottom: 3pt;
+}
+
+/* input fields grid */
+
+
+.ep_form_input_grid th {
+	vertical-align: middle;
+	text-align: center;
+	font-size: 80%;
+}
+.ep_form_input_grid td {
+	vertical-align: middle;
+}
+
+td.ep_form_input_grid_pos {
+	padding-right: 4px;
+}
+td.ep_form_input_grid_arrows {
+	white-space: nowrap;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+
+td.ep_form_input_grid_wide {
+	text-align: left;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/general.css */
+
+body {
+	margin: 0;
+	font-family: Sans-serif;
+	font-size: 80%;
+}
+
+/* left-align if we're in a div (e.g. ep_block) that centres */
+ul {
+	text-align: left;
+}
+
+img {
+        border:0;
+}
+
+.ep_no_js { 
+	display: none; 
+}
+
+.ep_no_js_inline { 
+	display: none; 
+}
+
+.ep_no_js_table_cell { 
+	display: none; 
+}
+
+.ep_hide { 
+	display: none; 
+}
+
+h1, h2 {
+	font-weight: bold;
+}
+h1 {
+	margin: 0px;
+	margin-top: 10px;
+	font-size: 130%;
+	text-align: center;
+}
+h2 {
+	font-size: 110%;
+}
+h3 {
+	font-size: 120%;
+}
+h4 {
+	font-size: 100%;
+}
+
+hr {
+	border: 0px;
+	color: #ccc;
+	background-color: #ccc;
+	height: 2px;
+}
+
+.ep_required {
+}
+
+.ep_toggle a, a.ep_toggle {
+	text-decoration: none;
+}
+
+th.ep_row {
+	padding-right: 0.25em;
+	text-align: right;
+	width: 20%;
+	border-width: 1px;
+}
+td.ep_row {
+	padding-left: 0.25em;
+	text-align: left;
+	border-width: 1px;
+}
+
+th.ep_title_row {
+	border-width: 1px;
+	border-style: solid;
+	border-left: none;
+	border-right: none;
+	padding: 0.1em 0.5em 0.1em 0.5em;
+	font-size: 100%;
+	height: 2em;
+	font-weight: normal;
+}
+
+.ep_highlight {
+	padding: 0.5em;
+	border: solid 2px #ff8888;
+	background-color: #ffeeee;
+}
+
+.ep_block {
+	width: auto;
+	margin: 0.25em auto 0.25em auto;
+	text-align: center;
+}
+.ep_block td {
+	text-align: left;
+}
+.ep_doc_icon
+{
+	padding: 2px;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/icontable.css */
+
+
+table.ep_icontable {
+	border-collapse: collapse;
+}
+table.ep_icontable th {
+	border: solid 1px #999;
+	background-color: #fff;
+	text-align: center;
+}
+table.ep_icontable td {
+	padding-left: 4px;
+	border: solid 1px #999;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/irstats2.css */
+
+/* IRStats2 CSS */
+
+div.irstats2_view
+{
+	width: 100%;
+	text-align:left;
+	font-family: Verdana, Arial, sans-serif;
+	margin: 10px;
+	border: 1px solid #D7D9E5;
+	border-radius: 3px;
+}
+
+div.irstats2_view_title
+{
+	border-top: 0px;
+	border-left: 0px;
+	border-right: 0px;
+	border-bottom: 1px solid #D7D9E5;
+	font-weight: bold;
+	font-size: 14px;
+	padding: 5px;
+	color: #000;
+	background: url("images/toolbox.png") repeat-x scroll 0 0 #E7E9F5;
+}
+
+div.irstats2_view_content
+{
+	line-height: 20px;
+	margin: auto;
+}
+
+div.irstats2_piechart
+{
+	width: 400px;
+	height: 350px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.irstats2_googlepiechart
+{
+	width: 400px;
+	height: 250px;
+	margin-left: auto;
+	margin-right: auto;
+}
+div.irstats2_googlegeochart
+{
+	width: 600px;
+	height: 300px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.irstats2_googlegraph
+{
+	width: 750px;
+	height: 200px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+div.irstats2_googlespark
+{
+	width: 150px;
+	height: 50px;
+	margin: 0px;
+	display: inline;
+	float:left;
+	border: 0px;
+	padding: 0px;
+}
+
+div.irstats2_counter
+{
+	display: inline;
+}
+
+div.irstats2_view_KeyFigures div.irstats2_view_content
+{
+	padding-top: 10px;
+}
+
+span.irstats2_keyfigures_metric_figure
+{
+	font-weight: bold;
+	font-size: 20px;
+}
+
+span.irstats2_keyfigures_metric_text
+{
+	padding-left: 5px;
+}
+
+div.irstats2_ruler {
+	clear:both;
+	margin-bottom: 10px;
+}
+
+div.irstats2_keyfigures_section {
+	float:left;
+	width: 50%
+}
+
+div.irstats2_keyfigures_deposits {
+	float:left;
+	width: 50%
+}
+
+div.irstats2_keyfigures_downloads {
+	float:right;
+	width: 50%
+}
+
+div.irstats2_keyfigures_fulltext {
+	float:left;
+	width: 50%;
+}
+
+div.irstats2_keyfigures_openaccess {
+	float:right;
+	width: 50%
+}
+
+table.irstats2_keyfigures_progress {
+	margin-left:12px;
+}
+
+table.irstats2_keyfigures_progress div.irstats2_progress_wrapper {
+	height: 25px;
+}
+
+
+table.irstats2_keyfigures_progress div.irstats2_progress {
+	height: 25px;
+}
+
+table.irstats2_keyfigures_progress td {
+	padding: 5px;
+}
+
+div.irstats2_deposit_details {
+	font-size: 12px;
+	color: #666;
+	margin-top: 5px;
+	margin-left: 10px;
+}
+
+span.irstats2_counter_label
+{
+	color: #333333;
+	font-size: 14px;
+	margin: auto 2px;	
+	vertical-align: middle;
+}
+
+span.irstats2_counter_value
+{
+	color: #000000;
+	font-size: 20px;
+	font-weight:bold;
+	margin: auto 2px;
+	vertical-align: bottom;
+	padding-bottom:4px;
+}
+
+img.irstats2_spin
+{
+	vertical-align:middle;
+}
+
+span.irstats2_loading
+{
+	margin-left: 5px;
+	vertical-align:middle;
+	color: #666666;
+}
+
+table.irstats2_table
+{
+	border-collapse: collapse;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top: 10px;
+	width: 100%;
+}
+
+div.irstats2_table_options
+{
+	text-align: center;
+}
+
+div.irstats2_table_options > a
+{
+	padding-left: 5px;
+}
+
+tr.irstats2_table_headings > td
+{
+	font-weight: bold;	
+	background-color: #666;
+	color: #FFF;
+	text-align: left;
+	padding: 2px;
+}
+
+td.irstats2_table_cell_order
+{
+	text-align:center;
+	width: 20px;
+}
+
+td.irstats2_table_cell_object
+{
+	padding-left: 5px;
+}
+
+td.irstats2_table_cell_count
+{
+	text-align:center;
+	width: 100px;
+}
+
+tr.irstats2_table_row_even > td
+{
+	padding: 2px;
+	background-color: #FFFFFF;
+}
+
+tr.irstats2_table_row_odd > td
+{
+	padding: 2px;
+	background-color: #EEE;
+}
+
+div.irstats2_reportmenu_row
+{
+	padding: 5px;
+	vertical-align:bottom;
+}
+span.irstats2_date_separator
+{
+	padding-left:5px;
+	padding-right:5px;
+}
+span.irstats2_date_label
+{
+	font-size:14px;
+	font-weight:bold;
+}
+div.irstats2_progress
+{
+        background-color: #c1d0ef;
+        color: #000;
+	text-align:left;
+	padding: 0px;
+	margin: 0px;
+}
+div.irstats2_progress_wrapper
+{
+	border: 1px solid #3366cc;
+	margin: 0px;
+	padding: 0px;
+	text-align:left;
+}
+div.irstats2_progress > span
+{
+	padding-left: 5px;
+	display: block;
+	width: 100px;
+}
+
+span.irstats2_keyfigures_metric {
+	font-size: 14px;
+	line-height: 50px;
+}
+
+h3.irstats2_keyfigures_heading, h3.irstats2_linkstoreports_heading
+{
+	margin-top: 2px;
+	margin-bottom: 2px;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+div.irstats2_keyfigures_column
+{
+	width: 25%;
+	float: left;
+	text-align:left;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+div.irstats2_reportheader_column
+{
+	float: left;
+	text-align:left;
+	margin-left:15px;
+}
+
+table.irstats2_reports 
+{
+	border-collapse:collapse;	
+	width: 100%;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+td.irstats2_reports_heading
+{
+	border: 1px solid #CCC;
+	padding: 2px 10px;
+	text-align:right;
+	width: 20%;
+	background-color: #EEE;
+}
+
+td.irstats2_reports_heading > span
+{
+	color: #222;
+}
+
+td.irstats2_reports_content
+{
+	border: 1px solid #CCC;
+	padding: 2px 10px;
+	text-align: left;
+	width: 80%;
+}
+
+td.irstats2_reports_content > span
+{
+	padding-right: 10px;
+	font-family: Verdana;
+}
+
+
+a.irstats2_export_bar_toggle
+{
+	float: right;
+}
+
+div.irstats2_export_bar
+{
+	text-align: left;
+}
+
+div.irstats2_export_content
+{
+	margin: 0px auto;
+	border-bottom: 1px solid #D7D9E5;
+	padding: 5px;
+	text-align: center;
+	background-color: #F9F9F9;
+}
+
+.irstats2_setdesc_link
+{
+	margin-left: 5px;
+	width: 45px;
+}
+
+input.irstats2_setdesc_q
+{
+	margin-top: 5px;
+	border: 1px solid #CCCCCC;
+	padding: 2px;
+	font-size: 14px;	
+}
+
+input.irstats2_placeholder
+{
+	color: #AAA;
+	font-style: italic;
+}
+
+div.irstats2_setdesc_values
+{
+	max-height:150px;
+	overflow-y:scroll; 
+	margin: 5px; 
+	padding: 5px; 
+	border: 1px solid #CCCCCC;
+	background-color: #FFFFFF;
+}
+
+ul.irstats2_setfinder_values
+{
+	margin: 0px;
+	padding: 0px;
+}
+
+ul.irstats2_setfinder_values > li
+{
+}
+
+div.irstats2_setfinder_row > a
+{
+	display: block
+}
+
+div.irstats2_setfinder_row > a:hover
+{
+	background-color: #F5F5F5;
+}
+
+div.irstats2_datepicker_inner
+{
+	font-size:11px;
+	padding: 4px;
+	color:#000;
+}
+
+p.irstats2_error_login {
+	width: 100%;
+	text-align: center;
+}
+
+h3.irstats2_summary_page_header {
+	margin-top:20px;
+}
+
+div.irstats2_summary_page_container {
+	border:1px solid #CCC;
+	width:80%;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+div.irstats2_summary_page_container > p {
+	text-align:center;
+	width:100%;
+	margin:5px 0px 0px 0px;
+	color:#666;
+}
+
+#irstats2_summary_page_downloads {
+	height:250px;
+	width:100%
+}
+
+#irstats2_summary_page_countries {
+	height:250px;
+	width:100%
+}
+
+td.irstats2_reportheader_breadcrumbs {
+	width: 60%;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 5px;
+}
+
+td.irstats2_reportheader_breadcrumbs > a, td.irstats2_reportheader_breadcrumbs > a:visited {
+	color: #0645AD;
+}
+
+div.irstats2_reportheader_timeline {
+	width: 30%;
+	float: right;
+	text-align: right;
+	vertical-align: middle;
+}
+
+div.irstats2_reportheader_timeline_frame {
+	font-size: 14px;
+	padding: 5px;
+	text-align: right;
+	float: right;
+}
+
+div.irstats2_reportheader_options {
+	width:100%;
+	text-align: left;
+	vertical-align: middle;
+}
+
+div.irstats2_reportheader_clear {
+	clear:both;
+}
+
+div.irstats2_reportheader {
+	width: 100%;
+	padding: 0px;
+}
+
+table.irstats2_reportheader {
+	width: 100%;
+}
+
+div.irstats2_view_ReportHeader {
+	border: 0px;
+}
+
+input.irstats2_form_action_button {
+	text-align: center;
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 3px;
+	padding: 2px 20px;
+	cursor: pointer;
+	background-color: #F9F9F9;
+	color: #111;
+}
+
+input.irstats2_form_action_button:active, input.irstats2_form_action_button:hover, input.irstats2_form_action_button_selected {
+	background-color: #EEE;
+	color: #222;
+}
+
+div.irstats2_options_dates, div.irstats2_options_filters, div.irstats2_options_reports {
+	background-color: #EEE;
+	text-align: left;
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 3px;
+	border-color: #DDD;
+}
+
+table.irstats2_view_Grid div.irstats2_view {
+	width: 97%;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/irstats2_datepicker.css */
+
+/* This is a very basic stylesheet for the date-picker. Feel free to create your own. */
+
+/* The wrapper div */
+div.datePicker
+        {
+        position:absolute;
+        min-width:24em;
+        width:24em;
+        z-index:9999;
+        text-align:center;
+
+        /* Change the font-size to suit your design's CSS. The following line is for the demo that has a 12px font-size defined on the body tag */
+        font:900 0.8em/0.8em Verdana, Sans-Serif;
+        
+        /* For Example: If using the YUI font CSS, uncomment the following line to get a 10px font-size within the datePicker */
+        /* font:900 77%/77% Verdana; */
+
+        background:transparent;
+
+        /* Mozilla & Webkit extensions to stop text-selection. Remove if you wish to validate the CSS */
+        -moz-user-select:none;
+        -khtml-user-select:none;
+        }
+/* Styles for the static datePickers */
+div.staticDP
+        {
+        position:relative;
+        top:5px;
+        left:0;
+        }
+/* The iframe hack to cover selectlists in Internet Explorer <= v6 */
+iframe.iehack
+        {
+        position:absolute;
+        background:#fff;
+        z-index:9998;
+        padding:0;
+        border:0;
+        display:none;
+        margin:0;
+        }
+/* The "button" created beside each input for non-static datePickers */
+a.date-picker-control:link,
+a.date-picker-control:visited,
+a.date-picker-control:hover,
+a.date-picker-control:active,
+a.date-picker-control:focus
+        {
+        /*position:relative;*/
+        /* Moz & FF */
+        display: -moz-inline-stack;
+        border:0 none;
+        padding:0;
+        margin:0 0 0 4px;
+        background:transparent url(../images/irstats2/datepicker/cal.gif) no-repeat 50% 50%;
+        min-width:16px;
+        line-height:1;
+        cursor:pointer;
+        visibility:visible;
+        text-decoration:none;
+        vertical-align:middle;
+        }
+/* Feed IE6 the following rule, IE7 should handle the min-width declared above */
+* html a.date-picker-control
+        {
+        width:16px;
+        }
+a.date-picker-control
+        {
+        /* IE, Safari & Opera. Seperate CSS rule seems to be required. */
+        display:inline-block;
+        }
+a.date-picker-control span
+        {
+        display:block;
+        width:16px;
+        height:16px;
+        margin:auto 0;
+        }
+/* The next & previous buttons */
+div.datePicker th span
+        {
+        display:inline;
+        padding:0;
+        margin:0;
+        color:#000;
+        text-align:center;
+        line-height:1em;
+        border-width:0;
+        font-family: georgia, times new roman, palatino, times, bookman, serif;
+        background:transparent;
+        font-weight:bold;
+        cursor:pointer;
+        }
+div.datePicker th span.month-display,
+div.datePicker th span.year-display
+        {
+        text-transform:uppercase;
+        letter-spacing:1px;
+        font:normal 1.2em Verdana, Sans-Serif;
+        cursor:default;
+        }
+div.datePicker th span.prev-but,
+div.datePicker th span.next-but
+        {
+        font-size:1.8em;
+        cursor:pointer !important;
+        }
+
+div.datePicker th span.today-but
+        {
+        text-align:center;
+        margin:0 auto;
+        font:normal 1em Verdana, Sans-Serif;
+        width:100%;
+        text-decoration:none;
+        line-height:1.6em;
+        text-transform:uppercase;
+        cursor:pointer !important
+        }
+div.datePicker thead th span.fd-disabled
+        {
+        color:#aaa;
+        cursor:default !important;
+        }
+/* The mon, tue, wed etc day buttons */
+div.datePicker th span.fd-day-header
+        {
+        text-align:center;
+        margin:0 auto;
+        font:900 1em Verdana, Sans-Serif;
+        height:1.4em;
+        width:2em;
+        text-decoration:none;
+        text-transform:lowercase;
+        line-height:1.4em;
+        }
+/* The table */
+div.datePicker table
+        {
+        position:relative;
+        margin:0;
+        padding:0;
+        border:1px solid #ccc;
+        background:#fff url(../images/irstats2/datepicker/gradient-e5e5e5-ffffff.gif) repeat-x 0 -20px;
+        text-align:center;
+        width:100%;
+        border-spacing:2px;
+        table-layout:fixed;
+        border-collapse:separate;
+        }
+/* Common TD & TH styling */
+div.datePicker table td
+        {
+        border:1px solid #ccc;
+        padding:0;
+        text-align:center;
+        vertical-align:middle;
+        /* Opera requires a line-height bigger than 1em in order to redraw properly */
+        line-height:1.2em;
+        cursor:pointer;
+        background:#fff url(../images/irstats2/datepicker/gradient-e5e5e5-ffffff.gif) repeat-x 0 -40px;
+        width:3em;
+        height:3em !important;
+        height:2.8em;
+        outline:none;
+        }
+div.datePicker table th
+        {
+        border:0 none;
+        padding:0;
+        line-height:1em;
+        font-weight:bold;
+        color:#222;
+        text-align:center;
+        vertical-align:middle;
+        }
+div.datePicker table td.date-picker-unused
+        {
+        background:#fff url(../images/irstats2/datepicker/backstripes.gif);
+        border-color:#dcdcdc;
+        padding:0;
+        cursor:default !important;
+        }
+div.datePicker table thead th.date-picker-title
+        {
+        width:auto;
+        height:auto;
+        padding:0.4em 0;
+        }
+/* The "mon tue wed etc" day header button styles */
+div.datePicker table th.date-picker-day-header
+        {
+        text-transform:lowercase;
+        width:3em;
+        }
+div.datePicker table th.date-picker-day-header span
+        {
+        display:block;
+        }
+/* The "todays date" style */
+div.datePicker table td.date-picker-today
+        {
+        background:#fff url(../images/irstats2/datepicker/bullet2.gif) no-repeat 0 0;
+        color:rgb(100,100,100) !important;
+        }
+/* The "selected date" style */
+div.datePicker table td.date-picker-selected-date
+        {
+        color:#333 !important;
+        border-color:#333 !important;
+        }
+/* the "highlight days" style */
+td.date-picker-highlight
+        {
+        color:#a86666;
+        }
+/* The date "out of range" style */
+div.datePicker table td.out-of-range
+        {
+        color:#ccc !important;
+        font-style:oblique;
+        background:#fcfcfc !important;
+        cursor:default !important;
+        }
+/* The "disabled days" style */
+div.datePicker table td.day-disabled
+        {
+        color:#aaa !important;
+        background:transparent !important;
+        cursor:default !important;
+        }
+/* The "active cursor" style */
+div.datePicker table tbody td.date-picker-hover
+        {
+        background:#fff url(../images/irstats2/datepicker/bg_header.jpg) no-repeat 0 0;
+        cursor:pointer;
+        border-color:rgb(100,130,170);
+        color:rgb(100,130,170);
+        }
+/*
+   Quirksmode necessity?
+   ---------------------
+
+   If your HTML document renders in quirksmode (i.e. has no doctype declaration)
+   then uncomment the following CSS rule to set a less drastic font-size in IE
+
+div.datePicker table th,
+div.datePicker table td
+        {
+        font-size:100%;
+        }
+*/
+
+/* Remove the images for Internet Explorer <= v6 using the "* html" hack */
+* html div.datePicker table td
+        {
+        background-image:none;
+        }
+* html div.datePicker table td.date-picker-unused
+        {
+        background:#f2f2f2;
+        }
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/items.css */
+
+
+/* Items Screen */
+
+.ep_items_filters {
+	text-align: center;
+	margin-top: 10px;
+}
+
+.ep_items_filters img {
+	border-width: 0px;
+	margin-left: 10px;
+	vertical-align: -2px;
+}
+
+.ep_items_filters a {
+	color: #000000;
+	text-decoration: none;
+}
+
+
+td.ep_columns_cell_inbox {
+	background-color: #ffc;
+}
+td.ep_columns_cell_buffer {
+	background-color: #dde;
+}
+td.ep_columns_cell_archive {
+	background-color: #cfc;
+}
+td.ep_columns_cell_deletion {
+	background-color: #ccc;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/latest.css */
+
+
+/* latest and latest tool */
+
+div.ep_latest_result {
+	margin-bottom: 0.5em;
+	margin-top: 0.5em;
+}
+
+div.ep_latest_tool_result {
+	margin-bottom: 0.5em;
+	margin-top: 0.5em;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/lightbox.css */
+
+#lightbox{	position: absolute;	left: 0; width: 100%; z-index: 100; text-align: center; }
+#lightbox img{ width: auto; height: auto;}
+#lightbox a img{ border: none; }
+
+#outerImageContainer{ position: relative; background-color: #fff; width: 250px; height: 250px; margin: 0 auto; }
+#imageContainer{ padding: 10px; }
+
+#loading{ position: absolute; top: 40%; left: 0%; height: 25%; width: 100%; text-align: center; line-height: 0; }
+/* #hoverNav{ position: absolute; top: 0; left: 0; height: 100%; width: 100%; z-index: 10; }
+#imageContainer>#hoverNav{ left: 0;} */
+#hoverNav a{ outline: none;}
+
+/* #prevLink, #nextLink{ width: 49%; height: 100%; background-image: url(data:image/gif;base64,AAAA); display: block; }
+#prevLink { left: 0; float: left;}
+#nextLink { right: 0; float: right;}
+#prevLink:hover, #prevLink:visited:hover { background: url(images/lightbox/prevlabel.gif) left 15% no-repeat; }
+#nextLink:hover, #nextLink:visited:hover { background: url(images/lightbox/nextlabel.gif) right 15% no-repeat; } */
+
+#hoverNav { height: 30px; }
+#prevLink, #nextLink { width: 49%; height: 100%; display: block; }
+#prevLink { left: 0; float: left; background: url(images/lightbox/prevlabel.gif) left 0 no-repeat; }
+#nextLink { right: 0; float: right; background: url(images/lightbox/nextlabel.gif) right 0 no-repeat; }
+
+#imageDataContainer{ font: 10px Verdana, Helvetica, sans-serif; background-color: #fff; margin: 0 auto; line-height: 1.4em; overflow: auto; width: 100%	; }
+
+#imageData{	padding:0 10px; color: #666; }
+#imageData #imageDetails{ width: 70%; float: left; text-align: left; }	
+#imageData #caption{ font-weight: bold;	}
+#imageData #numberDisplay{ display: block; clear: left; padding-bottom: 1.0em;	}			
+#imageData #bottomNavClose{ width: 66px; float: right;  padding-bottom: 0.7em; outline: none;}	 	
+
+#overlay{ position: absolute; top: 0; left: 0; z-index: 90; width: 100%; height: 500px; background-color: #000; }
+
+#lightboxMovie {}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/mail.css */
+
+
+
+.ep_mail_view {
+	border: dashed 2px #ccc;
+	margin-top: 20px;
+	background-color: #eee;
+}
+
+.ep_mail_header {
+	margin: 4px; 
+	padding: 2px;
+	font-family: monospace;
+}
+
+.ep_mail_body {
+	margin: 4px;
+	padding: 2px;
+}
+
+.ep_mail_body textarea {
+	background-color: #ccc;
+	border: solid #888 1px;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/messages.css */
+
+
+/* Message styles - used to provide alerts and errors */
+
+.ep_msg_message, .ep_msg_warning, .ep_msg_error, .ep_msg_other {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.ep_msg_message_icon, .ep_msg_warning_icon, .ep_msg_error_icon {
+	padding: 10px;
+}
+
+.ep_msg_message_content, .ep_msg_error_content, .ep_msg_warning_content, .ep_msg_other_content {
+	border-style: solid;
+	border-width: 1px;
+}
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/multi.css */
+
+
+
+/* 
+   Styles for the multi-field component.
+
+   ep_multi_*
+
+*/
+
+table.ep_multi
+{
+	width: 100%;
+}
+
+table.ep_multi tr:first-child th.ep_multi_heading,
+table.ep_multi tr:first-child td.ep_multi_input,
+table.ep_multi tr:first-child td.ep_multi_help 
+{
+	border-top: none;
+}
+
+th.ep_multi_heading
+{
+	border-top: dashed #bbf 1px;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	padding-right: 0.5em;
+	text-align: right;
+}
+
+td.ep_multi_input
+{
+	border-top: dashed #bbf 1px;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	border-left: dashed #bbf 1px;
+}
+
+td.ep_multi_help
+{
+	white-space: nowrap;
+	border-top: dashed #bbf 1px;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	padding-left: 0.5em;
+	vertical-align: top;
+	text-align: right;
+}
+
+/* help bits */
+
+.ep_multi_inline_help 
+{
+	padding-bottom: 0.5em;
+}
+	
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/nojs.css */
+
+
+/*  only loaded if the browser has javascript turned off (or does
+ *  not support it.
+ */
+
+.ep_no_js { display: block; }
+
+.ep_no_js_inline { display: inline; }
+
+.ep_no_js_table_cell { display: table-cell; }
+
+.ep_only_js { display: none; }
+
+.ep_only_js_inline { display: none; }
+
+.ep_only_js_table_cell { display: none; }
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/preview.css */
+
+
+/* 
+   Styles for the file preview popup.
+
+   ep_preview_*
+
+*/
+
+
+.ep_preview
+{
+	display: none;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 400px;	
+}
+
+.ep_preview table
+{
+	border: solid 1px black;
+	background-color: white;
+	padding: 4px;
+	margin: auto;
+}
+
+.ep_preview_title
+{
+	padding-top: 3px;
+	text-align: center;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/print.css */
+
+@media print {
+
+.ep_noprint {
+	display: none;
+}
+
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/progress.css */
+
+div#progress {
+	margin: 0px auto;
+	width: 382px;
+}
+
+.progressmeter {
+    font-size: 10pt;
+    text-align: center;
+}
+
+.progressmeter table {
+}
+
+.progressmeter th {
+    font-weight: bold;
+    text-align: right;
+}
+
+.progressmeter td {
+    text-align: left;
+}
+
+.finished {
+    color: #667799;
+}
+
+.progressmeter .meter {
+    position: relative;
+    background-color: lightgrey;
+    border: 2px solid #667799;
+    height: 20px;
+    width: 380px;
+}
+
+.progressmeter .meter .amount {
+	margin: 0px auto 0px 0px;
+    background-color: #667799;
+    width: 0px;
+    height: 20px
+}
+
+.progressmeter .meter .percent {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 20px;
+    z-index: 1000;
+    line-height: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.UploadMethod_file_progress_table {
+	width: 550px;
+	margin: 0 auto;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/savedsearches.css */
+
+
+
+table.ep_savedsearches {
+	margin: 10px auto 10px auto;
+}
+
+table.ep_savedsearches th {
+	border-bottom: 1px solid #ccc;
+}
+table.ep_savedsearches td {
+	border-bottom: 1px solid #ccc;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/search.css */
+
+
+/* EPrints 3 search form style */
+
+
+
+/* buttons are on the form, controls on the results */
+.ep_search_buttons, .ep_search_controls, .ep_search_controls_bottom {
+	border-style: solid none;
+	border-width: 1px;
+	text-align: center;
+	padding: 4px 0px;
+	margin: 4px 0px 12px 0px;
+}
+
+.ep_search_fields {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+.ep_search_fields th {
+	padding: 4px;
+}
+	
+.ep_search_fields td {
+	padding: 4px;
+}
+	
+
+.ep_search_control
+{
+	padding: 0px 4px 0px 4px;
+}
+
+.ep_search_export {
+	margin: 0.25em auto 0.25em auto;
+	text-align: center;
+}
+
+.ep_search_reorder {
+	margin: 0.4em auto 0 auto;
+	text-align: center;
+}
+
+.ep_search_tool {
+	white-space: nowrap;
+}
+.ep_search_tool img {
+	vertical-align: -2px;
+	padding-left: 0.5em;
+}
+.ep_search_tool a {
+	text-decoration: none;
+	color: #888;
+}
+
+
+.ep_search_feed {
+	white-space: nowrap;
+}
+.ep_search_feed img {
+	vertical-align: -2px;
+	padding-left: 0.5em;
+}
+.ep_search_feed a {
+	text-decoration: none;
+	color: #888;
+}
+
+.ep_search_results
+{
+	margin: 1em 0 1em 0;
+}
+
+.ep_search_desc
+{
+	text-align: center;
+	margin: 0.25em 0 0 0;
+}
+
+.ep_search_result td
+{
+	padding: 4px;
+	border-bottom: dashed #bbf 1px;
+}
+
+.ep_paginate_list
+{
+	margin: auto;
+	display: table;
+}
+
+.ep_search_field_name
+{
+	font-weight: bold;
+	margin-top: 0.5em;
+}
+
+input.ep_form_search_advanced_link, input.ep_form_search_advanced_link:hover {
+        border: none;
+        text-decoration: underline;
+        background: none;
+        color: #00f;
+        cursor: pointer;
+}
+
+span.search_desc {
+	font-style: italic;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/subjectinput.css */
+
+
+/* 
+   Styles for the subject component.
+
+   ep_subjectinput_*
+
+*/
+
+div.ep_subjectinput_tree {
+	margin-left: 25px;
+}
+.ep_subjectinput_tree dl {
+	margin: 0px 0px 0px 15px;
+	padding: 0px 0px;
+}
+.ep_subjectinput_tree dl dt {
+	margin: 0px 0px;
+	padding-left: 18px;
+	line-height: 18px;
+}
+.ep_subjectinput_tree dl dd {
+	margin-left: 0px;
+}
+.ep_subjectinput_tree dl dt.ep_subjectinput_tree {
+	cursor: pointer;
+	background: url(images/plus.png) no-repeat;
+}
+.ep_subjectinput_tree dl dt.ep_subjectinput_tree_open {
+	background: url(images/minus.png) no-repeat;
+}
+
+.ep_subjectinput_toggle {
+	text-decoration: none;
+	color: #000000;
+}
+
+.ep_subjectinput_selections {
+	margin: 0.5em auto 0.5em auto;
+	margin-top: 0.5em; 
+	padding: 0.5em; 
+}
+
+.ep_subjectinput_selected {
+	font-weight: bold;
+}
+
+.ep_subjectinput_selected_subject {
+	font-weight: bold;
+}
+
+ul.ep_subjectinput_subjects {
+	list-style: none;
+}
+ul.ep_subjectinput_subjects li {
+	margin-top: 3px;
+	margin-bottom: 3px;
+	list-style: none;
+}
+ul.ep_subjectinput_subjects img {
+	vertical-align: -2px;
+}
+
+
+.ep_subjectinput_selections {
+	padding-bottom: 10px;
+	border-bottom: dashed #808080 1px; 
+	margin-bottom: 10px;
+}
+.ep_subjectinput_selections td.ep_first {
+	border-top: none;
+}
+
+.ep_subjectinput_selections td {
+	border-top: dashed #ccc 1px; 
+}
+
+.ep_subjectinput_results {
+	border: dashed #c8cbdf 1px; 
+	margin-top: 0.5em; 
+	padding: 0.5em; 
+	background-color: white;
+	list-style: none;
+}
+
+.ep_subjectinput_results td.ep_first {
+	border-top: none;
+}
+
+.ep_subjectinput_results td {
+	border-top: dashed #ccc 1px; 
+}
+
+.ep_subjectinput_add_button, .ep_subjectinput_remove_button {
+	border: solid blue 1px;
+	padding: 1px;
+	background-color: transparent;
+	font-size: 70%;
+	color: blue;
+}
+
+
+.ep_subjectinput_searchbar {
+	text-align: center;
+}
+
+/* End of subject component section */
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/summary.css */
+
+
+/* Item Summary */
+
+.ep_summary_content {
+}
+.ep_summary_content_top {
+}
+.ep_summary_content_bottom {
+}
+.ep_summary_content_left {
+	float: left;
+}
+.ep_summary_content_right {
+	float: right;
+}
+.ep_summary_content_after {
+	clear: both;
+}
+
+
+.ep_summary_content_left .ep_summary_box {
+	width: 200px;
+	margin-right: 10px;
+}
+.ep_summary_content_right .ep_summary_box {
+	width: 200px;
+	margin-left: 10px;
+}
+
+
+.ep_summary_box {
+	margin-bottom: 10px
+}
+.ep_summary_box_title {
+	font-weight: normal;
+	padding: 2px 6px 2px 6px; 
+	font-weight: bold;
+	font-size: 115%;
+	border-style: solid;
+	border-width: 1px;
+}
+.ep_summary_box_body {
+	padding: 2px 6px 2px 6px; 
+	border-style: none solid solid solid;
+	border-width: 1px;
+}
+.ep_summary_box_title a {
+	text-decoration: none;
+}
+.ep_summary_box_title img
+{
+	vertical-align: -1px;
+}
+
+
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/surround.css */
+
+
+/* EPrints 3 default workflow component-surround style */
+
+/* ep_sr */
+
+.ep_sr_component {
+	padding: 0px;
+	margin-top: 10px;
+}
+.ep_sr_component .ep_sr_title_bar {
+	padding: 2px 6px 2px 6px; 
+}
+
+.ep_sr_component .ep_sr_title_bar table {
+}
+.ep_sr_component .ep_sr_title {
+	font-weight: bold;
+	font-size: 115%;
+	color: #444;
+}
+.ep_sr_component .ep_sr_content {
+	clear: both;
+	padding: 6px;
+	border-style: none solid solid solid;
+	border-width: 1px;
+}
+
+/* collapse bar */
+
+.ep_sr_collapse_bar {
+	padding: 2px 6px 2px 6px; 
+	font-weight: bold;
+	font-size: 115%;
+	margin-top: 10px;
+	border-style: solid;
+	border-width: 1px;
+}
+.ep_sr_collapse_bar a {
+	text-decoration: none;
+}
+.ep_sr_title a {
+	text-decoration: none;
+}
+.ep_sr_collapse_link img
+{
+	vertical-align: -1px;
+}
+
+/* help style - not primetime */
+
+.ep_sr_component .ep_sr_help {
+	margin-bottom: 8px;
+}
+.ep_sr_component .ep_sr_show_help {
+	white-space: nowrap;
+}
+.ep_sr_component .ep_sr_show_help a {
+	text-decoration: none;
+}	
+.ep_sr_component .ep_sr_hide_help {
+	white-space: nowrap;
+}
+.ep_sr_component .ep_sr_hide_help a {
+	text-decoration: none;
+}	
+.ep_sr_component .ep_sr_title_bar {
+	border-style: solid;
+	border-width: 1px;
+}
+.ep_sr_show_help img {
+	vertical-align: -2px;
+}
+.ep_sr_hide_help img {
+	vertical-align: -2px;
+}
+
+
+/* used for multi, maybe should be elsewhere */
+.ep_sr_component .ep_sr_help_chunk {
+	border-bottom: 1px solid #888;
+	padding-bottom: 4px; 
+	margin-bottom: 4px;
+}
+
+.ep_sr_component .ep_form_input_grid {
+	margin: auto;
+}
+.ep_multi_input .ep_form_input_grid {
+	margin-left: 0px;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/tabs.css */
+
+
+/* Tab Bar */
+
+.ep_tab_panel, .ep_tab_bar li, .ep_tab_bar li a {
+	border-width: 1px;
+	border-style: solid;
+}
+
+/* selected tab */
+.ep_tab_bar li.ep_tab_selected a {
+	border-bottom-width: 0;
+}
+
+/* panel contents */
+.ep_tab_panel {
+}
+
+/* tab text */
+.ep_tab_bar a {
+/*	color: #000000; */
+}
+
+/* remaining styles are structural */
+
+.ep_tab_bar {
+	list-style: none;
+	padding: 0 0;
+	margin: 0 0;
+}
+
+.ep_tab_bar li {
+	float: left;
+	padding: 0 0;
+	margin: 0 0;
+	border-top-width: 0;
+	border-right-width: 0;
+	border-left-width: 0;
+	list-style-type: none;
+}
+
+.ep_tab_bar li:first-child a {
+	margin-left: 1.5em;
+}
+
+.ep_tab_bar li a {
+	text-decoration: none;
+	text-align: center;
+	display: block;
+	margin-right: 1.5em;
+	padding: 3px 8px 4px 8px;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	margin-bottom: -1px; /* overwrite bottom-margin of li */
+	border-bottom-width: 0;
+}
+
+.ep_tab_panel {
+	border-top-width: 0;
+	padding: 12px;
+	clear: left;
+}
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/template.css */
+
+
+/* EPrints 3 template styles */
+/* prefix all styles with ep_tm */
+
+hr.ep_tm_last {
+	color: #152d4e;
+	background-color: #152d4e;
+}
+
+
+/* deprecated in 3.3 */
+.ep_tm_logo img {
+	float: right;
+	padding: 4px;
+	border-style: none;
+}
+
+.ep_tm_site_logo img {
+	border-style: none;
+	padding: 10px 10px;
+}
+
+.ep_tm_archivetitle, .ep_tm_archivetitle:visited {
+	font-size: 40px;
+	text-decoration: none;
+	margin: 10px;
+}
+
+.ep_tm_main {
+        margin: 1em;
+}
+
+/* Menu Bar */
+
+.ep_tm_menu, .ep_tm_key_tools {
+	clear: both;
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+.ep_tm_key_tools {
+	display: block;
+}
+
+.ep_tm_menu {
+	height: 30px;
+	line-height: 30px;
+}
+
+.ep_tm_menu, .ep_tm_menu ul {
+/*	background-color: #204f76; */
+}
+
+.ep_tm_menu li {
+	float: left;
+}
+.ep_tm_menu ul {
+}
+
+.ep_tm_menu a, .ep_tm_menu a:visited {
+	display: block;
+	padding: 0px 20px;
+	text-decoration: none;
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+.ep_tm_menu ul
+{
+	list-style: none;
+	position: absolute;
+	margin: 0;
+	padding: 0;
+}
+
+.ep_tm_menu ul li {
+	float: none;
+}
+
+.ep_tm_menu ul a
+{
+	text-align: left;
+}
+
+.ep_tm_key_tools li {
+	list-style: none;
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+
+.ep_tm_key_tools li a:hover {
+}
+
+.ep_tm_key_tools a {
+/*	white-space: nowrap; */
+}
+
+/* end of menu bar */
+
+/* Action Menu Bar */
+
+.ep_tm_key_tools li {
+	padding: 0px 6px;
+}
+
+.ep_tm_key_tools li:first-child {
+	padding-left: 0px;
+}
+
+/* end of Action Menu Bar */
+
+/* Search bar */
+
+.ep_tm_searchbar {
+	padding: 4px 10px;
+}
+
+.ep_tm_searchbarbutton {
+	text-align: center;
+	padding: 1px 4px;
+	margin: 0px;
+	margin-left: 4px;
+	font-size: 85%;
+	background-position: 0px -2px;
+	border-width: 1px;
+	border-radius: 3px;
+}
+
+.ep_tm_searchbarbox {
+	font-size: 80%;
+	padding: 2px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+/* end of search bar */
+
+#ep_tm_languages {
+	display: inline;
+}
+#ep_tm_languages a {
+	margin-left: 4px;
+}
+
+.ep_tm_searchbar {
+        border-width:0;
+        width:100%;
+}
+
+.ep_tm_searchbar td {
+        padding: 0;
+        margin: 0;
+}
+
+.ep_tm_page_content {
+        width:770px;
+        margin-left: auto;
+		margin-right: auto;
+        margin-top:10px;
+}
+
+.ep_tm_eprints_logo {
+        float: right;
+        margin-left: 1em;
+}
+
+.ep_tm_footer {
+	clear: both;
+	margin-top: 20px;
+	font-size: 80%;
+	border-top-width: 2px;
+	border-top-style: solid;
+	padding: 10px 10px 0px 10px;
+}
+.ep_tm_footer hr {
+	display: none;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/toolbox.css */
+
+
+/* Toolbox styles - used to subdivide some content */
+
+.ep_toolbox {
+	margin-bottom: 10px;
+}
+
+.ep_toolbox_title {
+	padding: 2px 10px 2px 10px;
+}
+
+.ep_toolbox_content {
+	padding: 10px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/upload.css */
+
+
+/* 
+   Styles for the upload component.
+
+   ep_upload_*
+
+*/
+
+.ep_upload_newdoc
+{
+	text-align: center;
+/*	margin-top: 1em;
+	margin-bottom: 1em; */
+}
+
+.ep_upload_fields th
+{
+	text-align: right;
+}
+
+/* Document section */
+
+.ep_upload_doc
+{
+	margin-bottom: 0.5em;
+	border-style: solid;
+	border-width: 1px;
+}
+
+.ep_upload_doc .ep_upload_doc_title_bar {
+	padding: 0px 6px 0px 6px; 
+	border-bottom: solid 1px #d8dbef;
+}
+.ep_upload_doc .ep_upload_doc_title {
+	color: #444;
+}
+.ep_upload_doc .ep_upload_doc_content {
+	clear: both;
+	padding: 6px;
+}
+
+.ep_update_doc_delete {
+	white-space: nowrap;
+}
+.ep_update_doc_delete input {
+	vertical-align: -2px;
+}
+
+.ep_update_doc_options {
+	white-space: nowrap;
+}
+.ep_update_doc_options img {
+	vertical-align: -2px;
+	border: none;
+}
+.ep_update_doc_options a {
+	text-decoration: none;
+}
+
+.ep_upload_doc_toolbar
+{
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	text-align: center;
+}
+
+.ep_upload_files
+{
+/*	border: dashed #c8cbdf 1px; 
+	text-align: center;
+	margin-top: 0.5em; 
+	padding: 0.5em; 
+	background-color: white; */
+}
+
+.ep_upload_file_table 
+{
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 0.5em;
+}
+.ep_upload_add_file_toolbar
+{
+	margin-top: 0.5em;
+}
+
+.ep_upload_doc_expansion_bar
+{
+	text-align: right;
+	padding: 2px .5em;
+}
+.ep_upload_doc_expansion_bar a
+{
+	cursor: pointer;
+	text-decoration: none;
+}
+
+/* End of Document section */
+
+/* Drag and drop */
+
+.ep_dropbox {
+	border-width: 2px;
+	border-style: dashed;
+	border-color: #4ea;
+	background-color: #fff;
+	font-weight: bold;
+	font-size: 110%;
+	padding: 40px 0px;
+}
+
+/* End of Drap and drop */
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/view.css */
+
+
+
+/* spacing between page elements */
+.ep_view_page h2 {
+	margin-top: 30px;
+}
+.ep_view_blurb {
+	margin-top: 20px;
+}
+.ep_view_timestamp {
+	margin-top: 30px;
+	text-align: right;
+}
+
+.ep_view_group_by_current {
+	font-weight: bold;
+}
+
+.ep_view_group_by {
+	border-style: solid none;
+	border-width: 1px;
+	text-align: center;
+	padding: 4px 0px;
+	margin: 4px 0px 12px 0px;
+}
+
+.ep_view_cols {
+	width: 100%;
+	margin-top: 1em;
+}
+
+.ep_view_cols_2 td { width: 50%; }
+.ep_view_cols_3 td { width: 33.3%; }
+.ep_view_cols_4 td { width: 25%; }
+.ep_view_cols_5 td { width: 20%; }
+.ep_view_cols_6 td { width: 16.6%; }
+.ep_view_cols_7 td { width: 14.28%; }
+.ep_view_cols_8 td { width: 12.5%; }
+
+.ep_view_cols ul {
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+
+	
+
+
+
+/* From: /opt/eprints3/archives/pittphilsci/cfg/static/style/auto/zzz_local.css */
+
+@charset "utf-8";
+/* CSS Document */
+
+/* CSS Document */
+
+/*
+ * This CSS file will be applied after all the built in styles.
+ *
+ * CSS files are loaded in alphabetic order, hence the  "zzz" in
+ * the filename to force it to load after the other css files!
+ *
+ * Add any local over-rides here.
+ *
+ * To totally replace a system css file, create a file of the same
+ * name in this directory. eg. messages.css
+ *
+*/
+/* From: /opt/eprints3/lib/static/style/auto/actions.css */
+
+.ep_act_bar {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.ep_act_bar table {
+  margin: auto;
+}
+
+.ep_act_list {
+  margin: auto;
+}
+
+td.ep_act_list_button {
+  text-align: right;
+  padding: 0.25em 0 0.25em 0;
+}
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/blister.css */
+
+
+/* EPrints 3 blister bar style */
+
+/* ep_blister */
+
+.ep_blister_bar {
+  margin: auto;
+}
+.ep_blister_join {
+  background-image: url(images/blister_arrow.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 20px;
+}
+.ep_blister_node {
+  padding: 3px;
+  text-align: center;
+  border: solid 1px #dbd2ba;
+  background-image: none;
+  background-color: #f6f1e5;
+  white-space: pre-wrap;
+}
+.ep_blister_node_selected {
+  padding: 6px;
+  text-align: center;
+  border: solid 1px #ebe3cd;
+  background-image: none; /*url(images/blue_bar.png);*/
+  color: #000;
+  white-space: pre-wrap;
+  background-color: #C8BC9B;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/columns.css */
+
+
+/* paginated columns */
+
+.ep_columns {
+  margin: auto;
+}
+
+td.ep_columns_cell {
+  border-left: 1px dashed #ccc;
+  border-bottom: 1px solid #ccc;
+}
+td.ep_columns_cell_first {
+}
+td.ep_columns_cell_last {
+  border-right: 1px dashed #ccc;
+}
+
+th.ep_columns_title {
+  border-left: solid 1px #dbd2ba;
+  border-bottom: solid 1px #dbd2ba;
+  border-top: solid 1px #dbd2ba;
+  background-image: none;
+  background-color: #f6f1e5;
+  font-weight: normal;
+
+}
+th.ep_columns_title a {
+  color: #000;
+  font-weight: normal;
+}
+th.ep_columns_title_last {
+  border-right: solid 1px #888;  
+}
+
+
+td.ep_columns_alter {
+  background-image: none;
+  background-color: #f6f1e5;
+  border-left: solid 1px #dbd2ba;
+  border-bottom: solid 1px #dbd2ba;
+}
+td.ep_columns_alter_last {
+  border-right: solid 1px #888;
+}
+
+td.ep_columns_no_items {
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  padding: 0.5em;
+  text-align: center;
+  font-size: 1.4em;
+}
+
+.ep_columns_add {
+  text-align: center;
+}
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/drop.css */
+
+
+/* style for ajax suggestion drops */
+
+.ep_drop_target {
+}
+
+.ep_drop_target ul {
+  margin: 0px;
+  padding: 4px;
+  list-style: none;
+  background-color: white;
+  border: 1px dotted #888;
+  z-index: 6;
+}
+  
+.ep_drop_target ul li {
+  margin: 0px;
+  padding: 3px;
+  list-style: none;
+  border-top: 1px dashed #ccc;
+  cursor: pointer;
+}
+.ep_drop_target ul li.ep_first {
+  border-top: none;
+}
+
+.ep_drop_target ul li.selected {
+  background-color: #f6f1e5;
+}
+
+
+
+
+.ep_drop_target ul ul {
+  display: none;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/fields.css */
+
+
+/* style for metafields */
+
+dl.ep_field_set_long dt label {
+  margin-bottom: 0.2em;
+  font-weight: bold;
+}
+
+dl.ep_field_set_long dd {
+  margin-bottom: 0.5em;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/form.css */
+
+
+/* Form related styles */
+
+form {
+  display: inline;
+}
+
+select, input.ep_form_text, textarea {
+  padding: 1px 2px 1px 2px;
+  margin-right: 4px;
+  border: solid 1px #ccc;
+}
+
+.ep_form_example {
+  font-weight: bold;
+  color: blue;
+}
+
+/* buttons */
+
+.ep_form_button_bar {
+  text-align: center;
+  padding: 4px;
+  background: transparent;
+  background-image: none; /*url(images/toolbox_title.png);*/
+  clear: both;
+  border: solid 0px #dbd2ba;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.ep_form_action_button, .ep_form_internal_button {
+  text-align: center;
+  border-width: 0px;
+  border-style: solid;
+  border-color: transparent;
+  background-image: none;
+  color: white;
+  padding: 3px 6px;
+  margin: 3px 1px;
+  font-weight: normal;
+  background-color: #a89b84;
+    border-radius: 31px;
+  -moz-border-radius: 31px;
+  -webkit-border-radius: 31px;
+}
+
+/* form fields */
+
+.ep_form_field_help {
+   font-size: 1em ;
+}
+
+.ep_form_field_name {
+  padding: 1.5em 0em 0.5em 0em;
+  font-size: 1.3em ;
+  font-weight: bold;
+}
+
+.ep_form_field_input {
+  padding: .5em;
+  background-color: #f6f1e5;
+  width: 720px;
+}
+
+/* input fields grid */
+
+
+.ep_form_input_grid th {
+  vertical-align: middle;
+  text-align: left;
+  font-size: 1em;
+  width: 600px;
+  white-space: pre-wrap;
+}
+.ep_form_input_grid td {
+  vertical-align: middle;
+  width: 600px;
+  white-space: pre-wrap;
+}
+
+td.ep_form_input_grid_pos {
+  padding-right: 4px;
+}
+td.ep_form_input_grid_arrows {
+  white-space: pre-wrap;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+
+td.ep_form_input_grid_wide {
+  text-align: left;
+}
+
+/* From: /opt/eprints3/lib/static/style/auto/general.css */
+
+.ep_hide {
+  display: none;
+}
+
+h1 {
+  text-align: left;
+  margin: 30px 0px 14px 0px;
+  padding: 0;
+  font-size: 3em;
+  font-family: Verdana, Geneva, sans-serif;
+  background-color: transparent;
+  color: #6E0E0E;
+  border-bottom: 1px solid #b3a791;
+  width: 100%;
+  font-weight: normal;
+}
+
+h2 {
+  margin: 10px 0 14px 0;
+  padding: 0;
+  font-size: 2.2em;
+  font-weight: normal;
+  border: 0;
+  background-color: transparent;
+  color: #7B6128;
+  font-family: Verdana, Geneva, sans-serif;
+}
+
+h3 {
+  color: #6E0E0E;
+  margin: 0 0 14px 0;
+  padding: 0;
+  font-size: 1.8em;
+  font-weight: normal;
+  font-family: Verdana, Geneva, sans-serif;
+  }
+
+h4 {
+  margin: 0 0 14px 0;
+  padding: 0;
+  font-size: 1.4em;
+  font-weight: normal;
+  font-family: Verdana, Geneva, sans-serif;
+  color: #7B6128;
+}
+
+.menuheading  {
+  margin: 0px 0px 0px 0px;
+  font-size: 1.9em;
+}
+
+p {
+  font-size: 1.2em;
+  font-weight: normal;
+  color: #333333;
+  padding: 3px 0px;
+  text-align: left;
+  line-height: 1.5em;
+}
+hr {
+  border: 0px;
+  color: #ccc;
+  background-color: #ccc;
+  height: 2px;
+}
+
+.ep_required {
+}
+
+.ep_toggle a, a.ep_toggle {
+  text-decoration: none;
+  color: #44c;
+}
+
+th.ep_row {
+  border-bottom: dotted #b3a791 1px;
+  padding-right: 0.25em;
+  text-align: right;
+  width: 20%;
+}
+td.ep_row {
+  border-left: dotted #b3a791 1px;
+  border-bottom: dotted #b3a791 1px;
+  padding-left: 0.25em;
+  text-align: left;
+}
+
+.ep_highlight {
+  padding: 0.5em;
+  border: solid 2px #ff8888;
+  background-color: #ffeeee;
+}
+
+.ep_block {
+  width: auto;
+  margin: 0.25em auto 0.25em auto;
+  text-align: center;
+}
+.ep_block td {
+  text-align: left;
+}
+
+.ep_doc_icon
+{
+  padding: 2px;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/icontable.css */
+
+
+table.ep_icontable {
+  border-collapse: collapse;
+}
+table.ep_icontable th {
+  border: solid 1px #999;
+  background-color: #fff;
+  text-align: center;
+}
+table.ep_icontable td {
+  padding-left: 4px;
+  border: solid 1px #999;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/items.css */
+
+
+/* Items Screen */
+
+.ep_items_filters {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.ep_items_filters img {
+  border-width: 0px;
+  margin-left: 10px;
+  vertical-align: -2px;
+}
+
+.ep_items_filters a {
+  color: #000000;
+  text-decoration: none;
+}
+
+
+td.ep_columns_cell_inbox {
+  background-color: #ffc;
+  border-left: 1px dashed #ccc;
+  border-bottom: 1px solid #888;
+}
+td.ep_columns_cell_buffer {
+  background-color: #dde;
+  border-left: 1px dashed #ccc;
+  border-bottom: 1px solid #888;
+}
+td.ep_columns_cell_archive {
+  background-color: #cfc;
+  border-left: 1px dashed #ccc;
+  border-bottom: 1px solid #888;
+}
+td.ep_columns_cell_deletion {
+  background-color: #ccc;
+  border-left: 1px dashed #ccc;
+  border-bottom: 1px solid #888;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/latest.css */
+
+
+/* latest and latest tool */
+
+div.ep_latest_result {
+  font-size:1.1em;
+  line-height: 16px;
+  margin:10px 0px;
+}
+
+div.ep_latest_tool_result {
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/mail.css */
+
+
+
+.ep_mail_view {
+  border: dashed 2px #ccc;
+  margin-top: 20px;
+  background-color: #eee;
+}
+
+.ep_mail_header {
+  margin: 4px;
+  padding: 2px;
+  font-family: monospace;
+}
+
+.ep_mail_body {
+  margin: 4px;
+  padding: 2px;
+}
+
+.ep_mail_body textarea {
+  background-color: #ccc;
+  border: solid #888 1px;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/messages.css */
+
+
+/* Message styles - used to provide alerts and errors */
+
+.ep_msg_message, .ep_msg_warning, .ep_msg_error {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.ep_msg_message_icon, .ep_msg_warning_icon, .ep_msg_error_icon {
+  padding: 10px;
+}
+/*
+
+Not currently using titles
+
+.ep_msg_message_title {
+  color: #70cf70;
+  padding: 2px 10px 2px 10px;
+}
+.ep_msg_error_title {
+  color: #ff8080;
+  padding: 2px 10px 2px 10px;
+}
+.ep_msg_warning_title {
+  color: #cf9070;
+  padding: 2px 10px 2px 10px;
+}
+
+*/
+
+.ep_msg_message_content {
+  background-image: none; /*url(images/green_back.png);*/
+  background-color: #c0ffc0;
+  border: solid 1px #80ff80;
+}
+
+.ep_msg_error_content {
+  background-image: none; /*url(images/red_back.png);*/
+  background-color: #ffe0e0;
+  border: solid 1px #ffc0c0;
+}
+
+.ep_msg_warning_content {
+  background-image: none; /*url(images/orange_back.png);*/
+  background-color: #ffe0c0;
+  border: solid 1px #ffc080;
+}
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/multi.css */
+
+
+
+/*
+   Styles for the multi-field component.
+
+   ep_multi_*
+
+*/
+
+table.ep_multi
+{
+  width: 100%;
+}
+
+tr.ep_first th.ep_multi_heading,
+tr.ep_first td.ep_multi_input,
+tr.ep_first td.ep_multi_help
+{
+  border-top: none;
+}
+
+th.ep_multi_heading
+{
+  border-top: dotted #b3a791 1px;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-right: 0.5em;
+  text-align: right;
+}
+
+td.ep_multi_input
+{
+  border-top: dotted #b3a791 1px;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  border-left: dotted #b3a791 1px;
+}
+
+td.ep_multi_help
+{
+  white-space: nowrap;
+  border-top: dotted #b3a791 1px;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-left: 0.5em;
+  vertical-align: top;
+  text-align: right;
+}
+
+/* help bits */
+
+.ep_multi_inline_help
+{
+  padding-bottom: 0.5em;
+}
+  
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/preview.css */
+
+
+/*
+   Styles for the file preview popup.
+
+   ep_preview_*
+
+*/
+
+
+.ep_preview
+{
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 400px;  
+}
+
+.ep_preview table
+{
+  border: solid 1px black;
+  background-color: white;
+  padding: 4px;
+  margin: auto;
+}
+
+.ep_preview_title
+{
+  padding-top: 3px;
+  text-align: center;
+}
+
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/savedsearches.css */
+
+
+
+table.ep_savedsearches {
+  margin: 10px auto 10px auto;
+}
+
+table.ep_savedsearches th {
+  border-bottom: 1px solid #ccc;
+}
+table.ep_savedsearches td {
+  border-bottom: 1px solid #ccc;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/search.css */
+
+
+/* EPrints 3 search form style */
+
+
+
+/* buttons are on the form, controls on the results */
+
+
+.ep_search_buttons, .ep_search_controls, .ep_search_controls_bottom {
+  border-top: 0px;
+  border-bottom: 0px;
+  text-align: center;
+  background: #f6f1e5;
+  background-image: none; /*url(images/toolbox.png) repeat-x;*/
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-bottom: 0.25em;
+  margin-top: 0.25em;
+}
+.ep_search_fields {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+.ep_search_fields th {
+  padding: 4px;
+}
+  
+.ep_search_fields td {
+  padding: 4px;
+}
+  
+
+.ep_search_control
+{
+  padding: 0px 4px 0px 4px;
+}
+
+.ep_search_export {
+  margin: 0.25em auto 0.25em auto;
+  text-align: center;
+}
+
+
+.ep_search_reorder {
+  margin: 0.4em auto 0 auto;
+  text-align: center;
+}
+
+.ep_search_tool {
+  white-space: nowrap;
+}
+.ep_search_tool img {
+  vertical-align: -2px;
+  padding-left: 0.5em;
+}
+
+.ep_search_feed {
+  white-space: nowrap;
+}
+.ep_search_feed img {
+  vertical-align: -2px;
+  padding-left: 0.5em;
+}
+.ep_search_feed a {
+  text-decoration: none;
+  color: #888;
+}
+
+.ep_search_results
+{
+  margin: 1em 0 1em 0;
+  background-color: #f6f1e5;
+}
+
+.ep_search_desc
+{
+  text-align: center;
+  margin: 0.25em 0 0 0;
+}
+
+.ep_search_result td
+{
+  padding: 4px;
+  border-bottom: dotted #b3a791 1px;
+}
+
+.ep_paginate_list
+{
+  margin: auto;
+  display: table;
+}
+
+.ep_search_field_name
+{
+  font-weight: bold;
+  margin-top: 0.5em;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/subjectinput.css */
+
+
+/*
+   Styles for the subject component.
+
+   ep_subjectinput_*
+
+*/
+
+.ep_subjectinput_toggle {
+  text-decoration: none;
+  color: #000000;
+}
+
+.ep_subjectinput_selections {
+  margin: 0.5em auto 0.5em auto;
+  margin-top: 0.5em;
+  padding: 0.5em;
+}
+
+.ep_subjectinput_selected {
+  font-weight: bold;
+}
+
+.ep_subjectinput_selected_subject {
+  font-weight: bold;
+}
+
+ul.ep_subjectinput_subjects {
+  list-style: none;
+}
+ul.ep_subjectinput_subjects li {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  list-style: none;
+}
+ul.ep_subjectinput_subjects img {
+  vertical-align: -2px;
+}
+
+
+.ep_subjectinput_selections {
+  padding-bottom: 10px;
+  border-bottom: dashed #808080 1px;
+  margin-bottom: 10px;
+}
+.ep_subjectinput_selections td.ep_first {
+  border-top: none;
+}
+
+.ep_subjectinput_selections td {
+  border-top: dashed #ccc 1px;
+}
+
+.ep_subjectinput_results {
+  border: dashed #c8cbdf 1px;
+  margin-top: 0.5em;
+  padding: 0.5em;
+  background-color: white;
+  list-style: none;
+}
+
+.ep_subjectinput_results td.ep_first {
+  border-top: none;
+}
+
+.ep_subjectinput_results td {
+  border-top: dashed #ccc 1px;
+}
+
+.ep_subjectinput_add_button, .ep_subjectinput_remove_button {
+  border: solid #dbd2ba 1px;
+  padding: 1px;
+  font-size: 1em;
+  color: #6e0e0e;
+  background-color: #fffafa;
+}
+
+
+.ep_subjectinput_searchbar {
+  text-align: center;
+  width:100%;
+}
+
+/* End of subject component section */
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/summary.css */
+
+
+/* Item Summary */
+
+.ep_summary_content {
+}
+.ep_summary_content_top {
+}
+.ep_summary_content_bottom {
+}
+.ep_summary_content_left {
+  float: left;
+}
+.ep_summary_content_right {
+  float: right;
+}
+.ep_summary_content_after {
+  clear: both;
+}
+
+
+.ep_summary_content_left .ep_summary_box {
+  width: 200px;
+  margin-right: 10px;
+}
+.ep_summary_content_right .ep_summary_box {
+  width: 200px;
+  margin-left: 10px;
+}
+
+
+.ep_summary_box {
+  margin-bottom: 10px
+}
+.ep_summary_box_title {
+  background-image: none; /*url(images/toolbox_title.png);*/
+  font-weight: normal;
+  padding: 2px 6px 2px 6px;
+  border: solid 0px #dbd2ba;
+  font-weight: bold;
+  font-size: 1.4em;
+}
+.ep_summary_box_body {
+  padding: 2px 6px 2px 6px;
+  border: 2px solid #dbd2ba;
+  background-color: #F6F1e5;
+}
+.ep_summary_box_title a {
+  text-decoration: none;
+}
+.ep_summary_box_title img
+{
+  vertical-align: -1px;
+}
+
+
+
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/surround.css */
+
+
+/* EPrints 3 default workflow component-surround style */
+
+/* ep_sr */
+
+.ep_sr_component {
+  padding: 0px;
+  background-color: transparent;
+  margin-top: 10px;
+}
+.ep_sr_component .ep_sr_title_bar {
+  background-image: none; /*url(images/toolbox_title.png);*/
+  padding: 2px 6px 2px 6px;
+  border-left: solid 1px #dbd2ba;
+  border-top: solid 1px #dbd2ba;
+  border-right: solid 1px #dbd2ba;
+  background-color: #EBE3cd;
+}
+
+.ep_sr_component .ep_sr_title_bar table {
+}
+.ep_sr_component .ep_sr_title {
+  font-weight: bold;
+  font-size: 1.4em;
+  color: #444;  
+}
+.ep_sr_component .ep_sr_content {
+  clear: both;
+  background: #f6f1e5;
+  background-image: none; /*url(images/toolbox_title.png);*/
+  border: solid 1px #dbd2ba;
+  padding: 6px;
+}
+
+/* collapse bar */
+
+.ep_sr_collapse_bar {
+  background-image: none; /*url(images/toolbox_title.png);*/
+  padding: 2px 6px 2px 6px;
+  border: solid 1px #dbd2ba;
+  font-weight: bold;
+  font-size: 1.4em;
+  margin-top: 10px;
+}
+.ep_sr_collapse_bar a {
+  text-decoration: none;
+}
+.ep_sr_title a {
+  text-decoration: none;
+}
+.ep_sr_collapse_link img
+{
+  vertical-align: -1px;
+}
+
+/* help style - not primetime */
+
+.ep_sr_component .ep_sr_help {
+  margin-bottom: 8px;
+}
+.ep_sr_component .ep_sr_show_help {
+  white-space: nowrap;
+}
+.ep_sr_component .ep_sr_show_help a {
+  text-decoration: none;
+}  
+.ep_sr_component .ep_sr_hide_help {
+  white-space: nowrap;
+}
+.ep_sr_component .ep_sr_hide_help a {
+  text-decoration: none;
+}  
+.ep_sr_component .ep_sr_title_bar {
+}
+.ep_sr_show_help img {
+  vertical-align: -2px;
+}
+.ep_sr_hide_help img {
+  vertical-align: -2px;
+}
+
+
+/* used for multi, maybe should be elsewhere */
+.ep_sr_component .ep_sr_help_chunk {
+  border-bottom: 1px solid #888;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+.ep_sr_component .ep_form_input_grid {
+  margin: auto;
+}
+.ep_multi_input .ep_form_input_grid {
+  margin-left: 0px;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/tabs.css */
+
+
+/* Tab Bar */
+
+table.ep_tab_bar {
+  margin-top: 10px;
+  width: 100%;
+}
+
+td.ep_tab {
+  background-color: #dbd2ba;
+  text-align: center;
+  border: solid #dbd2ba 1px;
+  background-image: none;
+}
+td.ep_tab a {
+  display: block;
+  padding-bottom: 4px;
+  padding-top: 2px;
+  text-decoration: none;
+  color: #000000;
+}
+
+td.ep_tab_selected {
+  text-align: center;
+  background-color: #ffffff;
+  border-left: solid #dbd2ba 1px;
+  border-top: solid #dbd2ba 1px;
+  border-right: solid #dbd2ba 1px;
+  border-bottom: solid #ffffff 1px;
+}
+td.ep_tab_selected a {
+  text-decoration: none;
+  padding-top: 2px;
+  padding-bottom: 4px;
+  color: #000000;
+}
+
+td.ep_tab_spacer {
+  border-bottom: solid #dbd2ba 1px;
+  width: 20px;
+}
+
+.ep_tab_panel {
+  border-right: solid #dbd2ba 1px;
+  border-bottom: solid #dbd2ba 1px;
+  border-left: solid #dbd2ba 1px;
+  background-color: #f6f1e5;
+  background-image: none; /*url(images/toolbox_title.png);*/
+  padding: 12px;
+  clear: both;
+}
+
+table.ep_tab_bar a {
+  text-decoration: none;
+}
+.ep_tab_bar li a {
+    background-color: #DBD2BA;
+}
+.ep_tab_bar li a {
+    background-image: none;
+    background-repeat: repeat-x;
+}
+
+/* From: /opt/eprints3/lib/static/style/auto/template.css */
+
+
+/* EPrints 3 template styles */
+/* prefix all styles with ep_tm */
+
+.ep_tm_logo img {
+  float: right;
+  padding-bottom: 4px;
+  border-style: none;
+}
+
+.ep_tm_archivetitle {
+  font: 0px Arial,Sans-serif;
+  color: #850000;
+  text-decoration: none;
+  margin: 0 auto;
+  width: 980px;
+  background-color: #fffafa;
+  height: 100px;
+}
+
+.ep_tm_main {
+  margin: 0em;
+  width: 90%;
+}
+
+hr.ep_tm_last {
+  color: #240f78;
+  background-color: #240f78;
+}
+
+
+
+/* Menu Bar */
+
+ul.ep_tm_menu{
+  list-style: none;
+  margin: 0px;
+  background-image: none;
+  font-weight: normal;
+  background: none;
+  border: solid 0px white;
+}
+
+ul.ep_tm_menu li {
+  list-style: none;
+  display: block;
+  font-weight: normal;
+  font-size: 1.2em;
+  line-height:1.3em;
+  padding: 5px 0px 5px 0;
+  margin: 2px 0px;
+  background-color: transparent;
+  border: solid 0px white;
+  width: 100%;
+  font-weight:normal;
+}
+
+ul.ep_tm_menu li a:visited {
+  text-decoration: none;
+  color: #6E0E0E;
+  background-color: transparent;
+  white-space: normal;
+  font-weight:normal;
+}
+ul.ep_tm_menu li a {
+  text-decoration: none;
+  color: #6E0E0E;
+  background-color: transparent;
+  white-space: normal;
+  font-weight:normal;
+}
+ul.ep_tm_menu li:hover {
+  background-color: #D3C7A6;
+  color: #6E0E0E;
+  background-image:none;
+}
+
+ul.ep_tm_menu li a:hover {
+  text-decoration: none;
+  color: #6E0E0E;
+  background-color: transparent;
+}
+
+#navi_section ul.ep_tm_menu a, #navi_section ul.ep_tm_menu a:visited {
+	padding: 0px;
+}
+
+/* end of menu bar */
+
+/* Search bar */
+
+.ep_tm_searchbar {
+  height: 40px;
+  background-image:none;
+  margin: 0;
+  width: 970px;
+  background-color: #6e0e0e;
+  padding:0px 0 0 10px;
+  color: #EBE3CD;
+  border-top: solid 0px white;
+}
+.ep_tm_searchbar a {
+  color: #FFF;
+  text-decoration: none;
+  text-transform: normal;
+  font-weight: normal;
+  letter-spacing:0px;
+}
+.ep_tm_searchbar  a:visited {
+
+  color: #FFF;
+  text-decoration: none;
+}
+
+.ep_tm_searchbar a:hover {
+  color: #6E0E0E;
+  background-color: #A89B84;
+  textdecoration: underline;
+
+}
+.ep_tm_searchbarbutton {
+  text-align: center;
+  background-image: none;
+  background-color: #6E0E0E;
+  color: white;
+  font-weight: normal;
+  font-size: 1.6em;
+  padding: 2px 5px;
+  border: 0px;
+}
+.ep_tm_searchbarbox {
+  font-size: 1.2em;
+  padding: 5px;
+  border: #606060 1px solid;
+  color: #7B6128;
+}
+
+/* end of search bar */
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/toolbox.css */
+
+
+/* Toolbox styles - used to subdivide some content */
+
+.ep_toolbox {
+  margin-bottom: 10px;
+}
+
+.ep_toolbox_title {
+  padding: 2px 10px 2px 10px;
+  color: #808080;
+}
+
+.ep_toolbox_content {
+  padding: 10px;
+  border: solid 1px #dbd2ba;
+  background-color: #f6f1e5;
+  background-image: none;
+  background-repeat: repeat-x;
+}
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/upload.css */
+
+
+/*
+   Styles for the upload component.
+
+   ep_upload_*
+
+*/
+
+.ep_upload_newdoc
+{
+ text-align: center;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.ep_upload_fields th
+{
+  text-align: right;
+}
+
+/* Document section */
+
+.ep_upload_doc
+{
+  margin-bottom: 0.5em;
+  background: #EBE3CD;
+  background-image: none; /*url(images/toolbox_title.png);*/
+}
+
+.ep_upload_doc .ep_upload_doc_title_bar {
+  padding: 0px 6px 0px 6px;
+  border-left: solid 1px #dbd2ba;
+  border-top: solid 1px #dbd2ba;
+  border-right: solid 1px #dbd2ba;
+}
+.ep_upload_doc .ep_upload_doc_title {
+  color: #444;
+}
+.ep_upload_doc .ep_upload_doc_content {
+  clear: both;
+  border: solid 1px #dbd2ba;
+  padding: 6px;
+}
+
+.ep_update_doc_delete {
+  white-space: nowrap;
+}
+.ep_update_doc_delete input {
+  vertical-align: -2px;
+}
+
+.ep_update_doc_options {
+  white-space: nowrap;
+}
+.ep_update_doc_options img {
+  vertical-align: -2px;
+  border: none;
+}
+.ep_update_doc_options a {
+  text-decoration: none;
+}
+
+.ep_upload_doc_toolbar
+{
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+.ep_upload_files
+{
+  border: dashed #c8cbdf 1px;
+  text-align: center;
+  margin-top: 0.5em;
+  padding: 0.5em;
+  background-color: white;
+}
+
+.ep_upload_file_table
+{
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0.5em;
+}
+.ep_upload_add_file_toolbar
+{
+  margin-top: 0.5em;
+}
+
+/* End of Document section */
+
+
+
+/* From: /opt/eprints3/lib/static/style/auto/view.css */
+
+
+
+.ep_view_page h2 {
+  margin-top: 3em;
+  border-bottom: solid 1px #808080;
+}
+
+.ep_view_timestamp {
+  margin-top: 3em;
+  text-align: right;
+}
+
+.ep_view_subjects {
+  padding: 10px;
+  background: #f6f1e5;
+  background-image: none; /*url(images/toolbox_title.png);*/
+  border: solid 1px #dbd2ba;
+  margin-bottom: 20px;
+}
+
+.ep_view_blurb {
+  margin-top: 20px;
+}
+
+.ep_view_group_by_current {
+  font-weight: bold;
+}
+
+.ep_view_group_by {
+  border-top: 1px solid rgb(216, 219, 239);
+  border-bottom: 1px solid rgb(216, 219, 239);
+  text-align: center;
+  background: #f6f1e5;
+  background-image: none; /*url(images/toolbox_title.png);*/
+  padding-top: 4px;
+  padding-bottom: 4px;
+  margin-bottom: 0.75em;
+  margin-top: 0.25em;
+}
+
+.ep_view_cols {
+  width: 100%;
+  margin-top: 1em;
+}
+
+.ep_view_cols_2 td { width: 50%; }
+.ep_view_cols_3 td { width: 33.3%; }
+.ep_view_cols_4 td { width: 25%; }
+.ep_view_cols_5 td { width: 20%; }
+.ep_view_cols_6 td { width: 16.6%; }
+.ep_view_cols_7 td { width: 14.28%; }
+.ep_view_cols_8 td { width: 12.5%; }
+
+.ep_view_cols ul {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.ep_tm_header{
+  background-color: #6E0E0E;
+}
+#main_content {
+  width: 980px;
+  margin: 0 auto;
+  background-color: transparent;
+  padding: 0 0 50px 0;
+  height: auto;
+  min-height: 730px;
+  background-color: #FFF;   
+}
+a {
+  text-decoration: underline;
+  color: #6E0E0E;
+}
+a:visited {
+  text-decoration: underline;
+  color: #766A54;
+}
+a:hover {
+  text-decoration:none;
+  color: #A89b84;
+}
+.cleardivs {
+  clear: both;
+}
+
+
+
+#main_pageinfo {
+  margin: 0 auto;
+  width: 740px;
+  float: right;
+}
+
+#search_box{
+  margin: 30px 0 30px 30px;
+}
+#search_form{
+  float: left;
+}
+#sidelinks{
+  margin:0;
+  padding:0 0 0 10px;
+  font-size:0.9em;
+  text-align:left;
+  float: left;
+}
+
+#sidelinks ul{
+list-style-type:none;
+margin:0;
+padding:0;
+}
+
+
+html {
+  padding:0px;
+  margin:0px;
+  overflow: -moz-scrollbars-vertical;
+  overflow-y: scroll;
+}
+/*
+body {
+  padding:0;
+  margin:0;
+  color: #000;
+  background-color: #EBE3CD; 
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 62.5%;
+}
+
+#header_wrapper {
+ width: 100%;
+ background-image: url(http://philsci-archive.pitt.edu/images/top_bg.png);
+ background-repeat: repeat-x;
+}
+
+#main_wrapper {
+  background-color: #FFFAFA;
+  width: 100%;
+}
+
+#wrapper {
+  margin: 0 auto 30px auto;
+  width: 980px;
+  border: solid 0px #000;
+}
+*/
+
+body {
+  padding:0;
+  margin:0;
+  color: #000;
+  background-image: url(http://philsci-archive.pitt.edu/images/top_bg.png);
+  background-repeat: repeat-x;
+  background-color: #FFF !important;    
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 62.5%;
+}
+
+#wrapper{
+  margin: 0 auto 30px auto;
+  width: 980px;
+  border: solid 0px #000;
+}
+
+
+#footer {
+  margin: 50px auto 0 auto;
+  padding: 0px;
+  background-color: #EBE3CD;
+  color: #b3a791;
+  border-top: 3px solid #a89b84;
+  border-bottom: 3px solid #a89b84;
+  width:100%;
+  /*position:absolute;
+  bottom:0;*/
+}
+#footer a img {
+  border: 0px none;
+  text-decoration:none;
+  margin:0;
+  padding:0;
+}
+#footer p {
+  font-size: 1em;
+  font-weight: normal;
+  color: #333333;
+  padding: 0px;
+  text-align: left;
+  line-height: 1.3em;
+}
+
+#footer a {
+  color:#6e0e0e;
+  text-decoration: underline;
+}
+
+#footer a:hover {
+  color: #7B6128;
+  text-decoration: none;
+}
+.ep_tm_footer {
+  clear: both;
+  width: 980px;
+  margin: 0 auto;
+  padding: 0px;
+  border-top-width: 0px;
+}
+
+.footer_sections {
+  width: 200px;
+  float: left;
+  margin: 0 30px 0 0;
+  border-right: dotted 1px #b3a791;
+  padding: 15px 20px 0 0;
+  height: 200px;
+}
+
+.footer_sectionsR {
+  width: 200px;
+  float: left;
+  margin: 0;
+  padding: 15px 20px 0 0;
+  height: 200px;
+}
+
+
+
+
+#side_navi{
+  background: transparent;
+  list-style: none;
+  padding: 5px 0px 0px 0px;
+  background-image: none;
+  margin:30px 0px 0px 0px;
+  width: 200px;
+  float: left;
+  font-weight: normal;
+  }
+  
+.navi_section {
+  background-color: #EBE3CD;
+  border-radius: 0px;
+  padding: 10px;
+  margin: 0px 0px 30px 0px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  display:inline-block !important;
+}
+
+.ep_config_viewfile {
+  font-size: 1.6em;
+  color: #666;
+  width: 500px;
+}
+.ep_icontable {
+  background-color: #FFFAFA;
+}
+.ep_act_list_desc {
+      font-size: 1.2em;
+}
+.ep_tm_archivetitle a img {
+  border: 0px none;
+    text-decoration:none;
+}
+a img {
+    border: 0px none;
+    text-decoration:none;
+}
+th.ep_title_row {
+    border: solid 1px #dbd2ba;
+    padding: 0.1em 0.5em 0.1em 0.5em;
+    font-size: 1.3em;
+    height: 2em;
+    background-image: none;
+    background-color: #ebe3cd;
+    color: #6e0e0e;
+    font-weight: normal;
+    text-align: left;
+}
+.ep_phraseedit_widget, #ep_phraseedit_table textarea {
+    font-family: monospace;
+    font-size: 9pt;
+    width: 98%;
+    display: block;
+    background-color: white;.ep_blister_node_selected
+    border: solid 1px #dbd2ba;
+    padding: 3px;
+}
+#ep_phraseedit_table tr {
+/*    background-color: #ccf; */
+    border-bottom: dotted 1px #dbd2ba;
+}
+.ep_tm_main ul li {
+  font-size: 1.1em;
+}
+
+.ep_view_menu ul, .ep_view_intro {
+    font-size: 11px;
+    line-height: 16px;
+    margin:5px 0px;
+}
+.ep_summary_content_main table {
+  font-size: 1.1em;
+}
+
+ 
+/* For the "Add" button in the subject selection */
+a.ep_only_js { display:inline; }
+
+#clear, .clear {
+  clear:both;
+  margin:0;
+  padding:0
+}
+ 
+/* Size fix for table text and ordered lists*/ 
+#wrapper .main_content #main_pageinfo .ep_tm_main tbody tr td ol li, #wrapper .main_content #main_pageinfo .ep_tm_main tbody tr td table tbody tr td  {   font-size: 1.2em;
+
+  font-weight: normal;
+  color: #333333;
+  padding: 3px 0px;
+  text-align: left;
+  line-height: 1.5em;}
+  
+.ep_fileselector dt.ep_fileselector{
+	      padding-bottom: 5px;
+  }
+  
+ /*black box lightbox fix?
+#overlay{ position: absolute; top: 0; left: 0; z-index: 90; width: 100%; height: 500px; background-color: #000; display: none;} */

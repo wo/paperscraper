@@ -6,7 +6,7 @@ import sys
 import subprocess
 from opp.browser import Browser
 
-VDISPLAY = True
+VDISPLAY = False
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'sourcepages')

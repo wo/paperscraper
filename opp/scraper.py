@@ -9,16 +9,16 @@ import os.path
 import subprocess
 import shutil
 import tempfile
-from . import db
-from . import error
-from . import util
-from .debug import debug, debuglevel
-from .browser import Browser
-from .webpage import Webpage
-from .pdftools.pdftools import pdfinfo, pdfcut
-from .pdftools.pdf2xml import pdf2xml
-from .config import config
-from .exceptions import *
+from opp import db
+from opp import error
+from opp import util
+from opp.debug import debug, debuglevel
+from opp.browser import Browser
+from opp.webpage import Webpage
+from opp.pdftools.pdftools import pdfinfo, pdfcut
+from opp.pdftools.pdf2xml import pdf2xml
+from opp.config import config
+from opp.exceptions import *
 
 logger = logging.getLogger('opp')
 
@@ -221,7 +221,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         return debug(1, "unsupported filetype: %s", r.filetype)
 
     doc = Doc(url=url, r=r, link=li, source=li.source)
-
+    
     if doc.load_from_db():
         li.update_db(status=1, doc_id=doc.doc_id)
         return debug(1, "%s is already in docs table", url)
@@ -400,13 +400,14 @@ def process_file(doc, keep_tempfiles=False):
         raise Exception('parser error')
         return 0
 
+
 class Source(Webpage):
     """ represents a source page with links to papers """
     
     db_fields = {
         'source_id': 0,
         'url': '',
-        'sourcetype': 'personal', # (alt: repository, journal, blog)
+        'sourcetype': 'personal', # (alt: repo, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
         'found_date': None,
         'last_checked': None,
@@ -494,9 +495,11 @@ class Source(Webpage):
                 debug(3, 'ignoring link to %s (bad url)', href)
                 continue
             href = util.normalize_url(self.make_absolute(href))
+            if href in old_links.keys() or href in new_links.keys():
+                debug(3, 'ignoring repeated link to %s', href)
             old_link = self.old_link(href)
             if old_link:
-                debug(3, 'link to %s is old: %s', href, old_link.url)
+                debug(3, 'link to %s is old: %s', href)
                 old_links[href] = old_link
                 old_links[href].element = el
             else:
@@ -518,7 +521,7 @@ class Source(Webpage):
             cur.execute(query, (self.source_id,))
             debug(5, cur._last_executed)
             self._links = [ Link(source=self, **li) for li in cur.fetchall() ]
-            debug(2, 'xxx old links:\n%s', '\n'.join([li.url for li in self._links]))
+            #debug(2, 'xxx old links:\n%s', '\n'.join([li.url for li in self._links]))
 
         for li in self._links:
             if li.url == url:
@@ -900,6 +903,66 @@ class Doc():
         cur.execute(query, (cat_id, self.doc_id, strength, strength))
         debug(4, cur._last_executed)
         db.commit()
+
+    @property
+    def default_author(self):
+        """
+        returns doc.source.default_author if that is defined (i.e., if
+        doc.source is a personal page), otherwise tries to extract an
+        author candidate from doc.link.context.
+
+        The metadata extractor (docparser.paperparser) uses this
+        property as default author if no author string can be found in
+        the document, and to evaluate the plausibility of candidate
+        author strings.
+
+        Unfortunately, journal pages tend to put the author name in
+        unpredictable places, often outside what is recognized as the
+        link context. On the other hand, journal publications reliably
+        contain the author name(s) in the document. So here we don't
+        bother setting default_author at the moment. On repository
+        pages, people do sometimes upload papers that don't contain
+        any author names. 
+
+        The metadata extractor assumes that default_author is a
+        single author, because personal homepages only have a single
+        default author. People also usually don't forget to put their
+        names in the paper if there are co-authors. So we return the
+        first author only.
+
+        On philsci-archive, the format is 
+
+        Teller, Paul (2016) Role-Player Realism.
+        Livengood, Jonathan and Sytsma, Justin and Rose, David (2016) Following...
+
+        On philpapers, it is 
+
+        Stefan Dragulinescu, Mechanisms and Difference-Making.
+        Michael Baumgartner & Lorenzo Casini, An Abductive Theory of Constitution.
+
+        How do we know "Stefan Dragulinescu, Mechanisms" isn't the
+        name of a person called "Mechanisms Stefan Dragulinescu" in
+        last-comma-first format? Ultimately, we should use some clever
+        general heuristics here. For now we simply split at /,| &|
+        and|\(/; if the first element contains a whitespace, we return
+        that element, otherwise we concatenate the first two elements
+        in reverse order. This will only retrieve the surname on
+        philsci-archive for authors with a double surname. 
+
+        TODO: improve.
+        """
+        try:
+            if doc.source.sourcetype != 'repo':
+                return doc.source.default_author
+            re_split = re.compile(',| & | and|\(')
+            au = re_split.split(doc.link.context, 1)
+            if len(au.split()) == 1:
+                au2, rest2 = re_split.split(rest, 1)
+                au = au2 + ' ' + au
+            debug(3, 'setting "%s" as default_author', au)
+            return au
+        except:
+            return ''
 
 def is_bad_url(url):
     if len(url) > 512:

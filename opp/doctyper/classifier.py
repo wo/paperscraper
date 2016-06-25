@@ -9,10 +9,10 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import MultinomialNB
-from .. import db
-from ..debug import debug
-from ..scraper import Doc
-from ..exceptions import UntrainedClassifierException
+from opp import db
+from opp.debug import debug
+from opp.scraper import Doc
+from opp.exceptions import UntrainedClassifierException
 
 PICKLE_DIRECTORY = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..', 'data')
 

@@ -138,7 +138,7 @@ def enrich_xml(xmlfile, doc):
         mk_el('url', doc.url),
         mk_el('anchortext', doc.link.anchortext),
         mk_el('linkcontext', doc.link.context),
-        mk_el('sourceauthor', doc.source.default_author),
+        mk_el('sourceauthor', doc.default_author),
         mk_el('sourcecontent', doc.source.text())
         ])
     bakfile = xmlfile+'.bak'
