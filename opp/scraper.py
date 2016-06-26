@@ -222,7 +222,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
 
     doc = Doc(url=url, r=r, link=li, source=li.source)
     
-    if doc.load_from_db():
+    if doc.load_from_db() and not force_reprocess:
         li.update_db(status=1, doc_id=doc.doc_id)
         return debug(1, "%s is already in docs table", url)
     
@@ -951,16 +951,16 @@ class Doc():
         TODO: improve.
         """
         try:
-            if doc.source.sourcetype != 'repo':
-                return doc.source.default_author
+            if self.source.sourcetype != 'repo':
+                return self.source.default_author
             re_split = re.compile(',| & | and|\(')
-            au = re_split.split(doc.link.context, 1)
+            au = re_split.split(self.link.context, 1)
             if len(au.split()) == 1:
                 au2, rest2 = re_split.split(rest, 1)
                 au = au2 + ' ' + au
             debug(3, 'setting "%s" as default_author', au)
             return au
-        except:
+        except Exception as e:
             return ''
 
 def is_bad_url(url):
