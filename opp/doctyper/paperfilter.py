@@ -29,10 +29,12 @@ classifier.likelihood('bad anchortext', bad_anchortext, p_ifyes=0.01, p_ifno=0.3
 def good_linkcontext(doc):
     pat = re.compile(r'penultimate|draft|forthcoming')
     return pat.search(doc.link.context.lower())
-classifier.likelihood('good link context', good_linkcontext, p_ifyes=0.5, p_ifno=0.05)
+classifier.likelihood('good link context', good_linkcontext, p_ifyes=0.2, p_ifno=0.05)
 
 def course_words(doc):
-    pat = re.compile(r'\bcourse|seminar|schedule|readings|textbook|students|\bpresentation|handout|essay|\bweek|hours/', re.I) 
+    # note: 'course' is also common in 'of course', 'in the course of',
+    # 'essay' is common in discussions of Locke
+    pat = re.compile(r'seminar|schedule|readings|textbook|students|handout|\bweek|hours/', re.I) 
     # normalize all measures to 10000 word documents (i.e., here we
     # return the number of matches per 10000 words):
     return int(len(pat.findall(doc.content)) * 10000 / doc.numwords)
