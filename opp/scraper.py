@@ -954,7 +954,7 @@ class Doc():
             if self.source.sourcetype != 'repo':
                 return self.source.default_author
             re_split = re.compile(',| & | and|\(')
-            au = re_split.split(self.link.context, 1)
+            au, rest = re_split.split(self.link.context.strip(), 1)
             if len(au.split()) == 1:
                 au2, rest2 = re_split.split(rest, 1)
                 au = au2 + ' ' + au
