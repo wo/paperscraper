@@ -52,7 +52,6 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
     except requests.exceptions.RequestException as e:
         return 900, None
     except Exception:
-        raise
         return 900, None
 
 def request_filetype(r):
