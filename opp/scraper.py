@@ -331,15 +331,17 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     doc.update_db()
     li.update_db(status=1, doc_id=doc.doc_id)
     
-    # categorize:
-    for (cat_id, cat) in categories():
-        clf = classifier.get_classifier(cat)
-        try:
-            strength = int(clf.classify(doc) * 100)
-            debug(3, "%s score %s", cat, strength)
-        except UntrainedClassifierException as e:
-            continue 
-        doc.assign_category(cat_id, strength)
+    # categorize, but only if doc has more than 1000 words --
+    # otherwise categorization is pretty random:
+    if doc.numwords > 1000:
+        for (cat_id, cat) in categories():
+            clf = classifier.get_classifier(cat)
+            try:
+                strength = int(clf.classify(doc) * 100)
+                debug(3, "%s score %s", cat, strength)
+            except UntrainedClassifierException as e:
+                continue 
+            doc.assign_category(cat_id, strength)
 
     return 1
 
@@ -869,7 +871,7 @@ class Doc():
                 setattr(self, k, v)
             return True
         else:
-            debug(4, "no doc with id %s in database", doc_id)
+            debug(4, "no doc with id %s or url %s in database", doc_id, url)
             return False
 
     def update_db(self, **kwargs):
@@ -1049,7 +1051,7 @@ def convert_to_pdf(tempfile):
     outfile = tempfile.rsplit('.',1)[0]+'.pdf'
     try:
         cmd = ['/usr/bin/python3', '/usr/bin/unoconv', 
-               '-f', 'pdf', '-o', outfile, tempfile],
+               '-f', 'pdf', '-o', outfile, tempfile]
         debug(2, ' '.join(cmd))
         subprocess.check_call(cmd, timeout=20)
     except Exception as e:
