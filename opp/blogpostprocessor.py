@@ -53,14 +53,15 @@ def process_blogpost(doc):
         doc.hidden = True
 
     # categorize:
-    for (cat_id, cat) in categories():
-        clf = classifier.get_classifier(cat)
-        try:
-            strength = int(clf.classify(doc) * 100)
-            debug(3, "%s score %s", cat, strength)
-        except UntrainedClassifierException as e:
-            continue 
-        doc.assign_category(cat_id, strength)
+    if doc.numwords > 1000:
+        for (cat_id, cat) in categories():
+            clf = classifier.get_classifier(cat)
+            try:
+                strength = int(clf.classify(doc) * 100)
+                debug(3, "%s score %s", cat, strength)
+            except UntrainedClassifierException as e:
+                continue 
+            doc.assign_category(cat_id, strength)
    
     doc.found_date = datetime.now()
     doc.status = 1
