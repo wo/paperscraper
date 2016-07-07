@@ -92,7 +92,7 @@ def scrape(source, keep_tempfiles=False):
     try:
         browser.goto(source.url)
     except Exception as e:
-        logger.warning('connection to source %s failed: %s', source.url, str(e))
+        debug(1, 'connection to source %s failed: %s', source.url, str(e))
         source.update_db(status=error.code['connection failed'])
         return 0
 
@@ -108,7 +108,7 @@ def scrape(source, keep_tempfiles=False):
             if trivial_url_variant(browser.current_url, source.url):
                 source.update_db(url=browser.current_url)
             else:
-                logger.warning('%s redirects to %s', source.url, browser.current_url)
+                debug(1, '%s redirects to %s', source.url, browser.current_url)
                 source.update_db(status=301)
                 return 0
         else:
@@ -126,7 +126,7 @@ def scrape(source, keep_tempfiles=False):
         debug(1, 'suspiciously few old links, checking status code')
         status, r = util.request_url(source.url)
         if status != 200:
-            logger.warning('error %s at source %s', status, source.url)
+            debug(1, 'error %s at source %s', status, source.url)
             source.update_db(status=status)
             return 0
 
@@ -449,7 +449,7 @@ def save_local(r):
             for block in r.iter_content(1024):
                 f.write(block)
     except EnvironmentError as e:
-        logger.warning("cannot save %s to %s: %s", r.url, tempfile, str(e))
+        debug(1, "cannot save %s to %s: %s", r.url, tempfile, str(e))
         raise
     return tempfile
     
@@ -461,7 +461,7 @@ def convert_to_pdf(tempfile):
         debug(2, ' '.join(cmd))
         subprocess.check_call(cmd, timeout=20)
     except Exception as e:
-        logger.warning("cannot convert %s to pdf: %s", tempfile, str(e))
+        debug(1, "cannot convert %s to pdf: %s", tempfile, str(e))
         raise
     return outfile
 
