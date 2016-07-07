@@ -2,7 +2,7 @@
 import re
 import time
 import requests
-from . import error
+from opp import error
 
 def normalize_url(url):
     """normalize ~ vs %7e etc."""

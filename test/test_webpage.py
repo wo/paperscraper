@@ -4,7 +4,7 @@ import logging
 import os.path
 import sys
 import re
-from webpage import Webpage
+from opp.webpage import Webpage
 
 def source(pagename):
     curpath = os.path.abspath(os.path.dirname(__file__))

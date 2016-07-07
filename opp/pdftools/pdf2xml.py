@@ -4,11 +4,11 @@ import sys
 import os
 from os.path import abspath, dirname, join, exists
 import subprocess
-from ..debug import debug, debuglevel
+from opp.debug import debug, debuglevel
 from .ocr2xml import ocr2xml
 from .doctidy import doctidy
 from .pdftools import pdfcut
-from ..exceptions import *
+from opp.exceptions import *
 
 PDFTOHTML = '/usr/bin/pdftohtml'
 PERL = '/usr/bin/perl'

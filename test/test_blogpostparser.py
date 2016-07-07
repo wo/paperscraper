@@ -5,7 +5,8 @@ import os.path
 import os, sys, shutil
 import json
 import re
-from opp import scraper
+from opp import models
+from opp.debug import debuglevel
 from opp.docparser import blogpostparser
 
 curpath = os.path.abspath(os.path.dirname(__file__))
@@ -22,10 +23,10 @@ testcases = [
 
 @pytest.mark.parametrize("basefile, title", testcases)
 def test_linkcontext(basefile, title):
-    scraper.debuglevel(5)
+    debuglevel(5)
     html = readfile(os.path.join(testdir, basefile+'.html'))
     content = readfile(os.path.join(testdir, basefile+'.txt')).strip()
-    doc = scraper.Doc(title=title)
+    doc = models.Doc(title=title)
     res = blogpostparser.extract_content(html, doc)
     assert re.sub(r'\s+', ' ', content) == re.sub(r'\s+', ' ', res)
 

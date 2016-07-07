@@ -2,11 +2,11 @@
 import time, sys, re
 from datetime import datetime
 import requests
-from . import db
-from .scraper import Doc, categories
-from .debug import debug
-from .docparser import blogpostparser
-from .doctyper import classifier
+from opp import db
+from opp.models import Doc, categories
+from opp.debug import debug
+from opp.docparser import blogpostparser
+from opp.doctyper import classifier
 
 def run():
     """

@@ -6,10 +6,10 @@
    <fontspec color="#000" family="Times" id="2" size="11"/>
    <fontspec color="#000" family="Times" id="3" size="13"/>
    <text top="166" left="167" width="162" height="10" font="0">Tan JOURNAL or SYunomc Loom</text>
-<text top="179" left="168" width="161" height="10" font="0">Volume 11, <b>Number</b> 2. June 1946</text>
+<text top="179" left="168" width="161" height="10" font="0">Volume 11, Number 2. June 1946</text>
 <text top="219" left="290" width="279" height="19" font="1">MODALITIES AND QUANTIFICATION</text>
 <text top="247" left="376" width="105" height="11" font="2">RUDOLF CARNAP</text>
-<text top="266" left="183" width="505" height="15" font="1">1. The <b>problems of modal</b> logic. The purpose of this article is to give a</text>
+<text top="266" left="183" width="505" height="15" font="1">1. The problems of modal logic. The purpose of this article is to give a</text>
 <text top="284" left="168" width="519" height="15" font="1">survey of some results I have found in investigations concerning logical modali-</text>
 <text top="302" left="168" width="520" height="18" font="1">ties. The results refer: (1) to semantical systems, i.e., symbolic language sys-</text>
 <text top="320" left="168" width="520" height="18" font="1">tems for which semantical rules of interpretation are laid down; (2) to</text>
@@ -22,7 +22,7 @@
 <text top="445" left="168" width="521" height="15" font="1">out of PL by the addition of the symbol ‘N’ for logical necessity; likewise MFL</text>
 <text top="463" left="168" width="520" height="19" font="1">out of FL. In terms of Lewis’s symbol ‘O’ for logical possibility, ‘Np’ means</text>
 <text top="481" left="168" width="521" height="16" font="1">the same as ‘~O~p’. All other logical modalities can, of course, be defined</text>
-<text top="498" left="168" width="521" height="16" font="1">on the basis of <b>‘N’;</b> e.g., impossibility by ‘N~p’, possibility by ‘~N~p’, con-</text>
+<text top="498" left="168" width="521" height="16" font="1">on the basis of ‘N’; e.g., impossibility by ‘N~p’, possibility by ‘~N~p’, con-</text>
 <text top="519" left="168" width="212" height="14" font="1">tingency by ‘~Np.~N~p’, etc.</text>
 <text top="535" left="183" width="505" height="16" font="1">The calculi corresponding to these semantical systems are the following: the</text>
 <text top="552" left="168" width="520" height="16" font="1">propositional calculus (PC), the functional calculus (FC), and the modal calculi</text>

@@ -6,7 +6,9 @@ import sys
 import json
 from datetime import datetime
 from opp import scraper
+from opp.models import Source, Link, Doc
 from opp import db
+from opp.debug import debug, debuglevel
 
 """
 To run these tests, create a test database called test_opp and
@@ -15,7 +17,7 @@ give the standard mysql user access to it.
 
 VDISPLAY = True
 
-scraper.debuglevel(5)
+debuglevel(5)
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'testdocs')
@@ -29,49 +31,23 @@ def testdb():
     for t in ('sources', 'links', 'docs'):
         cur.execute('DELETE FROM {}'.format(t))
     db.commit()
-    scraper.Source(
+    Source(
         url='http://umsu.de/papers/',
         sourcetype='personal',
         status=0,
         last_checked=datetime.now()).save_to_db()
-    scraper.Source(
+    Source(
         url='http://consc.net/papers.html',
         sourcetype='personal',
         status=1).save_to_db()
 
 def test_debug(caplog):
-    scraper.debuglevel(4)
-    scraper.debug(4, 'hi there')
+    debuglevel(4)
+    debug(4, 'hi there')
     assert 'hi there' in caplog.text()
-    scraper.debug(5, 'secret')
+    debug(5, 'secret')
     assert 'secret' not in caplog.text()
-    scraper.debuglevel(5)
-
-def test_Source(testdb):
-    src = scraper.Source(url='http://umsu.de/papers/')
-    src.load_from_db()
-    assert type(src.last_checked) is datetime
-    assert type(src.found_date) is datetime
-    src.update_db(name="wo's weblog")
-    src2 = scraper.Source(url='http://umsu.de/papers/')
-    src2.load_from_db()
-    assert src2.name == "wo's weblog"
-
-def test_Link(testdb):
-    li = scraper.Link(source_id=1, url='http://umsu.de/papers/magnetism2.pdf')
-    li.update_db(filesize=1234)
-    assert li.link_id > 0
-    li2 = scraper.Link(source_id=1, url='http://umsu.de/papers/magnetism2.pdf')
-    li2.load_from_db()
-    assert li2.filesize == 1234
-
-def test_Doc(testdb):
-    doc = scraper.Doc(url='http://umsu.de/papers/magnetism.pdf')
-    doc.update_db(authors='wo')
-    assert doc.doc_id > 0
-    doc2 = scraper.Doc(url='http://umsu.de/papers/magnetism.pdf')
-    doc2.load_from_db()
-    assert doc2.authors == 'wo'
+    debuglevel(5)
 
 def test_next_source(testdb):
     src = scraper.next_source()
@@ -93,16 +69,16 @@ def test_check_steppingstone():
         assert t == target
 
 def test_get_duplicate(testdb):
-    doc = scraper.Doc(url='http://umsu.de/papers/driver-2011.pdf')
-    doc.link = scraper.Link(url='http://umsu.de/papers/driver-2011.pdf')
+    doc = Doc(url='http://umsu.de/papers/driver-2011.pdf')
+    doc.link = Link(url='http://umsu.de/papers/driver-2011.pdf')
     doc.content = readfile(os.path.join(testdir, 'attitudes.txt'))
     doc.numwords = 13940
     doc.numpages = 26
     doc.authors = 'Wolfang Schwarz'
     doc.title = 'Lost memories and useless coins: Revisiting the absentminded driver'
     doc.update_db()
-    doc2 = scraper.Doc(url='http://download.springer.com/static/pdf/307/art%253A10.1007%252Fs11229-015-0699-z.pdf')
-    doc2.link = scraper.Link(url=doc2.url)
+    doc2 = Doc(url='http://download.springer.com/static/pdf/307/art%253A10.1007%252Fs11229-015-0699-z.pdf')
+    doc2.link = Link(url=doc2.url)
     doc2.content = 'abcdefghjik'+readfile(os.path.join(testdir, 'attitudes.txt'))
     doc2.numwords = 14130
     doc2.numpages = 29
@@ -129,17 +105,17 @@ def test_context_suggests_published(context, published, caplog):
     assert res == published
 
 def test_process_file():
-    doc = scraper.Doc(filetype='pdf')
-    doc.link = scraper.Link(url='foo')
+    doc = Doc(filetype='pdf')
+    doc.link = Link(url='foo')
     doc.link.context = 'Lorem ipsum dolor sit amet'
     doc.link.anchortext = 'Lorem ipsum dolor sit amet'
-    doc.source = scraper.Source(url='foo', html='<b>Lorem ipsum dolor sit amet</b>')
+    doc.source = Source(url='foo', html='<b>Lorem ipsum dolor sit amet</b>')
     doc.tempfile = os.path.join(testdir, 'simple.pdf')
     scraper.process_file(doc)
     assert doc.title == 'Lorem ipsum dolor sit amet'
 
 def test_process_link(testdb, caplog):
-    source = scraper.Source(url='http://umsu.de/papers/')
+    source = Source(url='http://umsu.de/papers/')
     source.load_from_db()
     browser = scraper.Browser(use_virtual_display=VDISPLAY)
     browser.goto(source.url)
@@ -147,16 +123,16 @@ def test_process_link(testdb, caplog):
     link = 'options.pdf'
     el = browser.find_element_by_xpath("//a[@href='{}']".format(link))
     url = source.make_absolute(link)
-    li = scraper.Link(url=url, source=source, element=el)
+    li = Link(url=url, source=source, element=el)
     li.load_from_db()
-    scraper.debuglevel(2)
+    debuglevel(2)
     scraper.process_link(li, force_reprocess=True, keep_tempfiles=True)
-    scraper.debuglevel(5)
+    debuglevel(5)
     assert 'Options and Actions' in caplog.text()
     assert 'But even if we know' in caplog.text()
 
 def test_scrape(testdb):
-    src = scraper.Source(url='http://umsu.de/papers/')
+    src = Source(url='http://umsu.de/papers/')
     src.load_from_db()
     scraper.scrape(src)
 

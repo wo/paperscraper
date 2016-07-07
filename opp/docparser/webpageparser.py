@@ -2,7 +2,7 @@
 import re
 from lxml import etree
 from nltk.tokenize import sent_tokenize
-from ..debug import debug
+from opp.debug import debug
 
 def parse(doc):
     """

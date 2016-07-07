@@ -6,8 +6,8 @@ from scipy.stats import nbinom
 #curpath = os.path.abspath(os.path.dirname(__file__))
 #libpath = os.path.join(curpath, os.path.pardir)
 #sys.path.insert(0, libpath)
-from ..subjectivebayes import BinaryNaiveBayes
-from ..debug import debug, debuglevel
+from opp.subjectivebayes import BinaryNaiveBayes
+from opp.debug import debug, debuglevel
 
 """
 classifier to evaluate whether a pdf/word document is a paper (or
@@ -24,7 +24,7 @@ classifier.likelihood('bad url', bad_url, p_ifyes=0.05, p_ifno=0.2)
 def bad_anchortext(doc):
     pat = re.compile(r'^site\s*map$|^home|page\b|\bslides\b|handout')
     return pat.search(doc.link.anchortext.lower())
-classifier.likelihood('bad anchortext', bad_anchortext, p_ifyes=0.01, p_ifno=0.3)
+classifier.likelihood('bad anchortext', bad_anchortext, p_ifyes=0.005, p_ifno=0.3)
 
 def good_linkcontext(doc):
     pat = re.compile(r'penultimate|draft|forthcoming')
