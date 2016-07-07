@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import subprocess
 from functools import lru_cache
-from ..debug import debug
+from opp.debug import debug
 
 PDFINFO = '/usr/bin/pdfinfo'
 PDFSEPARATE = '/usr/bin/pdfseparate'

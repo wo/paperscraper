@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
+from opp import db
+from opp.scraper import Doc
+from opp.debug import debug
 from .classifier import DocClassifier
-from .. import db
-from ..scraper import Doc
-from ..debug import debug
 
 clf = DocClassifier('data/philosophy.pk')
 clf.load()
 
 def evaluate(*docs):
-   probs = clf.classify(docs)
-   if len(probs) > 1:
-      debug(4, 'probability that documents are about philosophy: %s', ','.join(probs))
-      return probs
+   prob = clf.classify(*docs)
+   if len(docs) > 1:
+      debug(4, 'probability that documents are about philosophy: %s', ','.join(prob))
+      return prob
    else:
-      debug(4, 'probability that document is about philosophy: %s', probs[0])
-      return probs[0]
+      debug(4, 'probability that document is about philosophy: %s', prob)
+      return prob
 
 def update():
     """

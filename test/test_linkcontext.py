@@ -3,8 +3,9 @@ import pytest
 import logging
 import os.path
 import sys
-from opp import scraper
+from opp.models import Link
 from opp.browser import Browser
+from opp.debug import debuglevel
 
 VDISPLAY = True
 
@@ -60,6 +61,10 @@ Download'''),
      'http://consc.net/papers/revisability.pdf',
      'Revisability and Conceptual Change in "Two Dogmas of Empiricism".  Journal of Philosophy 108:387-415, 2011.'),
 
+    ('searle.html',
+     'http://socrates.berkeley.edu/~jsearle/BiologicalNaturalismOct04.doc',
+     '"Biological Naturalism" Word document'),
+
     ('cath-broken.html',
      'http://philrsss.anu.edu.au/people-defaults/yuricath/function.require',
      'Warning: require() [function.require]: URL file-access is disabled in the server configuration in /var/www/philosophy/public_html/people-defaults/yuricath/index.php3 on line 1'),
@@ -75,13 +80,13 @@ Download'''),
 def test_linkcontext(page, link, context, caplog):
     caplog.setLevel(logging.CRITICAL, logger='selenium')
     caplog.setLevel(logging.DEBUG, logger='opp')
-    scraper.debuglevel(5)
+    debuglevel(5)
     curpath = os.path.abspath(os.path.dirname(__file__))
     testdir = os.path.join(curpath, 'sourcepages')
     browser = Browser(reuse_browser=True, use_virtual_display=VDISPLAY)
     src = 'file://'+testdir+'/'+page
     browser.goto(src)
     el = browser.find_elements_by_xpath('//a[@href="{}"]'.format(link))[0]
-    li = scraper.Link(element=el)
+    li = Link(element=el)
     res = li.html_context()
     assert res == context

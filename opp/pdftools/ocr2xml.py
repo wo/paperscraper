@@ -15,10 +15,10 @@ from timeit import default_timer as timer
 curpath = os.path.abspath(os.path.dirname(__file__))
 libpath = os.path.join(curpath, os.path.pardir)
 sys.path.insert(0, libpath)
-from ..debug import debug, debuglevel
+from opp.debug import debug, debuglevel
 from .pdftools import pdfinfo
 from .doctidy import doctidy
-from ..exceptions import *
+from opp.exceptions import *
 
 PDFSEPARATE = '/usr/bin/pdfseparate'
 PDFTOPPM = '/usr/bin/pdftoppm'

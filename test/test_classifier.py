@@ -2,7 +2,7 @@
 import pytest
 import os.path
 from opp.doctyper.classifier import DocClassifier
-from opp import scraper
+from opp.models import Doc
 from opp.debug import debuglevel
 
 debuglevel(5)
@@ -18,7 +18,7 @@ def test_setup():
 
 def test_train():
     mc = DocClassifier(picklefile)
-    doc = scraper.Doc(url='http://umsu.de/papers/variations.pdf')
+    doc = Doc(url='http://umsu.de/papers/variations.pdf')
     doc.content = readfile(os.path.join(testdir, 'attitudes.txt'))
     mc.train([doc], [True])
     mc.save()
@@ -26,9 +26,9 @@ def test_train():
     
 def test_classify():
     mc = DocClassifier(picklefile)
-    ham = scraper.Doc(url='http://umsu.de/papers/variations.pdf')
+    ham = Doc(url='http://umsu.de/papers/variations.pdf')
     ham.content = readfile(os.path.join(testdir, 'attitudes.txt'))
-    spam = scraper.Doc(url='http://umsu.de/papers/spam.pdf')
+    spam = Doc(url='http://umsu.de/papers/spam.pdf')
     spam.content = """ 
        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -42,8 +42,8 @@ def test_classify():
     spam.content *= 50
     mc.train([ham, spam], [True, False])
     ham.content += 'foo bar'
-    probs = mc.classify([ham])
-    assert probs[0] > 0.5
+    prob = mc.classify(ham)
+    assert prob > 0.5
     
 def readfile(path):
     with open(path, 'r', encoding='utf-8') as f:

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import pytest
 import os.path
-from doctyper import philosophyfilter
-import scraper
-from debug import debug, debuglevel
-import db
+from opp.doctyper import philosophyfilter
+from opp.models import Doc
+from opp.debug import debug, debuglevel
+from opp import db
 
 debuglevel(4)
 
@@ -18,11 +18,11 @@ def setups():
         return
     db.close()
     db.connection(db='test_opp')
-    ham = scraper.Doc(url='http://umsu.de/papers/magnetism2.pdf')
+    ham = Doc(url='http://umsu.de/papers/magnetism2.pdf')
     ham.load_from_db()
     ham.content = readfile(os.path.join(testdir, 'attitudes.txt'))
     ham.update_db()
-    spam = scraper.Doc(url='http://umsu.de/papers/spam.pdf')
+    spam = Doc(url='http://umsu.de/papers/spam.pdf')
     spam.load_from_db()
     spam.content = """ 
        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -46,7 +46,7 @@ def setups():
     philosophyfilter.update()
 
 def test_gooddoc(setups):
-    doc = scraper.Doc(url='http://umsu.de/papers/variations.pdf')
+    doc = Doc(url='http://umsu.de/papers/variations.pdf')
     doc.content = readfile(os.path.join(testdir, 'attitudes.txt'))
     assert philosophyfilter.evaluate(doc) > 0.6
 

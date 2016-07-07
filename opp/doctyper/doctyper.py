@@ -6,8 +6,8 @@ import sys, os.path
 #curpath = os.path.abspath(os.path.dirname(__file__))
 #libpath = os.path.join(curpath, os.path.pardir)
 #sys.path.insert(0, libpath)
-from ..subjectivebayes import BinaryNaiveBayes
-from ..debug import debug, debuglevel
+from opp.subjectivebayes import BinaryNaiveBayes
+from opp.debug import debug, debuglevel
 
 def evaluate(doc):
     debug(4, 'trying to guess document type')
