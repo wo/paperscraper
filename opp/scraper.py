@@ -333,7 +333,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     
     # categorize, but only if doc has more than 1000 words --
     # otherwise categorization is pretty random:
-    if doc.numwords > 1000:
+    if doc.numwords > 700:
         for (cat_id, cat) in categories():
             clf = classifier.get_classifier(cat)
             try:

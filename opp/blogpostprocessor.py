@@ -53,7 +53,7 @@ def process_blogpost(doc):
         doc.hidden = True
 
     # categorize:
-    if doc.numwords > 1000:
+    if doc.numwords > 700:
         for (cat_id, cat) in categories():
             clf = classifier.get_classifier(cat)
             try:
