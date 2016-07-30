@@ -25,13 +25,14 @@ from opp.debug import debug
 # clean-up on the html; I also look for 'by [names]' strings in the
 # vicinity of the start of the blog post to identify authors.
 #
-# Update 2016-06-13: Goose requires Python 2, so I'm currently always
-# falling back on the rss feed content
+# Update 2016-06-13: Goose requires Python 2, so I'm reinventing the
+# wheel.
+#
 
 def parse(doc):
     """
-    fixes title and content of blogpost <doc> and adds authors,
-    abstract, numwords
+    main method: fixes title and content of blogpost <doc> and adds
+    authors, abstract, numwords
     """
     debug(3, "fetching blog post %s", doc.url)
     bytehtml = requests.get(doc.url).content.decode('utf-8', 'ignore')
@@ -64,7 +65,7 @@ def extract_content(bytehtml, doc):
     content_el = find_content_element(lxmldoc)
     if content_el:
         debug(3, 'content quality {}'.format(content_el._quality))
-        text = content_el.text_content().strip()
+        text = tidy_content(content_el.text_content())
         return text
     else:
         debug(2, 'no content found!')
@@ -103,8 +104,8 @@ def quality(el):
     # we should do that. The following equation approximates what we
     # might want: quality = ratio^3 * textlen
     quality = (ratio**3)*textlen
-    print(etree.tostring(el)[:100])
-    print("textlen {}, htmllen {}, ratio {}, quality {}".format(textlen, htmllen, ratio, quality))
+    #print(etree.tostring(el)[:100])
+    #print("textlen {}, htmllen {}, ratio {}, quality {}".format(textlen, htmllen, ratio, quality))
     if quality < 300:
         return  0
     return quality
@@ -112,6 +113,17 @@ def quality(el):
 #bytehtml = b'<html><body><div>asdf hahaha</div><p>dddd</p></body></html>'
 #doc = lxml.html.document_fromstring(bytehtml)
 #print(find_content_element(doc))
+
+def tidy_content(text):
+    """
+    strips redundant whitespace, removes "share" links etc. from
+    beginning and end. TODO: improve
+    """
+    text = text.strip()
+    if text.startswith('Tweet'):
+        return text[len('Tweet'):]
+    text = re.sub(r'\n\s+', '\n', text)
+    return text
 
 def get_abstract(text):
     sentences = sent_tokenize(text[:1000])
