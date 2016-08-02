@@ -44,6 +44,13 @@ forthcoming articles
 Amit Saad, On the Coherence of Wittgensteinian Constructivism.No categories Direct download (2 more)     Export citation     My bibliography'''),
 
     ('philpapers.html',
+     'http://philpapers.org/go.pl?id=SAAOTC&proxyId=&u=http%3A%2F%2Fdx.doi.org%2F10.1007%2Fs12136-016-0284-1',
+     '''\
+Acta Analytica
+forthcoming articles
+Amit Saad, On the Coherence of Wittgensteinian Constructivism.No categories Direct download (2 more)     Export citation     My bibliography'''),
+
+    ('philpapers.html',
      'http://philpapers.org/rec/ANTTEO-8',
      '''\
 Kyriakos Antoniou, Kleanthes K. Grohmann, Maria Kambanaros & Napoleon Katsos, The Effect of Childhood Bilectalism and Multilingualism on Executive Control.
