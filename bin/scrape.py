@@ -3,8 +3,7 @@ import sys
 import logging
 import argparse
 import findmodules
-from opp import db
-from opp import scraper
+from opp import db, scraper, debug
 
 logger = logging.getLogger('opp')
 logger.setLevel(logging.DEBUG)
@@ -19,7 +18,7 @@ ap.add_argument('-k', '--keep', action='store_true', help='keep temporary files'
 ap.add_argument('-l', '--link', type=str, help='only process this link')
 args = ap.parse_args()
 
-scraper.debuglevel(args.debug_level)
+debug.debuglevel(args.debug_level)
 
 cur = db.dict_cursor()
 query = "SELECT * FROM sources WHERE url LIKE %s LIMIT 1"
