@@ -225,11 +225,15 @@ class Link():
         el._text = el.get_attribute('textContent')
         while (True):
             debug(5, 'climbing up par: %s', par.get_attribute('outerHTML'))
-            # check if parent has many links or other children
+            # check if parent has many links or other significant children
             par._links = par.find_elements_by_xpath('.//a')
             par._children = par.find_elements_by_xpath('./*')
-            if len(par._links) > 3 or len(par._children) > 5:
-                debug(5, 'stopping: too many links or children')
+            if len(par._links) > 3:
+                debug(5, 'stopping: too many links (%s)', len(par._links))
+                break
+            sc = [c for c in par._children if len(c.get_attribute('textContent')) > 10]
+            if len(sc) > 5:
+                debug(5, 'stopping: too many children (%s)', len(sc))
                 break
             # List of drafts may only contain two papers, so we also
             # check if the previous element was already fairly

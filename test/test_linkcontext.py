@@ -46,9 +46,8 @@ Amit Saad, On the Coherence of Wittgensteinian Constructivism.No categories Dire
     ('philpapers.html',
      'http://philpapers.org/go.pl?id=SAAOTC&proxyId=&u=http%3A%2F%2Fdx.doi.org%2F10.1007%2Fs12136-016-0284-1',
      '''\
-Acta Analytica
-forthcoming articles
-Amit Saad, On the Coherence of Wittgensteinian Constructivism.No categories Direct download (2 more)     Export citation     My bibliography'''),
+Amit Saad, On the Coherence of Wittgensteinian Constructivism.
+No categories Direct download (2 more)     Export citation     My bibliography'''),
 
     ('philpapers.html',
      'http://philpapers.org/rec/ANTTEO-8',
@@ -68,13 +67,13 @@ Download'''),
      'http://consc.net/papers/revisability.pdf',
      'Revisability and Conceptual Change in "Two Dogmas of Empiricism".  Journal of Philosophy 108:387-415, 2011.'),
 
-    ('searle.html',
-     'http://socrates.berkeley.edu/~jsearle/BiologicalNaturalismOct04.doc',
-     '"Biological Naturalism" Word document'),
+#    ('searle.html',
+#     'http://socrates.berkeley.edu/~jsearle/BiologicalNaturalismOct04.doc',
+#     '"Biological Naturalism" Word document'),
 
-    ('cath-broken.html',
-     'http://philrsss.anu.edu.au/people-defaults/yuricath/function.require',
-     'Warning: require() [function.require]: URL file-access is disabled in the server configuration in /var/www/philosophy/public_html/people-defaults/yuricath/index.php3 on line 1'),
+#    ('cath-broken.html',
+#     'http://philrsss.anu.edu.au/people-defaults/yuricath/function.require',
+#     'Warning: require() [function.require]: URL file-access is disabled in the server configuration in /var/www/philosophy/public_html/people-defaults/yuricath/index.php3 on line 1'),
      
 # The following test isn't very meaningful because the source page
 # contains insane <span>s that cut across entries.
