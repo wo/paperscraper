@@ -37,13 +37,13 @@ def process_blogpost(doc):
         return 0
 
     # estimate whether post is on philosophy:
-    philosophyfilter = classifier.get_classifier('philosophy')
+    blogspamfilter = classifier.get_classifier('blogspam')
     try:
-        doc.is_philosophy = int(philosophyfilter.classify(doc) * 100)
+        doc.is_philosophy = 100 - int(blogspamfilter.classify(doc) * 100)
     except UntrainedClassifierException as e:
         doc.is_philosophy = 90
-    if doc.is_philosophy < 25 and False: # TODO: reactivate once philosophy filter works
-        debug(1, "spam: philosophy score %s < 25", doc.is_philosophy)
+    if doc.is_philosophy < 25:
+        debug(1, "spam: blogspam score %s > 75", 100 - doc.is_philosophy)
         remove_from_db(doc)
         return 0
         
