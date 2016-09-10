@@ -55,6 +55,13 @@ No categories Direct download (2 more)     Export citation     My bibliograp
 Kyriakos Antoniou, Kleanthes K. Grohmann, Maria Kambanaros & Napoleon Katsos, The Effect of Childhood Bilectalism and Multilingualism on Executive Control.
 Cognitive Sciences  Direct download (2 more)     Export citation     My bibliography'''),
 
+    ('philpapers.html',
+     'http://philpapers.org/go.pl?id=BEROU&proxyId=&u=http%3A%2F%2Fphilpapers.org%2Farchive%2FBEROU.pdf',
+     '''\
+Sara Bernstein, Overdetermination Underdetermined.
+Anomalous Monism and Mental Causation in Philosophy of Mind Causal Closure of the Physical in Metaphysics Causal Overdetermination in Metaphysics Causal Relata in Metaphysics Downward Causation in Metaphysics The Exclusion Problem in Philosophy of Mind
+Direct download (3 more)     Export citation     My bibliography 1 citation'''),
+
     ('researchgate.html',
      'https://www.researchgate.net/profile/J_Velleman/publication/259425635_Dying/links/0046352c3434bad606000000.pdf?origin=publication_list',
      '''\
