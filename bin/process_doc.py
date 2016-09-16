@@ -5,6 +5,7 @@ import argparse
 import findmodules
 from opp import db
 from opp import scraper
+from opp import debug
 
 """
 for debugging
@@ -26,7 +27,7 @@ ap.add_argument('-a', '--anchortext', type=str, help='anchortext')
 ap.add_argument('-s', '--sourcehtml', type=str, help='source page html')
 args = ap.parse_args()
 
-scraper.debuglevel(args.debuglevel or 2)
+debug.debuglevel(args.debuglevel or 2)
 
 # set up doc for processing:
 filetype = 'pdf' if 'pdf' in args.filename else 'doc'
