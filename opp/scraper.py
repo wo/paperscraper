@@ -313,9 +313,13 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
             debug(2, "new source page: setting found_date to 1970")
             doc.found_date = datetime(1970, 1, 1)
         
-    doc.update_db()
-    li.update_db(status=1, doc_id=doc.doc_id)
-    
+    try:
+        doc.update_db()
+        li.update_db(status=1, doc_id=doc.doc_id)
+    except Exception as e: # hack to catch 4-byte unicode strings not supported by mysql
+        debug(1, "COULD NOT WRITE DOC TO DATABASE: %s", e)
+        return 0
+
     # categorize, but only if doc has more than 1000 words --
     # otherwise categorization is pretty random:
     if doc.numwords > 700:

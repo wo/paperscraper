@@ -50,10 +50,7 @@ class Source(Webpage):
             kwargs['last_checked'] = time.strftime('%Y-%m-%d %H:%M:%S') 
             query = "UPDATE sources SET {},urlhash=MD5(url) WHERE source_id = %s".format(
                 ",".join(k+"=%s" for k in kwargs.keys()))
-            try:
-                cur.execute(query, tuple(kwargs.values()) + (self.source_id,))
-            except Exception as e: # hack to catch 4-byte unicode strings not supported by mysql
-                debug(1, "COULD NOT WRITE DOC TO DATABASE: %s", e)
+            cur.execute(query, tuple(kwargs.values()) + (self.source_id,))
             debug(3, cur._last_executed)
             db.commit()
     
