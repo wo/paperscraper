@@ -69,7 +69,7 @@ def extract_content(bytehtml, doc):
         return text
     else:
         debug(2, 'no content found!')
-        return ''
+        raise Exception('no content')
     
 def find_content_element(el, best_el=None):
     """
