@@ -1,16 +1,20 @@
-import logging
-import re
 import sys
-import MySQLdb
+import re
+import logging
+import findmodules
 import datetime
 import math
-import requests
 import smtplib
+import MySQLdb
 from email.mime.text import MIMEText
-from config import config
+from opp import db, util
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(logging.DEBUG)
+logger.addHandler(ch)
 
 class AuthorsFinder:
 
@@ -52,31 +56,31 @@ class AuthorsFinder:
     def select_journals(self):
         # if run as a daily cron job, cycles through the whole list once every week
         day = datetime.datetime.today().weekday()
-        num = int(math.ceil(float(len(self.journals)) / 7))
+        num = int(math.ceil(len(self.journals) / 7))
+        num -= 1
         return self.journals[day*num : day*num+num]
 
     def get_authornames(self, journal_url):
-        r = self.fetch(journal_url)
+        status,r = util.request_url(journal_url)
         ms = re.findall(r"<span class='name'>(.+?)</span>", r.text)
         names = { m for m in ms }
         return names
 
     def run(self):
-        db = self.get_db()
         cur = db.cursor()
         findings = []
         for url in self.select_journals():
-            logger.debug(u"looking for author names on %s", url)
+            logger.debug("looking for author names on %s", url)
             for name in self.get_authornames(url):
                 query = "INSERT INTO author_names (name, last_searched) VALUES (%s, '1970-01-01')"
                 try:
                     cur.execute(query, (name,))
                     db.commit()
                 except MySQLdb.IntegrityError:
-                    logger.debug(u"{} already in db".format(name))
+                    logger.debug("{} already in db".format(name))
                     findings = [f for f in findings if f[0] != name]
                 else:
-                    logger.debug(u"+++ new author name {}".format(name))
+                    logger.debug("+++ new author name {}".format(name))
                     name_id = cur.lastrowid
                     findings.append((name, name_id, url))
         if findings:
@@ -85,8 +89,8 @@ class AuthorsFinder:
     def sendmail(self, findings):
         body = u''
         for (name, name_id, url) in findings:
-            body += u"'{}' found on {}\n".format(name, url)
-            body += "Delete: http://umsu.de/opp/delete-authorname?name_id={}\n\n".format(name_id)
+            body += "'{}' found on {}\n".format(name, url)
+            body += "Delete: http://www.philosophicalprogress.org/admin/website/authorname/{}/change/".format(name_id)
         msg = MIMEText(body, 'plain', 'utf-8')
         msg['Subject'] = '[new author names]'
         msg['From'] = 'Philosophical Progress <opp@umsu.de>'
@@ -94,18 +98,6 @@ class AuthorsFinder:
         s = smtplib.SMTP('localhost')
         s.sendmail(msg['From'], [msg['To']], msg.as_string())
         s.quit()
-
-    def get_db(self):
-        if not hasattr(self, 'db'):
-            self.db = MySQLdb.connect('localhost',
-                                      config('MYSQL_USER'), config('MYSQL_PASS'), config('MYSQL_DB'),
-                                      charset='utf8', use_unicode=True)
-        return self.db
-        
-    def fetch(self, url):
-        headers = { 'User-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:37.0) Gecko/20100101 Firefox/37.0' }
-        logger.debug("fetching {}".format(url))
-        return requests.get(url, headers=headers)
 
 if __name__ == "__main__":
     af = AuthorsFinder()
