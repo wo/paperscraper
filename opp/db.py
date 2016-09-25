@@ -5,13 +5,11 @@ from .config import config
 import logging
 
 _conn = None
-_cur = None
-_dictcur = None
 
-def connection(host=config['mysql']['host'],
-               db=config['mysql']['db'],
-               user=config['mysql']['user'],
-               passwd=config['mysql']['pass']):
+def connect(host=config['mysql']['host'],
+            db=config['mysql']['db'],
+            user=config['mysql']['user'],
+            passwd=config['mysql']['pass']):
     global _conn
     if not _conn or not _conn.open:
         _conn = MySQLdb.connect(host=host, db=db, user=user, passwd=passwd,
@@ -19,16 +17,11 @@ def connection(host=config['mysql']['host'],
     return _conn
 
 def cursor():
-    global _cur
-    if not _cur:
-        _cur = connection().cursor()
-    return _cur
+    # not cached so we can reconnect if db connection is gone
+    return connect().cursor()
 
 def dict_cursor():
-    global _dictcur
-    if not _dictcur:
-        _dictcur = connection().cursor(MySQLdb.cursors.DictCursor)
-    return _dictcur
+    return connect().cursor(MySQLdb.cursors.DictCursor)
 
 def commit():
     global _conn
