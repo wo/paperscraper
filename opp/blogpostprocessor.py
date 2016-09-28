@@ -34,6 +34,7 @@ def process_blogpost(doc):
         blogpostparser.parse(doc)
     except Exception as e:
         debug(1, "parser error %s", e)
+        remove_from_db(doc)
         return 0
     if len(doc.content) < 500:
         debug(1, "content too short")
