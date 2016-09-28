@@ -30,7 +30,11 @@ def process_blogpost(doc):
     retrieve post info, check if philosophical content, classify
     """
     debug(1, "processing new blog post from %s", doc.source_name)
-    blogpostparser.parse(doc)
+    try:
+        blogpostparser.parse(doc)
+    except Exception as e:
+        debug(1, "parser error %s", e)
+        return 0
     if len(doc.content) < 500:
         debug(1, "content too short")
         remove_from_db(doc)

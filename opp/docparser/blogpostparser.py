@@ -36,10 +36,7 @@ def parse(doc):
     """
     debug(3, "fetching blog post %s", doc.url)
     bytehtml = requests.get(doc.url).content.decode('utf-8', 'ignore')
-    try:
-        doc.content = extract_content(bytehtml, doc) or strip_tags(doc.content)
-    except:
-        pass
+    doc.content = extract_content(bytehtml, doc) or strip_tags(doc.content)
     doc.numwords = len(doc.content.split())
     doc.abstract = get_abstract(doc.content)
     if doc.title.isupper():
