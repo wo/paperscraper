@@ -1,4 +1,4 @@
-SET NAMES 'utf8';
+SET NAMES 'utf8mb4';
 
 DROP TABLE IF EXISTS sources;
 CREATE TABLE sources (
@@ -14,7 +14,7 @@ CREATE TABLE sources (
   PRIMARY KEY (source_id),
   UNIQUE KEY (urlhash),
   KEY (last_checked)
-) ENGINE=InnoDB CHARACTER SET utf8;
+) ENGINE=InnoDB CHARACTER SET utf8mb4;
 
 DROP TABLE IF EXISTS links;
 CREATE TABLE links (
@@ -33,7 +33,7 @@ CREATE TABLE links (
   KEY (source_id),
   KEY (urlhash),
   KEY (last_checked)
-) ENGINE=InnoDB CHARACTER SET utf8;
+) ENGINE=InnoDB CHARACTER SET utf8mb4;
 
 DROP TABLE IF EXISTS docs;
 CREATE TABLE docs (
@@ -60,7 +60,7 @@ CREATE TABLE docs (
   PRIMARY KEY (doc_id),
   UNIQUE KEY (urlhash),
   KEY (found_date)
-) ENGINE=InnoDB CHARACTER SET utf8;
+) ENGINE=InnoDB CHARACTER SET utf8mb4;
 
 DROP TABLE IF EXISTS cats;
 CREATE TABLE cats (
@@ -68,7 +68,7 @@ CREATE TABLE cats (
   label VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (cat_id),
   UNIQUE KEY (label),
-) ENGINE=InnoDB CHARACTER SET utf8;
+) ENGINE=InnoDB CHARACTER SET utf8mb4;
 
 DROP TABLE IF EXISTS docs2cats;
 CREATE TABLE docs2cats (
@@ -81,7 +81,7 @@ CREATE TABLE docs2cats (
   KEY (doc_id),
   KEY (cat_id),
   UNIQUE KEY (cat_id, doc_id)
-) ENGINE=InnoDB CHARACTER SET utf8;
+) ENGINE=InnoDB CHARACTER SET utf8mb4;
 
 INSERT INTO cats (label) VALUES ('philosophy');
 
@@ -96,5 +96,5 @@ CREATE TABLE author_names (
   is_name TINYINT UNSIGNED DEFAULT 1,
   PRIMARY KEY (name_id),
   UNIQUE KEY (name)
-) ENGINE=InnoDB CHARACTER SET utf8;
+) ENGINE=InnoDB CHARACTER SET utf8mb4;
 
