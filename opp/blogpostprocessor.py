@@ -47,13 +47,13 @@ def process_blogpost(doc):
         doc.is_philosophy = 100 - int(blogspamfilter.classify(doc) * 100)
     except UntrainedClassifierException as e:
         doc.is_philosophy = 90
-    if doc.is_philosophy < 25:
-        debug(1, "spam: blogspam score %s > 75", 100 - doc.is_philosophy)
+    if doc.is_philosophy < 5:
+        debug(1, "spam: blogspam score %s > 95", 100 - doc.is_philosophy)
         remove_from_db(doc)
         return 0
         
     # flag for manual approval if dubious relevance:
-    if doc.is_philosophy < 60:
+    if doc.is_philosophy < 40:
         debug(1, "flagging for manual approval")
         doc.hidden = True
 
