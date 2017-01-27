@@ -3,7 +3,6 @@ import sys
 import logging
 import argparse
 import findmodules
-from opp import db
 from opp import scraper
 from opp import debug
 

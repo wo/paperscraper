@@ -16,16 +16,19 @@ def connect(host=config['mysql']['host'],
                                 use_unicode=True, charset='UTF8')
     return _conn
 
-def cursor():
+def cursor(use_dict=False):
     # not cached so we can reconnect if db connection is gone
-    cursor = connect().cursor()
+    if use_dict:
+        cursor = connect().cursor(MySQLdb.cursors.DictCursor)
+    else:
+        cursor = connect().cursor()
     cursor.execute('SET NAMES utf8mb4')
     cursor.execute("SET CHARACTER SET utf8mb4")
     cursor.execute("SET character_set_connection=utf8mb4")
     return cursor
 
 def dict_cursor():
-    return connect().cursor(MySQLdb.cursors.DictCursor)
+    return cursor(use_dict=True)
 
 def commit():
     global _conn

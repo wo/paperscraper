@@ -1,58 +1,45 @@
+#!/usr/bin/python3.4
+import argparse
 import logging
 import re
 import sys
-import MySQLdb
-import requests
+import findmodules
+from opp import db, util, googlesearch
+from opp.subjectivebayes import BinaryNaiveBayes 
 import json
 import urllib
-import smtplib
-from email.mime.text import MIMEText
-from subjectivebayes import BinaryNaiveBayes
-from config import config
-from util import normalize_url
-
-logging.getLogger("requests").setLevel(logging.WARNING)
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 class SourcesFinder:
 
     def __init__(self):
         self.page_classifier = self.make_page_classifier()
     
-    def select_names(self, num):
-        # returns list of num names from db to check for new papers pages
-        db = self.get_db()
+    def select_names(self, num_names):
+        """return list of num names names from db to check for new papers pages"""
         cur = db.cursor()
-        query = "SELECT name FROM author_names WHERE is_name=1 ORDER BY last_searched ASC LIMIT {}".format(num)
+        query = "SELECT name FROM author_names WHERE is_name=1 ORDER BY last_searched ASC LIMIT {}".format(num_names)
         cur.execute(query)
         rows = cur.fetchall()
         return [row[0] for row in rows]
 
-    def run(self, num_names=1):
-        # search for new papers pages matching num_names author names from db
-        new_pages = []
-        for name in self.select_names(num_names):
-            logger.info(u"\nsearching papers page(s) for %s", name)
-            pages = self.find_new_pages(name)
-            db = self.get_db()
-            cur = db.cursor()
-            for url in pages:
-                logger.info(u"new papers page for %s: %s", name, url)                
-                query = "INSERT INTO sources (status,type,url,default_author,name) VALUES (0,1,%s,%s,%s)"
-                cur.execute(query, (url,name,u"{}'s site".format(name)))
-                db.commit()
-                new_pages.append((name,url))
-            if not pages:
-                logger.info("no pages found")
-            query = "UPDATE author_names SET last_searched=NOW() WHERE name=%s"
-            cur.execute(query, (name,))
-            db.commit()
-        if new_pages:
-            self.sendmail(new_pages)
+    def store_page(self, url, name):
+        """write page <url> for author <name> to db"""
+        cur = db.cursor()
+        query = "INSERT INTO sources (status,sourcetype,url,default_author,name,found_date)"
+        query += "VALUES (0,'personal',%s,%s,%s, NOW())"
+        cur.execute(query, (url,name,"{}'s site".format(name)))
+        db.commit()
     
+    def update_author(self, name):
+        """update last_searched field for author <name>"""
+        cur = db.cursor()
+        query = "UPDATE author_names SET last_searched=NOW() WHERE name=%s"
+        cur.execute(query, (name,))
+        db.commit()
+
     def find_new_pages(self, name):
-        # searches for papers pages matching author name, returns urls of new pages
+        """searches for papers pages matching author name, returns urls of new pages"""
+        logger.info("\nsearching papers page(s) for %s", name)
         pages = set()
         search_terms = [
             # careful with google.com: don't block sites.google.com...
@@ -64,96 +51,101 @@ class SourcesFinder:
             '(publications OR articles OR papers OR "in progress" OR forthcoming)',
         ]
         # search full name first, then last name only:
-        search_phrase = u'"{}" '.format(name) + ' '.join(search_terms),
-        searchresults = set(self.websearch(search_phrase))
-        search_phrase = u'"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
-        searchresults |= set(self.websearch(search_phrase))
+        search_phrase = '"{}" '.format(name) + ' '.join(search_terms)
+        searchresults = set(googlesearch.search(search_phrase))
+        search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
+        searchresults |= set(googlesearch.search(search_phrase))
         for url in searchresults:
             logger.debug("\n")
-            url = normalize_url(url) 
+            url = util.normalize_url(url) 
+            if self.bad_url(url):
+                logger.info("bad url: %s", url)
+                continue
             # check if url already known:
-            cur = self.get_db().cursor()
+            cur = db.cursor()
             cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
             rows = cur.fetchall()
             if rows:
-                logger.info(u"%s already known", url)
+                logger.info("%s already known", url)
                 continue
             try:
-                r = self.fetch(url)
+                status, r = util.request_url(url)
+                if status != 200:
+                    raise Exception('status {}'.format(status))
             except:
-                logger.info(u"cannot retrieve %s", url)
+                logger.info("cannot retrieve %s", url)
             else:
                 score = self.evaluate(r, name)
                 if score < 0.7:
-                    logger.info(u"%s doesn't look like a papers page", url)
+                    logger.info("%s doesn't look like a papers page", url)
                     continue
                 dupe = self.is_duplicate(url)
                 if dupe:
-                    logger.info(u"%s is a duplicate of already known %s", url, dupe)
+                    logger.info("%s is a duplicate of already known %s", url, dupe)
                     continue
+                logger.info("new papers page for %s: %s", name, url)                
                 pages.add(url)
+        if not pages:
+            logger.info("no pages found")
+        self.update_author(name)
         return pages
 
-    def websearch(self, phrase):
-        url = 'http://ajax.googleapis.com/ajax/services/search/web?' 
-        params = { 'q': phrase, 'v': '1.0' }
-        # make sure params are encoded into str:
-        for k,v in params.iteritems():
-            params[k] = unicode(v).encode('utf-8')
-        url += urllib.urlencode(params)
-        r = self.fetch(url)
-        #logger.debug(r.content)
-        data = json.loads(r.text)
-        urls = [res['url'] for res in data['responseData']['results']]
-        return urls
-        
-    def fetch(self, url):
-        headers = { 'User-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:37.0) Gecko/20100101 Firefox/37.0' }
-        logger.debug("fetching %s", url)
-        return requests.get(url, headers=headers)
-        
+    def bad_url(self, url)
+        """returns True if url contains blacklisted part"""
+        for bad in self.BAD_URL_PARTS:
+            if bad in response.url:
+                return True
+        return False
+
+    BAD_URL_PARTS = [
+        'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
+        'scholar.google', 'books.google',
+        'amazon.com',
+        'suche', 'search', 'lookup',
+        '/cv', '/curriculum-vitae',
+        '/call',
+    ]
+
     def evaluate(self, response, name):
+        """return probability that <response> is a papers page for <name>"""
         response.textlower = response.text.lower()
         response.authorname = name
         p_source = self.page_classifier.test(response)
         return p_source
 
     def make_page_classifier(self):
-        "set up classifier to evaluate whether a page (Response object) is a papers source"
+        """set up classifier to evaluate whether a page (Response object) is a papers source"""
         classifier = BinaryNaiveBayes(prior_yes=0.6)
-        classifier.likelihood(
-            "journal url",
-            lambda r: re.search(r'jstor.org|springer.com|wiley.com|journals.org', r.url),
-            p_yes=0, p_no=0.1)
         classifier.likelihood(
             "contains at least 2 links to '.pdf' or '.doc'",
             lambda r: len(re.findall(r'href=[^>]+\.(?:pdf|docx?)\b', r.text, re.IGNORECASE)) > 1,
-            p_yes=0.99, p_no=0.2)
+            p_ifyes=0.99, p_ifno=0.2)
         classifier.likelihood(
             "contains 'syllabus'",
             lambda r: 'syllabus' in r.textlower,
-            p_yes=0.1, p_no=0.2)
+            p_ifyes=0.1, p_ifno=0.2)
         classifier.likelihood(
             "contains conference keywords",
             lambda r: r.textlower.count('schedule') + r.textlower.count('break') + r.textlower.count('dinner') > 2,
-            p_yes=0.01, p_no=0.2)
+            p_ifyes=0.01, p_ifno=0.2)
         classifier.likelihood(
             "author name in url",
             lambda r: r.authorname.split()[-1].lower() in r.url.lower(),
-            p_yes=0.6, p_no=0.1)
+            p_ifyes=0.6, p_ifno=0.1)
         return classifier
 
     def is_duplicate(self, url):
-        "check if page is already in db under different URL (e.g. /user/1076 and /user/sjones)"
-        # tricky: university pages might well have changed in
-        # irrelevant ways since the last fetch of the other version;
-        # maybe this functionality should be moved to process_pages,
-        # where I could check if a new page contains any links to
-        # papers that haven't also been found elsewhere and if not
-        # mark it as inactive. OTOH, it might still be further
-        # filtering out some obvious cases at this stage, such as
-        # trailing slashes or preceding 'www's.
-        db = self.get_db()
+        """
+        check if page is already in db under superficially different URL:
+        with(out) trailing slash or with(out) 'www'.
+
+        One should also check if the same page is available e.g. as
+        /user/1076 and as /user/sjones. But that's tricky. Perhaps
+        this functionality should be added to process_pages, where I
+        could check if a new page contains any links to papers that
+        haven't also been found elsewhere and if not mark it as
+        inactive. TODO
+        """
         cur = db.cursor()
         m = re.match('^(https?://)(www\.)?(.+?)(/)?$', url)
         if not m:
@@ -172,24 +164,17 @@ class SourcesFinder:
         return None
 
     def sendmail(self, new_pages):
-        body = u''
+        body = ''
         for (name, url) in new_pages:
-            body += u"new source page {} for {}\n".format(url,name)
+            body += "new source page {} for {}\n".format(url,name)
             body += "Edit: http://umsu.de/opp/edit-source?url={}\n\n".format(url)
-        msg = MIMEText(body, 'plain', 'utf-8')
-        msg['Subject'] = '[new source pages]'
-        msg['From'] = 'Philosophical Progress <opp@umsu.de>'
-        msg['To'] = 'wo@umsu.de'
-        s = smtplib.SMTP('localhost')
-        s.sendmail(msg['From'], [msg['To']], msg.as_string())
-        s.quit()
-
-    def get_db(self):
-        if not hasattr(self, 'db'):
-            self.db = MySQLdb.connect('localhost',
-                                      config('MYSQL_USER'), config('MYSQL_PASS'), config('MYSQL_DB'),
-                                      charset='utf8', use_unicode=True)
-        return self.db
+        #msg = MIMEText(body, 'plain', 'utf-8')
+        #msg['Subject'] = '[new source pages]'
+        #msg['From'] = 'Philosophical Progress <opp@umsu.de>'
+        #msg['To'] = 'wo@umsu.de'
+        #s = smtplib.SMTP('localhost')
+        #s.sendmail(msg['From'], [msg['To']], msg.as_string())
+        #s.quit()
 
     def test(self):
         tests = {
@@ -208,7 +193,7 @@ class SourcesFinder:
             'Adam Morton': { 'http://www.fernieroad.ca/a/PAPERS/papers.html' }, 
         }
         sf = SourcesFinder()
-        for name, sites in tests.iteritems():
+        for name, sites in tests.items():
             print("\n\ntesting {}".format(name))
             urls = sf.find_new_pages(name)
             if urls == sites:
@@ -218,12 +203,26 @@ class SourcesFinder:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        pf = PapersPageFinder()
-        print(pf.search(sys.argv[1]))
-        sys.exit(0)
-    else:
-        sf = SourcesFinder()
-        sf.run(num_names=1)
-        sys.exit(0)
 
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-v', '--verbose', action='store_true', help='turn on debugging output')
+    ap.add_argument('-n', '--name', type=str, help='search source pages for given author name')
+    ap.add_argument('-d', '--dry', action='store_true', help='do not store pages in db')
+    args = ap.parse_args()
+
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.basicConfig(level=(logging.DEBUG if args.verbose else logging.INFO))
+    logger = logging.getLogger(__name__)
+
+    sf = SourcesFinder()
+    if args.name:
+        names = [args.name]
+    else:
+        names = sf.select_names(num_names=1)
+    print(names)
+    for name in names:
+        pages = sf.find_new_pages(name)
+        if not args.dry:
+            for url in pages:
+                sf.store_page(url, name)
+    sys.exit(0)

@@ -19,7 +19,6 @@ logger.addHandler(ch)
 class AuthorsFinder:
 
     journals = [
-        'http://philpapers.org/pub/3444', # Analytic Philosophy
         'http://philpapers.org/pub/2563', # AJL
         'http://philpapers.org/pub/103', # AJP
         'http://philpapers.org/pub/158', # BJPS
@@ -30,12 +29,14 @@ class AuthorsFinder:
         'http://philpapers.org/pub/319', # Erkenntnis
         'http://philpapers.org/pub/324', # Ethical Theory and Moral Practice
         'http://philpapers.org/pub/325', # Ethics
+        'https://philpapers.org/pub/10486', # Ergo
         'http://philpapers.org/pub/420', # Inquiry
         'http://philpapers.org/pub/568', # JPL
         'http://philpapers.org/pub/570', # JoP
         'http://philpapers.org/pub/647', # Linguistics and Philosophy
         'http://philpapers.org/pub/682', # Mind
         'http://philpapers.org/pub/733', # Nous
+        'https://philpapers.org/pub/771', # Phil Imprint
         'http://philpapers.org/pub/774', # Philosophia Mathematica
         'http://philpapers.org/pub/795', # Phil Quarterly
         'http://philpapers.org/pub/798', # Phil Review
