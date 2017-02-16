@@ -25,7 +25,7 @@ class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
         logger.debug('initializing browser')
-        super().__init__()
+        super().__init__(log_path='/tmp/selenium.log')
         
     def __del__(self):
         global _display
