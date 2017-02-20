@@ -285,7 +285,8 @@ class Link():
             if re.search(r'\.(?:pdf|docx?)\b', lsib_outerHTML, flags=re.I):
                 debug(5, "no: contains link to pdf or doc")
                 return ''
-            lsib_height = int(lsib.get_attribute('offsetHeight'))
+            lsib_height = lsib.get_attribute('offsetHeight')
+            lsib_height = int(lsib_height) if lsib_height else 0
             lsib_text = lsib.get_attribute('textContent')
             if lsib_text.strip() == '' and lsib_height > 2:
                 debug(5, "no: sibling has no text but takes up space")
