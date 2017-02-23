@@ -7,6 +7,7 @@ import os.path
 import subprocess
 import shutil
 import tempfile
+from selenium.common.exceptions import *
 from opp import db
 from opp import error
 from opp import util
@@ -184,9 +185,14 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     at some point, if_modified_since and etag headers are sent.
     """
 
-    # ignore links to old and published papers:
-    li.context = li.html_context()
+    try:
+        li.context = li.html_context()
+    except StaleElementReferenceException:
+        debug(2, "link element has disappeared")
+        return li.update_db(status=1, doc_id=None)
     debug(2, "link context: %s", li.context)
+    
+    # ignore links to old and published papers:
     if context_suggests_published(li.context):
         return li.update_db(status=1, doc_id=None)
     
