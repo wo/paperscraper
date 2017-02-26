@@ -21,26 +21,37 @@ def Browser(use_virtual_display=False, reuse_browser=True):
         _browser = ActualBrowser()
     return _browser
 
+def stop_browser():
+    '''quit current _browser and _display if running'''
+    global _display
+    global _browser
+    if not _browser:
+        logger.debug('no browser running')
+        return
+
+    logger.debug('stopping browser')
+    try:
+        _browser.quit()
+    except Exception as e:
+        logger.debug(e)
+    if _display:
+        time.sleep(1)
+        logger.debug('stopping virtual display')
+        try:
+            _display.stop()
+        except Exception as e:
+            logger.debug(e)
+        del _display
+        _display = None
+    del _browser
+    _browser = None
+
 class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
         logger.debug('initializing browser')
         super().__init__(log_path='/tmp/selenium.log')
         
-    def __del__(self):
-        global _display
-        logger.debug('stopping browser')
-        self.quit()
-        if _display:
-            time.sleep(1)
-            logger.debug('stopping virtual display')
-            try:
-                _display.stop()
-            except Exception:
-                pass
-            _display = None
-        _browser = None
-    
     def goto(self, url, timeout=10):
         """sends browser to url, sets (guessed) status code"""
         self.set_page_load_timeout(timeout)
