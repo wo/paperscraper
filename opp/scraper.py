@@ -322,9 +322,9 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     
     # make sure doc fits in db:
     if len(doc.title) > 255:
-        doc.title = doc.title[:251].'...'
+        doc.title = doc.title[:251]+'...'
     if len(doc.authors) > 255:
-        doc.authors = doc.authors[:251].'...'
+        doc.authors = doc.authors[:251]+'...'
     
     doc.update_db()
     li.update_db(status=1, doc_id=doc.doc_id)
