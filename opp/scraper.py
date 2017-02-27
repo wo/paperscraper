@@ -253,11 +253,12 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         except:
             return li.update_db(status=error.code['cannot save local file'])
         try:
+            # metadata extraction:
             process_file(doc, keep_tempfiles=keep_tempfiles)
         except Exception as e:
             debug(1, 'could not process %s: %s', doc.tempfile, e)
             return li.update_db(status=error.code.get(str(e), 10))
-            
+    
     # estimate whether doc is a handout, cv etc.:
     from .doctyper import paperfilter
     paperprob = paperfilter.evaluate(doc)
@@ -318,7 +319,13 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         if doc.source.status == 0:
             debug(2, "new source page: setting found_date to 1970")
             doc.found_date = datetime(1970, 1, 1)
-        
+    
+    # make sure doc fits in db:
+    if len(doc.title) > 255:
+        doc.title = doc.title[:251].'...'
+    if len(doc.authors) > 255:
+        doc.authors = doc.authors[:251].'...'
+    
     doc.update_db()
     li.update_db(status=1, doc_id=doc.doc_id)
 
