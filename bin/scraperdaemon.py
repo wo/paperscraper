@@ -5,8 +5,7 @@ import signal
 import logging
 import findmodules
 from opp.config import config
-from opp import scraper
-from opp import blogpostprocessor
+from opp import scraper, blogpostprocessor, browser
 from opp.daemon import Daemon
 from opp.debug import debug, debuglevel
 
@@ -40,6 +39,8 @@ class ScraperDaemon(Daemon):
     def run(self):
         killer = GracefulKiller()
         pause_secs = 10
+        restart_browser_interval = 900
+        browser_starttime = time.time()
         while True:
             # process new blog posts:
             blogpostprocessor.run()
@@ -47,15 +48,22 @@ class ScraperDaemon(Daemon):
             source = scraper.next_source()
             if source:
                 scraper.scrape(source)
+            # wait:
             pause_secs = 10 if source else 60
             for sec in range(pause_secs):
                 if killer.kill_now:
+                    self.stop()
                     return
                 time.sleep(1)
+            # restart browser?
+            if time.time() - browser_starttime > restart_browser_interval:
+                browser.stop_browser()
+                browser_starttime = time.time() 
 
     def stop(self):
-        # scraper.stop_browser()
         print("hold on...")
+        browser.stop_browser()
+        time.sleep(1)
         super().stop()
 
 
