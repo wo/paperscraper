@@ -203,9 +203,14 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     if not r:
         return 0
         
-    if r.url != url: # redirected
-        url = util.normalize_url(r.url)
-        # now we treat li as if it directly led to the redirected document
+    if r.url != url: # redirected 
+        # 
+        # We generally ignore redirect urls and treat li as if it
+        # directly led to the redirected address. Exception: if the
+        # redirected address is unmanageably long, as on Barry Smith's
+        # page.
+        if len(r.url) < 500:
+            url = util.normalize_url(r.url)
 
     if r.filetype not in ('html', 'pdf', 'doc', 'rtf'):
         li.update_db(status=error.code['unsupported filetype'])
