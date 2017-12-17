@@ -2,9 +2,16 @@
     "mysql": {
         "host": "localhost",
         "db": "opptools",
-        "user": "user",
-        "pass": "pass"
+        "user": "opp",
+        "pass": "opp"
     },
     "loglevel": 3,
     "logfile": "/home/wo/opp-tools/log/scraper.log"
+    "email": {
+        "smtp": "localhost",
+        "port": "465",
+        "user": "opp",
+        "pass": "opp",
+        "from": "opp <opp@localhost>"
+    }
 }

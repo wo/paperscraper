@@ -4,10 +4,9 @@ import logging
 import findmodules
 import datetime
 import math
-import smtplib
 import MySQLdb
-from email.mime.text import MIMEText
 from opp import db, util
+from opp.sendmail import sendmail
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -85,20 +84,18 @@ class AuthorsFinder:
                     name_id = cur.lastrowid
                     findings.append((name, name_id, url))
         if findings:
-            self.sendmail(findings)
+            self.email(findings)
 
-    def sendmail(self, findings):
-        body = u''
+    def email(self, findings):
+        body = ''
         for (name, name_id, url) in findings:
             body += "'{}' found on {}\n".format(name, url)
             body += "Delete: http://www.philosophicalprogress.org/admin/website/authorname/{}/change/".format(name_id)
-        msg = MIMEText(body, 'plain', 'utf-8')
-        msg['Subject'] = '[new author names]'
-        msg['From'] = 'Philosophical Progress <opp@umsu.de>'
-        msg['To'] = 'wo@umsu.de'
-        s = smtplib.SMTP('localhost')
-        s.sendmail(msg['From'], [msg['To']], msg.as_string())
-        s.quit()
+        try:
+            sendmail('wo@umsu.de', '[PP] new author names', body)
+            logger.debug("mail sent")
+        except Exception as e:
+            logger.warning('failed to send email! %s', e)
 
 if __name__ == "__main__":
     af = AuthorsFinder()
