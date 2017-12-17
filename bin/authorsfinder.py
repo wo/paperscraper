@@ -18,36 +18,36 @@ logger.addHandler(ch)
 class AuthorsFinder:
 
     journals = [
-        'http://philpapers.org/pub/2563', # AJL
-        'http://philpapers.org/pub/103', # AJP
-        'http://philpapers.org/pub/158', # BJPS
-        'http://philpapers.org/pub/53', # Analysis
-        'http://philpapers.org/pub/120', # Behavioral and Brain Sciences
-        'http://philpapers.org/pub/178', # Canadian Journal of Philosophy
-        'http://philpapers.org/pub/283', # Dialectica
-        'http://philpapers.org/pub/319', # Erkenntnis
-        'http://philpapers.org/pub/324', # Ethical Theory and Moral Practice
-        'http://philpapers.org/pub/325', # Ethics
-        'https://philpapers.org/pub/10486', # Ergo
-        'http://philpapers.org/pub/420', # Inquiry
-        'http://philpapers.org/pub/568', # JPL
-        'http://philpapers.org/pub/570', # JoP
-        'http://philpapers.org/pub/647', # Linguistics and Philosophy
-        'http://philpapers.org/pub/682', # Mind
-        'http://philpapers.org/pub/733', # Nous
-        'https://philpapers.org/pub/771', # Phil Imprint
-        'http://philpapers.org/pub/774', # Philosophia Mathematica
-        'http://philpapers.org/pub/795', # Phil Quarterly
-        'http://philpapers.org/pub/798', # Phil Review
-        'http://philpapers.org/pub/799', # Phil Studies
-        'http://philpapers.org/pub/816', # PPR
-        'http://philpapers.org/pub/819', # Philosophy and Public Affairs
-        'http://philpapers.org/pub/822', # Phil Compass
-        'http://philpapers.org/pub/827', # PoS
-        'http://philpapers.org/pub/880', # Proceedings of the Arist Soc
-        'http://philpapers.org/pub/1053', # Studies in Hist and PoS
-        'http://philpapers.org/pub/1066', # Synthese
-        'http://philpapers.org/pub/1091', # Theory and Decision
+        'https://philpapers.org/pub/2563', # AJL
+        'https://philpapers.org/pub/103', # AJP
+        'https://philpapers.org/pub/158', # BJPS
+        'https://philpapers.org/pub/53', # Analysis
+        'https://philpapers.org/pub/120', # Behavioral and Brain Sciences
+        'https://philpapers.org/pub/178', # Canadian Journal of Philosophy
+        'https://philpapers.org/pub/283', # Dialectica
+        'https://philpapers.org/pub/319', # Erkenntnis
+        'https://philpapers.org/pub/324', # Ethical Theory and Moral Practice
+        'https://philpapers.org/pub/325', # Ethics
+        'httpss://philpapers.org/pub/10486', # Ergo
+        'https://philpapers.org/pub/420', # Inquiry
+        'https://philpapers.org/pub/568', # JPL
+        'https://philpapers.org/pub/570', # JoP
+        'https://philpapers.org/pub/647', # Linguistics and Philosophy
+        'https://philpapers.org/pub/682', # Mind
+        'https://philpapers.org/pub/733', # Nous
+        'httpss://philpapers.org/pub/771', # Phil Imprint
+        'https://philpapers.org/pub/774', # Philosophia Mathematica
+        'https://philpapers.org/pub/795', # Phil Quarterly
+        'https://philpapers.org/pub/798', # Phil Review
+        'https://philpapers.org/pub/799', # Phil Studies
+        'https://philpapers.org/pub/816', # PPR
+        'https://philpapers.org/pub/819', # Philosophy and Public Affairs
+        'https://philpapers.org/pub/822', # Phil Compass
+        'https://philpapers.org/pub/827', # PoS
+        'https://philpapers.org/pub/880', # Proceedings of the Arist Soc
+        'https://philpapers.org/pub/1053', # Studies in Hist and PoS
+        'https://philpapers.org/pub/1066', # Synthese
+        'https://philpapers.org/pub/1091', # Theory and Decision
     ]
 
     def __init__(self):
@@ -90,7 +90,7 @@ class AuthorsFinder:
         body = ''
         for (name, name_id, url) in findings:
             body += "'{}' found on {}\n".format(name, url)
-            body += "Delete: http://www.philosophicalprogress.org/admin/website/authorname/{}/change/".format(name_id)
+            body += "Delete: https://www.philosophicalprogress.org/admin/website/authorname/{}/change/".format(name_id)
         try:
             sendmail('wo@umsu.de', '[PP] new author names', body)
             logger.debug("mail sent")
