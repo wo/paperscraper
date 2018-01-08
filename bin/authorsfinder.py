@@ -56,7 +56,6 @@ class AuthorsFinder:
         # if run as a daily cron job, cycles through the whole list once every week
         day = datetime.datetime.today().weekday()
         num = int(math.ceil(len(self.journals) / 7))
-        return self.journals[day*num : day*num+1]
         return self.journals[day*num : day*num+num]
 
     def get_authornames(self, journal_url):
@@ -89,7 +88,6 @@ class AuthorsFinder:
         body = ''
         for (name, name_id, url) in findings:
             body += "'{}' found on {}\n".format(name, url)
-            body += "Delete: https://www.philosophicalprogress.org/admin/website/authorname/{}/change/".format(name_id)
         try:
             sendmail('wo@umsu.de', '[PP] new author names', body)
             logger.info("mail sent")
