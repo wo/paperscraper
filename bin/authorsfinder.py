@@ -56,7 +56,7 @@ class AuthorsFinder:
         # if run as a daily cron job, cycles through the whole list once every week
         day = datetime.datetime.today().weekday()
         num = int(math.ceil(len(self.journals) / 7))
-        num -= 1
+        return self.journals[day*num : day*num+1]
         return self.journals[day*num : day*num+num]
 
     def get_authornames(self, journal_url):
@@ -75,7 +75,7 @@ class AuthorsFinder:
                 try:
                     cur.execute(query, (name,))
                     db.commit()
-                except MySQLdb.IntegrityError:
+                except MySQLdb.IntegrityError as e:
                     logger.info("{} already in db".format(name))
                     findings = [f for f in findings if f[0] != name]
                 else:
