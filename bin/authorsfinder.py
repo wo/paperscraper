@@ -72,7 +72,7 @@ class AuthorsFinder:
         for url in self.select_journals():
             logger.debug("looking for author names on %s", url)
             for name in self.get_authornames(url):
-                query = "INSERT INTO author_names (name, last_searched) VALUES (%s, '1970-01-01')"
+                query = "INSERT INTO author_names (name, last_searched) VALUES (%s, NOW() - INTERVAL 1 YEARS)"
                 try:
                     cur.execute(query, (name,))
                     db.commit()
