@@ -21,20 +21,20 @@ class AuthorsFinder:
         'https://philpapers.org/pub/103', # AJP
         'https://philpapers.org/pub/158', # BJPS
         'https://philpapers.org/pub/53', # Analysis
-        'https://philpapers.org/pub/120', # Behavioral and Brain Sciences
+        #'https://philpapers.org/pub/120', # Behavioral and Brain Sciences
         'https://philpapers.org/pub/178', # Canadian Journal of Philosophy
         'https://philpapers.org/pub/283', # Dialectica
         'https://philpapers.org/pub/319', # Erkenntnis
         'https://philpapers.org/pub/324', # Ethical Theory and Moral Practice
         'https://philpapers.org/pub/325', # Ethics
-        'httpss://philpapers.org/pub/10486', # Ergo
+        'https://philpapers.org/pub/10486', # Ergo
         'https://philpapers.org/pub/420', # Inquiry
         'https://philpapers.org/pub/568', # JPL
         'https://philpapers.org/pub/570', # JoP
         'https://philpapers.org/pub/647', # Linguistics and Philosophy
         'https://philpapers.org/pub/682', # Mind
         'https://philpapers.org/pub/733', # Nous
-        'httpss://philpapers.org/pub/771', # Phil Imprint
+        'https://philpapers.org/pub/771', # Phil Imprint
         'https://philpapers.org/pub/774', # Philosophia Mathematica
         'https://philpapers.org/pub/795', # Phil Quarterly
         'https://philpapers.org/pub/798', # Phil Review
@@ -44,9 +44,9 @@ class AuthorsFinder:
         'https://philpapers.org/pub/822', # Phil Compass
         'https://philpapers.org/pub/827', # PoS
         'https://philpapers.org/pub/880', # Proceedings of the Arist Soc
-        'https://philpapers.org/pub/1053', # Studies in Hist and PoS
+        #'https://philpapers.org/pub/1053', # Studies in Hist and PoS
         'https://philpapers.org/pub/1066', # Synthese
-        'https://philpapers.org/pub/1091', # Theory and Decision
+        #'https://philpapers.org/pub/1091', # Theory and Decision
     ]
 
     def __init__(self):
