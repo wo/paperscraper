@@ -8,12 +8,11 @@ import MySQLdb
 from opp import db, util
 from opp.sendmail import sendmail
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.DEBUG)
+ch.setLevel(logging.INFO)
 logger.addHandler(ch)
+logger.setLevel(logging.INFO)
 
 class AuthorsFinder:
 
@@ -70,17 +69,17 @@ class AuthorsFinder:
         cur = db.cursor()
         findings = []
         for url in self.select_journals():
-            logger.debug("looking for author names on %s", url)
+            logger.info("looking for author names on %s", url)
             for name in self.get_authornames(url):
-                query = "INSERT INTO author_names (name, last_searched) VALUES (%s, NOW() - INTERVAL 1 YEARS)"
+                query = "INSERT INTO author_names (name, last_searched) VALUES (%s, NOW() - INTERVAL 1 YEAR)"
                 try:
                     cur.execute(query, (name,))
                     db.commit()
                 except MySQLdb.IntegrityError:
-                    logger.debug("{} already in db".format(name))
+                    logger.info("{} already in db".format(name))
                     findings = [f for f in findings if f[0] != name]
                 else:
-                    logger.debug("+++ new author name {}".format(name))
+                    logger.info("+++ new author name {}".format(name))
                     name_id = cur.lastrowid
                     findings.append((name, name_id, url))
         if findings:
@@ -93,7 +92,7 @@ class AuthorsFinder:
             body += "Delete: https://www.philosophicalprogress.org/admin/website/authorname/{}/change/".format(name_id)
         try:
             sendmail('wo@umsu.de', '[PP] new author names', body)
-            logger.debug("mail sent")
+            logger.info("mail sent")
         except Exception as e:
             logger.warning('failed to send email! %s', e)
 
