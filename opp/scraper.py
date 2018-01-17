@@ -116,7 +116,13 @@ def scrape(source, keep_tempfiles=False):
             debug(2, '%s redirected to %s', source.url, browser.current_url)
 
     # extract links:
-    source.set_html(browser.page_source)
+    try:
+        source.set_html(browser.page_source)
+    except WebDriverException as e:
+        debug(1, 'webdriver error retrieving page source: %s', e)
+        source.update_db(status=error.code['cannot parse document'])
+        return 0        
+
     source.extract_links(browser)
     
     # Selenium doesn't tell us when a site yields a 404, 401, 500
