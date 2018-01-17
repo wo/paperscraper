@@ -14,12 +14,15 @@ def Browser(use_virtual_display=False, reuse_browser=True):
     global _display
     global _browser
     if use_virtual_display and not _display:
-        logger.debug('initializing new virtual display')
-        _display = Display(visible=0, size=(1366, 768))
-        _display.start()
+        start_display()
     if not reuse_browser or not _browser:
         _browser = ActualBrowser()
     return _browser
+
+def start_display():
+    logger.debug('initializing new virtual display')
+    _display = Display(visible=0, size=(1366, 768))
+    _display.start()
 
 def stop_browser():
     '''quit current _browser and _display if running'''
@@ -27,13 +30,14 @@ def stop_browser():
     global _browser
     if not _browser:
         logger.debug('no browser running')
-        return
-
-    logger.debug('stopping browser')
-    try:
-        _browser.quit()
-    except Exception as e:
-        logger.debug(e)
+    else:
+        logger.debug('stopping browser')
+        try:
+            _browser.quit()
+        except Exception as e:
+            logger.debug(e)
+        del _browser
+        _browser = None
     if _display:
         time.sleep(1)
         logger.debug('stopping virtual display')
@@ -43,15 +47,21 @@ def stop_browser():
             logger.debug(e)
         del _display
         _display = None
-    del _browser
-    _browser = None
 
 class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
         logger.debug('initializing browser')
-        super().__init__(log_path='/tmp/selenium.log')
-        
+        try:
+            super().__init__(log_path='/tmp/selenium.log')
+        except Exception as e:
+            logger.debug('failed to start browser: %s', e)
+            stop_browser()
+            logger.debug('retrying')
+            time.sleep(10)
+            start_display()
+            return ActualBrowser()
+
     def goto(self, url, timeout=10):
         """sends browser to url, sets (guessed) status code"""
         self.set_page_load_timeout(timeout)
