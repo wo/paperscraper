@@ -20,6 +20,7 @@ def Browser(use_virtual_display=False, reuse_browser=True):
     return _browser
 
 def start_display():
+    global _display
     logger.debug('initializing new virtual display')
     _display = Display(visible=0, size=(1366, 768))
     _display.start()
