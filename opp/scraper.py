@@ -426,7 +426,7 @@ def check_steppingstone(page):
         (re.compile('<meta name="citation_pdf_url" content="(.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # philpapers.org:
-        (re.compile('class=\'outLink\' href="http://philpapers.org/go.pl[^"]+u=(http.+?)"'),
+        (re.compile('class=\'outLink\' href="https://philpapers.org/go.pl[^"]+u=(http.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # philsci-archive.pitt.edu:
         (re.compile('<meta name="eprints.document_url" content="(.+?)"'),
@@ -435,7 +435,7 @@ def check_steppingstone(page):
         (re.compile('pdfurl="(.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # PLOSOne:
-        (re.compile('(http://www.plosone.org/article/.+?representation=PDF)" id="downloadPdf"'),
+        (re.compile('(https?://www.plosone.org/article/.+?representation=PDF)" id="downloadPdf"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # Google Drive:
         (re.compile('content="https://drive.google.com/file/d/(.+?)/'),
@@ -457,6 +457,7 @@ def check_steppingstone(page):
     targets = set(u for u in page.xpath('//a/@href') if re.search('.pdf$', u, re.I))
     if len(targets) != 1:
         debug(3, "no: %s links to pdf files", len(targets))
+        debug(4, "targets: %s", targets)
         return None
     target = targets.pop()
     debug(3, "yes: single link to pdf file %s", target)
