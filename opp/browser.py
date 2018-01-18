@@ -16,7 +16,15 @@ def Browser(use_virtual_display=False, reuse_browser=True):
     if use_virtual_display and not _display:
         start_display()
     if not reuse_browser or not _browser:
-        _browser = ActualBrowser()
+        try:
+            _browser = ActualBrowser()
+        except Exception as e:
+            logger.debug('failed to start browser: %s', e)
+            stop_browser()
+            logger.debug('retrying')
+            time.sleep(1)
+            start_display()
+            _browser = ActualBrowser()
     return _browser
 
 def start_display():
@@ -53,15 +61,7 @@ class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
         logger.debug('initializing browser')
-        try:
-            super().__init__(log_path='/tmp/selenium.log')
-        except Exception as e:
-            logger.debug('failed to start browser: %s', e)
-            stop_browser()
-            logger.debug('retrying')
-            time.sleep(10)
-            start_display()
-            return ActualBrowser()
+        super().__init__(log_path='/tmp/selenium.log')
 
     def goto(self, url, timeout=10):
         """sends browser to url, sets (guessed) status code"""
