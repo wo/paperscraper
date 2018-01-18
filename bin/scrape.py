@@ -29,11 +29,11 @@ if not sources:
 source = scraper.Source(**sources[0])
 
 if args.link:
-    browser = scraper.Browser(use_virtual_display=True)
-    browser.goto(source.url)
-    source.set_html(browser.page_source)
+    b = scraper.Browser(use_virtual_display=True)
+    b.goto(source.url)
+    source.set_html(b.page_source)
     try:
-        el = browser.find_element_by_xpath("//a[contains(@href, '{}')]".format(args.link))
+        el = b.find_element_by_xpath("//a[contains(@href, '{}')]".format(args.link))
     except Exception as e:
         sys.exit('no link containing '+args.link+' on '+source.url)
     url = source.make_absolute(el.get_attribute('href'))
