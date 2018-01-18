@@ -191,7 +191,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     at some point, if_modified_since and etag headers are sent.
     """
 
-    if not li.context: # don't compute link context again for redirects
+    if not hasattr(li, 'context'): # skip on redirects
         try:
             li.context = li.html_context()
         except StaleElementReferenceException:
