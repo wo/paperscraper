@@ -396,6 +396,7 @@ class Link():
         success, otherwise stores error in db and returns None.
         '''
         time.sleep(1) # be gentle on servers
+        debug(1, "fetching url")
         url = url or self.url
         if only_if_modified and self.last_checked:
             ims = self.last_checked.strftime('%a, %d %b %Y %H:%M:%S GMT')

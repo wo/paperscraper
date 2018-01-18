@@ -191,22 +191,24 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     at some point, if_modified_since and etag headers are sent.
     """
 
-    try:
-        li.context = li.html_context()
-    except StaleElementReferenceException:
-        debug(2, "link element has disappeared")
-        return li.update_db(status=1, doc_id=None)
-    debug(2, "link context: %s", li.context)
+    if not li.context: # don't compute link context again for redirects
+        try:
+            li.context = li.html_context()
+        except StaleElementReferenceException:
+            debug(2, "link element has disappeared")
+            return li.update_db(status=1, doc_id=None)
+        debug(2, "link context: %s", li.context)
     
-    # ignore links to old and published papers:
-    if context_suggests_published(li.context):
-        return li.update_db(status=1, doc_id=None)
+        # ignore links to old and published papers:
+        if context_suggests_published(li.context):
+            return li.update_db(status=1, doc_id=None)
     
     # fetch url and handle errors, redirects, etc.:
     url = redir_url or li.url
     r = li.fetch(url=url, only_if_modified=not(force_reprocess))
     # note: li.fetch() updates the link entry in case of errors
     if not r:
+        debug(2, "failed to load %s", url)
         return 0
         
     if r.url != url: # redirected 
