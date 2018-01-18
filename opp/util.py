@@ -35,7 +35,6 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
         for chunk in r.iter_content(1024):
             if time.time() - start > timeout:
                 r.close()
-                print('{} - {} > {}'.format(time.time(), start, timeout))
                 raise requests.exceptions.Timeout
             size += len(chunk)
             content += chunk

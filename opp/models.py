@@ -399,7 +399,7 @@ class Link():
         url = url or self.url
         if only_if_modified and self.last_checked:
             ims = self.last_checked.strftime('%a, %d %b %Y %H:%M:%S GMT')
-            status,r = util.request_url(url, if_modified_since=ims, etag=self.etag)
+            status,r = util.request_url(url, if_modified_since=ims, etag=self.etag, timeout=15)
             if (status == 304 or
                 status == 200 and r.headers.get('content-length') == self.filesize):
                 self.update_db()
