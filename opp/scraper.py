@@ -210,7 +210,6 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         return 0
         
     if r.url != url: # redirected 
-        # 
         # We generally ignore redirect urls and treat li as if it
         # directly led to the redirected address. Exception: if the
         # redirected address is unmanageably long, as on Barry Smith's
@@ -451,7 +450,10 @@ def check_steppingstone(page):
             debug(3, "yes: repository page for %s", target)
             return target
     
-    # other steppingstone pages must have link(s) to a single pdf file:
+    # other steppingstone pages must have link(s) to a single pdf file
+    # and not be an SEP entry:
+    if 'stanford.edu/entries' in page.url:
+        return None
     targets = set(u for u in page.xpath('//a/@href') if re.search('.pdf$', u, re.I))
     if len(targets) != 1:
         debug(3, "no: %s links to pdf files", len(targets))
