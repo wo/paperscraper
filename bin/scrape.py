@@ -3,7 +3,7 @@ import sys
 import logging
 import argparse
 import findmodules
-from opp import db, scraper, debug
+from opp import db, scraper, debug, browser
 
 logger = logging.getLogger('opp')
 logger.setLevel(logging.DEBUG)
@@ -43,3 +43,4 @@ if args.link:
 else:
     scraper.scrape(source, keep_tempfiles=args.keep)
 
+browser.stop_browser()

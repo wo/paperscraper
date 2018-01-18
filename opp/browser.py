@@ -9,7 +9,7 @@ logger = logging.getLogger('opp')
 _display = None
 _browser = None
 
-# allow for singletons:
+# allow using only one instance:
 def Browser(use_virtual_display=False, reuse_browser=True):
     global _display
     global _browser
