@@ -426,7 +426,7 @@ def check_steppingstone(page):
         (re.compile('<meta name="citation_pdf_url" content="(.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # philpapers.org:
-        (re.compile('class=\'outLink\' href="https://philpapers.org/go.pl[^"]+u=(http.+?)"'),
+        (re.compile('<h1.+ href="https://philpapers.org/go.pl[^"]+u=(http.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # philsci-archive.pitt.edu:
         (re.compile('<meta name="eprints.document_url" content="(.+?)"'),
