@@ -20,10 +20,11 @@ def Browser(use_virtual_display=False, reuse_browser=True):
             _browser = ActualBrowser()
         except Exception as e:
             logger.debug('failed to start browser: %s', e)
-            stop_browser()
+            stop_browser(use_force=True)
             logger.debug('retrying')
-            time.sleep(1)
-            start_display()
+            time.sleep(10)
+            if use_virtual_display:
+                start_display()
             _browser = ActualBrowser()
     return _browser
 
@@ -33,7 +34,7 @@ def start_display():
     _display = Display(visible=0, size=(1366, 768))
     _display.start()
 
-def stop_browser():
+def stop_browser(use_force=False):
     '''quit current _browser and _display if running'''
     global _display
     global _browser
@@ -56,7 +57,12 @@ def stop_browser():
             logger.debug(e)
         del _display
         _display = None
-
+    if use_force:
+        logger.info('killing all Xvfb and geckodriver processes!')
+        os.system('killall -9 geckodriver')
+        os.system('killall -9 Xvfb')
+        
+        
 class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
