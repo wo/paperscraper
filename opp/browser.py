@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import time
 import logging
 from selenium import webdriver
