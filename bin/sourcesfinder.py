@@ -11,6 +11,8 @@ import urllib
 
 class SourcesFinder:
 
+    philpapers_search_url = 'https://philpapers.org/s/{}'
+    
     def __init__(self):
         self.page_classifier = self.make_page_classifier()
     
@@ -39,7 +41,8 @@ class SourcesFinder:
 
     def find_new_pages(self, name):
         """searches for papers pages matching author name, returns urls of new pages"""
-        logger.info("\nsearching papers page(s) for %s", name)
+        logger.info("\nsearching source pages for %s", name)
+        stored_publications = self.stored_publications()
         pages = set()
         search_terms = [
             # careful with google.com: don't block sites.google.com...
@@ -56,44 +59,44 @@ class SourcesFinder:
         search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
         searchresults |= set(googlesearch.search(search_phrase))
         for url in searchresults:
-            logger.debug("\n")
             url = util.normalize_url(url) 
+            logger.info(url)
             if self.bad_url(url):
-                logger.info("bad url: %s", url)
+                logger.info("bad url")
                 continue
             # check if url already known:
             cur = db.cursor()
             cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
             rows = cur.fetchall()
             if rows:
-                logger.info("%s already known", url)
+                logger.info("url already known")
                 continue
             try:
                 status, r = util.request_url(url)
                 if status != 200:
                     raise Exception('status {}'.format(status))
             except:
-                logger.info("cannot retrieve %s", url)
+                logger.info("cannot retrieve url", url)
             else:
                 score = self.evaluate(r, name)
                 if score < 0.7:
-                    logger.info("%s doesn't look like a papers page", url)
+                    logger.info("doesn't look like a papers page")
                     continue
                 dupe = self.is_duplicate(url)
                 if dupe:
-                    logger.info("%s is a duplicate of already known %s", url, dupe)
+                    logger.info("duplicate of already known %s", dupe)
                     continue
-                logger.info("new papers page for %s: %s", name, url)                
+                logger.info("new papers page!")                
                 pages.add(url)
         if not pages:
             logger.info("no pages found")
         self.update_author(name)
         return pages
 
-    def bad_url(self, url)
+    def bad_url(self, url):
         """returns True if url contains blacklisted part"""
         for bad in self.BAD_URL_PARTS:
-            if bad in response.url:
+            if bad in url:
                 return True
         return False
 
@@ -106,6 +109,45 @@ class SourcesFinder:
         '/call',
     ]
 
+    def stored_publications(self, name):
+        """
+        return list of publications for <name> from DB; if none are
+        stored, try to fetch some from philpapers
+
+        We do this for two reasons: First, because the list of known
+        publications helps decide whether something is a source
+        page. Second, we need a list of known publications later, when
+        processing papers, to decide whether a paper is new or
+        not. Here is a good point at which to create this list.
+        """
+        cur = db.cursor()
+        query = "SELECT title FROM publication WHERE INSTR(authors, %s)"
+        cur.execute(query, (name,))
+        rows = cur.fetchall()
+        if rows:
+            logger.info("%s publications stored for %s", len(rows), name)
+            return [row[0] for row in rows]
+        else:
+            logger.info("no publications stored for %s; searching philpapers", name)
+            pubs = self.fetch_publications(self, name)
+            for pub in pubs:
+                query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
+                cur.execute(query, (name, pub[0], pub[1]))
+                logger.debug(4, cur._last_executed)
+            return [pub[0] for pub in pubs]
+
+    def fetch_publications(self, name):
+        """
+        fetch list of publications (title, year) for <name> from philpapers
+        """
+        url = self.philpapers_search_url.format(name)
+        logger.debug(url)
+        status,r = util.request_url(url)
+        ms = re.findall(r"class='articleTitle.+?>(.+?)</span>.+class='pubyear'>(.+)</span>", r.text)
+        logger.info("%s records on philpapers for %s", len(ms), name)
+        pubs = [(m[0], (m[1] if m[1].isDigit else None)) for m in ms]
+        return pubs
+        
     def evaluate(self, response, name):
         """return probability that <response> is a papers page for <name>"""
         response.textlower = response.text.lower()
@@ -210,19 +252,23 @@ if __name__ == "__main__":
     ap.add_argument('-d', '--dry', action='store_true', help='do not store pages in db')
     args = ap.parse_args()
 
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-    logging.basicConfig(level=(logging.DEBUG if args.verbose else logging.INFO))
+    loglevel = logging.DEBUG if args.verbose else logging.INFO
     logger = logging.getLogger(__name__)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(loglevel)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logger.addHandler(ch)
+    logger.setLevel(loglevel)
 
     sf = SourcesFinder()
     if args.name:
         names = [args.name]
     else:
         names = sf.select_names(num_names=1)
-    print(names)
     for name in names:
         pages = sf.find_new_pages(name)
         if not args.dry:
             for url in pages:
                 sf.store_page(url, name)
+                
     sys.exit(0)
