@@ -60,8 +60,14 @@ def stop_browser(use_force=False):
         _display = None
     if use_force:
         logger.info('killing all Xvfb and geckodriver processes!')
-        os.system('killall -9 geckodriver')
-        os.system('killall -9 Xvfb')
+        try:
+            os.system('killall -9 Xvfb')
+        except Exception as e:
+            logger.debug(e)
+        try: 
+            os.system('killall -9 geckodriver')
+        except Exception as e:
+            logger.debug(e)
         
         
 class ActualBrowser(webdriver.Firefox):
