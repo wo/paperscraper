@@ -4,6 +4,8 @@ import logging
 import re
 import sys
 import findmodules
+import hashlib
+from scipy.stats import nbinom
 from opp import db, util, googlesearch
 from opp.subjectivebayes import BinaryNaiveBayes 
 import json
@@ -26,10 +28,12 @@ class SourcesFinder:
 
     def store_page(self, url, name):
         """write page <url> for author <name> to db"""
+        urlhash = hashlib.md5(url.encode('utf-8')).hexdigest()
+        sourcename = "{}'s site".format(name)
         cur = db.cursor()
-        query = "INSERT INTO sources (status,sourcetype,url,default_author,name,found_date)"
-        query += "VALUES (0,'personal',%s,%s,%s, NOW())"
-        cur.execute(query, (url,name,"{}'s site".format(name)))
+        query = "INSERT INTO sources (status,sourcetype,url,urlhash,default_author,name,found_date)"
+        query += "VALUES (0,'personal',%s,%s,%s,%s,NOW())"
+        cur.execute(query, (url,urlhash,name,sourcename))
         db.commit()
     
     def update_author(self, name):
@@ -42,7 +46,7 @@ class SourcesFinder:
     def find_new_pages(self, name):
         """searches for papers pages matching author name, returns urls of new pages"""
         logger.info("\nsearching source pages for %s", name)
-        stored_publications = self.stored_publications()
+        stored_publications = self.get_stored_publications(name)
         pages = set()
         search_terms = [
             # careful with google.com: don't block sites.google.com...
@@ -78,7 +82,7 @@ class SourcesFinder:
             except:
                 logger.info("cannot retrieve url", url)
             else:
-                score = self.evaluate(r, name)
+                score = self.evaluate(r, name, stored_publications)
                 if score < 0.7:
                     logger.info("doesn't look like a papers page")
                     continue
@@ -109,9 +113,9 @@ class SourcesFinder:
         '/call',
     ]
 
-    def stored_publications(self, name):
+    def get_stored_publications(self, name):
         """
-        return list of publications for <name> from DB; if none are
+        return list of publication titles for <name> from DB; if none are
         stored, try to fetch some from philpapers
 
         We do this for two reasons: First, because the list of known
@@ -121,7 +125,7 @@ class SourcesFinder:
         not. Here is a good point at which to create this list.
         """
         cur = db.cursor()
-        query = "SELECT title FROM publication WHERE INSTR(authors, %s)"
+        query = "SELECT title FROM publication WHERE INSTR(author, %s)"
         cur.execute(query, (name,))
         rows = cur.fetchall()
         if rows:
@@ -129,7 +133,7 @@ class SourcesFinder:
             return [row[0] for row in rows]
         else:
             logger.info("no publications stored for %s; searching philpapers", name)
-            pubs = self.fetch_publications(self, name)
+            pubs = self.fetch_publications(name)
             for pub in pubs:
                 query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
                 cur.execute(query, (name, pub[0], pub[1]))
@@ -148,20 +152,30 @@ class SourcesFinder:
         pubs = [(m[0], (m[1] if m[1].isDigit else None)) for m in ms]
         return pubs
         
-    def evaluate(self, response, name):
+    def evaluate(self, response, name, stored_publications):
         """return probability that <response> is a papers page for <name>"""
         response.textlower = response.text.lower()
         response.authorname = name
-        p_source = self.page_classifier.test(response)
+        response.stored_publications = stored_publications
+        p_source = self.page_classifier.test(response, debug=args.verbose)
         return p_source
 
     def make_page_classifier(self):
         """set up classifier to evaluate whether a page (Response object) is a papers source"""
         classifier = BinaryNaiveBayes(prior_yes=0.6)
         classifier.likelihood(
-            "contains at least 2 links to '.pdf' or '.doc'",
-            lambda r: len(re.findall(r'href=[^>]+\.(?:pdf|docx?)\b', r.text, re.IGNORECASE)) > 1,
-            p_ifyes=0.99, p_ifno=0.2)
+            "links to '.pdf' or '.doc' files",
+            lambda r: len(re.findall(r'href=[^>]+\.(?:pdf|docx?)\b', r.text, re.IGNORECASE)),
+            p_ifyes=nbinom(3,.1), p_ifno=nbimon(.5,.2))
+        if r.stored_publications:
+            classifier.likelihood(
+                "contains titles of stored publications",
+                lambda r: any(title.lower() in r.textlower for title in stored_publications),
+                p_ifyes=0.8, p_ifno=0.05)
+        classifier.likelihood(
+            "contains publication status keywords",
+            lambda r: any(word in r.textlower for word in ('forthcoming', 'draft', 'in progress', 'preprint'))
+            p_ifyes=0.6, p_ifno=0.2)
         classifier.likelihood(
             "contains 'syllabus'",
             lambda r: 'syllabus' in r.textlower,
