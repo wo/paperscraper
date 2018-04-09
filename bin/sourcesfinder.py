@@ -59,12 +59,14 @@ class SourcesFinder:
         ]
         # search full name first, then last name only:
         search_phrase = '"{}" '.format(name) + ' '.join(search_terms)
-        searchresults = set(googlesearch.search(search_phrase))
-        search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
-        searchresults |= set(googlesearch.search(search_phrase))
+        logger.debug(search_phrase)
+        searchresults = googlesearch.search(search_phrase)
+        #searchresults = set(googlesearch.search(search_phrase))
+        #search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
+        #searchresults |= set(googlesearch.search(search_phrase))
         for url in searchresults:
-            url = util.normalize_url(url) 
             logger.info(url)
+            url = util.normalize_url(url)
             if self.bad_url(url):
                 logger.info("bad url")
                 continue
@@ -80,7 +82,7 @@ class SourcesFinder:
                 if status != 200:
                     raise Exception('status {}'.format(status))
             except:
-                logger.info("cannot retrieve url", url)
+                logger.info("cannot retrieve url %s", url)
             else:
                 score = self.evaluate(r, name, stored_publications)
                 if score < 0.7:
@@ -105,12 +107,11 @@ class SourcesFinder:
         return False
 
     BAD_URL_PARTS = [
-        'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
+        'jstor.org', 'springer.com', 'wiley.com', 'journals.org', 'tandfonline.com', 'researchgate.net',
         'scholar.google', 'books.google',
-        'amazon.com',
-        'suche', 'search', 'lookup',
+        'amazon.',
         '/cv', '/curriculum-vitae',
-        '/call',
+        '/call', '/search', '/lookup',
     ]
 
     def get_stored_publications(self, name):
@@ -125,7 +126,7 @@ class SourcesFinder:
         not. Here is a good point at which to create this list.
         """
         cur = db.cursor()
-        query = "SELECT title FROM publication WHERE INSTR(author, %s)"
+        query = "SELECT title FROM publications WHERE INSTR(author, %s)"
         cur.execute(query, (name,))
         rows = cur.fetchall()
         if rows:
@@ -137,7 +138,7 @@ class SourcesFinder:
             for pub in pubs:
                 query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
                 cur.execute(query, (name, pub[0], pub[1]))
-                logger.debug(4, cur._last_executed)
+                logger.debug(cur._last_executed)
             return [pub[0] for pub in pubs]
 
     def fetch_publications(self, name):
@@ -147,9 +148,9 @@ class SourcesFinder:
         url = self.philpapers_search_url.format(name)
         logger.debug(url)
         status,r = util.request_url(url)
-        ms = re.findall(r"class='articleTitle.+?>(.+?)</span>.+class='pubyear'>(.+)</span>", r.text)
+        ms = re.findall("class='articleTitle[^>]+>([^<]+)</span>.+"+name+".+class=\"pubYear\">([^<]+)</span>", r.text)
         logger.info("%s records on philpapers for %s", len(ms), name)
-        pubs = [(m[0], (m[1] if m[1].isDigit else None)) for m in ms]
+        pubs = [(m[0], (m[1] if m[1].isdigit() else None)) for m in ms]
         return pubs
         
     def evaluate(self, response, name, stored_publications):
@@ -157,7 +158,7 @@ class SourcesFinder:
         response.textlower = response.text.lower()
         response.authorname = name
         response.stored_publications = stored_publications
-        p_source = self.page_classifier.test(response, debug=args.verbose)
+        p_source = self.page_classifier.test(response, debug=args.verbose, smooth=True)
         return p_source
 
     def make_page_classifier(self):
@@ -166,15 +167,14 @@ class SourcesFinder:
         classifier.likelihood(
             "links to '.pdf' or '.doc' files",
             lambda r: len(re.findall(r'href=[^>]+\.(?:pdf|docx?)\b', r.text, re.IGNORECASE)),
-            p_ifyes=nbinom(3,.1), p_ifno=nbimon(.5,.2))
-        if r.stored_publications:
-            classifier.likelihood(
-                "contains titles of stored publications",
-                lambda r: any(title.lower() in r.textlower for title in stored_publications),
-                p_ifyes=0.8, p_ifno=0.05)
+            p_ifyes=nbinom(2.5,.1), p_ifno=nbinom(.1,.1))
+        classifier.likelihood(
+            "contains titles of stored publications",
+            lambda r: any(title.lower() in r.textlower for title in r.stored_publications),
+            p_ifyes=0.8, p_ifno=0.2)
         classifier.likelihood(
             "contains publication status keywords",
-            lambda r: any(word in r.textlower for word in ('forthcoming', 'draft', 'in progress', 'preprint'))
+            lambda r: any(word in r.textlower for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
             p_ifyes=0.6, p_ifno=0.2)
         classifier.likelihood(
             "contains 'syllabus'",

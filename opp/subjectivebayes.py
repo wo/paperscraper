@@ -65,12 +65,12 @@ class BinaryNaiveBayes:
         logpos = math.log(self.prior) # initialize logp(Yes)
         logneg = math.log(1-self.prior) # initialize logp(No)
         if debug:
-            logger.debug("prior %s", self.prior)
+            print("prior {}".format(self.prior))
         for li in self.likelihoods:
             (description, condition, p_ifyes, p_ifno) = li
             res = condition(target)
             if debug:
-                logger.debug("%s? %s", description, res)
+                print ("{}? {}".format(description, res))
             if res == Ellipsis:
                 # skip features that don't apply
                 continue
@@ -87,15 +87,15 @@ class BinaryNaiveBayes:
                     elif neg > pos:
                         pos = max((neg+pos)/2, neg/10)
             if debug:
-                logger.debug("likelihood %s if yes, %s if no", pos, neg)
+                print("likelihood {} if yes, {} if no".format(pos, neg))
             logpos += math.log(pos)
             logneg += math.log(neg)
         logfeat = math.log(math.exp(logpos) + math.exp(logneg))
         if debug:
-            logger.debug("prior probability of features: %s", math.exp(logfeat))
+            print("prior probability of features: {}".format(math.exp(logfeat)))
         logp_yes = logpos - logfeat
         p_yes = math.exp(logp_yes)
         if debug:
-            logger.debug("result: p_yes %s", p_yes)
+            print("result: p_yes {}".format(p_yes))
         return p_yes
                               
