@@ -1,3 +1,4 @@
+import argparse
 import sys
 import re
 import logging
@@ -8,11 +9,11 @@ import MySQLdb
 from opp import db, util
 from opp.sendmail import sendmail
 
-logger = logging.getLogger(__name__)
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.INFO)
-logger.addHandler(ch)
-logger.setLevel(logging.INFO)
+#logger = logging.getLogger(__name__)
+#ch = logging.StreamHandler(sys.stdout)
+#ch.setLevel(logging.INFO)
+#logger.addHandler(ch)
+#logger.setLevel(logging.INFO)
 
 class AuthorsFinder:
 
@@ -95,6 +96,22 @@ class AuthorsFinder:
             logger.warning('failed to send email! %s', e)
 
 if __name__ == "__main__":
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-v', '--verbose', action='store_true', help='turn on debugging output')
+    ap.add_argument('-n', '--name', type=str, help='search source pages for given author name')
+    ap.add_argument('-d', '--dry', action='store_true', help='do not store pages in db')
+    args = ap.parse_args()
+
+    loglevel = logging.DEBUG if args.verbose else logging.INFO
+    logger = logging.getLogger(__name__)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(loglevel)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logger.addHandler(ch)
+    logger.setLevel(loglevel)
+
     af = AuthorsFinder()
     af.run()
-
+    
+    sys.exit(0)

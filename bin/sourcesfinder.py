@@ -1,4 +1,3 @@
-#!/usr/bin/python3.4
 import argparse
 import logging
 import re
@@ -65,7 +64,7 @@ class SourcesFinder:
         #search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
         #searchresults |= set(googlesearch.search(search_phrase))
         for url in searchresults:
-            logger.info(url)
+            logger.info('\n'+url)
             url = util.normalize_url(url)
             if self.bad_url(url):
                 logger.info("bad url")
@@ -81,8 +80,8 @@ class SourcesFinder:
                 status, r = util.request_url(url)
                 if status != 200:
                     raise Exception('status {}'.format(status))
-            except:
-                logger.info("cannot retrieve url %s", url)
+            except Exception as e:
+                logger.info("cannot retrieve url %s (%s)", url, e)
             else:
                 score = self.evaluate(r, name, stored_publications)
                 if score < 0.7:
@@ -107,10 +106,12 @@ class SourcesFinder:
         return False
 
     BAD_URL_PARTS = [
-        'jstor.org', 'springer.com', 'wiley.com', 'journals.org', 'tandfonline.com', 'researchgate.net',
-        'scholar.google', 'books.google',
-        'amazon.',
-        '/cv', '/curriculum-vitae',
+        'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
+        'tandfonline.com', 'papers.ssrn.com', 'oup.com',
+        'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
+        'amazon.', 'twitter.', 'goodreads.com',
+        'dailynous.com',
+        '/cv', '/curriculum-vitae', '/teaching',
         '/call', '/search', '/lookup',
     ]
 
@@ -165,8 +166,12 @@ class SourcesFinder:
         """set up classifier to evaluate whether a page (Response object) is a papers source"""
         classifier = BinaryNaiveBayes(prior_yes=0.6)
         classifier.likelihood(
+            "any links to '.pdf' or '.doc' files",
+            lambda r: re.search(r'href=[^>]+\.(?:pdf|docx?)\b', r.textlower),
+            p_ifyes=1, p_ifno=.6)
+        classifier.likelihood(
             "links to '.pdf' or '.doc' files",
-            lambda r: len(re.findall(r'href=[^>]+\.(?:pdf|docx?)\b', r.text, re.IGNORECASE)),
+            lambda r: len(re.findall(r'href=[^>]+\.(?:pdf|docx?)\b', r.textlower)),
             p_ifyes=nbinom(2.5,.1), p_ifno=nbinom(.1,.1))
         classifier.likelihood(
             "contains titles of stored publications",
@@ -175,7 +180,7 @@ class SourcesFinder:
         classifier.likelihood(
             "contains publication status keywords",
             lambda r: any(word in r.textlower for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
-            p_ifyes=0.6, p_ifno=0.2)
+            p_ifyes=0.8, p_ifno=0.2)
         classifier.likelihood(
             "contains 'syllabus'",
             lambda r: 'syllabus' in r.textlower,
@@ -184,6 +189,10 @@ class SourcesFinder:
             "contains conference keywords",
             lambda r: r.textlower.count('schedule') + r.textlower.count('break') + r.textlower.count('dinner') > 2,
             p_ifyes=0.01, p_ifno=0.2)
+        classifier.likelihood(
+            "contains commercial keywords",
+            lambda r: any(word in r.textlower for word in ('contact us', 'sign up', 'sign in', 'log in', 'terms and conditions')),
+            p_ifyes=0.05, p_ifno=0.5)
         classifier.likelihood(
             "author name in url",
             lambda r: r.authorname.split()[-1].lower() in r.url.lower(),

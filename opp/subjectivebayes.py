@@ -42,8 +42,12 @@ class BinaryNaiveBayes:
         # stay regular, avoid infinite logs:
         if p_ifyes == 0:
             p_ifyes = 0.0000001
+        if p_ifyes == 1:
+            p_ifyes = 0.9999999
         if p_ifno == 0:
             p_ifno = 0.0000001
+        if p_ifno == 1:
+            p_ifno = 0.9999999
         self.likelihoods.append((description, condition, p_ifyes, p_ifno))
 
     def test(self, target, debug=False, smooth=False):
