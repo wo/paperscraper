@@ -7,6 +7,7 @@ import os.path
 import subprocess
 import shutil
 import tempfile
+import hashlib
 from selenium.common.exceptions import *
 from opp import db
 from opp import error
@@ -223,9 +224,10 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         return debug(1, "unsupported filetype: %s", r.filetype)
 
     doc = Doc(url=url, r=r, link=li, source=li.source)
-    
-    if doc.load_from_db() and not force_reprocess:
-        li.update_db(status=1, doc_id=doc.doc_id)
+
+    old_id = doc.get_id()
+    if old_id and not force_reprocess:
+        li.update_db(status=1, doc_id=old_id)
         return debug(1, "%s is already in docs table", url)
     
     if r.filetype == 'html':
@@ -260,9 +262,15 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
 
     else:
         try:
-            doc.tempfile = save_local(r)
+            (doc.tempfile, doc.filehash) = save_local(r)
         except:
             return li.update_db(status=error.code['cannot save local file'])
+        # check if doc with that filehash already stored:
+        old_id = doc.get_id()
+        if old_id:
+            debug(1, "document already stored under id %s", old_id)
+            li.update_db(status=1, doc_id=old_id)
+            return 0
         try:
             # metadata extraction:
             process_file(doc, keep_tempfiles=keep_tempfiles)
@@ -466,20 +474,23 @@ def check_steppingstone(page):
     return target
     
 def save_local(r):
+    '''saves file from resource, returns (local_path, md5)'''
     # use recognizable tempfile name:
     m = re.search('/([^/]+?)(?:\.\w+)?(?:[\?\#].+)*$', r.url)
     fname = m.group(1) if m else r.url
     fname = re.sub('\W', '_', fname) + '.' + r.filetype
-    tempfile = os.path.join(tempdir(), fname)
-    debug(2, "saving %s to %s", r.url, tempfile)
+    temppath = os.path.join(tempdir(), fname)
+    debug(2, "saving %s to %s", r.url, temppath)
+    md5 = hashlib.md5()
     try:
-        with open(tempfile, 'wb') as f:
+        with open(temppath, 'wb') as f:
             for block in r.iter_content(1024):
                 f.write(block)
+                md5.update(block)
     except EnvironmentError as e:
-        debug(1, "cannot save %s to %s: %s", r.url, tempfile, str(e))
+        debug(1, "cannot save %s to %s: %s", r.url, temppath, str(e))
         raise
-    return tempfile
+    return (temppath, md5.hexdigest())
     
 def convert_to_pdf(tempfile):
     outfile = tempfile.rsplit('.',1)[0]+'.pdf'
