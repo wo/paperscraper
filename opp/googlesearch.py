@@ -64,8 +64,6 @@ def get_page(url):
         cookie_jar.extract_cookies(response, request)
         html = response.read()
         response.close()
-    try:
-    urls = search("site:facebook.com inurl:login", stop=20)
     except urllib.error.HTTPError as httperr:
         debug(1, httperr.headers)
         debug(httperr.read())
