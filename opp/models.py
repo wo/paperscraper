@@ -425,10 +425,12 @@ class Doc():
     db_fields = {
         'doc_id': 0,
         'url': '',
+        #'urlhash': '',
         'doctype': 'article',
         'status': 1,
         'filetype': None,
         'filesize': 0,
+        'filehash': None,
         'found_date': None,
         'earlier_id': None,
         'authors': '',
@@ -463,6 +465,24 @@ class Doc():
             self.source_name = kwargs.get('source_name', self.source.name)
             self.source_id = kwargs.get('source_id', self.source.source_id)
         self.ocr = False
+
+    def get_id(self):
+        '''
+        checks if Doc with present filehash or url exists in db; returns
+        id or None
+        '''
+        cur = db.dict_cursor()
+        if self.filehash:
+            query = "SELECT doc_id FROM docs WHERE filehash = %s LIMIT 1"
+            cur.execute(query, (self.filehash,))
+        elif self.url:
+            query = "SELECT doc_id FROM docs WHERE urlhash = MD5(%s) LIMIT 1"
+            cur.execute(query, (self.url,))
+        else:
+            raise TypeError("need url or filehash to check doc in db")
+        debug(5, cur._last_executed)
+        docs = cur.fetchall()
+        return docs[0][0] if docs else None
     
     def load_from_db(self, doc_id=None, url=None):
         doc_id = doc_id or self.doc_id
