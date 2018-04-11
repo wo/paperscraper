@@ -27,6 +27,7 @@ class Source(Webpage):
             setattr(self, k, kwargs.get(k, v))
         if not self.found_date:
             self.found_date = datetime.now()
+        self.is_new = True
 
     def load_from_db(self, url=''):
         url = url or self.url
@@ -40,6 +41,8 @@ class Source(Webpage):
         if sources:
             for k,v in sources[0].items():
                 setattr(self, k, v)
+            if self.last_checked:
+                self.is_new = False
         else:
             debug(4, "%s not in sources table", url)
             
@@ -70,7 +73,7 @@ class Source(Webpage):
     def set_html(self, html):
         debug(6, "\n====== %s ======\n%s\n======\n", self.url, html)
         self.html = html
-   
+
     def extract_links(self, browser):
         """
         extracts links from source page; sets self.new_links and
@@ -482,7 +485,11 @@ class Doc():
             raise TypeError("need url or filehash to check doc in db")
         debug(5, cur._last_executed)
         docs = cur.fetchall()
-        return docs[0][0] if docs else None
+        if docs:
+            print(docs[0])
+            return docs[0][0]
+        else:
+            return None
     
     def load_from_db(self, doc_id=None, url=None):
         doc_id = doc_id or self.doc_id
