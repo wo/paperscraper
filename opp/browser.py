@@ -3,20 +3,16 @@ import os
 import time
 import logging
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from pyvirtualdisplay import Display
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 logger = logging.getLogger('opp')
 
-_display = None
 _browser = None
 
 # allow using only one instance:
 def Browser(use_virtual_display=False, reuse_browser=True):
-    global _display
     global _browser
-    if use_virtual_display and not _display:
-        start_display()
     if not reuse_browser or not _browser:
         try:
             _browser = ActualBrowser()
@@ -24,21 +20,12 @@ def Browser(use_virtual_display=False, reuse_browser=True):
             logger.debug('failed to start browser: %s', e)
             stop_browser(use_force=True)
             logger.debug('retrying')
-            time.sleep(10)
-            if use_virtual_display:
-                start_display()
+            time.sleep(100)
             _browser = ActualBrowser()
     return _browser
 
-def start_display():
-    global _display
-    logger.debug('initializing new virtual display')
-    _display = Display(visible=0, size=(1366, 768))
-    _display.start()
-
 def stop_browser(use_force=False):
-    '''quit current _browser and _display if running'''
-    global _display
+    '''quit current _browser if running'''
     global _browser
     if not _browser:
         logger.debug('no browser running')
@@ -50,32 +37,21 @@ def stop_browser(use_force=False):
             logger.debug(e)
         del _browser
         _browser = None
-    if _display:
-        time.sleep(1)
-        logger.debug('stopping virtual display')
-        try:
-            _display.stop()
-        except Exception as e:
-            logger.debug(e)
-        del _display
-        _display = None
     if use_force:
-        logger.info('killing all Xvfb and geckodriver processes!')
-        try:
-            os.system('killall -9 Xvfb')
-        except Exception as e:
-            logger.debug(e)
+        logger.info('killing all geckodriver processes!')
         try: 
             os.system('killall -9 geckodriver')
         except Exception as e:
             logger.debug(e)
         
-        
 class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
         logger.debug('initializing browser')
-        super().__init__(log_path='/tmp/selenium.log')
+        options = Options()
+        options.set_headless(headless=True)
+        binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
+        super().__init__(firefox_binary=binary, firefox_options=options, log_path='/tmp/selenium.log')
 
     def goto(self, url, timeout=10):
         """sends browser to url, sets (guessed) status code"""
@@ -93,3 +69,4 @@ class ActualBrowser(webdriver.Firefox):
             pass
         if self.current_url != url:
             self.status = 301
+
