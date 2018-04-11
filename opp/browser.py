@@ -51,7 +51,11 @@ class ActualBrowser(webdriver.Firefox):
         options = Options()
         options.set_headless(headless=True)
         binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
-        super().__init__(firefox_binary=binary, firefox_options=options, log_path='/tmp/selenium.log')
+        geckodriverpath = '/usr/local/bin/geckodriver'
+        super().__init__(executable_path=geckodriverpath,
+                         firefox_binary=binary,
+                         firefox_options=options,
+                         log_path='/tmp/selenium.log')
 
     def goto(self, url, timeout=10):
         """sends browser to url, sets (guessed) status code"""
