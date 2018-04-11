@@ -59,21 +59,24 @@ def get_page(url):
     request.add_header('User-Agent', USER_AGENT)
     cookie_jar = get_cookie_jar()
     cookie_jar.add_cookie_header(request)
-    response = urlopen(request)
-    cookie_jar.extract_cookies(response, request)
-    html = response.read()
-    response.close()
+    try:
+        response = urlopen(request)
+        cookie_jar.extract_cookies(response, request)
+        html = response.read()
+        response.close()
+    try:
+    urls = search("site:facebook.com inurl:login", stop=20)
+    except urllib.error.HTTPError as httperr:
+        debug(1, httperr.headers)
+        debug(httperr.read())
     cookie_jar.save()
     return html
 
 def get_cookie_jar():
     """returns cookie jar"""
-    COOKIE_JAR_FILE = '.googlesearch-coookie'
+    COOKIE_JAR_FILE = '/home/wo/opp-tools/.googlesearch-cookie'
     cookie_jar = LWPCookieJar(COOKIE_JAR_FILE)
-    try:
-        cookie_jar.load()
-    except:
-        pass
+    cookie_jar.load()
     return cookie_jar
 
 if __name__ == "__main__":
