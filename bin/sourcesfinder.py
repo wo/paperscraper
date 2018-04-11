@@ -10,6 +10,11 @@ from opp.subjectivebayes import BinaryNaiveBayes
 import json
 import urllib
 
+'''
+This script is supposed to be run from the command line (or regularly
+as a cron job) to find new source pages.
+'''
+
 class SourcesFinder:
 
     philpapers_search_url = 'https://philpapers.org/s/{}'
