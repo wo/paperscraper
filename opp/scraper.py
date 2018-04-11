@@ -599,11 +599,23 @@ def journal_names():
 
 def paper_is_old(doc):
     """
-    checks online if document has been published earlier than this
-    year
+    check if document is old; currently we just check against our
+    publications database (retrieved from philpapers) because google
+    scholar includes citations for documents that aren't even
+    available as drafts yet
     """
     debug(4, "checking if paper is old")
     title = re.sub('<[\S]+?>', '', doc.title) # strip tags
+    cur = db.cursor()
+    query = "SELECT author FROM publications WHERE title = %s"
+    cur.execute(query, (title,))
+    for author in cur.fetchall():
+        if author in doc.authors:
+            debug(2, "paper is in publications database; ignoring.")
+            return True
+    return False
+
+    # TODO: remove or reactivate scholar lookup
     match = scholarquery(doc.authors, title)
     if (match and match['year'] 
         and 1950 < int(match['year']) < datetime.today().year-2):
