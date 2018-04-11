@@ -31,7 +31,7 @@ def next_source():
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
     debug(4, cur._last_executed)
-    source = cur.fetchall()
+    sources = cur.fetchall()
     if sources:
         return Source(**sources[0])
     else:
