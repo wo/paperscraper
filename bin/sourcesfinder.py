@@ -5,7 +5,7 @@ import sys
 import findmodules
 import hashlib
 from scipy.stats import nbinom
-from opp import db, util, googlesearch
+from opp import db, util, googlesearch, philpaperssearch
 from opp.subjectivebayes import BinaryNaiveBayes 
 import json
 import urllib
@@ -17,8 +17,6 @@ as a cron job) to find new source pages.
 
 class SourcesFinder:
 
-    philpapers_search_url = 'https://philpapers.org/s/{}'
-    
     def __init__(self):
         self.page_classifier = self.make_page_classifier()
     
@@ -132,7 +130,7 @@ class SourcesFinder:
         not. Here is a good point at which to create this list.
         """
         cur = db.cursor()
-        query = "SELECT title FROM publications WHERE INSTR(author, %s)"
+        query = "SELECT title FROM publications WHERE author=%s"
         cur.execute(query, (name,))
         rows = cur.fetchall()
         if rows:
@@ -140,25 +138,14 @@ class SourcesFinder:
             return [row[0] for row in rows]
         else:
             logger.info("no publications stored for %s; searching philpapers", name)
-            pubs = self.fetch_publications(name)
+            pubs = philpaperssearch.get_publications(name)
+            print('{} publications found on philpapers'.format(len(pubs)))
             for pub in pubs:
                 query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
                 cur.execute(query, (name, pub[0], pub[1]))
                 logger.debug(cur._last_executed)
             return [pub[0] for pub in pubs]
 
-    def fetch_publications(self, name):
-        """
-        fetch list of publications (title, year) for <name> from philpapers
-        """
-        url = self.philpapers_search_url.format(name)
-        logger.debug(url)
-        status,r = util.request_url(url)
-        ms = re.findall("class='articleTitle[^>]+>([^<]+)</span>.+"+name+".+class=\"pubYear\">([^<]+)</span>", r.text)
-        logger.info("%s records on philpapers for %s", len(ms), name)
-        pubs = [(m[0], (m[1] if m[1].isdigit() else None)) for m in ms]
-        return pubs
-        
     def evaluate(self, response, name, stored_publications):
         """return probability that <response> is a papers page for <name>"""
         response.textlower = response.text.lower()
@@ -166,7 +153,7 @@ class SourcesFinder:
         response.stored_publications = stored_publications
         p_source = self.page_classifier.test(response, debug=args.verbose, smooth=True)
         return p_source
-
+    
     def make_page_classifier(self):
         """set up classifier to evaluate whether a page (Response object) is a papers source"""
         classifier = BinaryNaiveBayes(prior_yes=0.6)
