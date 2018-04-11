@@ -474,7 +474,7 @@ class Doc():
         checks if Doc with present filehash or url exists in db; returns
         id or None
         '''
-        cur = db.dict_cursor()
+        cur = db.cursor()
         if self.filehash:
             query = "SELECT doc_id FROM docs WHERE filehash = %s LIMIT 1"
             cur.execute(query, (self.filehash,))
@@ -486,7 +486,6 @@ class Doc():
         debug(5, cur._last_executed)
         docs = cur.fetchall()
         if docs:
-            print(docs[0])
             return docs[0][0]
         else:
             return None
