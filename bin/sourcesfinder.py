@@ -136,15 +136,16 @@ class SourcesFinder:
         if rows:
             logger.info("%s publications stored for %s", len(rows), name)
             return [row[0] for row in rows]
-        else:
-            logger.info("no publications stored for %s; searching philpapers", name)
-            pubs = philpaperssearch.get_publications(name)
-            print('{} publications found on philpapers'.format(len(pubs)))
-            for pub in pubs:
-                query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
-                cur.execute(query, (name, pub[0], pub[1]))
-                logger.debug(cur._last_executed)
-            return [pub[0] for pub in pubs]
+        
+        logger.info("no publications stored for %s; searching philpapers", name)
+        pubs = philpaperssearch.get_publications(name)
+        logger.info('{} publications found on philpapers'.format(len(pubs)))
+        for pub in pubs:
+            query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
+            cur.execute(query, (name, pub[0], pub[1]))
+            logger.debug(cur._last_executed)
+        db.commit()
+        return [pub[0] for pub in pubs]
 
     def evaluate(self, response, name, stored_publications):
         """return probability that <response> is a papers page for <name>"""

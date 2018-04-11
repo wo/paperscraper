@@ -72,7 +72,7 @@ def get_page(url):
 
 def get_cookie_jar():
     """returns cookie jar"""
-    COOKIE_JAR_FILE = '/home/wo/opp-tools/.googlesearch-cookie'
+    COOKIE_JAR_FILE = '.googlesearch-cookie'
     cookie_jar = LWPCookieJar(COOKIE_JAR_FILE)
     cookie_jar.load()
     return cookie_jar
