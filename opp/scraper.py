@@ -25,8 +25,8 @@ def next_source():
     min_age = datetime.now() - timedelta(hours=16)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     cur = db.dict_cursor()
-    query = ("SELECT * FROM sources WHERE"
-             " sourcetype != 'blog'" # ignore rss feeds
+    query = ("SELECT * FROM sources WHERE status > 0"
+             " AND sourcetype != 'blog'" # ignore rss feeds
              " AND (last_checked IS NULL OR last_checked < %s)"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
@@ -78,10 +78,10 @@ def scrape(source, keep_tempfiles=False):
     they remain in the db, but they are never revisited until they
     reappear on the page.
     
-    (5) If a page is processed for the first time (status==0 in the
-    db), we don't want to display all linked papers in the news
-    feed. Nonetheless, we process all links so that we can check for
-    revisions (think of the Stanford Encyclopedia). To avoid
+    (5) If a page is processed for the first time (no links yet
+    associated with it), we don't want to display all linked papers in
+    the news feed. Nonetheless, we process all links so that we can
+    check for revisions (think of the Stanford Encyclopedia). To avoid
     displaying the papers as new, we mark them with a found_date of
     1970.
     """
@@ -130,7 +130,7 @@ def scrape(source, keep_tempfiles=False):
     # etc. error. But we can usually tell from the fact that there are
     # few known links on the error page:
     debug(1, 'old status {}, old links: {}'.format(source.status, len(source.old_links)))
-    if source.status > 0 and len(source.old_links) <= 1:
+    if not source.is_new and len(source.old_links) <= 1:
         debug(1, 'suspiciously few old links, checking status code')
         status, r = util.request_url(source.url)
         if status != 200:
@@ -335,7 +335,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
 
         # don't show papers (incl HTML pages) from newly added source
         # pages in news feed:
-        if doc.source.status == 0:
+        if doc.source.is_new:
             debug(2, "new source page: setting found_date to 1970")
             doc.found_date = datetime(1970, 1, 1)
     
