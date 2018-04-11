@@ -30,7 +30,7 @@ def next_source():
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
     debug(4, cur._last_executed)
-    sources = cur.fetchall()
+    source = cur.fetchall()
     if sources:
         return Source(**sources[0])
     else:
@@ -177,8 +177,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
                  recurse=0):
     """
     Fetch url, check for http errors and steppingstones, filter spam,
-    parse candidate papers, check for duplicates, check if published
-    before last year.
+    parse candidate papers, check for duplicates, check if paper is old.
 
     Links often lead to intermediate pages (e.g. on repositories) with
     another link to the actual paper. In this case, we only store the
@@ -191,7 +190,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     at some point, if_modified_since and etag headers are sent.
     """
 
-    if not hasattr(li, 'context'): # skip on redirects
+    if not hasattr(li, 'context'): # skip context extraction on redirects
         try:
             li.context = li.html_context()
         except StaleElementReferenceException:
@@ -210,7 +209,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     if not r:
         debug(2, "failed to load %s", url)
         return 0
-        
+    
     if r.url != url: # redirected 
         # We generally ignore redirect urls and treat li as if it
         # directly led to the redirected address. Exception: if the
@@ -588,14 +587,14 @@ def context_suggests_published(context):
     debug(4, 'no publication keywords, assuming not yet published')
     return False
 
-def journal_names():
-    try:
-        return journal_names.res
-    except AttributeError:
-        cur = db.cursor()
-        cur.execute("SELECT name FROM journals")
-        journal_names.res = cur.fetchall()
-        return journal_names.res
+#def journal_names():
+#    try:
+#        return journal_names.res
+#    except AttributeError:
+#        cur = db.cursor()
+#        cur.execute("SELECT name FROM journals")
+#        journal_names.res = cur.fetchall()
+#        return journal_names.res
 
 def paper_is_old(doc):
     """
@@ -609,8 +608,9 @@ def paper_is_old(doc):
     cur = db.cursor()
     query = "SELECT author FROM publications WHERE title = %s"
     cur.execute(query, (title,))
-    for author in cur.fetchall():
-        if author in doc.authors:
+    for row in cur.fetchall():
+        if row[0] in doc.authors:
+            # TODO: need to allow for fuzzy name matching!
             debug(2, "paper is in publications database; ignoring.")
             return True
     return False
