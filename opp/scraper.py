@@ -25,7 +25,7 @@ def next_source():
     min_age = datetime.now() - timedelta(hours=16)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     cur = db.dict_cursor()
-    query = ("SELECT * FROM sources WHERE (status = 1 OR status > 99)"
+    query = ("SELECT * FROM sources WHERE status > 0"
              " AND sourcetype != 'blog'" # ignore rss feeds
              " AND (last_checked IS NULL OR last_checked < %s)"
              " ORDER BY last_checked LIMIT 1")

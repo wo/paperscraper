@@ -12,10 +12,10 @@ error.message[5] => 'unsupported filetype'
 
 message = {
 
+    -1: 'source ignored',
     0: 'unprocessed',
     1: 'OK',
     5: 'unsupported filetype',
-    9: 'source ignored',
    
     # 10-99: processing errors 
     # TODO: tidy
