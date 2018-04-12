@@ -557,7 +557,7 @@ def get_duplicate(doc):
 def trivial_url_variant(url1, url2):
     """
     returns True if the two urls are almost identical so that we don't
-    have to manual approve a source page redirect.
+    have to manually approve a source page redirect.
     """
     # ignore trailing slashes:
     url1 = url1.rstrip('/')

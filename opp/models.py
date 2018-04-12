@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import time, re
 from datetime import datetime
+from urllib.parse import urlparse
 from opp import db
 from opp import error
 from opp import util
@@ -100,11 +101,11 @@ class Source(Webpage):
                     continue
             except:
                 continue
-            if is_bad_url(href):
-                debug(3, 'ignoring link to %s (bad url)', href)
+            if self.link_has_bad_url(href):
+                debug(4, 'ignoring link to %s (bad url)', href)
                 continue
             if href in old_links.keys() or href in new_links.keys():
-                debug(3, 'ignoring repeated link to %s', href)
+                debug(4, 'ignoring repeated link to %s', href)
             old_link = self.old_link(href)
             if old_link:
                 debug(3, 'link to %s is old', href)
@@ -117,6 +118,33 @@ class Source(Webpage):
         self.new_links = new_links.values()
         self.old_links = old_links.values()
  
+    def link_has_bad_url(self, url):
+        """
+        returns True if url definitely doesn't lead to a paper
+        """
+        try:
+            assert url.startswith('http')
+            assert len(url) < 512
+            assert url.split('#')[0] != self.url.split('#')[0]
+            (http, domain, path, params, query, fragment) = urlparse(url)
+            assert len(path) > 1 # TLD
+            bad_exts = [
+                '.css', '.mp3', '.avi', '.mov', '.jpg', '.gif', '.ppt', '.png',
+                '.ico', '.mso', '.xml'
+            ]
+            assert not any(path.endswith(s) for s in bad_exts)
+            bad_domains = [
+                'twitter.com',
+                'fonts.googleapis.com',
+                'youtube.com',
+                'amazon.com'
+                ]
+            assert not any(s in domain for s in bad_domains)
+            assert 'philpapers.org/asearch' not in url
+            return False
+        except Exception as e:
+            return True
+
     def old_link(self, url):
         """
         If a link to (a session variant of) url is already known on this
@@ -602,23 +630,6 @@ class Doc():
             return au
         except Exception as e:
             return ''
-
-def is_bad_url(url):
-    if len(url) > 512:
-        debug(1, 'url %s is too long', url)
-        return True
-    re_bad_url = re.compile("""
-                ^\#|
-                ^mailto|
-                ^data|
-                ^javascript|
-                ^.+//[^/]+/?$|          # TLD
-                twitter\.com|
-                fonts\.googleapis\.com|
-                philpapers\.org/asearch|
-                \.(?:css|mp3|avi|mov|jpg|gif|ppt|png|ico|mso|xml)(?:\?.+)?$   # .css?version=12
-                """, re.I | re.X)
-    return re_bad_url.search(url) is not None
 
 def categories():
     """returns list of (cat_id,cat_label) pairs from db"""
