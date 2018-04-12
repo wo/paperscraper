@@ -5,7 +5,8 @@ import requests
 from opp import error
 
 def normalize_url(url):
-    """normalize ~ vs %7e etc."""
+    """normalize ~ vs %7e etc. and strip local anchors #foo"""
+    url = url.split('#')[0]
     return requests.utils.requote_uri(url)
       
 def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=10000000):
