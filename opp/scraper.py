@@ -320,6 +320,9 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         if dupe:
             debug(1, "duplicate of document %s", dupe.doc_id)
             li.update_db(status=1, doc_id=dupe.doc_id)
+            if not dupe.filehash:
+                dupe.filehash = doc.filehash
+                dupe.update_db()
             return 0
     
         # ignore old and published paper:
