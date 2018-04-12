@@ -240,7 +240,7 @@ class Link():
         link to a paper? etc.
         """
 
-        debug(5, 'trying to find link context')
+        debug(4, 'trying to find link context')
         try:
             self.anchortext = self.element.get_attribute('textContent').strip()
         except Exception as e:
@@ -252,19 +252,19 @@ class Link():
         # too large:
         el = self.element
         par = el.find_element_by_xpath('..')
-        debug(5, 'starting with %s', el.get_attribute('outerHTML'))
+        debug(4, 'starting with %s', el.get_attribute('outerHTML'))
         el._text = el.get_attribute('textContent')
         while (True):
-            debug(5, 'climbing up par: %s', par.get_attribute('outerHTML'))
+            debug(4, 'climbing up par: %s', par.get_attribute('outerHTML'))
             # check if parent has many links or other significant children
             par._links = par.find_elements_by_xpath('.//a')
             par._children = par.find_elements_by_xpath('./*')
             if len(par._links) > 3:
-                debug(5, 'stopping: too many links (%s)', len(par._links))
+                debug(4, 'stopping: too many links (%s)', len(par._links))
                 break
             sc = [c for c in par._children if len(c.get_attribute('textContent')) > 10]
             if len(sc) > 5:
-                debug(5, 'stopping: too many children (%s)', len(sc))
+                debug(4, 'stopping: too many children (%s)', len(sc))
                 break
             # List of drafts may only contain two papers, so we also
             # check if the previous element was already fairly
@@ -274,7 +274,7 @@ class Link():
             # publication info that belongs to another entry.)
             par._text = par.get_attribute('textContent')
             if len(el._text) > 70 and len(par._text) > len(el._text)*1.5:
-                debug(5, 'stopping: enough text already (%s)', el._text)
+                debug(4, 'stopping: enough text already (%s)', el._text)
                 break
             try:
                 gpar = par.find_element_by_xpath('..')
@@ -293,7 +293,7 @@ class Link():
             except ValueError: # no split, what now?
                 return el._text
             if re.search(r'\w\s*$', l) or re.search(r'^\s*\w', r):
-                debug(5, 'argh: case (3)')
+                debug(4, 'argh: case (3)')
                 for pat in (r'<h\d.*?>', r'<br>\s*<br>', r'<br>'):
                     parts = re.split(pat, par._outerHTML, flags=re.I)
                     if len(parts) > 1:
@@ -312,22 +312,22 @@ class Link():
                 return ''
             lsib = par._children[par._children.index(el)-i]
             lsib_outerHTML = lsib.get_attribute('outerHTML')
-            debug(5, "add left sibling?: %s", lsib_outerHTML)
+            debug(4, "add left sibling?: %s", lsib_outerHTML)
             if re.search(r'\.(?:pdf|docx?)\b', lsib_outerHTML, flags=re.I):
-                debug(5, "no: contains link to pdf or doc")
+                debug(4, "no: contains link to pdf or doc")
                 return ''
             lsib_height = lsib.get_attribute('offsetHeight')
             lsib_height = int(lsib_height) if lsib_height else 0
             lsib_text = lsib.get_attribute('textContent')
             if lsib_text.strip() == '' and lsib_height > 2:
-                debug(5, "no: sibling has no text but takes up space")
+                debug(4, "no: sibling has no text but takes up space")
                 return ''
             lsib_bottom = lsib.location['y'] + lsib_height
             gap = par._children[par._children.index(el)-(i-1)].location['y'] - lsib_bottom
             if gap > 20 or (gap > 10 and len(context) > 20):
-                debug(5, "no: too far away (%s)", gap)
+                debug(4, "no: too far away (%s)", gap)
                 return ''
-            debug(5, "yes, expanding context")
+            debug(4, "yes, expanding context")
             return lsib_text
 
         def context_right(i):
@@ -336,9 +336,9 @@ class Link():
             except IndexError:
                 return ''
             rsib_outerHTML = rsib.get_attribute('outerHTML')
-            debug(5, "add right sibling?: %s", rsib_outerHTML)
+            debug(4, "add right sibling?: %s", rsib_outerHTML)
             if re.search(r'\.(?:pdf|docx?)\b', rsib_outerHTML, flags=re.I):
-                debug(5, "no: contains link to pdf or doc")
+                debug(4, "no: contains link to pdf or doc")
                 return ''
             if (len(context) > 20 
                 and not re.search(r'\d{4}|draft|forthcoming', rsib_outerHTML, flags=re.I)):
@@ -346,24 +346,24 @@ class Link():
                 # publication info. The first two never occur after
                 # the link element (unless that is very short: e.g. an
                 # icon), so we only need to check for the third.
-                debug(5, "no: doesn't look like publication info")
+                debug(4, "no: doesn't look like publication info")
                 return ''
             rsib_height = int(rsib.get_attribute('offsetHeight'))
             rsib_text = rsib.get_attribute('textContent')
             if rsib_text.strip() == '' and rsib_height > 2:
-                debug(5, "no: sibling has no text but takes up space")
+                debug(4, "no: sibling has no text but takes up space")
                 return ''
             rsiblsib = par._children[par._children.index(el)+(i-1)]
             rsiblsib_bottom = rsiblsib.location['y'] + int(rsiblsib.get_attribute('offsetHeight'))
             gap = rsib.location['y'] - rsiblsib_bottom
             if gap > 20 or (gap > 10 and len(context) > 20):
-                debug(5, "no: too far away (%s)", gap)
+                debug(4, "no: too far away (%s)", gap)
                 return ''
-            debug(5, "yes, expanding context")
+            debug(4, "yes, expanding context")
             return rsib_text
 
         context = el.get_attribute('textContent')
-        debug(5, "initial context: %s", context)
+        debug(4, "initial context: %s", context)
         for i in (1,2,3):
             more = context_right(i)
             if not more: break

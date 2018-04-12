@@ -74,3 +74,16 @@ class ActualBrowser(webdriver.Firefox):
         if self.current_url != url:
             self.status = 301
 
+if __name__ == '__main__':
+    # test
+    print('starting browser')
+    browser = Browser()
+    print('fetching umsu.de')
+    browser.goto('https://www.umsu.de')
+    print(browser.status)
+    print('reusing browser')
+    browser2 = Browser()
+    print(browser == browser2)
+    print('closing browser')
+    stop_browser()
+    print('please check that no browser is running')
