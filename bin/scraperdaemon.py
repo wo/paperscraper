@@ -32,34 +32,30 @@ class GracefulKiller:
 class ScraperDaemon(Daemon):
 
     def start(self):
-        debuglevel(3)
+        debuglevel(4)
         super().start()
         self.run()
 
     def run(self):
         killer = GracefulKiller()
-        pause_secs = 10
-        restart_browser_interval = 900
-        browser_starttime = time.time()
         while True:
-            # process new blog posts:
+            for n in range(200):
+                # one loop takes about 30 minutes (or 3 hours if
+                # there's nothing to do)
+                source = scraper.next_source()
+                if source:
+                    scraper.scrape(source)
+                # wait:
+                pause_secs = 10 if source else 60
+                for sec in range(pause_secs):
+                    if killer.kill_now:
+                        self.stop()
+                        return
+                    time.sleep(1)
+            # occasionally restart browser and check for blog posts:
             blogpostprocessor.run()
-            # look for new papers:
-            source = scraper.next_source()
-            if source:
-                scraper.scrape(source)
-            # wait:
-            pause_secs = 10 if source else 60
-            for sec in range(pause_secs):
-                if killer.kill_now:
-                    self.stop()
-                    return
-                time.sleep(1)
-            # restart browser?
-            if time.time() - browser_starttime > restart_browser_interval:
-                browser.stop_browser()
-                browser_starttime = time.time() 
-
+            browser.stop_browser()
+            
     def stop(self):
         print("hold on...")
         browser.stop_browser()
