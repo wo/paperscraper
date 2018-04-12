@@ -141,8 +141,6 @@ class SourcesFinder:
         pubs = philpaperssearch.get_publications(name)
         logger.info('{} publications found on philpapers'.format(len(pubs)))
         for pub in pubs:
-            if len(pub[0]) > 254:
-                pub[0] = pub[0][:254]
             query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
             cur.execute(query, (name, pub[0], pub[1]))
             logger.debug(cur._last_executed)

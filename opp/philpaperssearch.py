@@ -57,6 +57,8 @@ def get_publications(author_name, strict=False):
         if not m:
             continue
         title = m.group(1)
+        if len(title) > 255:
+           title = title[:251]+'...'
         ms = re.findall("class='name'>([^<]+)</span>", recordhtml)
         authors = [m for m in ms]
         m = re.search('class="pubYear">([^<]+)</span>', recordhtml)
