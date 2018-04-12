@@ -195,7 +195,7 @@ class SourcesFinder:
     def is_duplicate(self, url):
         """
         check if page is already in db under superficially different URL:
-        with(out) trailing slash or with(out) 'www'.
+        with(out) trailing slash or with(out) SSL or with(out) 'www'.
 
         One should also check if the same page is available e.g. as
         /user/1076 and as /user/sjones. But that's tricky. Perhaps
@@ -209,13 +209,13 @@ class SourcesFinder:
         if not m:
             logger.warn('malformed url %s?', url)
             return None
-        urlvars = [
-            m.group(1)+m.group(3), # no 'www.', no trailing slash
-            m.group(1)+m.group(3)+'/', # no 'www.', trailing slash
-            m.group(1)+'www.'+m.group(3), # 'www.', no trailing slash 
-            m.group(1)+'www.'+m.group(3)+'/' # 'www.', trailing slash 
-        ]
-        cur.execute("SELECT url FROM sources WHERE url IN (%s, %s, %s, %s)", urlvars)
+        urlpath = m.group(3)
+        urlvars = []
+        for protocol in ('http://', 'https://'):
+            for www in ('www.', ''):
+                for slash in ('/', ''):
+                    urlvars.append(protocol+www+urlpath+slash)
+        cur.execute("SELECT url FROM sources WHERE url IN (%s,%s,%s,%s,%s,%s,%s,%s)", urlvars)
         rows = cur.fetchall()
         if rows:
             return rows[0][0]
