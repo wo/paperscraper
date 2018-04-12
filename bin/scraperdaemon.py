@@ -32,7 +32,7 @@ class GracefulKiller:
 class ScraperDaemon(Daemon):
 
     def start(self):
-        debuglevel(4)
+        debuglevel(3)
         super().start()
         self.run()
 
