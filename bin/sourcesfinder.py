@@ -114,7 +114,7 @@ class SourcesFinder:
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
         'dailynous.com', 'ipfs.io/', 'philostv.com'
-        '/cv', '/curriculum-vitae', '/teaching',
+        '/cv', '/curriculum-vitae', '/teaching', 'conference',
         '/call', '/search', '/lookup',
     ]
 
@@ -150,7 +150,7 @@ class SourcesFinder:
     def evaluate(self, response, name, stored_publications):
         """return probability that <response> is a papers page for <name>"""
         response.textlower = response.text.lower()
-        doclinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', r.textlower)
+        doclinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', response.textlower)
         response.doclinks = [s for s in doclinks if not 'cv' in s]
         response.authorname = name
         response.stored_publications = stored_publications
