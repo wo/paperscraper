@@ -113,7 +113,7 @@ class SourcesFinder:
         'tandfonline.com', 'papers.ssrn.com', 'oup.com',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
-        'dailynous.com',
+        'dailynous.com', 'ipfs.io/', 'philostv.com'
         '/cv', '/curriculum-vitae', '/teaching',
         '/call', '/search', '/lookup',
     ]
