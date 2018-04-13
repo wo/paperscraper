@@ -28,22 +28,19 @@ class Source(Webpage):
             setattr(self, k, kwargs.get(k, v))
         if not self.found_date:
             self.found_date = datetime.now()
-        self.is_new = True
 
     def load_from_db(self, url=''):
         url = url or self.url
         if not url:
             raise TypeError("need source url to load Source from db")
         cur = db.dict_cursor()
-        query = "SELECT * FROM sources WHERE urlhash = MD5(%s)"
+        query = "SELECT * FROM sources WHERE urlhash = MD5(%s) LIMIT 1"
         cur.execute(query, (url,))
         debug(5, cur._last_executed)
         sources = cur.fetchall()
         if sources:
             for k,v in sources[0].items():
                 setattr(self, k, v)
-            if self.last_checked:
-                self.is_new = False
         else:
             debug(4, "%s not in sources table", url)
             
