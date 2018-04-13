@@ -130,7 +130,7 @@ def scrape(source, keep_tempfiles=False):
     # etc. error. But we can usually tell from the fact that there are
     # few known links on the error page:
     debug(1, 'old status {}, old links: {}'.format(source.status, len(source.old_links)))
-    if not source.is_new and len(source.old_links) <= 1:
+    if source.last_checked and len(source.old_links) <= 1:
         debug(1, 'suspiciously few old links, checking status code')
         status, r = util.request_url(source.url)
         if status != 200:
@@ -338,7 +338,8 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
 
         # don't show papers (incl HTML pages) from newly added source
         # pages in news feed:
-        if doc.source.is_new:
+        debug(1, "source.last_checked: {}".format(li.source.last_checked)) # DEBUGGING!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if not li.source.last_checked:
             debug(2, "new source page: setting found_date to 1970")
             doc.found_date = datetime(1970, 1, 1)
     
