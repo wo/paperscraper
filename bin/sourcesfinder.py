@@ -150,6 +150,8 @@ class SourcesFinder:
     def evaluate(self, response, name, stored_publications):
         """return probability that <response> is a papers page for <name>"""
         response.textlower = response.text.lower()
+        doclinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', r.textlower)
+        response.doclinks = [s for s in doclinks if not 'cv' in s]
         response.authorname = name
         response.stored_publications = stored_publications
         p_source = self.page_classifier.test(response, debug=args.verbose, smooth=True)
@@ -160,11 +162,11 @@ class SourcesFinder:
         classifier = BinaryNaiveBayes(prior_yes=0.6)
         classifier.likelihood(
             "any links to '.pdf' or '.doc' files",
-            lambda r: re.search(r'href=[^>]+\.(?:pdf|docx?)\b', r.textlower),
+            lambda r: len(r.doclinks) > 0,
             p_ifyes=1, p_ifno=.6)
         classifier.likelihood(
             "links to '.pdf' or '.doc' files",
-            lambda r: len(re.findall(r'href=[^>]+\.(?:pdf|docx?)\b', r.textlower)),
+            lambda r: len(r.doclinks),
             p_ifyes=nbinom(2.5,.1), p_ifno=nbinom(.1,.1))
         classifier.likelihood(
             "contains titles of stored publications",
