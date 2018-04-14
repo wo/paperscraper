@@ -338,7 +338,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
 
         # don't show papers (incl HTML pages) from newly added source
         # pages in news feed:
-        debug(1, "source.last_checked: {}".format(li.source.last_checked)) # DEBUGGING!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        debug(1, "source.last_checked: {}".format(li.source.last_checked)) # DEBUGGING!!!!!!!!!!!!!!!!!!!!!!!!!!!gg
         if not li.source.last_checked:
             debug(2, "new source page: setting found_date to 1970")
             doc.found_date = datetime(1970, 1, 1)
