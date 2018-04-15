@@ -103,17 +103,15 @@ class SourcesFinder:
 
     def bad_url(self, url):
         """returns True if url contains blacklisted part"""
-        for bad in self.BAD_URL_PARTS:
-            if bad in url:
-                return True
-        return False
+        return any(w in url for w in self.BAD_URL_PARTS):
 
     BAD_URL_PARTS = [
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
-        'dailynous.com', 'ipfs.io/', 'philostv.com',
+        'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
+        'whatisitliketobeaphilosopher.com',
         '/cv', '/curriculum-vitae', '/teaching', 'conference',
         '/call', '/search', '/lookup',
     ]
