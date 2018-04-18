@@ -111,6 +111,7 @@ class SourcesFinder:
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
+        'peasoup.typepad.com', 
         'whatisitliketobeaphilosopher.com',
         '/cv', '/curriculum-vitae', '/teaching', 'conference',
         '/call', '/search', '/lookup',
