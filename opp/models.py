@@ -55,6 +55,20 @@ class Source(Webpage):
             debug(3, cur._last_executed)
             db.commit()
     
+    def mark_as_dead(self, statuscode):
+        """write status to db or delete page if previously dead as well"""
+        if not self.source_id:
+            return
+        if self.status == statuscode:
+            debug(1, 'source repeatedly found with status {}; removing from db'.format(statuscode))
+            cur = db.cursor()
+            query = "DELETE FROM sources WHERE source_id = %s"
+            cur.execute(query, (self.source_id,))
+            debug(3, cur._last_executed)
+            db.commit()
+        else:
+            self.update_db(status=statuscode)
+        
     def save_to_db(self):
         """write object to db"""
         cur = db.cursor()

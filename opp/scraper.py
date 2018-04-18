@@ -95,7 +95,7 @@ def scrape(source, keep_tempfiles=False):
         browser.goto(source.url)
     except Exception as e:
         debug(1, 'connection to source %s failed: %s', source.url, str(e))
-        source.update_db(status=error.code['connection failed'])
+        source.mark_as_dead(brower.status or error.code['connection failed'])
         return 0
 
     if browser.current_url != source.url:
