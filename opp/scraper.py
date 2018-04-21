@@ -167,7 +167,7 @@ def scrape(source, keep_tempfiles=False):
             source.mark_as_dead(status)
             return 0
 
-    source.update_db(status=1)
+    source.update_db(status=(0 if source.status == 0 else 1))
     
     # process new links:
     if source.new_links:
