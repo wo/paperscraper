@@ -282,7 +282,8 @@ class Link():
         except Exception as e:
             debug(1, "cannot retrieve link context: %s", str(e))
             self.context = ''
-            return self.context
+            self.anchortext = ''
+            return ''
 
         # First climb up DOM until we reach an element (par) that's
         # too large:
