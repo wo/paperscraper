@@ -199,15 +199,15 @@ class Source(Webpage):
 
     # class attribute:
     dead_classifier = BinaryNaiveBayes(prior_yes=0.3)
-    classifier.likelihood(
+    dead_classifier.likelihood(
         "little text on page",
         lambda s: len(s.plaintext) < 500,
         p_ifyes=.9, p_ifno=.2)
-    classifier.likelihood(
+    dead_classifier.likelihood(
         "no links to '.pdf' or '.doc' files",
         lambda s: not any(li for li in s.old_links if ('.pdf' in li.url or '.doc' in li.url)),
         p_ifyes=.9, p_ifno=.3)
-    classifier.likelihood(
+    dead_classifier.likelihood(
         "no publication status keywords",
         lambda s: not any(word in s.plaintext for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
         p_ifyes=0.9, p_ifno=.2)
