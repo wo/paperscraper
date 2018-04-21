@@ -89,7 +89,9 @@ class Source(Webpage):
     def extract_links(self, browser):
         """
         extracts links from source page; sets self.new_links and
-        self.old_links, both lists of Link objects.
+        self.old_links, both lists of Link objects. An "old link" is a
+        link currently on the page that's aleardy in the database. A
+        "new link" is not yet in the database.
         """
         self.new_links = []
         self.old_links = []
