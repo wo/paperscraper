@@ -22,11 +22,29 @@ from opp.exceptions import *
 
 def next_source():
     """return the next source from db that's due to be checked"""
+
+    # First priority: process newly found pages so that we can better
+    # decide whether they're genuine source pages or not.
+    query = ("SELECT * FROM sources WHERE status = 0"
+             " AND sourcetype != 'blog'"
+             " AND last_checked IS NULL"
+             " ORDER BY last_checked LIMIT 1")
+    cur.execute(query)
+    debug(4, cur._last_executed)
+    sources = cur.fetchall()
+    if sources:
+        debug(1, "processing new source")
+        return Source(**sources[0])
+        # After processing, the source will have a last_checked date,
+        # but still status=0, so it will not be processed again until
+        # it is confirmed.
+    
+    # Second priority: process confirmed and working pages.
     min_age = datetime.now() - timedelta(hours=16)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     cur = db.dict_cursor()
-    query = ("SELECT * FROM sources WHERE status > 0"
-             " AND sourcetype != 'blog'" # ignore rss feeds
+    query = ("SELECT * FROM sources WHERE status = 1"
+             " AND sourcetype != 'blog'"
              " AND (last_checked IS NULL OR last_checked < %s)"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
@@ -34,9 +52,26 @@ def next_source():
     sources = cur.fetchall()
     if sources:
         return Source(**sources[0])
-    else:
-        debug(1, "all pages recently checked")
-        return None
+
+    # Third priority: occasionally re-test broken pages to decide
+    # whether we should remove them for good. (Want to give
+    # maintainers a few days to fix things.)
+    min_age = datetime.now() - timedelta(hours=96)
+    min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
+    cur = db.dict_cursor()
+    query = ("SELECT * FROM sources WHERE status > 1"
+             " AND sourcetype != 'blog'"
+             " AND (last_checked IS NULL OR last_checked < %s)"
+             " ORDER BY last_checked LIMIT 1")
+    cur.execute(query, (min_age,))
+    debug(4, cur._last_executed)
+    sources = cur.fetchall()
+    if sources:
+        debug(1, "re-checking broken source")
+        return Source(**sources[0])
+
+    debug(1, "all pages recently checked")
+    return None
 
 def scrape(source, keep_tempfiles=False):
     """
@@ -50,13 +85,8 @@ def scrape(source, keep_tempfiles=False):
     when people upload older papers.) We don't want to list these
     papers in the news feed, nor do we need to check them for
     revisions. So if we find a link to an old and published paper, we
-    treat it like a link to a non-paper. (If a manuscript changes into
-    a published paper, we keep the paper in the database because it
-    still ought to show up as "new papers found on x/y/z" and because
-    it might have been used to train personal filters, but we remove
-    the doc_id from the link, thereby marking the link as known but
-    irrelevant.)
-
+    treat it like a link to a non-paper.
+ 
     (2) Sometimes links to papers are temporarily broken, or
     there's a temporary problem with the metadata extraction. So
     if we encounter an error while processing a (promising) new
@@ -78,12 +108,11 @@ def scrape(source, keep_tempfiles=False):
     they remain in the db, but they are never revisited until they
     reappear on the page.
     
-    (5) If a page is processed for the first time (no links yet
-    associated with it), we don't want to display all linked papers in
-    the news feed. Nonetheless, we process all links so that we can
-    check for revisions (think of the Stanford Encyclopedia). To avoid
-    displaying the papers as new, we mark them with a found_date of
-    1970.
+    (5) If a page is processed for the first time, we don't want to
+    display all linked papers in the news feed. Nonetheless, we
+    process all links so that we can check for revisions (think of the
+    Stanford Encyclopedia). To avoid displaying the papers as new, we
+    mark them with a found_date of 1970.
     """
 
     debug(1, '*'*50)
@@ -127,11 +156,12 @@ def scrape(source, keep_tempfiles=False):
     source.extract_links(browser)
     
     # Selenium doesn't tell us when a site yields a 404, 401, 500
-    # etc. error. But we can usually tell from the fact that there are
-    # few known links on the error page:
+    # etc. error. If there are reasons to be suspicious, we get the
+    # HTTP status through requests. Reasons to be suspicious are (1)
+    # few known links on the page, (2) previous status > 9.
     debug(1, 'old status {}, old links: {}'.format(source.status, len(source.old_links)))
-    if source.last_checked and len(source.old_links) <= 1:
-        debug(1, 'suspiciously few old links, checking status code')
+    if source.status > 1 or (source.last_checked and len(source.old_links) <= 1):
+        debug(1, 'suspicious, checking HTTP status code')
         status, r = util.request_url(source.url)
         if status != 200:
             debug(1, 'error %s at source %s', status, source.url)
@@ -169,10 +199,14 @@ def scrape(source, keep_tempfiles=False):
     if not keep_tempfiles:
         remove_tempdir()
 
-    # TODO: make process_link return 1/0 depending on whether link
-    # leads to paper; then check here if there are no old links and no
-    # new links to paper => mark as 404.
-
+    # Check if source page has secretly gone dead:
+    num_doc_links = sum(1 for li in source.old_links if li.doc_id)
+    num_doc_links += sum(1 for li in source.new_links if li.doc_id)
+    debug(1, '%s active document links on page', num_doc_links)
+    if num_doc_links == 0 and source.looks_dead():
+        debug(1, 'marking page as dead')
+        #source.mark_as_dead(error.code['no links to documents on source page'])
+        
 
 def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
                  recurse=0):

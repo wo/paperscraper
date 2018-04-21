@@ -5,8 +5,9 @@ from urllib.parse import urlparse
 from opp import db
 from opp import error
 from opp import util
-from opp.debug import debug
+from opp.debug import debug, debuglevel
 from opp.webpage import Webpage
+from opp.subjectivebayes import BinaryNaiveBayes 
 
 class Source(Webpage):
     """ represents a source page with links to papers """
@@ -89,7 +90,9 @@ class Source(Webpage):
     def extract_links(self, browser):
         """
         extracts links from source page; sets self.new_links and
-        self.old_links, both lists of Link objects.
+        self.old_links, both lists of Link objects. An "old link" is a
+        link currently on the page that's aleardy in the database. A
+        "new link" is not yet in the database.
         """
         self.new_links = []
         self.old_links = []
@@ -188,6 +191,28 @@ class Source(Webpage):
         # cur.execute(query, pattern)
         # variants = cur.fetchall()
 
+    def looks_dead(self):
+        """evaluate whether this page is dead (given that it has no active links to docs)"""
+        self.plaintext = util.strip_tags(self.html).lower()
+        p_dead = dead_classifier.test(self, debug=(debuglevel() > 2))
+        return p_dead > .8
+
+    # class attribute:
+    dead_classifier = BinaryNaiveBayes(prior_yes=0.3)
+    classifier.likelihood(
+        "little text on page",
+        lambda s: len(s.plaintext) < 500,
+        p_ifyes=.9, p_ifno=.2)
+    classifier.likelihood(
+        "no links to '.pdf' or '.doc' files",
+        lambda s: not any(li for li in s.old_links if ('.pdf' in li.url or '.doc' in li.url)),
+        p_ifyes=.9, p_ifno=.3)
+    classifier.likelihood(
+        "no publication status keywords",
+        lambda s: not any(word in s.plaintext for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
+        p_ifyes=0.9, p_ifno=.2)
+
+            
 class Link():
     """ represents a link on a source page """
 
