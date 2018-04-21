@@ -25,6 +25,7 @@ def next_source():
 
     # First priority: process newly found pages so that we can better
     # decide whether they're genuine source pages or not.
+    cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE status = 0"
              " AND sourcetype != 'blog'"
              " AND last_checked IS NULL"
@@ -42,7 +43,6 @@ def next_source():
     # Second priority: process confirmed and working pages.
     min_age = datetime.now() - timedelta(hours=16)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
-    cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE status = 1"
              " AND sourcetype != 'blog'"
              " AND (last_checked IS NULL OR last_checked < %s)"
@@ -58,7 +58,6 @@ def next_source():
     # maintainers a few days to fix things.)
     min_age = datetime.now() - timedelta(hours=96)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
-    cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE status > 1"
              " AND sourcetype != 'blog'"
              " AND (last_checked IS NULL OR last_checked < %s)"
