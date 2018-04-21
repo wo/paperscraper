@@ -22,11 +22,29 @@ from opp.exceptions import *
 
 def next_source():
     """return the next source from db that's due to be checked"""
+
+    # First priority: process newly found pages so that we can better
+    # decide whether they're genuine source pages or not.
+    query = ("SELECT * FROM sources WHERE status = 0"
+             " AND sourcetype != 'blog'"
+             " AND last_checked IS NULL"
+             " ORDER BY last_checked LIMIT 1")
+    cur.execute(query)
+    debug(4, cur._last_executed)
+    sources = cur.fetchall()
+    if sources:
+        debug(1, "processing new source")
+        return Source(**sources[0])
+        # After processing, the source will have a last_checked date,
+        # but still status=0, so it will not be processed again until
+        # it is confirmed.
+    
+    # Second priority: process confirmed and working pages.
     min_age = datetime.now() - timedelta(hours=16)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     cur = db.dict_cursor()
-    query = ("SELECT * FROM sources WHERE status > 0"
-             " AND sourcetype != 'blog'" # ignore rss feeds
+    query = ("SELECT * FROM sources WHERE status = 1"
+             " AND sourcetype != 'blog'"
              " AND (last_checked IS NULL OR last_checked < %s)"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
@@ -34,9 +52,26 @@ def next_source():
     sources = cur.fetchall()
     if sources:
         return Source(**sources[0])
-    else:
-        debug(1, "all pages recently checked")
-        return None
+
+    # Third priority: occasionally re-test broken pages to decide
+    # whether we should remove them for good. (Want to give
+    # maintainers a few days to fix things.)
+    min_age = datetime.now() - timedelta(hours=96)
+    min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
+    cur = db.dict_cursor()
+    query = ("SELECT * FROM sources WHERE status > 1"
+             " AND sourcetype != 'blog'"
+             " AND (last_checked IS NULL OR last_checked < %s)"
+             " ORDER BY last_checked LIMIT 1")
+    cur.execute(query, (min_age,))
+    debug(4, cur._last_executed)
+    sources = cur.fetchall()
+    if sources:
+        debug(1, "re-checking broken source")
+        return Source(**sources[0])
+
+    debug(1, "all pages recently checked")
+    return None
 
 def scrape(source, keep_tempfiles=False):
     """
