@@ -194,7 +194,7 @@ class Source(Webpage):
     def looks_dead(self):
         """evaluate whether this page is dead (given that it has no active links to docs)"""
         self.plaintext = util.strip_tags(self.html).lower()
-        p_dead = dead_classifier.test(self, debug=(debuglevel() > 2))
+        p_dead = self.dead_classifier.test(self, debug=(debuglevel() > 2))
         return p_dead > .8
 
     # class attribute:
