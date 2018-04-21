@@ -171,15 +171,16 @@ def scrape(source, keep_tempfiles=False):
     
     # process new links:
     if source.new_links:
-        for li in source.new_links[:50]:
-            debug(1, '*** processing new link to %s on %s ***', li.url, source.url)
-            process_link(li)
-        for li in source.new_links[50:]:
-            # sourcesfinder sometimes digs up archive pages with
-            # thousands of links; we don't want to process them all
-            # before we manually remove the page.
-            debug(1, '*** ignoring new link to %s on %s ***', li.url, source.url)
-            return li.update_db(status=1, doc_id=None)
+        for i,li in enumerate(source.new_links):
+            if i < 50:
+                debug(1, '*** processing new link to %s on %s ***', li.url, source.url)
+                process_link(li)
+            else:
+                # sourcesfinder sometimes digs up archive pages with
+                # thousands of links; we don't want to process them all
+                # before we manually remove the page.
+                debug(1, '*** ignoring new link to %s on %s ***', li.url, source.url)
+                return li.update_db(status=1, doc_id=None)
     
     else:
         debug(1, "no new links")
