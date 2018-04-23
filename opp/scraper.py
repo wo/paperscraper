@@ -210,7 +210,7 @@ def scrape(source, keep_tempfiles=False):
     debug(1, '%s active document links on page', num_doc_links)
     if num_doc_links == 0 and source.looks_dead():
         debug(1, 'marking page as dead')
-        #source.mark_as_dead(error.code['no links to documents on source page'])
+        source.mark_as_dead(error.code['no links to documents on source page'])
         
 
 def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
