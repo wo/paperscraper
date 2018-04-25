@@ -108,12 +108,14 @@ class SourcesFinder:
     BAD_URL_PARTS = [
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com',
-        'dblp.uni-trier', 'citec.repec.org',
+        'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
+        'klcpure.kcl.ac.uk',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
         'peasoup.typepad.com', 
         'whatisitliketobeaphilosopher.com',
+        'wikivisually.com',
         '/cv', '/curriculum-vitae', '/teaching', 'conference',
         '/call', '/search', '/lookup',
     ]
