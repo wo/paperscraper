@@ -3,6 +3,7 @@ import time, re
 from datetime import datetime, timedelta
 import requests
 from difflib import SequenceMatcher
+from Levenshtein import distance
 import os.path
 import subprocess
 import shutil
@@ -602,16 +603,9 @@ def trivial_url_variant(url1, url2):
     returns True if the two urls are almost identical so that we don't
     have to manually approve a source page redirect.
     """
-    # ignore trailing slashes:
-    url1 = url1.rstrip('/')
-    url2 = url2.rstrip('/')
-    if url1.split(':',1)[1] == url2.split(':',1)[1]:
-        # https vs http
-        return True
-    if url1.replace('www.', '') == url2.replace('www.', ''):
-        # 'www.example.com' vs 'example.com'
-        return True
-    return False
+    url1 = url1.replace('www.', '')
+    url2 = url2.replace('www.', ''):
+    return distance(url1, url2) < 4
 
 def context_suggests_published(context):
     """
