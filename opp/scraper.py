@@ -604,7 +604,7 @@ def trivial_url_variant(url1, url2):
     have to manually approve a source page redirect.
     """
     url1 = url1.replace('www.', '')
-    url2 = url2.replace('www.', ''):
+    url2 = url2.replace('www.', '')
     return distance(url1, url2) < 4
 
 def context_suggests_published(context):
