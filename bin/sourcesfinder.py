@@ -33,8 +33,8 @@ class SourcesFinder:
         urlhash = hashlib.md5(url.encode('utf-8')).hexdigest()
         sourcename = "{}'s site".format(name)
         cur = db.cursor()
-        query = "INSERT INTO sources (status,sourcetype,url,urlhash,default_author,name,found_date)"
-        query += "VALUES (0,'personal',%s,%s,%s,%s,NOW())"
+        query = "INSERT INTO sources (status,confirmed,sourcetype,url,urlhash,default_author,name,found_date)"
+        query += "VALUES (0,0,'personal',%s,%s,%s,%s,NOW())"
         cur.execute(query, (url,urlhash,name,sourcename))
         db.commit()
     

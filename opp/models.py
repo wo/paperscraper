@@ -17,6 +17,7 @@ class Source(Webpage):
         'url': '',
         'sourcetype': 'personal', # (alt: repo, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
+        'confirmed': True,
         'found_date': None,
         'last_checked': None,
         'default_author': '',
