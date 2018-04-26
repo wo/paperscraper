@@ -24,7 +24,7 @@ from opp.exceptions import *
 def next_source():
     """return the next source from db that's due to be checked"""
 
-    debug(1, '*'*50)
+    debug(1, '*'*90)
     
     # First priority: process newly found pages so that we can better
     # decide whether they're genuine source pages or not. (We don't
@@ -176,13 +176,14 @@ def scrape(source, keep_tempfiles=False):
     if source.new_links:
         for i,li in enumerate(source.new_links):
             if i < 50:
-                debug(1, '\n*** processing new link to %s on %s ***', li.url, source.url)
+                debug(1, '-'*80)
+                debug(1, '*** processing new link to %s on %s ***', li.url, source.url)
                 process_link(li)
             else:
                 # sourcesfinder sometimes digs up archive pages with
                 # thousands of links; we don't want to process them all
                 # before we manually remove the page.
-                debug(1, '\n*** ignoring new link to %s on %s ***', li.url, source.url)
+                debug(1, '*** ignoring new link to %s on %s ***', li.url, source.url)
                 return li.update_db(status=1, doc_id=None)
     
     else:
