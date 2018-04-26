@@ -24,29 +24,34 @@ from opp.exceptions import *
 def next_source():
     """return the next source from db that's due to be checked"""
 
+    debug(1, '*'*50)
+    
     # First priority: process newly found pages so that we can better
-    # decide whether they're genuine source pages or not.
+    # decide whether they're genuine source pages or not. (We don't
+    # restrict to confirmed = 0 so that we also catch manually added
+    # and already confirmed pages.)
     cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE status = 0"
              " AND sourcetype != 'blog'"
-             " AND last_checked IS NULL"
-             " ORDER BY last_checked LIMIT 1")
+             " LIMIT 1")
     cur.execute(query)
     debug(4, cur._last_executed)
     sources = cur.fetchall()
     if sources:
         debug(1, "processing new source")
         return Source(**sources[0])
-        # After processing, the source will have a last_checked date,
-        # but still status=0, so it will not be processed again until
-        # it is confirmed.
+        # If a page isnt' confirmed yet, then after processing, it
+        # will have a last_checked date and status > 0, but still
+        # confirmed = 0. From then on, it will be processed just like
+        # other pages (below), but new links won't show up in the feed
+        # until it is confirmed.
     
-    # Second priority: process confirmed and working pages.
+    # Second priority: process working pages.
     min_age = datetime.now() - timedelta(hours=16)
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     query = ("SELECT * FROM sources WHERE status = 1"
              " AND sourcetype != 'blog'"
-             " AND (last_checked IS NULL OR last_checked < %s)"
+             " AND last_checked < %s"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
     debug(4, cur._last_executed)
@@ -61,7 +66,7 @@ def next_source():
     min_age = min_age.strftime('%Y-%m-%d %H:%M:%S')
     query = ("SELECT * FROM sources WHERE status > 1"
              " AND sourcetype != 'blog'"
-             " AND (last_checked IS NULL OR last_checked < %s)"
+             " AND last_checked < %s"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
     debug(4, cur._last_executed)
@@ -115,7 +120,6 @@ def scrape(source, keep_tempfiles=False):
     mark them with a found_date of 1970.
     """
 
-    debug(1, '*'*50)
     debug(1, "checking links on %s", source.url)
 
     # go to page:
@@ -168,19 +172,17 @@ def scrape(source, keep_tempfiles=False):
             source.mark_as_dead(status)
             return 0
 
-    source.update_db(status=(0 if source.status == 0 else 1))
-    
     # process new links:
     if source.new_links:
         for i,li in enumerate(source.new_links):
             if i < 50:
-                debug(1, '*** processing new link to %s on %s ***', li.url, source.url)
+                debug(1, '\n*** processing new link to %s on %s ***', li.url, source.url)
                 process_link(li)
             else:
                 # sourcesfinder sometimes digs up archive pages with
                 # thousands of links; we don't want to process them all
                 # before we manually remove the page.
-                debug(1, '*** ignoring new link to %s on %s ***', li.url, source.url)
+                debug(1, '\n*** ignoring new link to %s on %s ***', li.url, source.url)
                 return li.update_db(status=1, doc_id=None)
     
     else:
@@ -205,14 +207,17 @@ def scrape(source, keep_tempfiles=False):
     if not keep_tempfiles:
         remove_tempdir()
 
-    # Check if source page has secretly gone dead:
+    # Check if source page has gone dead:
     num_doc_links = sum(1 for li in source.old_links if li.doc_id)
     num_doc_links += sum(1 for li in source.new_links if li.doc_id)
     debug(1, '%s active document links on page', num_doc_links)
     if num_doc_links == 0 and source.looks_dead():
         debug(1, 'marking page as dead')
         source.mark_as_dead(error.code['no links to documents on source page'])
-        
+        return 0
+    
+    source.update_db(status=1)
+    return 1
 
 def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
                  recurse=0):
@@ -376,10 +381,15 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
             debug(1, "flagging for manual approval")
             doc.hidden = True
 
-        # don't show papers (incl HTML pages) from newly added source
-        # pages in news feed:
-        debug(1, "source.last_checked: {}".format(li.source.last_checked)) # DEBUGGING!!!!!!!!!!!!!!!!!!!!!!!!!!!gg
-        if not li.source.last_checked:
+        # don't show papers from newly added source pages in news feed:
+        if not li.source.confirmed or li.source.status != 1:
+            # We check the status because a page might be new and yet
+            # (a) confirmed because added manually, and (b) have a
+            # last_checked date because it was already fetched once
+            # but through a 900 error. Only if we successfully
+            # processed it before (and thus its status is 1) can we
+            # infer that the page isn't new. (Downside: we won't find
+            # new papers that have been added while a page was down.)
             debug(2, "new source page: setting found_date to 1970")
             doc.found_date = datetime(1970, 1, 1)
     
