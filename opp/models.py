@@ -200,7 +200,7 @@ class Source(Webpage):
         return p_dead > .8
 
     # class attribute:
-    dead_classifier = BinaryNaiveBayes(prior_yes=0.3)
+    dead_classifier = BinaryNaiveBayes(prior_yes=0.5)
     dead_classifier.likelihood(
         "little text on page",
         lambda s: len(s.plaintext) < 500,
@@ -213,6 +213,10 @@ class Source(Webpage):
         "no publication status keywords",
         lambda s: not any(word in s.plaintext for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
         p_ifyes=0.9, p_ifno=.2)
+    dead_classifier.likelihood(
+        "contains 404 keywords",
+        lambda s: any(word in s.plaintext for word in ('not found', 'error 404')),
+        p_ifyes=0.7, p_ifno=.1)
 
             
 class Link():
