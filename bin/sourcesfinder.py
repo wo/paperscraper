@@ -107,7 +107,7 @@ class SourcesFinder:
 
     BAD_URL_PARTS = [
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
-        'tandfonline.com', 'ssrn.com', 'oup.com',
+        'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
         'klcpure.kcl.ac.uk',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
