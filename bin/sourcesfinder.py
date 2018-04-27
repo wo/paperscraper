@@ -109,11 +109,11 @@ class SourcesFinder:
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
-        'klcpure.kcl.ac.uk',
+        '/portal/en/researcher', # PURE
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
-        'peasoup.typepad.com', 
+        'peasoup.typepad.com', 'm-phi.blogspot.de',
         'whatisitliketobeaphilosopher.com',
         'wikivisually.com',
         '/cv', '/curriculum-vitae', '/teaching', 'conference',
