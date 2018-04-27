@@ -631,7 +631,7 @@ def context_suggests_published(context):
         debug(4, 'forthcoming/unpublished in context suggests not yet published')
         return False
     for m in re.finditer(r'\b\d{4}\b', context):
-        if 1950 < int(m.group(0)) <= datetime.today().year:
+        if 1950 < int(m.group(0)) < datetime.today().year:
             break
     else:
         debug(4, 'no suitable year in context suggests not yet published')
