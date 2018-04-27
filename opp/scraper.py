@@ -24,7 +24,7 @@ from opp.exceptions import *
 def next_source():
     """return the next source from db that's due to be checked"""
 
-    debug(1, '*'*90)
+    debug(1, '*'*50)
     
     # First priority: process newly found pages so that we can better
     # decide whether they're genuine source pages or not. (We don't
@@ -591,7 +591,7 @@ def get_duplicate(doc):
         where.append('authors LIKE %s')
         values.append('%'+m.group(1)+'%')
     cur = db.dict_cursor()
-    query = "SELECT * FROM docs WHERE " + (' AND '.join(where))
+    query = "SELECT * FROM docs WHERE status=1 AND " + (' AND '.join(where))
     cur.execute(query, values)
     debug(5, cur._last_executed)
     dupes = cur.fetchall()
