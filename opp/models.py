@@ -18,6 +18,7 @@ class Source(Webpage):
         'sourcetype': 'personal', # (alt: repo, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
         'confirmed': True,
+        'num_doclinks': 0, # number of current links to Doc objects
         'found_date': None,
         'last_checked': None,
         'default_author': '',
@@ -199,7 +200,7 @@ class Source(Webpage):
         p_dead = self.dead_classifier.test(self, debug=(debuglevel() > 2))
         return p_dead > .8
 
-    # class attribute:
+    # looks_dead classifier is a class attribute:
     dead_classifier = BinaryNaiveBayes(prior_yes=0.5)
     dead_classifier.likelihood(
         "little text on page",
