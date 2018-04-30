@@ -96,6 +96,8 @@ message = {
     505: 'HTTP Version Not Supported',
     507: 'Insufficient Storage',
 
+    800: 'broken feed',
+    
     900: 'connection failed',
     901: 'document is empty',
     902: 'too many redirects',
