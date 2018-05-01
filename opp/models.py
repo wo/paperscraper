@@ -299,13 +299,13 @@ class Source(Webpage):
             debug(3, "%s publications stored for %s", len(rows), name)
             return [row[0] for row in rows]
         
-        logger.info("no publications stored for %s; searching philpapers", name)
+        debug(3, "no publications stored for %s; searching philpapers", name)
         pubs = philpaperssearch.get_publications(name)
-        logger.info('{} publications found on philpapers'.format(len(pubs)))
+        debug(3, '%s publications found on philpapers', len(pubs))
         for pub in pubs:
             query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
             cur.execute(query, (name, pub[0], pub[1]))
-            logger.debug(cur._last_executed)
+            debug(4, cur._last_executed)
         db.commit()
         return [pub[0] for pub in pubs]
 
