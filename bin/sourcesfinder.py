@@ -17,7 +17,7 @@ as a cron job) to find new source pages.
 class SourcesFinder:
 
     def __init__(self):
-        self.page_classifier = self.make_page_classifier()
+        pass
     
     def select_names(self, num_names):
         """return list of num names names from db to check for new papers pages"""
