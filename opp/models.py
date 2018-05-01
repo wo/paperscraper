@@ -12,11 +12,11 @@ class Source(Webpage):
     """ represents a source page with links to papers """
     
     db_fields = {
-        'source_id': 0,
+        'source_id': None,
         'url': '',
         'sourcetype': 'personal', # (alt: repo, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
-        'confirmed': True,
+        'confirmed': False,
         'num_doclinks': 0, # number of current links to Doc objects
         'found_date': None,
         'last_checked': None,
