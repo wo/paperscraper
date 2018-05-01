@@ -670,7 +670,7 @@ class Doc():
             cur.execute(query, (self.url,))
         else:
             raise TypeError("need url or filehash to check doc in db")
-        debug(5, cur._last_executed)
+        debug(3, cur._last_executed)
         docs = cur.fetchall()
         if docs:
             return docs[0][0]
