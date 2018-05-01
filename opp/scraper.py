@@ -140,7 +140,7 @@ def scrape(source, keep_tempfiles=False):
         # instead of 'http'.
         if source.sourcetype == 'personal':
             def urlfrag(url):
-                return url.split('//', 2)[0].replace('www.', '').rstrip('/')
+                return url.split('//', 2)[1].replace('www.', '').rstrip('/')
             if urlfrag(browser.current_url) == urlfrag(source.url):
                 debug(1, "%s redirects to variant %s, updating source record",
                       source.url, browser.current_url)
