@@ -320,7 +320,7 @@ class Source(Webpage):
         levenshtein distance is dangerous, since ?p=1 and ?p=2 are
         probably different, and so are /F/ and /G/.
         '''
-        urlfrag = self.url.split('//', 2)[0].replace('www.', '').rstrip('/')
+        urlfrag = self.url.split('//', 2)[1].replace('www.', '').rstrip('/')
         cur = db.cursor()
         query = "SELECT source_id,url FROM sources WHERE url LIKE %s"
         cur.execute(query, ('%'+urlfrag+'%',))
@@ -329,7 +329,7 @@ class Source(Webpage):
         for (did,durl) in rows:
             # durl might still be a proper extension of self.url
             # (e.g. self.url+'/articles')
-            if durl.split('//', 2)[0].replace('www.', '').rstrip('/') == urlfrag:
+            if durl.split('//', 2)[1].replace('www.', '').rstrip('/') == urlfrag:
                 dupe = Source(url=durl)
                 dupe.load_from_db()
                 dupes.append(dupe)
