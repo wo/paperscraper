@@ -3,7 +3,6 @@ import time, re
 from datetime import datetime, timedelta
 import requests
 from difflib import SequenceMatcher
-from Levenshtein import distance
 import os.path
 import subprocess
 import shutil
@@ -135,19 +134,37 @@ def scrape(source, keep_tempfiles=False):
         # redirects of journal pages are OK (e.g. from /current to
         # /nov-2015), but redirects of personal papers pages are often
         # caused by pages having disappeared; the redirect can then
-        # take us e.g. to CMU's general document archive; we don't
-        # want that. So here we wait for manual approval of the new
-        # url, except if the new url is a trivial variant of the old
-        # one, e.g. 'https' instead of 'http'.
+        # take us e.g. to CMU's general document archive. We treat the
+        # redirect target as a candidate new source page, except if
+        # the url is a trivial variant of the old one, e.g. 'https'
+        # instead of 'http'.
         if source.sourcetype == 'personal':
-            if trivial_url_variant(browser.current_url, source.url):
+            def urlfrag(url):
+                return url.split('//', 2)[0].replace('www.', '').rstrip('/')
+            if urlfrag(browser.current_url) == urlfrag(source.url):
+                debug(1, "%s redirects to variant %s, updating source record",
+                      source.url, browser.current_url)
                 source.update_db(url=browser.current_url)
             else:
                 debug(1, '%s redirects to %s', source.url, browser.current_url)
                 source.update_db(status=301)
-                return 0
+                target = Source(url=browser.current_url,
+                                default_author=source.default_author,
+                                name=source.name)
+                try:
+                    target.set_html(browser.page_source)
+                except WebDriverException as e:
+                    debug(1, 'webdriver error retrieving page source: %s', e)
+                else:
+                    p = target.probability_sourcepage()
+                    if p < 0.5:
+                        debug(1, "target doesn't look like a source page")
+                    else:
+                        debug(1, "adding target as potential new source page")
+                        target.save_to_db()
+                return 0        
         else:
-            debug(2, '%s redirected to %s', source.url, browser.current_url)
+            debug(2, 'following redirect to %s', browser.current_url)
 
     # extract links:
     try:
@@ -608,15 +625,6 @@ def get_duplicate(doc):
         debug(4, "duplicate: %s, '%s'", dupe['authors'], dupe['title'])
         return Doc(**dupe)
     return None
-
-def trivial_url_variant(url1, url2):
-    """
-    returns True if the two urls are almost identical so that we don't
-    have to manually approve a source page redirect.
-    """
-    url1 = url1.replace('www.', '')
-    url2 = url2.replace('www.', '')
-    return distance(url1, url2) < 4
 
 def context_suggests_published(context):
     """

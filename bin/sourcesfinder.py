@@ -4,9 +4,8 @@ import re
 import sys
 import findmodules
 import hashlib
-from scipy.stats import nbinom
-from opp import db, util, googlesearch, philpaperssearch
-from opp.subjectivebayes import BinaryNaiveBayes 
+from opp import db, util, googlesearch
+from opp.models import Source
 import json
 import urllib
 
@@ -28,16 +27,6 @@ class SourcesFinder:
         rows = cur.fetchall()
         return [row[0] for row in rows]
 
-    def store_page(self, url, name):
-        """write page <url> for author <name> to db"""
-        urlhash = hashlib.md5(url.encode('utf-8')).hexdigest()
-        sourcename = "{}'s site".format(name)
-        cur = db.cursor()
-        query = "INSERT INTO sources (status,confirmed,sourcetype,url,urlhash,default_author,name,found_date)"
-        query += "VALUES (0,0,'personal',%s,%s,%s,%s,NOW())"
-        cur.execute(query, (url,urlhash,name,sourcename))
-        db.commit()
-    
     def update_author(self, name):
         """update last_searched field for author <name>"""
         cur = db.cursor()
@@ -45,10 +34,13 @@ class SourcesFinder:
         cur.execute(query, (name,))
         db.commit()
 
-    def find_new_pages(self, name):
-        """searches for papers pages matching author name, returns urls of new pages"""
+    def find_new_pages(self, name, store_in_db=True):
+        """
+        searches for Source pages matching author name and adds them to
+        the sources db
+        """
         logger.info("\nsearching source pages for %s", name)
-        stored_publications = self.get_stored_publications(name)
+        stored_publications = Source.get_stored_publications(name)
         pages = set()
         search_terms = [
             # careful with google.com: don't block sites.google.com...
@@ -72,7 +64,7 @@ class SourcesFinder:
             if self.bad_url(url):
                 logger.info("bad url")
                 continue
-            # check if url already known:
+            # check if url is already known:
             cur = db.cursor()
             cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
             rows = cur.fetchall()
@@ -85,21 +77,31 @@ class SourcesFinder:
                     raise Exception('status {}'.format(status))
             except Exception as e:
                 logger.info("cannot retrieve url %s (%s)", url, e)
+                continue
+            source = Source(
+                url=url,
+                default_author=name,
+                name="{}'s site".format(name),
+                html=r.text
+            )
+            score = source.probability_sourcepage(stored_publications=stored_publications)
+            if score < 0.7:
+                logger.info("doesn't look like a papers page")
+                continue
+            for dupe in source.get_duplicates():
+                # Now what? Sometimes the present URL is the
+                # correct new URL to use (e.g., everything is
+                # moving to 'https'). Other times the variants are
+                # equally valid. In neither case does it probably
+                # hurt to overwrite the old URL.
+                logger.info("duplicate of already known %s", dupe.url)
+                logger.info("changing url of source %s to %s", dupe.source_id, url)
+                dupe.update_db(url=url)
+                break
             else:
-                score = self.evaluate(r, name, stored_publications)
-                if score < 0.7:
-                    logger.info("doesn't look like a papers page")
-                    continue
-                dupe = self.is_duplicate(url)
-                if dupe:
-                    logger.info("duplicate of already known %s", dupe)
-                    continue
                 logger.info("new papers page!")                
-                pages.add(url)
-        if not pages:
-            logger.info("no pages found")
+                source.save_to_db()
         self.update_author(name)
-        return pages
 
     def bad_url(self, url):
         """returns True if url contains blacklisted part"""
@@ -121,111 +123,6 @@ class SourcesFinder:
         '/cv', '/curriculum-vitae', '/teaching', 'conference',
         '/call', '/search', '/lookup',
     ]
-
-    def get_stored_publications(self, name):
-        """
-        return list of publication titles for <name> from DB; if none are
-        stored, try to fetch some from philpapers
-
-        We do this for two reasons: First, because the list of known
-        publications helps decide whether something is a source
-        page. Second, we need a list of known publications later, when
-        processing papers, to decide whether a paper is new or
-        not. Here is a good point at which to create this list.
-        """
-        cur = db.cursor()
-        query = "SELECT title FROM publications WHERE author=%s"
-        cur.execute(query, (name,))
-        rows = cur.fetchall()
-        if rows:
-            logger.info("%s publications stored for %s", len(rows), name)
-            return [row[0] for row in rows]
-        
-        logger.info("no publications stored for %s; searching philpapers", name)
-        pubs = philpaperssearch.get_publications(name)
-        logger.info('{} publications found on philpapers'.format(len(pubs)))
-        for pub in pubs:
-            query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
-            cur.execute(query, (name, pub[0], pub[1]))
-            logger.debug(cur._last_executed)
-        db.commit()
-        return [pub[0] for pub in pubs]
-
-    def evaluate(self, response, name, stored_publications):
-        """return probability that <response> is a papers page for <name>"""
-        response.textlower = response.text.lower()
-        doclinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', response.textlower)
-        response.doclinks = [s for s in doclinks if not 'cv' in s]
-        response.authorname = name
-        response.stored_publications = stored_publications
-        p_source = self.page_classifier.test(response, debug=args.verbose, smooth=True)
-        return p_source
-    
-    def make_page_classifier(self):
-        """set up classifier to evaluate whether a page (Response object) is a papers source"""
-        classifier = BinaryNaiveBayes(prior_yes=0.6)
-        classifier.likelihood(
-            "any links to '.pdf' or '.doc' files",
-            lambda r: len(r.doclinks) > 0,
-            p_ifyes=1, p_ifno=.6)
-        classifier.likelihood(
-            "links to '.pdf' or '.doc' files",
-            lambda r: len(r.doclinks),
-            p_ifyes=nbinom(2.5,.1), p_ifno=nbinom(.1,.1))
-        classifier.likelihood(
-            "contains titles of stored publications",
-            lambda r: any(title.lower() in r.textlower for title in r.stored_publications),
-            p_ifyes=0.8, p_ifno=0.2)
-        classifier.likelihood(
-            "contains publication status keywords",
-            lambda r: any(word in r.textlower for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
-            p_ifyes=0.8, p_ifno=0.2)
-        classifier.likelihood(
-            "contains 'syllabus'",
-            lambda r: 'syllabus' in r.textlower,
-            p_ifyes=0.1, p_ifno=0.2)
-        classifier.likelihood(
-            "contains conference keywords",
-            lambda r: r.textlower.count('schedule') + r.textlower.count('break') + r.textlower.count('dinner') > 2,
-            p_ifyes=0.01, p_ifno=0.2)
-        classifier.likelihood(
-            "contains commercial keywords",
-            lambda r: any(word in r.textlower for word in ('contact us', 'sign up', 'sign in', 'log in', 'terms and conditions')),
-            p_ifyes=0.05, p_ifno=0.5)
-        classifier.likelihood(
-            "author name in url",
-            lambda r: r.authorname.split()[-1].lower() in r.url.lower(),
-            p_ifyes=0.6, p_ifno=0.1)
-        return classifier
-
-    def is_duplicate(self, url):
-        """
-        check if page is already in db under superficially different URL:
-        with(out) trailing slash or with(out) SSL or with(out) 'www'.
-
-        One should also check if the same page is available e.g. as
-        /user/1076 and as /user/sjones. But that's tricky. Perhaps
-        this functionality should be added to process_pages, where I
-        could check if a new page contains any links to papers that
-        haven't also been found elsewhere and if not mark it as
-        inactive. TODO
-        """
-        cur = db.cursor()
-        m = re.match('^(https?://)(www\.)?(.+?)(/)?$', url)
-        if not m:
-            logger.warn('malformed url %s?', url)
-            return None
-        urlpath = m.group(3)
-        urlvars = []
-        for protocol in ('http://', 'https://'):
-            for www in ('www.', ''):
-                for slash in ('/', ''):
-                    urlvars.append(protocol+www+urlpath+slash)
-        cur.execute("SELECT url FROM sources WHERE url IN (%s,%s,%s,%s,%s,%s,%s,%s)", urlvars)
-        rows = cur.fetchall()
-        if rows:
-            return rows[0][0]
-        return None
 
     def sendmail(self, new_pages):
         body = ''
@@ -259,7 +156,7 @@ class SourcesFinder:
         sf = SourcesFinder()
         for name, sites in tests.items():
             print("\n\ntesting {}".format(name))
-            urls = sf.find_new_pages(name)
+            urls = sf.find_new_pages(name, store_in_db=False)
             if urls == sites:
                 print("   OK")
             else:
@@ -288,9 +185,6 @@ if __name__ == "__main__":
     else:
         names = sf.select_names(num_names=1)
     for name in names:
-        pages = sf.find_new_pages(name)
-        if not args.dry:
-            for url in pages:
-                sf.store_page(url, name)
-                
+        pages = sf.find_new_pages(name, store_in_db=(not args.dry))
+     
     sys.exit(0)

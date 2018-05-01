@@ -2,9 +2,8 @@
 import time, re
 from datetime import datetime
 from urllib.parse import urlparse
-from opp import db
-from opp import error
-from opp import util
+from scipy.stats import nbinom
+from opp import db, error, util, philpaperssearch
 from opp.debug import debug, debuglevel
 from opp.webpage import Webpage
 from opp.subjectivebayes import BinaryNaiveBayes 
@@ -26,6 +25,7 @@ class Source(Webpage):
     }
 
     def __init__(self, **kwargs):
+        '''create Source object with attributes given as arguments'''
         super().__init__(kwargs.get('url',''), html=kwargs.get('html',''))
         for k,v in self.db_fields.items():
             setattr(self, k, kwargs.get(k, v))
@@ -33,6 +33,7 @@ class Source(Webpage):
             self.found_date = datetime.now()
 
     def load_from_db(self, url=''):
+        '''set attributes by looking up this Source in the db'''
         url = url or self.url
         if not url:
             raise TypeError("need source url to load Source from db")
@@ -59,7 +60,7 @@ class Source(Webpage):
             db.commit()
     
     def mark_as_dead(self, statuscode):
-        """write status to db or delete page if previously dead as well"""
+        """write <statuscode> to db or delete page if previously has same status"""
         if not self.source_id:
             return
         if self.status == statuscode:
@@ -73,7 +74,7 @@ class Source(Webpage):
             self.update_db(status=statuscode)
         
     def save_to_db(self):
-        """write object to db"""
+        """insert this Source object as new element into the db"""
         cur = db.cursor()
         fields = [f for f in self.db_fields.keys()
                   if f != 'link_id' and getattr(self, f) is not None]
@@ -219,7 +220,121 @@ class Source(Webpage):
         lambda s: any(word in s.plaintext for word in ('not found', 'error 404')),
         p_ifyes=0.7, p_ifno=.1)
 
-            
+    def probability_sourcepage(self, stored_publications=None):
+        """
+        evaluate whether the page (found via google or by following a
+        redirect) might be a genuine source page for the given
+        default_author; <stored_publications> can be passed to speed
+        up checking several pages for the same name.
+        """
+        debug(3, "checking if page is a genuine source page")
+        if not self.default_author:
+            debug(1, "cannot evaluate probability_sourcepage without default_author")
+            return 1
+        if not self.html:
+            debug(1, "cannot evaluate probability_sourcepage without html")
+            return 1
+        self.textlower = util.strip_tags(self.html).lower()
+        self.htmllower = self.html.lower()
+        doclinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', self.htmllower)
+        self.doclinks = [s for s in doclinks if not 'cv' in s]
+        if not stored_publications:
+            stored_publications = self.get_stored_publications(self.default_author)
+        self.stored_publications = stored_publications
+        p_source = self.issource_classifier.test(self, debug=(debuglevel() > 2), smooth=True)
+        return p_source
+
+    # issource classifier is a class attribute:
+    issource_classifier = BinaryNaiveBayes(prior_yes=0.6)
+    issource_classifier.likelihood(
+        "any links to '.pdf' or '.doc' files",
+        lambda s: len(s.doclinks) > 0,
+        p_ifyes=1, p_ifno=.6)
+    issource_classifier.likelihood(
+        "links to '.pdf' or '.doc' files",
+        lambda s: len(s.doclinks),
+        p_ifyes=nbinom(2.5,.1), p_ifno=nbinom(.1,.1))
+    issource_classifier.likelihood(
+        "contains titles of stored publications",
+        lambda s: any(title.lower() in s.textlower for title in s.stored_publications),
+        p_ifyes=0.8, p_ifno=0.2)
+    issource_classifier.likelihood(
+        "contains publication status keywords",
+        lambda s: any(word in s.textlower for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
+        p_ifyes=0.8, p_ifno=0.2)
+    issource_classifier.likelihood(
+        "contains 'syllabus'",
+        lambda s: 'syllabus' in s.textlower,
+        p_ifyes=0.1, p_ifno=0.2)
+    issource_classifier.likelihood(
+        "contains conference keywords",
+        lambda s: s.textlower.count('schedule') + s.textlower.count('break') + s.textlower.count('dinner') > 2,
+        p_ifyes=0.01, p_ifno=0.2)
+    issource_classifier.likelihood(
+        "contains commercial keywords",
+        lambda s: any(word in s.textlower for word in ('contact us', 'sign up', 'sign in', 'log in', 'terms and conditions')),
+        p_ifyes=0.05, p_ifno=0.5)
+    issource_classifier.likelihood(
+        "author name in url",
+        lambda s: s.default_author.split()[-1].lower() in s.url.lower(),
+        p_ifyes=0.6, p_ifno=0.1)
+    
+    @staticmethod
+    def get_stored_publications(name):
+        """
+        return list of publication titles for <name> from DB; if none are
+        stored, try to fetch some from philpapers.
+
+        We do this for two reasons: First, because the list of known
+        publications helps decide whether something is a source
+        page. Second, we need a list of known publications later, when
+        processing papers, to decide whether a paper is new or
+        not. This method is primarily called in sourcesfinder.py.
+        """
+        cur = db.cursor()
+        query = "SELECT title FROM publications WHERE author=%s"
+        cur.execute(query, (name,))
+        rows = cur.fetchall()
+        if rows:
+            debug(3, "%s publications stored for %s", len(rows), name)
+            return [row[0] for row in rows]
+        
+        logger.info("no publications stored for %s; searching philpapers", name)
+        pubs = philpaperssearch.get_publications(name)
+        logger.info('{} publications found on philpapers'.format(len(pubs)))
+        for pub in pubs:
+            query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
+            cur.execute(query, (name, pub[0], pub[1]))
+            logger.debug(cur._last_executed)
+        db.commit()
+        return [pub[0] for pub in pubs]
+
+    def get_duplicates(self):
+        '''
+        returns Sources with similar url.
+
+        This is used to test potential new pages against existing
+        records. Common variants are: with/without trailing slash,
+        with/without 'https', with/without 'www', '%20'/' ',
+        lower/uppercase pathname.  On the other hand, using
+        levenshtein distance is dangerous, since ?p=1 and ?p=2 are
+        probably different, and so are /F/ and /G/.
+        '''
+        urlfrag = self.url.split('//', 2)[0].replace('www.', '').rstrip('/')
+        cur = db.cursor()
+        query = "SELECT source_id,url FROM sources WHERE url LIKE %s"
+        cur.execute(query, ('%'+urlfrag+'%',))
+        rows = cur.fetchall()
+        dupes = []
+        for (did,durl) in rows:
+            # durl might still be a proper extension of self.url
+            # (e.g. self.url+'/articles')
+            if durl.split('//', 2)[0].replace('www.', '').rstrip('/') == urlfrag:
+                dupe = Source(url=durl)
+                dupe.load_from_db()
+                dupes.append(dupe)
+        return dupes 
+    
 class Link():
     """ represents a link on a source page """
 
