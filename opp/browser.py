@@ -10,10 +10,11 @@ logger = logging.getLogger('opp')
 
 _browser = None
 
-# allow using only one instance:
+# use only one instance:
 def Browser(use_virtual_display=False, reuse_browser=True):
+    # FIXME: arguments are ignored
     global _browser
-    if not reuse_browser or not _browser:
+    if not _browser:
         try:
             _browser = ActualBrowser()
         except Exception as e:
@@ -38,8 +39,9 @@ def stop_browser(use_force=False):
         del _browser
         _browser = None
     if use_force:
-        logger.info('killing all geckodriver processes!')
+        logger.info('killing all firefox processes!')
         try: 
+            os.system('killall -9 firefox-bin')
             os.system('killall -9 geckodriver')
         except Exception as e:
             logger.debug(e)
