@@ -6,6 +6,7 @@ import findmodules
 import hashlib
 from opp import db, util, googlesearch
 from opp.models import Source
+from opp.debug import debug, debuglevel
 import json
 import urllib
 
@@ -39,7 +40,7 @@ class SourcesFinder:
         searches for Source pages matching author name and adds them to
         the sources db
         """
-        logger.info("\nsearching source pages for %s", name)
+        debug(1, "\nsearching source pages for %s", name)
         stored_publications = Source.get_stored_publications(name)
         pages = set()
         search_terms = [
@@ -59,24 +60,24 @@ class SourcesFinder:
         #search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
         #searchresults |= set(googlesearch.search(search_phrase))
         for url in searchresults:
-            logger.info('\n'+url)
+            debug(1, '\n'+url)
             url = util.normalize_url(url)
             if self.bad_url(url):
-                logger.info("bad url")
+                debug(1, "bad url")
                 continue
             # check if url is already known:
             cur = db.cursor()
             cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
             rows = cur.fetchall()
             if rows:
-                logger.info("url already known")
+                debug(1, "url already known")
                 continue
             try:
                 status, r = util.request_url(url)
                 if status != 200:
                     raise Exception('status {}'.format(status))
             except Exception as e:
-                logger.info("cannot retrieve url %s (%s)", url, e)
+                debug(1, "cannot retrieve url %s (%s)", url, e)
                 continue
             source = Source(
                 url=url,
@@ -85,8 +86,8 @@ class SourcesFinder:
                 html=r.text
             )
             score = source.probability_sourcepage(stored_publications=stored_publications)
-            if score < 0.7:
-                logger.info("doesn't look like a papers page")
+            if score < 0.5:
+                debug(1, "doesn't look like a papers page")
                 continue
             for dupe in source.get_duplicates():
                 # Now what? Sometimes the present URL is the
@@ -94,12 +95,12 @@ class SourcesFinder:
                 # moving to 'https'). Other times the variants are
                 # equally valid. In neither case does it probably
                 # hurt to overwrite the old URL.
-                logger.info("duplicate of already known %s", dupe.url)
-                logger.info("changing url of source %s to %s", dupe.source_id, url)
+                debug(1, "duplicate of already known %s", dupe.url)
+                debug(1, "changing url of source %s to %s", dupe.source_id, url)
                 dupe.update_db(url=url)
                 break
             else:
-                logger.info("new papers page!")                
+                debug(1, "new papers page!")                
                 source.save_to_db()
         self.update_author(name)
 
@@ -113,14 +114,13 @@ class SourcesFinder:
         'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
         '/portal/en/', # PURE
+        'wikivisually.com',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
         'typepad.com/blog/20', 'm-phi.blogspot.de',
         'blogspot.com/20', 'whatisitliketobeaphilosopher.com',
-        'workshop', 'courses',
-        'wikivisually.com',
-        '/cv', '/curriculum-vitae', '/teaching', 'conference',
+        'workshop', 'courses', '/teaching', 'conference',
         '/call', '/search', '/lookup',
     ]
 
@@ -172,12 +172,13 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     loglevel = logging.DEBUG if args.verbose else logging.INFO
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger('opp')
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(loglevel)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logger.addHandler(ch)
     logger.setLevel(loglevel)
+    debuglevel(4 if args.verbose else 1)
 
     sf = SourcesFinder()
     if args.name:
