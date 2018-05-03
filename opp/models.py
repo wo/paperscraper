@@ -271,6 +271,10 @@ class Source(Webpage):
         lambda s: s.textlower.count('schedule') + s.textlower.count('break') + s.textlower.count('dinner') > 2,
         p_ifyes=0.01, p_ifno=0.2)
     issource_classifier.likelihood(
+        "contains blog keywords",
+        lambda s: s.textlower.count('permalink') + s.textlower.count('comments') > 5,
+        p_ifyes=0.01, p_ifno=0.1)
+    issource_classifier.likelihood(
         "contains commercial keywords",
         lambda s: any(word in s.textlower for word in ('contact us', 'sign up', 'sign in', 'log in', 'terms and conditions')),
         p_ifyes=0.05, p_ifno=0.5)
@@ -582,7 +586,7 @@ class Link():
 
     def fetch(self, url=None, only_if_modified=True):
         '''
-        fetch linked document (or url), returns response object on
+        fetch linked address (or <url>), returns response object on
         success, otherwise stores error in db and returns None.
         '''
         time.sleep(1) # be gentle on servers
