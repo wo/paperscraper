@@ -113,6 +113,7 @@ class SourcesFinder:
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
+        'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
         '/portal/en/', # PURE
         'wikivisually.com',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
