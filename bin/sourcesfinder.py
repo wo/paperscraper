@@ -112,8 +112,10 @@ class SourcesFinder:
     BAD_URL_PARTS = [
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
+        'umich.edu/e/ergo',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
         'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
+        'semanticscholar.org',
         '/portal/en/', # PURE
         'wikivisually.com',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
@@ -121,7 +123,8 @@ class SourcesFinder:
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
         'typepad.com/blog/20', 'm-phi.blogspot.de',
         'blogspot.com/20', 'whatisitliketobeaphilosopher.com',
-        'workshop', 'courses', '/teaching', 'conference',
+        'workshop', 'colloquium',
+        'courses', '/teaching', 'conference',
         '/call', '/search', '/lookup',
     ]
 
