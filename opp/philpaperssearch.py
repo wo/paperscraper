@@ -59,6 +59,10 @@ def get_publications(author_name, strict=False):
         title = m.group(1)
         if len(title) > 255:
            title = title[:251]+'...'
+        if title[-1] == '.':
+            # philpapers delimits titles that don't end with
+            # ?,!,etc. by a dot
+            title = title[:-1]
         ms = re.findall("class='name'>([^<]+)</span>", recordhtml)
         authors = [m for m in ms]
         m = re.search('class="pubYear">([^<]+)</span>', recordhtml)
