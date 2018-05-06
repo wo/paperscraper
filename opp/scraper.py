@@ -9,6 +9,7 @@ import shutil
 import tempfile
 import hashlib
 from selenium.common.exceptions import *
+from _mysql_exceptions import IntegrityError
 from opp import db
 from opp import error
 from opp import util
@@ -142,7 +143,7 @@ def scrape(source, keep_tempfiles=False):
             def urlfrag(url):
                 return url.split('//', 2)[1].replace('www.', '').rstrip('/')
             if urlfrag(browser.current_url) == urlfrag(source.url):
-                debug(1, "%s redirects to variant %s, updating source record",
+                debug(1, "%s redirects to variant %s; updating source record",
                       source.url, browser.current_url)
                 source.update_db(url=browser.current_url)
             else:
@@ -151,18 +152,22 @@ def scrape(source, keep_tempfiles=False):
                 target = Source(url=browser.current_url,
                                 default_author=source.default_author,
                                 name=source.name)
-                try:
-                    target.set_html(browser.page_source)
-                except WebDriverException as e:
-                    debug(1, 'webdriver error retrieving page source: %s', e)
+                for dupe in target.get_duplicates():
+                    debug(1, "redirect url already in db as %s", dupe.url)
+                    break
                 else:
-                    p = target.probability_sourcepage()
-                    if p < 0.5:
-                        debug(1, "target doesn't look like a source page")
+                    try:
+                        target.set_html(browser.page_source)
+                    except WebDriverException as e:
+                        debug(1, 'webdriver error retrieving page source: %s', e)
                     else:
-                        debug(1, "adding target as potential new source page")
-                        target.save_to_db()
-                return 0        
+                        p = target.probability_sourcepage()
+                        if p < 0.5:
+                            debug(1, "target doesn't look like a source page")
+                        else:
+                            debug(1, "adding target as potential new source page")
+                            target.save_to_db()
+                return 0
         else:
             debug(2, 'following redirect to %s', browser.current_url)
 
