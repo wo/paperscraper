@@ -3,6 +3,7 @@ import re
 import time
 from urllib.parse import quote_plus, parse_qs, urlparse
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 from http.cookiejar import LWPCookieJar
 from bs4 import BeautifulSoup
 try:
@@ -64,9 +65,9 @@ def get_page(url):
         cookie_jar.extract_cookies(response, request)
         html = response.read()
         response.close()
-    except urllib.error.HTTPError as httperr:
-        debug(1, httperr.headers)
-        debug(httperr.read())
+    except HTTPError as e:
+        debug(1, e.headers)
+        debug(e.read())
     cookie_jar.save()
     return html
 
