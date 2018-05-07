@@ -85,8 +85,8 @@ class SourcesFinder:
                 name="{}'s site".format(name),
                 html=r.text
             )
-            score = source.probability_sourcepage(stored_publications=stored_publications)
-            if score < 0.5:
+            source.compute_p_is_source(stored_publications=stored_publications)
+            if source.is_source < 50:
                 debug(1, "doesn't look like a papers page")
                 continue
             for dupe in source.get_duplicates():
@@ -117,7 +117,7 @@ class SourcesFinder:
         'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
         'semanticscholar.org',
         '/portal/en/', # PURE
-        'wikivisually.com',
+        'wikivisually.com', 'wikivividly.com',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.com',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
