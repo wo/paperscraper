@@ -161,8 +161,7 @@ def scrape(source, keep_tempfiles=False):
                     except WebDriverException as e:
                         debug(1, 'webdriver error retrieving page source: %s', e)
                     else:
-                        p = target.probability_sourcepage()
-                        if p < 0.5:
+                        if target.compute_p_is_source() < 50:
                             debug(1, "target doesn't look like a source page")
                         else:
                             debug(1, "adding target as potential new source page")

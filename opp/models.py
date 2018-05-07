@@ -16,6 +16,7 @@ class Source(Webpage):
         'url': '',
         'sourcetype': 'personal', # (alt: repo, journal, blog)
         'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
+        'is_source': None, # sourcesfinder guess, 0-100
         'confirmed': False,
         'num_doclinks': 0, # number of current links to Doc objects
         'found_date': None,
@@ -220,12 +221,14 @@ class Source(Webpage):
         lambda s: any(word in s.plaintext for word in ('not found', 'error 404')),
         p_ifyes=0.7, p_ifno=.1)
 
-    def probability_sourcepage(self, stored_publications=None):
+    def compute_p_is_source(self, stored_publications=None):
         """
         evaluate whether the page (found via google or by following a
         redirect) might be a genuine source page for the given
         default_author; <stored_publications> can be passed to speed
-        up checking several pages for the same name.
+        up checking several pages for the same name. The computed
+        probability *100 is stored in the is_source attribute and
+        returned.
         """
         debug(3, "checking if page is a genuine source page")
         if not self.default_author:
@@ -242,7 +245,8 @@ class Source(Webpage):
             stored_publications = self.get_stored_publications(self.default_author)
         self.stored_publications = stored_publications
         p_source = self.issource_classifier.test(self, debug=(debuglevel() > 2), smooth=True)
-        return p_source
+        self.is_source = round(100 * p_source)
+        return self.is_source
 
     # issource classifier is a class attribute:
     issource_classifier = BinaryNaiveBayes(prior_yes=0.6)
