@@ -124,7 +124,7 @@ class SourcesFinder:
         'typepad.com/blog/20', 'm-phi.blogspot.de',
         'blogspot.com/20', 'whatisitliketobeaphilosopher.com',
         'workshop', 'colloquium',
-        'courses', '/teaching', 'conference',
+        'courses', '/teaching', 'conference', '/news/',
         '/call', '/search', '/lookup',
     ]
 

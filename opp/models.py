@@ -238,7 +238,7 @@ class Source(Webpage):
         self.htmllower = self.html.lower()
         doclinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', self.htmllower)
         self.doclinks = [s for s in doclinks if not 'cv' in s]
-        if not stored_publications:
+        if stored_publications is None:
             stored_publications = self.get_stored_publications(self.default_author)
         self.stored_publications = stored_publications
         p_source = self.issource_classifier.test(self, debug=(debuglevel() > 2), smooth=True)
@@ -272,7 +272,7 @@ class Source(Webpage):
         p_ifyes=0.01, p_ifno=0.2)
     issource_classifier.likelihood(
         "contains blog keywords",
-        lambda s: s.textlower.count('permalink') + s.textlower.count('comments') > 5,
+        lambda s: s.textlower.count('permalink') + s.textlower.count('comment') > 5,
         p_ifyes=0.01, p_ifno=0.1)
     issource_classifier.likelihood(
         "contains commercial keywords",
