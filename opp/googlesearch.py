@@ -67,7 +67,8 @@ def get_page(url):
         response.close()
     except HTTPError as e:
         debug(1, e.headers)
-        debug(e.read())
+        debug(1, e.read())
+        raise
     cookie_jar.save()
     return html
 
