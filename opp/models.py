@@ -243,7 +243,7 @@ class Source(Webpage):
         if stored_publications is None:
             stored_publications = self.get_stored_publications(self.default_author)
         self.stored_publications = stored_publications
-        p_source = self.issource_classifier.test(self, debug=(debuglevel() > 2), smooth=True)
+        p_source = self.issource_classifier.test(self, debug=(debuglevel() > 2))
         self.is_source = round(100 * p_source)
         return self.is_source
 

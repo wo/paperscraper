@@ -167,7 +167,7 @@ class SubjectiveNaiveBayes:
             for (threshold, pr_y, pr_n) in p:
                 pr = pr_y if yes else pr_n
                 if n <= threshold:
-                    return pr - prev_p
+                    return pr - prev_pr
                 prev_pr = pr
             return 1 - prev_pr
         return (lambda n: dist(True, n), lambda n: dist(False, n))
