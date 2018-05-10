@@ -2,11 +2,10 @@
 import time, re
 from datetime import datetime
 from urllib.parse import urlparse
-from scipy.stats import nbinom
 from opp import db, error, util, philpaperssearch
 from opp.debug import debug, debuglevel
 from opp.webpage import Webpage
-from opp.subjectivebayes import BinaryNaiveBayes 
+from opp.subjectivebayes import SubjectiveNaiveBayes 
 
 class Source(Webpage):
     """ represents a source page with links to papers """
@@ -203,7 +202,7 @@ class Source(Webpage):
         return p_dead > .8
 
     # looks_dead classifier is a class attribute:
-    dead_classifier = BinaryNaiveBayes(prior_yes=0.5)
+    dead_classifier = SubjectiveNaiveBayes(prior_yes=0.5)
     dead_classifier.likelihood(
         "little text on page",
         lambda s: len(s.plaintext) < 500,
@@ -249,39 +248,54 @@ class Source(Webpage):
         return self.is_source
 
     # issource classifier is a class attribute:
-    issource_classifier = BinaryNaiveBayes(prior_yes=0.6)
-    issource_classifier.likelihood(
-        "any links to '.pdf' or '.doc' files",
-        lambda s: len(s.doclinks) > 0,
-        p_ifyes=1, p_ifno=.6)
+    issource_classifier = SubjectiveNaiveBayes(prior_yes=0.6)
     issource_classifier.likelihood(
         "links to '.pdf' or '.doc' files",
         lambda s: len(s.doclinks),
-        p_ifyes=nbinom(2.5,.1), p_ifno=nbinom(.1,.1))
+        p=(
+            (0, .1, .7), # 0 links: probability .1 if yes, .7 if no
+            (1, .13, .8), # 0-1 links
+            (3, .2, .88), # 0-3 links
+            (10, .6, .91), # 0-10
+            (100, .95, .95), # 0-100
+        ))
     issource_classifier.likelihood(
         "contains titles of stored publications",
         lambda s: any(title.lower() in s.textlower for title in s.stored_publications),
+        precondition=lambda s: s.stored_publications is not None, 
         p_ifyes=0.8, p_ifno=0.2)
     issource_classifier.likelihood(
-        "contains publication status keywords",
-        lambda s: any(word in s.textlower for word in ('forthcoming', 'draft', 'in progress', 'preprint')),
-        p_ifyes=0.8, p_ifno=0.2)
+        "publication status keywords",
+        lambda s: sum(s.textlower.count(w) for w in ('forthcoming', 'draft', 'in progress', 'preprint')),
+        p=(
+            (0, .2, .8),
+            (1, .3, .86),
+            (2, .4, .9),
+        ))
     issource_classifier.likelihood(
         "contains 'syllabus'",
         lambda s: 'syllabus' in s.textlower,
         p_ifyes=0.1, p_ifno=0.2)
     issource_classifier.likelihood(
         "contains conference keywords",
-        lambda s: s.textlower.count('schedule') + s.textlower.count('break') + s.textlower.count('dinner') > 2,
+        lambda s: sum(s.textlower.count(w) for w in ('schedule', 'break', 'dinner')) > 2,
         p_ifyes=0.01, p_ifno=0.2)
     issource_classifier.likelihood(
-        "contains blog keywords",
-        lambda s: s.textlower.count('permalink') + s.textlower.count('comment') > 5,
-        p_ifyes=0.01, p_ifno=0.1)
+        "blog keywords",
+        lambda s: sum(s.textlower.count(w) for w in ('permalink', 'comment')),
+        p=(
+            (0, .86, .7), # 0 keywords
+            (2, .93, .8), # 0-2
+            (4, .98, .88), # 0-4
+        ))
     issource_classifier.likelihood(
-        "contains commercial keywords",
-        lambda s: any(word in s.textlower for word in ('contact us', 'sign up', 'sign in', 'log in', 'terms and conditions')),
-        p_ifyes=0.05, p_ifno=0.5)
+        "commercial keywords",
+        lambda s: sum(s.textlower.count(w) for w in
+                      ('contact us', 'sign up', 'sign in', 'log in', 'terms and conditions')),
+        p=(
+            (0, .9, .3), # 0 keywords
+            (2, .95, .6), # 0-2
+        ))
     issource_classifier.likelihood(
         "author name in url",
         lambda s: s.default_author.split()[-1].lower() in s.url.lower(),
