@@ -115,7 +115,7 @@ class SourcesFinder:
         'umich.edu/e/ergo',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
         'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
-        'semanticscholar.org',
+        'semanticscholar.org', 'oalib.com',
         '/portal/en/', # PURE
         'wikivisually.com', 'wikivividly.com',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
@@ -124,7 +124,7 @@ class SourcesFinder:
         'typepad.com/blog/20', 'm-phi.blogspot.de',
         'blogspot.com/20', 'whatisitliketobeaphilosopher.com',
         'workshop', 'colloquium',
-        'courses', '/teaching', 'conference', '/news/',
+        'courses', '/teaching', 'conference', '/news/', '/events/', '/event/',
         '/call', '/search', '/lookup',
     ]
 
