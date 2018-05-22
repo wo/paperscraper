@@ -107,7 +107,7 @@ class SourcesFinder:
     def bad_url(self, url):
         """returns True if url is too long or contains blacklisted part"""
         if len(url) > 255:
-            return true
+            return True
         url = url.lower()
         return any(w in url for w in self.BAD_URL_PARTS)
 
