@@ -237,9 +237,10 @@ class Source(Webpage):
             debug(1, "cannot evaluate probability_sourcepage without html")
             return 1
         self.textlower = util.strip_tags(self.html).lower()
+        self.textlower += self.url # so we catch e.g. 'syllabus' in url
         self.htmllower = self.html.lower()
-        doclinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', self.htmllower)
-        self.doclinks = [s for s in doclinks if not 'cv' in s]
+        pdflinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', self.htmllower)
+        self.pdflinks = set(s for s in pdflinks if not 'cv' in s)
         if stored_publications is None:
             stored_publications = self.get_stored_publications(self.default_author)
         self.stored_publications = stored_publications
@@ -251,7 +252,7 @@ class Source(Webpage):
     issource_classifier = SubjectiveNaiveBayes(prior_yes=0.6)
     issource_classifier.likelihood(
         "links to '.pdf' or '.doc' files",
-        lambda s: len(s.doclinks),
+        lambda s: len(s.pdflinks),
         p=(
             (0, .1, .7), # 0 links: probability .1 if yes, .7 if no
             (1, .13, .8), # 0-1 links
@@ -261,9 +262,12 @@ class Source(Webpage):
         ))
     issource_classifier.likelihood(
         "contains titles of stored publications",
-        lambda s: any(title.lower() in s.textlower for title in s.stored_publications),
+        lambda s: sum(1 for t in s.stored_publications if t.lower() in s.textlower and len(t)>12),
         precondition=lambda s: s.stored_publications is not None, 
-        p_ifyes=0.8, p_ifno=0.2)
+        p=(
+            (0, .1, .8), 
+            (1, .22, .9),
+        ))
     issource_classifier.likelihood(
         "publication status keywords",
         lambda s: sum(s.textlower.count(w) for w in ('forthcoming', 'draft', 'in progress', 'preprint')),
@@ -273,25 +277,40 @@ class Source(Webpage):
             (2, .4, .9),
         ))
     issource_classifier.likelihood(
-        "contains 'syllabus'",
-        lambda s: 'syllabus' in s.textlower,
-        p_ifyes=0.1, p_ifno=0.2)
+        "contains syllabus keywords",
+        lambda s: sum(s.textlower.count(w) for w in ('syllabus', 'schedule', 'week 3', 'student presentation')),
+        p=(
+            (0, .95, .7),
+            (1, .97, .8),
+        ))
+    issource_classifier.likelihood(
+        "contains single paper keywords",
+        lambda s: sum(s.textlower.count(w) for w in ('introduction', 'however', 'references', 'how to cite')),
+        p=(
+            (0, .94, .8),
+            (1, .98, .9),
+        ))
     issource_classifier.likelihood(
         "contains conference keywords",
         lambda s: sum(s.textlower.count(w) for w in ('schedule', 'break', 'dinner')) > 2,
         p_ifyes=0.01, p_ifno=0.2)
     issource_classifier.likelihood(
+        "blog post url",
+        lambda s: re.search("20\d\d/\d\d?/", s.url),
+        p_ifyes=0.01, p_ifno=0.1)
+    issource_classifier.likelihood(
         "blog keywords",
-        lambda s: sum(s.textlower.count(w) for w in ('permalink', 'comment')),
+        lambda s: sum(s.textlower.count(w) for w in ('permalink', 'comment', 'recent posts', 'archives')),
         p=(
-            (0, .86, .7), # 0 keywords
-            (2, .93, .8), # 0-2
+            (0, .9, .7), # 0 keywords
+            (2, .95, .8), # 0-2
             (4, .98, .88), # 0-4
         ))
     issource_classifier.likelihood(
         "commercial keywords",
         lambda s: sum(s.textlower.count(w) for w in
-                      ('contact us', 'sign up', 'sign in', 'log in', 'terms and conditions')),
+                      ('contact us', 'about us', 'faq', 'sign up', 'sign in', 'log in',
+                       'newsletter', 'terms and conditions', 'terms of use')),
         p=(
             (0, .9, .3), # 0 keywords
             (2, .95, .6), # 0-2
@@ -299,7 +318,7 @@ class Source(Webpage):
     issource_classifier.likelihood(
         "author name in url",
         lambda s: s.default_author.split()[-1].lower() in s.url.lower(),
-        p_ifyes=0.6, p_ifno=0.1)
+        p_ifyes=0.7, p_ifno=0.1)
     
     @staticmethod
     def get_stored_publications(name):

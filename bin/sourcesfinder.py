@@ -105,26 +105,29 @@ class SourcesFinder:
         self.update_author(name)
 
     def bad_url(self, url):
-        """returns True if url contains blacklisted part"""
+        """returns True if url is too long or contains blacklisted part"""
+        if len(url) > 255:
+            return true
         url = url.lower()
         return any(w in url for w in self.BAD_URL_PARTS)
 
     BAD_URL_PARTS = [
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
-        'umich.edu/e/ergo',
+        'plato.stanford.edu',
+        'umich.edu/e/ergo', 'cambridge.org', 'hugendubel.',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
         'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
-        'semanticscholar.org',
-        '/portal/en/', # PURE
-        'wikivisually.com', 'wikivividly.com',
+        'semanticscholar.org', 'oalib.com', 'academia-net',
+        '/portal/en/',  # PURE
+        'wikivisually.', 'wikivividly.',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
-        'amazon.', 'twitter.', 'goodreads.com',
+        'amazon.', 'twitter.', 'goodreads.',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
         'typepad.com/blog/20', 'm-phi.blogspot.de',
         'blogspot.com/20', 'whatisitliketobeaphilosopher.com',
         'workshop', 'colloquium',
-        'courses', '/teaching', 'conference', '/news/',
+        'courses', '/teaching', 'conference', '/news/', '/events/', '/event/',
         '/call', '/search', '/lookup',
     ]
 
