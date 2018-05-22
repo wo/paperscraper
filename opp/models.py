@@ -237,6 +237,7 @@ class Source(Webpage):
             debug(1, "cannot evaluate probability_sourcepage without html")
             return 1
         self.textlower = util.strip_tags(self.html).lower()
+        self.textlower += self.url # so we catch e.g. 'syllabus' in url
         self.htmllower = self.html.lower()
         pdflinks = re.findall(r'href=([^>]+\.(?:pdf|docx?)\b)', self.htmllower)
         self.pdflinks = set(s for s in pdflinks if not 'cv' in s)
@@ -276,9 +277,19 @@ class Source(Webpage):
             (2, .4, .9),
         ))
     issource_classifier.likelihood(
-        "contains 'syllabus'",
-        lambda s: 'syllabus' in s.textlower,
-        p_ifyes=0.1, p_ifno=0.2)
+        "contains syllabus keywords",
+        lambda s: sum(s.textlower.count(w) for w in ('syllabus', 'schedule', 'week 3', 'student presentation')),
+        p=(
+            (0, .95, .7),
+            (1, .97, .8),
+        ))
+    issource_classifier.likelihood(
+        "contains single paper keywords",
+        lambda s: sum(s.textlower.count(w) for w in ('introduction', 'however', 'references', 'how to cite')),
+        p=(
+            (0, .94, .8),
+            (1, .98, .9),
+        ))
     issource_classifier.likelihood(
         "contains conference keywords",
         lambda s: sum(s.textlower.count(w) for w in ('schedule', 'break', 'dinner')) > 2,
@@ -291,8 +302,8 @@ class Source(Webpage):
         "blog keywords",
         lambda s: sum(s.textlower.count(w) for w in ('permalink', 'comment', 'recent posts', 'archives')),
         p=(
-            (0, .86, .7), # 0 keywords
-            (2, .93, .8), # 0-2
+            (0, .9, .7), # 0 keywords
+            (2, .95, .8), # 0-2
             (4, .98, .88), # 0-4
         ))
     issource_classifier.likelihood(
