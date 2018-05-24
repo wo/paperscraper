@@ -254,9 +254,9 @@ class Source(Webpage):
         "links to '.pdf' or '.doc' files",
         lambda s: len(s.pdflinks),
         p=(
-            (0, .1, .7), # 0 links: probability .1 if yes, .7 if no
-            (1, .13, .8), # 0-1 links
-            (3, .2, .88), # 0-3 links
+            (0, .15, .7), # 0 links: probability .15 if yes, .7 if no
+            (1, .18, .8), # 0-1 links
+            (3, .25, .88), # 0-3 links
             (10, .6, .91), # 0-10
             (100, .95, .95), # 0-100
         ))
@@ -265,16 +265,16 @@ class Source(Webpage):
         lambda s: sum(1 for t in s.stored_publications if t.lower() in s.textlower and len(t)>12),
         precondition=lambda s: s.stored_publications is not None, 
         p=(
-            (0, .1, .8), 
-            (1, .22, .9),
+            (0, .13, .8), 
+            (1, .25, .9),
         ))
     issource_classifier.likelihood(
         "publication status keywords",
         lambda s: sum(s.textlower.count(w) for w in ('forthcoming', 'draft', 'in progress', 'preprint')),
         p=(
-            (0, .2, .8),
-            (1, .3, .86),
-            (2, .4, .9),
+            (0, .3, .8),
+            (1, .4, .86),
+            (2, .5, .9),
         ))
     issource_classifier.likelihood(
         "contains syllabus keywords",
@@ -565,12 +565,20 @@ class Link():
         context = el.get_attribute('textContent')
         debug(4, "initial context: %s", context)
         for i in (1,2,3):
-            more = context_right(i)
-            if not more: break
+            try:
+                more = context_right(i)
+            except:
+                break
+            if not more:
+                break
             context += '\n' + more
         for i in (1,2,3,4):
-            more = context_left(i)
-            if not more: break
+            try:
+                more = context_left(i)
+            except:
+                break
+            if not more:
+                break
             context = more + '\n' + context
         # tidy up slightly (mainly for easier testing):
         self.context = re.sub(r'\s*\n+\s*', r'\n', context).strip()
