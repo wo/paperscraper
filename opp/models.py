@@ -565,20 +565,12 @@ class Link():
         context = el.get_attribute('textContent')
         debug(4, "initial context: %s", context)
         for i in (1,2,3):
-            try:
-                more = context_right(i)
-            except:
-                break
-            if not more:
-                break
+            more = context_right(i)
+            if not more: break
             context += '\n' + more
         for i in (1,2,3,4):
-            try:
-                more = context_left(i)
-            except:
-                break
-            if not more:
-                break
+            more = context_left(i)
+            if not more: break
             context = more + '\n' + context
         # tidy up slightly (mainly for easier testing):
         self.context = re.sub(r'\s*\n+\s*', r'\n', context).strip()
