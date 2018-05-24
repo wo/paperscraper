@@ -45,6 +45,7 @@ class DocClassifier:
             self.vectorizer = vect
             self.classifier = clf
             self.ready = True
+            debug(4, "loaded classifier model from disk")
         else:
             self.reset()
     

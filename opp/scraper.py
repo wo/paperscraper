@@ -257,7 +257,6 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     If force_reprocess is False and the link has already been checked
     at some point, if_modified_since and etag headers are sent.
     """
-
     if not hasattr(li, 'context'): # skip context extraction on redirects
         try:
             li.context = li.html_context()
