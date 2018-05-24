@@ -601,6 +601,9 @@ def get_duplicate(doc):
     # different authors and abstracts (due to parser mistakes,
     # author name variants, etc.).
     debug(5, "checking for duplicates")
+    if len(doc.title) < 4 and len(doc.authors) < 4:
+        # don't check entire database if no title or author provided
+        return None
     where = ['doc_id != %s']
     values = [doc.doc_id]
     m = re.search('\w+', doc.title) # first title word
