@@ -258,7 +258,7 @@ class Source(Webpage):
             (1, .18, .8), # 0-1 links
             (3, .25, .88), # 0-3 links
             (10, .6, .91), # 0-10
-            (100, .95, .95), # 0-100
+            (100, .98, .95), # 0-100
         ))
     issource_classifier.likelihood(
         "contains titles of stored publications",
@@ -298,6 +298,14 @@ class Source(Webpage):
         "blog post url",
         lambda s: re.search("20\d\d/\d\d?/", s.url),
         p_ifyes=0.01, p_ifno=0.1)
+    issource_classifier.likelihood(
+        "long url",
+        lambda s: len(s.url),
+        p=(
+            (50, .85, .7),
+            (100, .94, .82),
+            (150, .98, .92),
+        ))
     issource_classifier.likelihood(
         "blog keywords",
         lambda s: sum(s.textlower.count(w) for w in ('permalink', 'comment', 'recent posts', 'archives')),
@@ -565,12 +573,20 @@ class Link():
         context = el.get_attribute('textContent')
         debug(4, "initial context: %s", context)
         for i in (1,2,3):
-            more = context_right(i)
-            if not more: break
+            try:
+                more = context_right(i)
+            except:
+                break
+            if not more:
+                break
             context += '\n' + more
         for i in (1,2,3,4):
-            more = context_left(i)
-            if not more: break
+            try:
+                more = context_left(i)
+            except:
+                break
+            if not more:
+                break
             context = more + '\n' + context
         # tidy up slightly (mainly for easier testing):
         self.context = re.sub(r'\s*\n+\s*', r'\n', context).strip()

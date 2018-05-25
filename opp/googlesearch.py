@@ -23,7 +23,7 @@ def search(query):
     """
     urls = []
     query = quote_plus(query)
-    url = "https://www.google.de/search?q={}".format(query)
+    url = "https://www.google.com/search?q={}".format(query)
     debug(5, "fetching %s", url)
     html = get_page(url)
     #debug(5, "response:\n%s\n", html)
