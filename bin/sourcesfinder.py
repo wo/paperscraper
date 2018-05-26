@@ -122,7 +122,7 @@ class SourcesFinder:
         '/portal/en/',  # PURE
         'wikivisually.', 'wikivividly.',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
-        'amazon.', 'twitter.', 'goodreads.',
+        'amazon.', 'twitter.', 'goodreads.', 'pinterest.com', 'ebay.',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
         'typepad.com/blog/20', 'm-phi.blogspot.de',
         'blogspot.com/20', 'whatisitliketobeaphilosopher.com',

@@ -315,6 +315,10 @@ class Source(Webpage):
             (4, .98, .88), # 0-4
         ))
     issource_classifier.likelihood(
+        "search result keywords",
+        lambda s: any(s.textlower.count(w) for w in ('search results', 'sort by')),
+        p_ifyes=0.03, p_ifno=0.12)
+    issource_classifier.likelihood(
         "commercial keywords",
         lambda s: sum(s.textlower.count(w) for w in
                       ('contact us', 'about us', 'faq', 'sign up', 'sign in', 'log in',
