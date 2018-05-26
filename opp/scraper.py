@@ -31,7 +31,8 @@ def next_source():
     # restrict to confirmed = 0 so that we also catch manually added
     # and already confirmed pages.)
     cur = db.dict_cursor()
-    query = ("SELECT * FROM sources WHERE status = 0"
+    query = ("SELECT * FROM sources WHERE"
+             " (status = 0 OR last_checked IS NULL)" 
              " AND sourcetype != 'blog'"
              " LIMIT 1")
     cur.execute(query)
