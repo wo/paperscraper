@@ -2,8 +2,10 @@ import argparse
 import logging
 import re
 import sys
-import findmodules
 import hashlib
+from random import randint
+from time import sleep
+import findmodules
 from opp import db, util, googlesearch
 from opp.models import Source
 from opp.debug import debug, debuglevel
@@ -45,17 +47,30 @@ class SourcesFinder:
         pages = set()
         search_terms = [
             # careful with google.com: don't block sites.google.com...
-            '-site:academia.edu',
-            '-site:wikipedia.org',
-            '-site:philpapers.org',
-            '-filetype:pdf',
+            '"'+name+'"',
             '~philosophy',
             '(publications OR articles OR papers OR "in progress" OR forthcoming)',
+            '-site:philpapers.org',
         ]
-        # search full name first, then last name only:
-        search_phrase = '"{}" '.format(name) + ' '.join(search_terms)
-        logger.debug(search_phrase)
+        # vary query to hide we're a bot:
+        random_more_terms = [
+            '~research',
+            '-filetype:pdf',
+            '-site:academia.edu',
+            '-site:wikipedia.org',
+            '-site:jstor.org',
+        ]
+        for term in random_more_terms:
+            if randint(0,1) == 1:
+                search_terms.append(term)
+        search_phrase = ' '.join(search_terms)
+        debug(2, search_phrase)
+        # vary interval between searches to hide that we're a bot:
+        sleeptime = randint(0,130)
+        debug(2, "waiting for %s seconds", sleeptime)
+        sleep(sleeptime)
         searchresults = googlesearch.search(search_phrase)
+        # search full name first, then last name only:
         #searchresults = set(googlesearch.search(search_phrase))
         #search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
         #searchresults |= set(googlesearch.search(search_phrase))
@@ -112,6 +127,7 @@ class SourcesFinder:
         return any(w in url for w in self.BAD_URL_PARTS)
 
     BAD_URL_PARTS = [
+        'academia.edu',
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
         'plato.stanford.edu', 'scribd.com', 'archive.org',
@@ -120,7 +136,7 @@ class SourcesFinder:
         'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
         'semanticscholar.org', 'oalib.com', 'academia-net',
         '/portal/en/',  # PURE
-        'wikivisually.', 'wikivividly.',
+        'wikipedia.', 'wikivisually.', 'wikivividly.',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'amazon.', 'twitter.', 'goodreads.', 'pinterest.com', 'ebay.',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
