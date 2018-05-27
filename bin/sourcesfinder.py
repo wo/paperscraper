@@ -102,7 +102,7 @@ class SourcesFinder:
                 html=r.text
             )
             source.compute_p_is_source(stored_publications=stored_publications)
-            if source.is_source < 50:
+            if source.is_source < 75:
                 debug(1, "doesn't look like a papers page")
                 continue
             for dupe in source.get_duplicates():
@@ -132,6 +132,7 @@ class SourcesFinder:
         'jstor.org', 'springer.com', 'wiley.com', 'journals.org',
         'tandfonline.com', 'ssrn.com', 'oup.com', 'mitpress.mit.edu',
         'plato.stanford.edu', 'scribd.com', 'archive.org',
+        'philsci-archive.pitt',
         'umich.edu/e/ergo', 'cambridge.org', 'hugendubel.',
         'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
         'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
