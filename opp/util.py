@@ -68,7 +68,7 @@ def request_filetype(r):
     if m:
         return normalize(m.group(0))
     # for others, first check if content has pdf signature:
-    if r.content.startswith(b'^%PDF-'):
+    if r.content.startswith(b'%PDF-'):
         return 'pdf'
     # otherwise use file-ending, if it is a 2-4 character string:
     m = re.search('/.+/.+\.([A-Za-z]{2,4})$', r.url)
