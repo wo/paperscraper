@@ -55,11 +55,11 @@ class SourcesFinder:
         ]
         # vary query to hide we're a bot:
         random_more_terms = [
-            '~research',
             '-filetype:pdf',
             '-site:academia.edu',
             '-site:wikipedia.org',
             '-site:jstor.org',
+            '-site:researchgate.net',
         ]
         for term in random_more_terms:
             if randint(0,1) == 1:
