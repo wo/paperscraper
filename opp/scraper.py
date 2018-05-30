@@ -505,6 +505,12 @@ def check_steppingstone(page):
 
     debug(3, "checking: intermediate page leading to article?")
 
+    # catch dropbox pdf reader:
+    if re.search('dropbox.+dl=0', page.url):
+        target = page.url.replace('dl=0', 'dl=1')
+        debug(3, "yes: dropbox page for %s", target)
+        return target
+    
     # steppingstone pages from known repositories:
     redir_patterns = [
         # arxiv.org, springer.com, researchgate, etc.:
