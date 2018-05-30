@@ -134,7 +134,7 @@ class SourcesFinder:
         'plato.stanford.edu', 'scribd.com', 'archive.org',
         'philsci-archive.pitt',
         'umich.edu/e/ergo', 'cambridge.org', 'hugendubel.',
-        'dblp.uni-trier', 'citec.repec.org', 'publicationslist.org',
+        'dblp.uni-trier', 'dblp.org', 'citec.repec.org', 'publicationslist.org',
         'philarchive.org', 'aristoteliansociety.org.uk/the-proceedings',
         'semanticscholar.org', 'oalib.com', 'academia-net',
         '/portal/en/',  # PURE
