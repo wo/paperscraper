@@ -62,7 +62,7 @@ class SourcesFinder:
             '-site:researchgate.net',
         ]
         for term in random_more_terms:
-            if randint(0,1) == 1:
+            if randint(0,2) != 0:
                 search_terms.append(term)
         search_phrase = ' '.join(search_terms)
         debug(2, search_phrase)
