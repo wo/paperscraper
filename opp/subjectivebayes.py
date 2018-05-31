@@ -195,8 +195,6 @@ class SubjectiveNaiveBayes:
         for li in self.likelihoods:
             (description, condition, precondition, p_ifyes, p_ifno) = li
             if precondition and not precondition(target):
-                if debug:
-                    print("{}? -- ignored, precondition fails")
                 continue
             res = condition(target)
             if debug:
