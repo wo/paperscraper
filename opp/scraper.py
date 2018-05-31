@@ -268,8 +268,24 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         debug(2, "link context: %s", li.context)
     
         # ignore links to old and published papers:
-        if context_suggests_published(li.context):
-            return li.update_db(status=1, doc_id=None)
+        #if context_suggests_published(li.context):
+        #    return li.update_db(status=1, doc_id=None)
+        """
+        This is currently deactivated, for three reasons:
+
+        (1) The context extraction doesn't work too well; it often
+        retrieves the context of other publications as part of a link
+        context. So new papers are wrongly treated as old.
+
+        (2) To find out whether a candidate source page is genuine or
+        whether an old source page has gone dead, it is useful to know
+        if it contains links to genuine papers. If we skip published
+        ones, that information is missing.
+
+        (3) Since we check every new paper against the philpapers
+        database of already published documents, we shouldn't get a
+        lot of newly uploaded old papers in the news feed anyway.
+        """
     
     # fetch url and handle errors, redirects, etc.:
     url = redir_url or li.url
