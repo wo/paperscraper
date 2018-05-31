@@ -194,6 +194,14 @@ class Source(Webpage):
         # cur.execute(query, pattern)
         # variants = cur.fetchall()
 
+    def doc_authors(self):
+        """return list of authors of Doc objects linked to from this page"""
+        cur = db.cursor()
+        query = "SELECT authors FROM docs WHERE source_id = %s"
+        cur.execute(query, (self.source_id,))
+        debug(4, cur._last_executed)
+        return [row[0] for row in cur.fetchall()]
+        
     def looks_dead(self):
         """evaluate whether this page is dead (given that it has no active links to docs)"""
         debug(3, "checking if page is dead")
@@ -231,10 +239,10 @@ class Source(Webpage):
         """
         debug(3, "checking if page is a genuine source page")
         if not self.default_author:
-            debug(1, "cannot evaluate probability_sourcepage without default_author")
+            debug(1, "cannot evaluate source probability without default_author")
             return 1
         if not self.html:
-            debug(1, "cannot evaluate probability_sourcepage without html")
+            debug(1, "cannot evaluate source probability without html")
             return 1
         self.textlower = util.strip_tags(self.html).lower()
         self.textlower += self.url # so we catch e.g. 'syllabus' in url
@@ -260,6 +268,7 @@ class Source(Webpage):
             (10, .6, .91), # 0-10
             (100, .98, .95), # 0-100
         ))
+
     issource_classifier.likelihood(
         "contains titles of stored publications",
         lambda s: sum(1 for t in s.stored_publications if t.lower() in s.textlower and len(t)>12),
@@ -268,6 +277,7 @@ class Source(Webpage):
             (0, .13, .8), 
             (1, .25, .9),
         ))
+
     issource_classifier.likelihood(
         "publication status keywords",
         lambda s: sum(s.textlower.count(w) for w in ('forthcoming', 'draft', 'in progress', 'preprint')),
@@ -276,6 +286,7 @@ class Source(Webpage):
             (1, .4, .86),
             (2, .5, .9),
         ))
+
     issource_classifier.likelihood(
         "contains syllabus keywords",
         lambda s: sum(s.textlower.count(w) for w in ('syllabus', 'schedule', 'week 3', 'student presentation')),
@@ -283,6 +294,7 @@ class Source(Webpage):
             (0, .95, .7),
             (1, .97, .8),
         ))
+
     issource_classifier.likelihood(
         "contains single paper keywords",
         lambda s: sum(s.textlower.count(w) for w in ('introduction', 'however', 'references', 'how to cite')),
@@ -290,14 +302,17 @@ class Source(Webpage):
             (0, .94, .8),
             (1, .98, .9),
         ))
+
     issource_classifier.likelihood(
         "contains conference keywords",
         lambda s: sum(s.textlower.count(w) for w in ('schedule', 'break', 'dinner')) > 2,
         p_ifyes=0.01, p_ifno=0.2)
+
     issource_classifier.likelihood(
         "blog post url",
         lambda s: re.search("20\d\d/\d\d?/", s.url),
         p_ifyes=0.01, p_ifno=0.1)
+
     issource_classifier.likelihood(
         "long url",
         lambda s: len(s.url),
@@ -306,6 +321,7 @@ class Source(Webpage):
             (100, .94, .82),
             (150, .98, .92),
         ))
+
     issource_classifier.likelihood(
         "blog keywords",
         lambda s: sum(s.textlower.count(w) for w in ('permalink', 'comment', 'recent posts', 'archives')),
@@ -314,10 +330,12 @@ class Source(Webpage):
             (2, .95, .8), # 0-2
             (4, .98, .88), # 0-4
         ))
+
     issource_classifier.likelihood(
         "search result keywords",
         lambda s: any(s.textlower.count(w) for w in ('search results', 'sort by')),
         p_ifyes=0.03, p_ifno=0.12)
+    
     issource_classifier.likelihood(
         "commercial keywords",
         lambda s: sum(s.textlower.count(w) for w in
@@ -327,10 +345,33 @@ class Source(Webpage):
             (0, .9, .3), # 0 keywords
             (2, .95, .6), # 0-2
         ))
+
     issource_classifier.likelihood(
         "author name in url",
         lambda s: s.default_author.split()[-1].lower() in s.url.lower(),
         p_ifyes=0.7, p_ifno=0.1)
+
+    # The following tests presuppose that we have scraped the page.
+    
+    issource_classifier.likelihood(
+        "links to papers",
+        lambda s: s.num_doclinks,
+        precondition=lambda s: hasattr(s, 'new_links'),
+        p=(
+            (0, .1, .8), 
+            (1, .3, .9),
+        ))
+    
+    issource_classifier.likelihood(
+        "links to papers by different authors",
+        lambda s: sum(1 for d in s.doc_authors() if s.default_author.split()[-1] not in d),
+        precondition=lambda s: hasattr(s, 'new_links'),
+        p=(
+            (0, .8, .2),
+            (4, .96, .8),
+        ))
+
+    
     
     @staticmethod
     def get_stored_publications(name):

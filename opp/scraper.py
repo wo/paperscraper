@@ -29,7 +29,7 @@ def next_source():
     # First priority: process newly found pages so that we can better
     # decide whether they're genuine source pages or not. (We don't
     # restrict to confirmed = 0 so that we also catch manually added
-    # and already confirmed pages.)
+    # and thus already confirmed pages.)
     cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE"
              " (status = 0 OR last_checked IS NULL)" 
@@ -41,7 +41,7 @@ def next_source():
     if sources:
         debug(1, "processing new source")
         return Source(**sources[0])
-        # If a page isnt' confirmed yet, then after processing, it
+        # If a page isn't confirmed yet, then after processing, it
         # will have a last_checked date and status > 0, but still
         # confirmed = 0. From then on, it will be processed just like
         # other pages (below), but new links won't show up in the feed
@@ -162,7 +162,7 @@ def scrape(source, keep_tempfiles=False):
                     except WebDriverException as e:
                         debug(1, 'webdriver error retrieving page source: %s', e)
                     else:
-                        if target.compute_p_is_source() < 50:
+                        if target.compute_p_is_source() < 60:
                             debug(1, "target doesn't look like a source page")
                         else:
                             debug(1, "adding target as potential new source page")
@@ -204,7 +204,7 @@ def scrape(source, keep_tempfiles=False):
             else:
                 # sourcesfinder sometimes digs up archive pages with
                 # thousands of links; we don't want to process them all
-                # before we manually remove the page.
+                # before we finally remove the page.
                 debug(1, '*** ignoring new link to %s on %s ***', li.url, source.url)
                 return li.update_db(status=1, doc_id=None)
     
@@ -230,16 +230,34 @@ def scrape(source, keep_tempfiles=False):
     if not keep_tempfiles:
         remove_tempdir()
 
-    # Check if source page has gone dead:
-    num_doclinks = sum(1 for li in source.old_links if li.doc_id)
-    num_doclinks += sum(1 for li in source.new_links if li.doc_id)
-    debug(1, '%s active document links on page', num_doclinks)
-    if num_doclinks == 0 and source.looks_dead():
+    source.num_doclinks = sum(1 for li in source.old_links if li.doc_id)
+    source.num_doclinks += sum(1 for li in source.new_links if li.doc_id)
+    debug(1, '%s active document links on page', source.num_doclinks)
+    
+    if source.status == 0 and not source.confirmed:
+        debug(1, "re-evaluating whether candidate source page is genuine source")
+        is_source = source.compute_p_is_source()
+        if is_source < 60:
+            # Now, should we delete the record or set its status to
+            # -1? If we delete the record, it will be reprocessed
+            # again at some point, which is probably a waste of
+            # effort, but might occasionally catch a page that has
+            # turned into a genuine source page. The same question
+            # arises for pages manually flagged as non-sources. We
+            # should probably set the status to -1 but let
+            # sourcesfinder remove records with status -1 and
+            # found_date more than 1 year ago.
+            debug(1, "doesn't look like a papers page; setting status to -1")
+            source.update_db(is_source=is_source, status=-1)
+            return 0
+        
+    elif source.num_doclinks == 0 and source.looks_dead():
+        # Check if source page has gone dead:
         debug(1, 'marking page as dead')
         source.mark_as_dead(error.code['no links to documents on source page'])
         return 0
     
-    source.update_db(num_doclinks=num_doclinks, status=1)
+    source.update_db(num_doclinks=source.num_doclinks, status=1)
     return 1
 
 def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False,
@@ -267,8 +285,24 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
         debug(2, "link context: %s", li.context)
     
         # ignore links to old and published papers:
-        if context_suggests_published(li.context):
-            return li.update_db(status=1, doc_id=None)
+        #if context_suggests_published(li.context):
+        #    return li.update_db(status=1, doc_id=None)
+        """
+        This is currently deactivated, for three reasons:
+
+        (1) The context extraction doesn't work too well; it often
+        retrieves the context of other publications as part of a link
+        context. So new papers are wrongly treated as old.
+
+        (2) To find out whether a candidate source page is genuine or
+        whether an old source page has gone dead, it is useful to know
+        if it contains links to genuine papers. If we skip published
+        ones, that information is missing.
+
+        (3) Since we check every new paper against the philpapers
+        database of already published documents, we shouldn't get a
+        lot of newly uploaded old papers in the news feed anyway.
+        """
     
     # fetch url and handle errors, redirects, etc.:
     url = redir_url or li.url
