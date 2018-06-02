@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import logging
+import os, sys, time
+from pathlib import Path
 import re
-import sys
 import hashlib
 from random import randint
-from time import sleep
 import findmodules
 from opp import db, util, googlesearch
 from opp.models import Source
@@ -17,6 +17,9 @@ import urllib
 This script is supposed to be run from the command line (or regularly
 as a cron job) to find new source pages.
 '''
+
+LOCKFILE = '/tmp/sourcesfinder_wait.lk'
+GOOGLE_REST_TIME = 60*60*9 # wait 9 hours if google locked us out
 
 class SourcesFinder:
 
@@ -46,20 +49,27 @@ class SourcesFinder:
         debug(1, "\nsearching source pages for %s", name)
         stored_publications = Source.get_stored_publications(name)
         pages = set()
-        search_terms = [
-            # careful with google.com: don't block sites.google.com...
-            '"'+name+'"',
-            '~philosophy',
-            '(publications OR articles OR papers OR "in progress" OR forthcoming)',
-            '-site:philpapers.org',
-        ]
-        # vary query to hide we're a bot:
+        search_terms = ['"{}"'.format(name)]
+        # We vary the query to hide we're a bot and give us better
+        # chances of finding a source page after several tries.
+        if len(stored_publications) > 1 and randint(0,1) == 0:
+            for title in stored_publications[:2]:
+                title3words = ' '.join(title.split()[:3])
+                search_terms.append('"{}"'.format(title3words))
+        else:
+            search_terms.append('~philosophy')
+            more_terms = [
+                '(publications OR articles OR papers OR "in progress" OR forthcoming)',
+                '(publications OR articles OR forthcoming)',
+                '(publications OR articles OR "in progress" OR forthcoming)'
+            ]
+            search_terms.append(more_terms[randint(0,2)])
         random_more_terms = [
+            # careful: -site:google.com blocks sites.google.com...
             '-filetype:pdf',
-            '-site:academia.edu',
+            '-site:philpapers.org',
             '-site:wikipedia.org',
-            '-site:jstor.org',
-            '-site:researchgate.net',
+            '-site:academia.edu',
         ]
         for term in random_more_terms:
             if randint(0,2) != 0:
@@ -67,10 +77,16 @@ class SourcesFinder:
         search_phrase = ' '.join(search_terms)
         debug(2, search_phrase)
         # vary interval between searches to hide that we're a bot:
-        sleeptime = randint(0,130)
+        sleeptime = randint(0,100)
         debug(2, "waiting for %s seconds", sleeptime)
-        sleep(sleeptime)
-        searchresults = googlesearch.search(search_phrase)
+        time.sleep(sleeptime)
+        try:
+            searchresults = googlesearch.search(search_phrase)
+        except Exception as e:
+            debug(1, "Ooops. Looks like google caught us. Creating lock file to enforce break.")
+            Path(LOCKFILE).touch()
+            raise
+            
         # search full name first, then last name only:
         #searchresults = set(googlesearch.search(search_phrase))
         #search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
@@ -124,6 +140,8 @@ class SourcesFinder:
         """returns True if url is too long or contains blacklisted part"""
         if len(url) > 255:
             return True
+        if url.endswith('.pdf'):
+            return True
         url = url.lower()
         return any(w in url for w in self.BAD_URL_PARTS)
 
@@ -140,6 +158,7 @@ class SourcesFinder:
         '/portal/en/',  # PURE
         'wikipedia.', 'wikivisually.', 'wikivividly.',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
+        'ratemyprofessors.', 
         'amazon.', 'twitter.', 'goodreads.', 'pinterest.com', 'ebay.',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
         'typepad.com/blog/20', 'm-phi.blogspot.de',
@@ -205,6 +224,13 @@ if __name__ == "__main__":
     logger.setLevel(loglevel)
     debuglevel(4 if args.verbose else 1)
 
+    if os.path.exists(LOCKFILE):
+        if os.path.getctime(LOCKFILE) < time.time()-GOOGLE_REST_TIME:
+            debug(1, "google locked us out; waiting.", LOCKFILE)
+            sys.exit(0)
+        else:
+            os.remove(LOCKFILE)
+    
     sf = SourcesFinder()
     if args.name:
         names = [args.name]
