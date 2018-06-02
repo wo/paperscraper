@@ -66,6 +66,7 @@ def get_page(url):
         html = response.read()
         response.close()
     except HTTPError as e:
+        debug(1, url)
         debug(1, e.headers)
         debug(1, e.read())
         raise
