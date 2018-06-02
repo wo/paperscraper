@@ -158,6 +158,7 @@ class SourcesFinder:
         '/portal/en/',  # PURE
         'wikipedia.', 'wikivisually.', 'wikivividly.',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
+        'philx.org',
         'ratemyprofessors.', 
         'amazon.', 'twitter.', 'goodreads.', 'pinterest.com', 'ebay.',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
@@ -225,7 +226,7 @@ if __name__ == "__main__":
     debuglevel(4 if args.verbose else 1)
 
     if os.path.exists(LOCKFILE):
-        if os.path.getctime(LOCKFILE) < time.time()-GOOGLE_REST_TIME:
+        if os.path.getctime(LOCKFILE) > time.time()-GOOGLE_REST_TIME:
             debug(1, "google locked us out; waiting.", LOCKFILE)
             sys.exit(0)
         else:
