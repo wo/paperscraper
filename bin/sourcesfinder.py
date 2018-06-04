@@ -227,7 +227,7 @@ if __name__ == "__main__":
 
     if os.path.exists(LOCKFILE):
         if os.path.getctime(LOCKFILE) > time.time()-GOOGLE_REST_TIME:
-            debug(1, "google locked us out; waiting.", LOCKFILE)
+            debug(1, "google locked us out; waiting.")
             sys.exit(0)
         else:
             os.remove(LOCKFILE)
