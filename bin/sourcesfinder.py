@@ -158,7 +158,7 @@ class SourcesFinder:
         '/portal/en/',  # PURE
         'wikipedia.', 'wikivisually.', 'wikivividly.',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
-        'philx.org',
+        'philx.org', 'philpeople.',
         'ratemyprofessors.', 
         'amazon.', 'twitter.', 'goodreads.', 'pinterest.com', 'ebay.',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
