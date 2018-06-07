@@ -206,7 +206,7 @@ def scrape(source, keep_tempfiles=False):
                 # thousands of links; we don't want to process them all
                 # before we finally remove the page.
                 debug(1, '*** ignoring new link to %s on %s ***', li.url, source.url)
-                return li.update_db(status=1, doc_id=None)
+                li.update_db(status=1, doc_id=None)
     
     else:
         debug(1, "no new links")
