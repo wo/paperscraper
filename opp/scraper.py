@@ -426,20 +426,18 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
                 dupe.filehash = doc.filehash
                 dupe.update_db()
             return 0
-    
-        # ignore old and published paper:
+        
+        # ignore old published papers:
         if paper_is_old(doc):
             li.update_db(status=1, doc_id=None)
-            debug(1, "ignoring already published paper")
-            return 0
-
-        # flag for manual approval if confidence low or dubious relevance:
-        if doc.is_paper < 60 or doc.is_philosophy < 60 or doc.meta_confidence < 60:
-            debug(1, "flagging for manual approval")
-            doc.hidden = True
-
+            debug(1, "setting found_date of published paper to 1970")
+            doc.found_date = datetime(1970, 1, 1)
+            # Why store these docs in the first place? Mainly so that
+            # we can use the number of docs associated with a page as
+            # indicator of whether it's a source page.
+        
         # don't show papers from newly added source pages in news feed:
-        if not li.source.confirmed or li.source.status != 1:
+        elif not li.source.confirmed or li.source.status != 1:
             # We check the status because a page might be new and yet
             # (a) confirmed because added manually, and (b) have a
             # last_checked date because it was already fetched once
@@ -449,7 +447,12 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
             # new papers that have been added while a page was down.)
             debug(2, "new source page: setting found_date to 1970")
             doc.found_date = datetime(1970, 1, 1)
-    
+        
+        # flag for manual approval if confidence low or dubious relevance:
+        elif doc.is_paper < 60 or doc.is_philosophy < 60 or doc.meta_confidence < 60:
+            debug(1, "flagging for manual approval")
+            doc.hidden = True
+
     # make sure doc fits in db:
     if len(doc.title) > 255:
         doc.title = doc.title[:251]+'...'
@@ -459,9 +462,9 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
     doc.update_db()
     li.update_db(status=1, doc_id=doc.doc_id)
 
-    # categorize, but only if doc has more than 1000 words --
-    # otherwise categorization is pretty random:
-    if doc.numwords > 700:
+    # categorize, but only if doc is reasonably long -- otherwise
+    # categorization is pretty random:
+    if doc.found_date > datetime(1970, 1, 1) and doc.numwords > 700:
         for (cat_id, cat) in categories():
             clf = classifier.get_classifier(cat)
             try:
