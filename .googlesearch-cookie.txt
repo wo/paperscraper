@@ -1,0 +1,11 @@
+# Netscape HTTP Cookie File
+# http://curl.haxx.se/rfc/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+.google.com	TRUE	/	FALSE	1531579132	1P_JAR	2018-06-14-14
+.google.com	TRUE	/	FALSE	1544798332	NID	132=ZGY9FcOVq6S3yD2BfSrbXf2V83gXZa1p9RjsQSWj5d0pmK5CyecnN6m7i8rE7NfhRYpy_AewDbvxZPh2aaIPw-q-cVxxNvvdrHKlkIE1YL8z9YvYKIRoeCy0Su0C7TdS
+.google.com	TRUE	/complete/search	FALSE	1544765608	CGIC	
+.google.com	TRUE	/search	FALSE	1544765608	CGIC	
+.mozilla.org	TRUE	/	FALSE	1592058662	_ga	GA1.2.482138165.1528986612
+.mozilla.org	TRUE	/	FALSE	1528987138	_gat	1
+.mozilla.org	TRUE	/	FALSE	1529073062	_gid	GA1.2.1087470115.1528986612
