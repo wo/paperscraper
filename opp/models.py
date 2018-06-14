@@ -263,8 +263,8 @@ class Source(Webpage):
         lambda s: len(s.pdflinks),
         p=(
             (0, .15, .7), # 0 links: probability .15 if yes, .7 if no
-            (1, .18, .8), # 0-1 links
-            (3, .25, .88), # 0-3 links
+            (1, .25, .8), # 0-1 links
+            (3, .35, .88), # 0-3 links
             (10, .6, .91), # 0-10
             (100, .98, .95), # 0-100
         ))
@@ -280,7 +280,7 @@ class Source(Webpage):
 
     issource_classifier.likelihood(
         "publication status keywords",
-        lambda s: sum(s.textlower.count(w) for w in ('forthcoming', 'draft', 'in progress', 'preprint')),
+        lambda s: sum(s.textlower.count(w) for w in ('forthcoming', 'draft', 'in progress', 'preprint', 'penultimate')),
         p=(
             (0, .3, .8),
             (1, .4, .86),
@@ -327,8 +327,8 @@ class Source(Webpage):
         lambda s: sum(s.textlower.count(w) for w in ('permalink', 'comment', 'recent posts', 'archives')),
         p=(
             (0, .9, .7), # 0 keywords
-            (2, .95, .8), # 0-2
-            (4, .98, .88), # 0-4
+            (3, .95, .8), # 0-3
+            (7, .98, .88), # 0-7
         ))
 
     issource_classifier.likelihood(
@@ -349,7 +349,7 @@ class Source(Webpage):
     issource_classifier.likelihood(
         "author name in url",
         lambda s: s.default_author.split()[-1].lower() in s.url.lower(),
-        p_ifyes=0.7, p_ifno=0.1)
+        p_ifyes=0.7, p_ifno=0.15)
 
     # The following tests presuppose that we have scraped the page.
     
