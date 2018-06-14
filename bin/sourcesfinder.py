@@ -49,7 +49,9 @@ class SourcesFinder:
         debug(1, "\nsearching source pages for %s", name)
         stored_publications = Source.get_stored_publications(name)
         pages = set()
-        search_terms = ['"{}"'.format(name)]
+        search_terms = [
+            '"{}"'.format(name),
+        ]
         # We vary the query to hide we're a bot and give us better
         # chances of finding a source page after several tries.
         if len(stored_publications) > 1 and randint(0,1) == 0:
@@ -58,32 +60,15 @@ class SourcesFinder:
                 search_terms.append('"{}"'.format(title3words))
         else:
             search_terms.append('~philosophy')
-            more_terms = [
-                '(publications OR articles OR papers OR "in progress" OR forthcoming)',
-                '(publications OR articles OR forthcoming)',
-                '(publications OR articles OR "in progress" OR forthcoming)'
-            ]
-            search_terms.append(more_terms[randint(0,2)])
-        random_more_terms = [
-            # careful: -site:google.com blocks sites.google.com...
-            '-filetype:pdf',
-            '-site:philpapers.org',
-            '-site:wikipedia.org',
-            '-site:academia.edu',
-        ]
-        for term in random_more_terms:
-            if randint(0,2) != 0:
-                search_terms.append(term)
+            search_terms.append('(publications OR articles OR papers OR "in progress" OR forthcoming)')
+        search_terms.append('-filetype:pdf')
         search_phrase = ' '.join(search_terms)
         debug(2, search_phrase)
         # vary interval between searches to hide that we're a bot:
-        sleeptime = randint(0,100)
-        debug(2, "waiting for %s seconds", sleeptime)
-        time.sleep(sleeptime)
         try:
             searchresults = googlesearch.search(search_phrase)
         except Exception as e:
-            debug(1, "Ooops. Looks like google caught us. Creating lock file to enforce break.")
+            debug(1, "Ooops. Looks like google caught us. Creating {} to enforce break.".format(LOCKFILE))
             Path(LOCKFILE).touch()
             raise
             
