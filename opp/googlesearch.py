@@ -5,8 +5,8 @@ from urllib.parse import quote_plus, parse_qs, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 #from http.cookiejar import LWPCookieJar
-from http.cookiejar import MozillaCookieJar
-from bs4 import BeautifulSoup
+#from http.cookiejar import MozillaCookieJar
+#from bs4 import BeautifulSoup
 try:
     from .debug import debug, debuglevel
 except SystemError:
@@ -18,7 +18,17 @@ except SystemError:
     sys.path.insert(0, libpath)
     from opp.debug import debug, debuglevel
 
+from googleapiclient.discovery import build
+
+GOOGLE_API_KEY = config['google_api_key']
+GOOGLE_CSE_ID = config['google_cse_id']
+
 def search(query):
+    service = build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
+    res = service.cse().list(q=query, cx=GOOGLE_CSE_ID, num=10).execute()
+    return [i['formattedUrl'] for i in res['items']]
+
+def old_search(query):
     """
     Search <query> on google
     """
@@ -98,6 +108,6 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     urls = search(args.query)
-    for url in urls:
-        print(url)
-        
+    for result in urls:
+        print(result)
+    
