@@ -4,7 +4,8 @@ import time
 from urllib.parse import quote_plus, parse_qs, urlparse
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
-from http.cookiejar import LWPCookieJar
+#from http.cookiejar import LWPCookieJar
+from http.cookiejar import MozillaCookieJar
 from bs4 import BeautifulSoup
 try:
     from .debug import debug, debuglevel
@@ -75,8 +76,8 @@ def get_page(url):
 
 def get_cookie_jar():
     """returns cookie jar"""
-    COOKIE_JAR_FILE = '.googlesearch-cookie'
-    cookie_jar = LWPCookieJar(COOKIE_JAR_FILE)
+    COOKIE_JAR_FILE = '.googlesearch-cookie.txt'
+    cookie_jar = MozillaCookieJar(COOKIE_JAR_FILE)
     cookie_jar.load()
     return cookie_jar
 
