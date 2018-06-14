@@ -26,8 +26,13 @@ GOOGLE_CSE_ID = config['google_cse_id']
 def search(query):
     service = build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
     res = service.cse().list(q=query, cx=GOOGLE_CSE_ID, num=10).execute()
-    return [i['formattedUrl'] for i in res['items']]
-
+    import pprint
+    #pprint.pprint(res)
+    if res['searchInformation']['totalResults'] != '0':
+        return [i['link'] for i in res['items']]
+    else:
+        return []
+    
 def old_search(query):
     """
     Search <query> on google
