@@ -51,76 +51,95 @@ class SourcesFinder:
         pages = set()
         search_terms = [
             '"{}"'.format(name),
+            '~philosophy',
+            '(publications OR articles OR papers OR "in progress" OR forthcoming)',
+            '-filetype:pdf'
         ]
-        # We vary the query to hide we're a bot and give us better
-        # chances of finding a source page after several tries.
-        if len(stored_publications) > 1 and randint(0,1) == 0:
-            for title in stored_publications[:2]:
-                title3words = ' '.join(title.split()[:3])
-                search_terms.append('"{}"'.format(title3words))
-        else:
-            search_terms.append('~philosophy')
-            search_terms.append('(publications OR articles OR papers OR "in progress" OR forthcoming)')
-        search_terms.append('-filetype:pdf')
         search_phrase = ' '.join(search_terms)
         debug(2, search_phrase)
-        # vary interval between searches to hide that we're a bot:
         try:
             searchresults = googlesearch.search(search_phrase)
         except Exception as e:
             debug(1, "Ooops. Looks like google caught us. Creating {} to enforce break.".format(LOCKFILE))
             Path(LOCKFILE).touch()
             raise
-            
-        # search full name first, then last name only:
-        #searchresults = set(googlesearch.search(search_phrase))
-        #search_phrase = '"{}" '.format(name.split()[-1]) + ' '.join(search_terms)
-        #searchresults |= set(googlesearch.search(search_phrase))
+
+        num_hits = 0
         for url in searchresults:
-            debug(1, '\n'+url)
-            url = util.normalize_url(url)
-            if self.bad_url(url):
-                debug(1, "bad url")
-                continue
-            # check if url is already known:
-            cur = db.cursor()
-            cur.execute("SELECT 1 FROM sources WHERE url = %s", (url,))
-            rows = cur.fetchall()
-            if rows:
-                debug(1, "url already known")
-                continue
+            num_hits += self.check_page(url, name, stored_publications)
+
+        if num_hits == 0 and len(stored_publications) > 1:
+            debug(2, "no hits, trying different query")
+            search_terms = [
+                name.split()[-1], # surname only
+                '-filetype:pdf',
+            ]
+            for title in stored_publications[:2]:
+                title3words = ' '.join(title.split()[:3])
+                search_terms.append('"{}"'.format(title3words))
+            search_phrase = ' '.join(search_terms)
+            debug(2, search_phrase)
             try:
-                status, r = util.request_url(url)
-                if status != 200:
-                    raise Exception('status {}'.format(status))
+                newresults = googlesearch.search(search_phrase)
             except Exception as e:
-                debug(1, "cannot retrieve url %s (%s)", url, e)
-                continue
-            source = Source(
-                url=url,
-                default_author=name,
-                name="{}'s site".format(name),
-                html=r.text
-            )
-            source.compute_p_is_source(stored_publications=stored_publications)
-            if source.is_source < 75:
-                debug(1, "doesn't look like a papers page")
-                continue
-            for dupe in source.get_duplicates():
-                # Now what? Sometimes the present URL is the
-                # correct new URL to use (e.g., everything is
-                # moving to 'https'). Other times the variants are
-                # equally valid. In neither case does it probably
-                # hurt to overwrite the old URL.
-                debug(1, "duplicate of already known %s", dupe.url)
-                debug(1, "changing url of source %s to %s", dupe.source_id, url)
-                dupe.update_db(url=url)
-                break
-            else:
-                debug(1, "new papers page!")                
-                source.save_to_db()
+                debug(1, "Ooops. Looks like google caught us. Creating {} to enforce break.".format(LOCKFILE))
+                Path(LOCKFILE).touch()
+                raise
+            
+            for url in [u for u in newresults if u not in searchresults]:
+                self.check_page(url, name, stored_publications)
+
         self.update_author(name)
 
+                
+    def check_page(self, url, name, stored_publications):
+        """check if <url> is a plausible source page, return 1 if yes, 0 if no"""
+        debug(1, '\n'+url)
+        url = util.normalize_url(url)
+        if self.bad_url(url):
+            debug(1, "bad url")
+            return 0
+        # check if url is already known:
+        cur = db.cursor()
+        cur.execute("SELECT * FROM sources WHERE url = %s LIMIT 1", (url,))
+        rows = cur.fetchall()
+        if rows:
+            debug(1, "url already known")
+            if (rows[0]['status'] == 1 and rows[0]['default_author'].split()[-1] == name.split()[-1]):
+                return 1
+            return 0
+        try:
+            status, r = util.request_url(url)
+            if status != 200:
+                raise Exception('status {}'.format(status))
+        except Exception as e:
+            debug(1, "cannot retrieve url %s (%s)", url, e)
+            return 0
+        source = Source(
+            url=url,
+            default_author=name,
+            name="{}'s site".format(name),
+            html=r.text
+        )
+        source.compute_p_is_source(stored_publications=stored_publications)
+        if source.is_source < 75:
+            debug(1, "doesn't look like a papers page")
+            return 0
+        for dupe in source.get_duplicates():
+            # Now what? Sometimes the present URL is the
+            # correct new URL to use (e.g., everything is
+            # moving to 'https'). Other times the variants are
+            # equally valid. In neither case does it probably
+            # hurt to overwrite the old URL.
+            debug(1, "duplicate of already known %s", dupe.url)
+            debug(1, "changing url of source %s to %s", dupe.source_id, url)
+            dupe.update_db(url=url)
+            return 1
+        else:
+            debug(1, "new papers page!")                
+            source.save_to_db()
+            return 1
+        
     def bad_url(self, url):
         """returns True if url is too long or contains blacklisted part"""
         if len(url) > 255:

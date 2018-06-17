@@ -11,8 +11,7 @@ logger = logging.getLogger('opp')
 _browser = None
 
 # use only one instance:
-def Browser(use_virtual_display=False, reuse_browser=True):
-    # FIXME: arguments are ignored
+def Browser():
     global _browser
     if not _browser:
         try:
@@ -20,7 +19,7 @@ def Browser(use_virtual_display=False, reuse_browser=True):
         except Exception as e:
             logger.debug('failed to start browser: %s', e)
             stop_browser(use_force=True)
-            logger.debug('retrying')
+            logger.debug('waiting then retrying')
             time.sleep(100)
             _browser = ActualBrowser()
     return _browser
@@ -36,7 +35,6 @@ def stop_browser(use_force=False):
             _browser.quit()
         except Exception as e:
             logger.debug(e)
-        del _browser
         _browser = None
     if use_force:
         logger.info('killing all firefox processes!')

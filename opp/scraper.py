@@ -28,7 +28,7 @@ def next_source():
     
     # First priority: process newly found pages so that we can better
     # decide whether they're genuine source pages or not. (We don't
-    # restrict to confirmed = 0 so that we also catch manually added
+    # restrict to confirmed == 0 so that we also catch manually added
     # and thus already confirmed pages.)
     cur = db.dict_cursor()
     query = ("SELECT * FROM sources WHERE"
