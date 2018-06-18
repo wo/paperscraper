@@ -124,7 +124,7 @@ def scrape(source, keep_tempfiles=False):
     debug(1, "checking links on %s", source.url)
 
     # go to page:
-    browser = Browser(use_virtual_display=True)
+    browser = Browser()
     try:
         browser.goto(source.url)
     except Exception as e:
