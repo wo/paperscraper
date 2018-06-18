@@ -100,7 +100,7 @@ class SourcesFinder:
             debug(1, "bad url")
             return 0
         # check if url is already known:
-        cur = db.cursor()
+        cur = db.dict_cursor()
         cur.execute("SELECT * FROM sources WHERE url = %s LIMIT 1", (url,))
         rows = cur.fetchall()
         if rows:
