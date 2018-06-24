@@ -105,7 +105,9 @@ class SourcesFinder:
         rows = cur.fetchall()
         if rows:
             debug(1, "url already known")
-            if (rows[0]['status'] == 1 and rows[0]['default_author'].split()[-1] == name.split()[-1]):
+            if (rows[0]['status'] == 1 and
+                rows[0]['default_author'] and
+                rows[0]['default_author'].split()[-1] == name.split()[-1]):
                 return 1
             return 0
         try:
