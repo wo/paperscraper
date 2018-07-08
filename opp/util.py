@@ -93,12 +93,9 @@ def request_filetype(r):
 def meta_redirect(r):
     """read redirect url from meta tags"""
     if r.filetype == 'html':
-        print(2)
         html_tree = html.fromstring(r.text)
         attr = html_tree.xpath("//meta[translate(@http-equiv, 'REFSH', 'refsh') = 'refresh']/@content")[0]
         wait, text = attr.split(";")
-        print(text)
-        print(text.strip())
         if text.strip().lower().startswith("url="):
             r.redirect_url = text[4:]
             if not r.redirect_url.startswith('http'):
