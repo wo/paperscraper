@@ -3,7 +3,7 @@ import re
 import time
 import requests
 from lxml import html
-from urlparse import urljoin
+from urllib.parse import urljoin
 import magic
 import mimetypes
 from opp import error
