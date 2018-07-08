@@ -4,8 +4,6 @@ import time
 import requests
 from lxml import html
 from urllib.parse import urljoin
-import magic
-import mimetypes
 from opp import error
 
 def normalize_url(url):
