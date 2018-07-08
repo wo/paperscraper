@@ -96,7 +96,7 @@ def meta_redirect(r):
         html_tree = html.fromstring(r.text)
         attr = html_tree.xpath("//meta[translate(@http-equiv, 'REFSH', 'refsh') = 'refresh']/@content")[0]
         wait, text = attr.split(";")
-        if text.lower().startswith("url="):
+        if text.strip().lower().startswith("url="):
             r.redirect_url = text[4:]
             if not url.startswith('http'):
                 # Relative URL, adapt
