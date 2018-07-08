@@ -62,6 +62,7 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
     except requests.exceptions.RequestException as e:
         return 900, None
     except Exception:
+        #raise
         return 900, None
 
 def request_filetype(r):
@@ -93,9 +94,12 @@ def request_filetype(r):
 def meta_redirect(r):
     """read redirect url from meta tags"""
     if r.filetype == 'html':
+        print(2)
         html_tree = html.fromstring(r.text)
         attr = html_tree.xpath("//meta[translate(@http-equiv, 'REFSH', 'refsh') = 'refresh']/@content")[0]
         wait, text = attr.split(";")
+        print(text)
+        print(text.strip())
         if text.strip().lower().startswith("url="):
             r.redirect_url = text[4:]
             if not url.startswith('http'):
