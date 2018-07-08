@@ -2,14 +2,18 @@
 import re
 import time
 import requests
+from lxml import html
+from urlparse import urljoin
+import magic
+import mimetypes
 from opp import error
 
 def normalize_url(url):
     url = url.split('#')[0]
     """normalize ~ vs %7e etc. and strip local anchors #foo"""
     return requests.utils.requote_uri(url)
-      
-def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=10000000):
+
+def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=10000000, maxredirects=5):
     """
     fetches url, returns (status, response_object), where
     response_object has an additional 'filetype' field
@@ -45,6 +49,13 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
         if r.status_code == 200:
             r._content = content
             r.filetype = request_filetype(r)
+            if meta_redirect(r) and maxredirects > 0:
+                return request_url(r.redirect_url,
+                                   if_modified_since=if_modified_since,
+                                   etag=etag,
+                                   timeout=timeout,
+                                   maxsize=maxsize,
+                                   maxredirects=maxredirects-1)
         return r.status_code, r
     except requests.exceptions.Timeout:
         return 408, None
@@ -80,6 +91,20 @@ def request_filetype(r):
         return normalize(m.group(1))
     else:
         return 'unknown'
+
+def meta_redirect(r):
+    """read redirect url from meta tags"""
+    if r.filetype == 'html':
+        html_tree = html.fromstring(r.text)
+        attr = html_tree.xpath("//meta[translate(@http-equiv, 'REFSH', 'refsh') = 'refresh']/@content")[0]
+        wait, text = attr.split(";")
+        if text.lower().startswith("url="):
+            r.redirect_url = text[4:]
+            if not url.startswith('http'):
+                # Relative URL, adapt
+                r.redirect_url = urljoin(r.url, url)
+            return True
+    return False
 
 def strip_tags(text, keep_italics=False):
     # simplistic function to strip tags from tagsoup and possibly keep
