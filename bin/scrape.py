@@ -29,7 +29,7 @@ if not sources:
 source = scraper.Source(**sources[0])
 
 if args.link:
-    b = scraper.Browser(use_virtual_display=True)
+    b = scraper.Browser()
     b.goto(source.url)
     source.set_html(b.page_source)
     try:
