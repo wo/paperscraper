@@ -62,7 +62,6 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
     except requests.exceptions.RequestException as e:
         return 900, None
     except Exception:
-        #raise
         return 900, None
 
 def request_filetype(r):
@@ -102,9 +101,9 @@ def meta_redirect(r):
         print(text.strip())
         if text.strip().lower().startswith("url="):
             r.redirect_url = text[4:]
-            if not url.startswith('http'):
+            if not r.redirect_url.startswith('http'):
                 # Relative URL, adapt
-                r.redirect_url = urljoin(r.url, url)
+                r.redirect_url = urljoin(r.url, r.redirect_url)
             return True
     return False
 
