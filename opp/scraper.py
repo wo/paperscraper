@@ -566,8 +566,8 @@ def check_steppingstone(page):
         (re.compile('(https?://www.plosone.org/article/.+?representation=PDF)" id="downloadPdf"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # Google Drive:
-        (re.compile('content="https://drive.google.com/file/d/(.+?)/'),
-        (lambda m: 'https://googledrive.com/host/{}'.format(requests.utils.unquote(m.group(1)))))
+        #(re.compile('content="https://drive.google.com/file/d/(.+?)/'),
+        #(lambda m: 'https://googledrive.com/host/{}'.format(requests.utils.unquote(m.group(1)))))
     ]
     for (pattern, retr_target) in redir_patterns:
         m = pattern.search(page.html)
