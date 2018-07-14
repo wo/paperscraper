@@ -165,7 +165,7 @@ class SourcesFinder:
         'wikipedia.', 'wikivisually.', 'wikivividly.',
         'researchgate.net', 'scholar.google', 'books.google', 'philpapers.',
         'philx.org', 'philpeople.',
-        'ratemyprofessors.', 
+        'ratemyprofessors.', '3ammagazine', 
         'amazon.', 'twitter.', 'goodreads.', 'pinterest.com', 'ebay.',
         'dailynous.com', 'ipfs.io/', 'philostv.com', 'opp.weatherson',
         'typepad.com/blog/20', 'm-phi.blogspot.de',
