@@ -94,7 +94,7 @@ class Source(Webpage):
         """
         extracts links from source page; sets self.new_links and
         self.old_links, both lists of Link objects. An "old link" is a
-        link currently on the page that's aleardy in the database. A
+        link currently on the page that's already in the database. A
         "new link" is not yet in the database.
         """
         self.new_links = []
@@ -164,7 +164,7 @@ class Source(Webpage):
 
     def old_link(self, url):
         """
-        If a link to (a session variant of) url is already known on this
+        If a link to (a trivial variant of) <url> is already known on this
         page (as stored in the database), returns the stored Link,
         otherwise returns None.
         """
@@ -180,6 +180,14 @@ class Source(Webpage):
             if li.url == url:
                 return li
 
+        # ignore https vs http, www vs non-www and trailing slashes:
+        urlfrag = url.split('//', 2)[1].replace('www.', '').rstrip('/')
+        for li in self._links:
+            if li.url.split('//', 2)[1].replace('www.', '').rstrip('/') == url:
+                li.update_db(url=url)
+                return li
+
+        # ignore session variants:
         s_url = self.strip_session_variables(url)
         if s_url != url:
             for li in self._links:
