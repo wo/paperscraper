@@ -174,7 +174,7 @@ class Source(Webpage):
             cur.execute(query, (self.source_id,))
             debug(5, cur._last_executed)
             self._links = [ Link(source=self, **li) for li in cur.fetchall() ]
-            #debug(2, 'xxx old links:\n%s', '\n'.join([li.url for li in self._links]))
+            debug(2, 'xxx old links:\n%s', '\n'.join([li.url for li in self._links]))
 
         for li in self._links:
             if li.url == url:
@@ -182,7 +182,9 @@ class Source(Webpage):
 
         # ignore https vs http, www vs non-www and trailing slashes:
         urlfrag = url.split('//', 2)[1].replace('www.', '').rstrip('/')
+        debug(2, 'xxx urlfrag {}'.format(urlfrag))
         for li in self._links:
+            debug(2, 'xxx urlfrag li {}'.format(li.url.split('//', 2)[1].replace('www.', '').rstrip('/')))
             if li.url.split('//', 2)[1].replace('www.', '').rstrip('/') == url:
                 li.update_db(url=url)
                 return li
