@@ -76,10 +76,15 @@ class ActualBrowser(webdriver.Firefox):
             self.get(url)
         except WebDriverException as e:
             if 'Tried to run command without establishing a connection' in e.msg:
-                # no working browser instance
+                # no working browser instance; unfortunately we can't
+                # simply restart the browser because this would
+                # destroy self. But we kill all running browsers which
+                # should make sure a restart happens.
                 try:
                     stop_browser()
                     kill_all_browsers()
+                except Exception:
+                    pass
                 self.status = 906
                 raise PageLoadException(e.msg)
             if 'about:neterror' in e.msg:
