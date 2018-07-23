@@ -75,6 +75,13 @@ class ActualBrowser(webdriver.Firefox):
         try:
             self.get(url)
         except WebDriverException as e:
+            if 'Tried to run command without establishing a connection' in e.msg:
+                # no working browser instance
+                try:
+                    stop_browser()
+                    kill_all_browsers()
+                self.status = 906
+                raise PageLoadException(e.msg)
             if 'about:neterror' in e.msg:
                 # happens e.g. when selenium has no internet access
                 self.status = 905

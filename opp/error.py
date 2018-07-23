@@ -105,6 +105,7 @@ message = {
     903: 'document too large',
     904: 'cannot parse document',
     905: 'cannot connect to server',
+    906: 'browsers seems dead',
 
     
 }
