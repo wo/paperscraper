@@ -2,49 +2,55 @@
 import pytest
 import logging
 import os.path
+import time
 import sys
 import subprocess
-from opp.browser import Browser
-
-VDISPLAY = False
+from opp.browser import Browser, stop_browser
+from opp.exceptions import PageLoadException
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'sourcepages')
 
+def test_startstop(caplog):
+    num_browsers1 = count_processes('firefox-bin')
+    caplog.setLevel(logging.CRITICAL, logger='selenium')
+    caplog.setLevel(logging.DEBUG, logger='opp')
+    b = Browser()
+    time.sleep(1)
+    stop_browser()
+    b2 = Browser()
+    time.sleep(1)
+    stop_browser()
+    num_browsers2 = count_processes('firefox-bin')
+    assert num_browsers1 == num_browsers2
+
 def test_status(caplog):
     caplog.setLevel(logging.CRITICAL, logger='selenium')
     caplog.setLevel(logging.DEBUG, logger='opp')
-    b = Browser(use_virtual_display=VDISPLAY)
+    b = Browser()
     src = 'file://'+testdir+'/umsu.html'
     b.goto(src)
     assert b.status == 200
     src = 'file://'+testdir+'/xxx.html'
-    b.goto(src)
-    assert b.status == 404
-    del b
+    try:
+        b.goto(src)
+    except PageLoadException:
+        assert b.status != 200
+    stop_browser()
 
 def test_reuse(caplog):
     caplog.setLevel(logging.CRITICAL, logger='selenium')
     caplog.setLevel(logging.DEBUG, logger='opp')
-    b1 = Browser(reuse_browser=True, use_virtual_display=VDISPLAY)
+    b1 = Browser()
     src = 'file://'+testdir+'/umsu.html'
     b1.goto(src)
-    b2 = Browser(reuse_browser=True, use_virtual_display=VDISPLAY)
+    b2 = Browser()
     b2.goto(src)
     assert b1 == b2
-    del b1
-    del b2
+    stop_browser()
 
-def test_xvfb(caplog):
-    caplog.setLevel(logging.CRITICAL, logger='selenium')
-    caplog.setLevel(logging.DEBUG, logger='opp')
-    b = Browser(use_virtual_display=True)
-    src = 'file://'+testdir+'/umsu.html'
-    b.goto(src)
-    del b
+def count_processes(procname):
     ps = subprocess.Popen(('ps', 'aux'), stdout=subprocess.PIPE)
     output = ps.communicate()[0]
-    for line in output.decode('ascii').split('\n'):
-        assert 'Xfvb' not in line
-
-
+    pslines = output.decode('utf8').split('\n')
+    return sum(1 for line in pslines if procname in line)

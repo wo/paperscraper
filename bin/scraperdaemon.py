@@ -49,19 +49,20 @@ class ScraperDaemon(Daemon):
                 pause_secs = 10 if source else 60
                 for sec in range(pause_secs):
                     if killer.kill_now:
-                        self.stop()
+                        browser.stop_browser()
                         return
                     time.sleep(1)
             # occasionally restart browser and check for blog posts:
             blogpostprocessor.run()
             browser.stop_browser()
+            browser.kill_all_browsers()
             
     def stop(self):
         print("stopping...")
-        browser.stop_browser()
-        time.sleep(.5)
+        # browser.stop_browser() doesn't work here because the daemon
+        # doesn't have access to the relevant _browser instance; but
+        # the function will be called in run() via killer.
         super().stop()
-
 
 if __name__ == "__main__":
 

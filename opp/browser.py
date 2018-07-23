@@ -21,13 +21,14 @@ def Browser():
             _browser = ActualBrowser()
         except Exception as e:
             logger.debug('failed to start browser: %s', e)
-            stop_browser(use_force=True)
+            stop_browser()
+            kill_all_browsers()
             logger.debug('waiting then retrying')
             time.sleep(100)
             _browser = ActualBrowser()
     return _browser
 
-def stop_browser(use_force=False):
+def stop_browser():
     '''quit current _browser if running'''
     global _browser
     if not _browser:
@@ -39,14 +40,15 @@ def stop_browser(use_force=False):
         except Exception as e:
             logger.debug(e)
         _browser = None
-    if use_force:
-        logger.info('killing all firefox processes!')
-        try: 
-            os.system('killall -9 firefox-bin')
-            os.system('killall -9 geckodriver')
-        except Exception as e:
-            logger.debug(e)
-        
+
+def kill_all_browsers():
+    logger.info('killing all firefox processes!')
+    try: 
+        os.system('killall -9 firefox-bin')
+        os.system('killall -9 geckodriver')
+    except Exception as e:
+        logger.debug(e)
+ 
 class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
