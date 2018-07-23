@@ -5,6 +5,9 @@ import logging
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.common.exceptions import *
+from opp.util import get_http_status
+from opp.exceptions import PageLoadException
 
 logger = logging.getLogger('opp')
 
@@ -58,20 +61,36 @@ class ActualBrowser(webdriver.Firefox):
                          log_path='/tmp/selenium.log')
 
     def goto(self, url, timeout=10):
-        """sends browser to url, sets (guessed) status code"""
+        """
+        sends browser to <url>, sets self.status to (guessed) HTTP status
+   
+        This function attempts to throw a PageLoadException whenever
+        <url> can't be loaded, i.e. whenever self.status is not 200 or
+        301.
+        """
         self.status = 900
         self.set_page_load_timeout(timeout)
-        self.get(url)
+        try:
+            self.get(url)
+        except WebDriverException as e:
+            if 'about:neterror' in e.msg:
+                # happens e.g. when selenium has no internet access
+                self.status = 905
+                raise PageLoadException(e.msg)
+            print("xxx uncaught webdriver exception: {}".format(e.msg))
+            self.status = get_http_status(url)
+            raise PageLoadException(e.msg)
         self.status = 200
-        # check for errors:
-        if "not found" in self.title.lower():
-            self.status = 404
+        # selenium doesn't raise exceptions for 404/500/etc. errors,
+        # so we need to catch these manually:
         try:
             ff_error = self.find_element_by_id('errorTitleText')
-            if 'not found' in ff_error.text:
-                self.status = 404
         except Exception:
-            pass
+            ff_error = None
+        if ff_error or "not found" in self.title.lower():
+            self.status = get_http_status(self.current_url)
+            if self.status != 200:
+                raise PageLoadException('HTTP status {}'.format(self.status))
         if self.current_url != url:
             self.status = 301
 

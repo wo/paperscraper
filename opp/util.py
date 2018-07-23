@@ -29,7 +29,7 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
     try:
         # using stream to respect maxsize and load timeouts, see
         # http://stackoverflow.com/questions/22346158/
-        r = requests.get(url, headers=headers, timeout=10, stream=True)
+        r = requests.get(url, headers=headers, timeout=timeout, stream=True)
         if int(r.headers.get('Content-Length', 0)) > maxsize:
             return 903, None
         size = 0
@@ -60,8 +60,10 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
     except requests.exceptions.TooManyRedirects:
         return 902, None
     except requests.exceptions.RequestException as e:
-        return 900, None
+        print('requests connection failed: {}'.formate(e))
+        return 905, None
     except Exception as e:
+        print('uncaught requests exception: {}'.formate(e))
         print(e)
         # raise?
         return 900, None
@@ -108,6 +110,28 @@ def meta_redirect(r):
                 r.redirect_url = urljoin(r.url, r.redirect_url)
             return True
     return False
+
+def get_http_status(url, timeout=10):
+    """returns http status from <url>"""
+    headers = {
+        # Emulate a web browser profile:
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:37.0) Gecko/20100101 Firefox/37.0',
+        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'accept-language': 'en-US,en;q=0.5'
+    }
+    try:
+        # using stream to respect maxsize and load timeouts, see
+        # http://stackoverflow.com/questions/22346158/
+        r = requests.get(url, headers=headers, timeout=timeout, stream=True)
+        r.close()
+        return r.status_code
+    except requests.exceptions.Timeout:
+        return 408
+    except requests.exceptions.TooManyRedirects:
+        return 902
+    except Exception as e:
+        print('uncaught requests exception: {}'.formate(e))
+        return 900
 
 def strip_tags(text, keep_italics=False):
     # simplistic function to strip tags from tagsoup and possibly keep

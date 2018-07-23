@@ -96,14 +96,17 @@ message = {
     505: 'HTTP Version Not Supported',
     507: 'Insufficient Storage',
 
-    800: 'broken feed',
     
-    900: 'connection failed',
+    800: 'broken feed',
+
+    900: 'unknown browser error',
     901: 'document is empty',
     902: 'too many redirects',
     903: 'document too large',
     904: 'cannot parse document',
+    905: 'cannot connect to server',
 
+    
 }
 
 #code = defaultdict(lambda x: 99, { v:k for k,v in message.items() })

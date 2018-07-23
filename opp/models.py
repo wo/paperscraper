@@ -63,7 +63,7 @@ class Source(Webpage):
         """write <statuscode> to db or delete page if previously has same status"""
         if not self.source_id:
             return
-        if self.status == statuscode and statuscode != 900:
+        if self.status == statuscode and statuscode < 900:
             debug(1, 'source repeatedly found with status {}; removing from db'.format(statuscode))
             cur = db.cursor()
             query = "DELETE FROM sources WHERE source_id = %s"

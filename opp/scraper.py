@@ -129,7 +129,7 @@ def scrape(source, keep_tempfiles=False):
         browser.goto(source.url)
     except Exception as e:
         debug(1, 'connection to source %s failed: %s', source.url, str(e))
-        source.mark_as_dead(browser.status or error.code['connection failed'])
+        source.mark_as_dead(browser.status or error.code['unknown browser error'])
         return 0
 
     if browser.current_url != source.url:
@@ -177,7 +177,7 @@ def scrape(source, keep_tempfiles=False):
     except WebDriverException as e:
         debug(1, 'webdriver error retrieving page source: %s', e)
         source.update_db(status=error.code['cannot parse document'])
-        return 0        
+        return 0 
 
     source.extract_links(browser)
     
@@ -185,15 +185,19 @@ def scrape(source, keep_tempfiles=False):
     # etc. error. If there are reasons to be suspicious, we get the
     # HTTP status through requests. Reasons to be suspicious are (1)
     # few known links on the page, (2) previous status > 9.
-    debug(1, 'old status {}, old links: {}'.format(source.status, len(source.old_links)))
-    if source.status > 1 or (source.last_checked and len(source.old_links) <= 1):
-        debug(1, 'suspicious, checking HTTP status code')
-        status, r = util.request_url(source.url)
-        if status != 200:
-            debug(1, 'error %s at source %s', status, source.url)
-            source.mark_as_dead(status)
-            return 0
-
+    #
+    #debug(1, 'old status {}, old links: {}'.format(source.status, len(source.old_links)))
+    #if source.status > 1 or (source.last_checked and len(source.old_links) <= 1):
+    #    debug(1, 'suspicious, checking HTTP status code')
+    #    status, r = util.request_url(source.url)
+    #    if status != 200:
+    #        debug(1, 'error %s at source %s', status, source.url)
+    #        source.mark_as_dead(status)
+    #        return 0
+    #
+    # This is currently disabled because browser.goto now tries to
+    # catch http errors.
+    
     # process new links:
     if source.new_links:
         for i,li in enumerate(source.new_links):

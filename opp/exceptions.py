@@ -1,4 +1,7 @@
 
+class PageLoadException(Exception):
+    pass
+
 class MalformedPDFError(Exception):
     pass
 

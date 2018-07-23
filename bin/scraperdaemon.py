@@ -26,7 +26,7 @@ class GracefulKiller:
         signal.signal(signal.SIGINT, self.exit_gracefully)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
-    def exit_gracefully(self,signum, frame):
+    def exit_gracefully(self, signum, frame):
         self.kill_now = True
 
 class ScraperDaemon(Daemon):
@@ -57,9 +57,9 @@ class ScraperDaemon(Daemon):
             browser.stop_browser()
             
     def stop(self):
-        print("hold on...")
+        print("stopping...")
         browser.stop_browser()
-        time.sleep(1)
+        time.sleep(.5)
         super().stop()
 
 
