@@ -129,9 +129,11 @@ def get_http_status(url, timeout=10):
         return 408
     except requests.exceptions.TooManyRedirects:
         return 902
+    except requests.exceptions.ConnectionError:
+        return 905
     except Exception as e:
-        print('uncaught requests exception: {}'.formate(e))
-        return 900
+        print('uncaught requests exception: {}'.format(e))
+        return 905
 
 def strip_tags(text, keep_italics=False):
     # simplistic function to strip tags from tagsoup and possibly keep

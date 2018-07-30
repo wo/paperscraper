@@ -75,6 +75,13 @@ class ActualBrowser(webdriver.Firefox):
         try:
             self.get(url)
         except WebDriverException as e:
+            if 'Timeout' in e.msg:
+                self.status = 408
+                raise PageLoadException(e.msg)
+            if 'about:neterror' in e.msg:
+                # happens e.g. when selenium has no internet access
+                self.status = 905
+                raise PageLoadException(e.msg)
             if 'Tried to run command without establishing a connection' in e.msg:
                 # no working browser instance; unfortunately we can't
                 # simply restart the browser because this would
@@ -87,12 +94,10 @@ class ActualBrowser(webdriver.Firefox):
                     pass
                 self.status = 906
                 raise PageLoadException(e.msg)
-            if 'about:neterror' in e.msg:
-                # happens e.g. when selenium has no internet access
-                self.status = 905
-                raise PageLoadException(e.msg)
             print("xxx uncaught webdriver exception: {}".format(e.msg))
             self.status = get_http_status(url)
+            if self.status == 200:
+                self.status = 900
             raise PageLoadException(e.msg)
         self.status = 200
         # selenium doesn't raise exceptions for 404/500/etc. errors,
