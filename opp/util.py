@@ -60,10 +60,10 @@ def request_url(url, if_modified_since=None, etag=None, timeout=10, maxsize=1000
     except requests.exceptions.TooManyRedirects:
         return 902, None
     except requests.exceptions.RequestException as e:
-        print('requests connection failed: {}'.formate(e))
+        print('requests connection failed: {}'.format(e))
         return 905, None
     except Exception as e:
-        print('uncaught requests exception: {}'.formate(e))
+        print('uncaught requests exception: {}'.format(e))
         print(e)
         # raise?
         return 900, None
