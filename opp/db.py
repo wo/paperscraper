@@ -20,13 +20,13 @@ def cursor(use_dict=False, retry=False):
     # not cached so we can reconnect if db connection is gone
     try:
         if use_dict:
-            cursor = connect().cursor(MySQLdb.cursors.DictCursor)
+            cur = connect().cursor(MySQLdb.cursors.DictCursor)
         else:
-            cursor = connect().cursor()
-            cursor.execute("SET NAMES utf8mb4")
-            cursor.execute("SET CHARACTER SET utf8mb4")
-            cursor.execute("SET character_set_connection=utf8mb4")
-        return cursor
+            cur = connect().cursor()
+            cur.execute("SET NAMES utf8mb4")
+            cur.execute("SET CHARACTER SET utf8mb4")
+            cur.execute("SET character_set_connection=utf8mb4")
+        return cur
     except:
         # Lost connection to MySQL server
         if not retry:
