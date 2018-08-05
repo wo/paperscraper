@@ -185,7 +185,8 @@ class Source(Webpage):
         #debug(2, 'xxx urlfrag {}'.format(urlfrag))
         for li in self._links:
             #debug(2, 'xxx urlfrag li {}'.format(li.url.split('//', 2)[1].replace('www.', '').rstrip('/')))
-            if li.url.split('//', 2)[1].replace('www.', '').rstrip('/') == url:
+            if li.url.split('//', 2)[1].replace('www.', '').rstrip('/') == urlfrag:
+                debug('{} is trivial variant of {}; updating url in db'.format(url, li.url))
                 li.update_db(url=url)
                 return li
 
