@@ -19,7 +19,8 @@ as a cron job) to find new source pages.
 '''
 
 LOCKFILE = '/tmp/sourcesfinder_wait.lk'
-GOOGLE_REST_TIME = 60*60*9 # wait 9 hours if google locked us out
+# GOOGLE_REST_TIME = 60*60*9 # wait 9 hours if google locked us out
+GOOGLE_REST_TIME = 60 
 
 class SourcesFinder:
 
