@@ -1,8 +1,8 @@
 #!/bin/bash
 
-/usr/bin/python3 /home/wo/opp-tools/bin/scraperdemon.py stop
+/usr/bin/python3 /home/wo/opp-tools/bin/scraperdaemon.py stop
 sleep 2m
-pkill -9 scraperdemon
+pkill -9 scraperdaemon
 killall firefox-bin
 killall geckodriver
 killall -9 firefox-bin
