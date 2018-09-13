@@ -7,4 +7,4 @@ killall firefox-bin
 killall geckodriver
 killall -9 firefox-bin
 killall -9 geckodriver
-
+/usr/bin/python3 /home/wo/opp-tools/bin/scraperdaemon.py start
