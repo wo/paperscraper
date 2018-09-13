@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 /usr/bin/python3 /home/wo/opp-tools/bin/scraperdemon.py stop
 sleep 2m
