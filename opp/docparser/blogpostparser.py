@@ -79,7 +79,7 @@ def find_content_element(el, best_el=None):
         if child._textlen < MIN_LENGTH:
             continue
         child._quality = quality(child)
-        if child._quality > 0 and (not best_el or child._quality > best_el._quality):
+        if child._quality > 0 and (best_el is None or child._quality > best_el._quality):
             best_el = child
         best_child = find_content_element(child, best_el=best_el)
         if best_child != best_el:
