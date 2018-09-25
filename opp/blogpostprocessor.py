@@ -75,6 +75,12 @@ def process_blogpost(doc):
 def remove_from_db(doc):
     cur = db.cursor()
     query = "DELETE FROM docs WHERE doc_id = %s"
-    cur.execute(query, (doc.doc_id,))
-    debug(4, cur._last_executed)
-    db.commit()
+    try:
+        cur.execute(query, (doc.doc_id,))
+        debug(4, cur._last_executed)
+        db.commit()
+    except:
+        # delete fails if blogpost url is a document that has also
+        # been found by the scraper, because then there'll be a Link
+        # to the doc.
+        pass
