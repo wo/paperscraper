@@ -648,21 +648,22 @@ def get_duplicate(doc):
     # different authors and abstracts (due to parser mistakes,
     # author name variants, etc.).
     debug(5, "checking for duplicates")
-    if len(doc.title) < 4 and len(doc.authors) < 4:
-        # don't check entire database if no title or author provided
-        return None
     where = ['doc_id != %s']
     values = [doc.doc_id]
-    m = re.search('\w+', doc.title) # first title word
+    m = re.search('\w\w\w\w+', doc.title) # first title word
     if m:
         where.append('title LIKE %s') 
         values.append('%'+m.group()+'%')
-    m = re.search('(\w+)(?:,|$)', doc.authors) # first author surname
+    m = re.search('(\w\w+)(?:,|$)', doc.authors) # first author surname
     if m:
         where.append('authors LIKE %s')
         values.append('%'+m.group(1)+'%')
+    if len(values) < 3:
+        # don't check entire database if no title or author provided
+        return None
     cur = db.dict_cursor()
     query = "SELECT * FROM docs WHERE status=1 AND " + (' AND '.join(where))
+    query += " LIMIT 100"
     cur.execute(query, values)
     debug(5, cur._last_executed)
     dupes = cur.fetchall()
