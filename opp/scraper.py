@@ -729,9 +729,11 @@ def paper_is_old(doc):
     cur = db.cursor()
     query = "SELECT author FROM publications WHERE title = %s"
     cur.execute(query, (title,))
+    # use fuzzy name matching (e.g. J. Williams ~ Jon William ~ J Williams):
+    author_surnames = [n.split(' ')[-1] for n in doc.authors.split(',')]
     for row in cur.fetchall():
-        if row[0] in doc.authors:
-            # TODO: need to allow for fuzzy name matching!
+        pub_surname = row[0].split(' ')[-1]
+        if pub_surname in author_surnames:
             debug(2, "paper is in publications database; ignoring.")
             return True
     return False
