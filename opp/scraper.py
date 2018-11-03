@@ -146,7 +146,10 @@ def scrape(source, keep_tempfiles=False):
             if urlfrag(browser.current_url) == urlfrag(source.url):
                 debug(1, "%s redirects to variant %s; updating source record",
                       source.url, browser.current_url)
-                source.update_db(url=browser.current_url)
+                try:
+                    source.update_db(url=browser.current_url)
+                except: # ignore duplicate url error
+                    pass
             else:
                 debug(1, '%s redirects to %s', source.url, browser.current_url)
                 source.update_db(status=301)
