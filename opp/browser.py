@@ -6,6 +6,11 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.common.exceptions import *
+if __name__ == '__main__':
+    import sys
+    curpath = os.path.abspath(os.path.dirname(__file__))
+    libpath = os.path.join(curpath, os.path.pardir)
+    sys.path.insert(0, libpath)
 from opp.util import get_http_status
 from opp.exceptions import PageLoadException
 
@@ -56,12 +61,12 @@ class ActualBrowser(webdriver.Firefox):
         options = Options()
         options.set_headless(headless=True)
         binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
-        geckodriverpath = '/usr/local/bin/geckodriver'
+        geckodriverpath = '/home/wo/install/geckodriver'
         super().__init__(executable_path=geckodriverpath,
                          firefox_binary=binary,
                          firefox_options=options,
                          log_path='/tmp/selenium.log')
-
+    
     def goto(self, url, timeout=10):
         """
         sends browser to <url>, sets self.status to (guessed) HTTP status
@@ -115,14 +120,33 @@ class ActualBrowser(webdriver.Firefox):
 
 if __name__ == '__main__':
     # test
+    import os.path
+    import sys
+    curpath = os.path.abspath(os.path.dirname(__file__))
+    libpath = os.path.join(curpath, os.path.pardir)
+    sys.path.insert(0, libpath)
     print('starting browser')
     browser = Browser()
-    print('fetching umsu.de')
-    browser.goto('https://www.umsu.de')
-    print(browser.status)
+    urls = [
+        'https://www.umsu.de/',
+        'http://www.johncottingham.co.uk/',
+        'https://warwick.ac.uk/fac/soc/philosophy/people/brewer/',
+        'https://vivo.brown.edu/display/jdreier',
+    ]
+    for url in urls:
+        print('fetching {}'.format(url))
+        browser.goto(url)
+        print(browser.status)
+        time.sleep(1)
     print('reusing browser')
     browser2 = Browser()
-    print(browser == browser2)
+    if browser != browser2:
+        print('failed!!!')
+    for url in urls:
+        print('fetching {}'.format(url))
+        browser2.goto(url)
+        print(browser2.status)
+        time.sleep(1)
     print('closing browser')
     stop_browser()
     print('please check that no browser is running')
