@@ -69,7 +69,7 @@ class ActualBrowser(Firefox):
                          options=options,
                          log_path='/tmp/selenium.log')
 
-    def goto(self, url, timeout=20):
+    def goto(self, url, timeout=30):
         """
         sends browser to <url>, sets self.status to (guessed) HTTP status
    
@@ -131,8 +131,8 @@ if __name__ == '__main__':
     browser = Browser()
     urls = [
         'https://www.umsu.de/',
-        'http://www.johncottingham.co.uk/',
         'https://warwick.ac.uk/fac/soc/philosophy/people/brewer/',
+        'http://www.johncottingham.co.uk/',
         'https://vivo.brown.edu/display/jdreier',
     ]
     for url in urls:
