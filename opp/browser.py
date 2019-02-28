@@ -2,7 +2,7 @@
 import os
 import time
 import logging
-from selenium import webdriver
+from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.common.exceptions import *
@@ -54,20 +54,22 @@ def kill_all_browsers():
     except Exception as e:
         logger.debug(e)
  
-class ActualBrowser(webdriver.Firefox):
+class ActualBrowser(Firefox):
     
     def __init__(self):
         logger.debug('initializing browser')
         options = Options()
-        options.set_headless(headless=True)
-        binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
+        options.headless = True
+        binarypath = '/home/wo/install/firefox/firefox-bin'
+        options.binary_location = binarypath
+        #binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
         geckodriverpath = '/home/wo/install/geckodriver'
         super().__init__(executable_path=geckodriverpath,
-                         firefox_binary=binary,
-                         firefox_options=options,
+                         #firefox_binary=binary,
+                         options=options,
                          log_path='/tmp/selenium.log')
     
-    def goto(self, url, timeout=10):
+    def goto(self, url, timeout=20):
         """
         sends browser to <url>, sets self.status to (guessed) HTTP status
    
