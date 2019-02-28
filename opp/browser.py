@@ -56,13 +56,13 @@ class ActualBrowser(webdriver.Firefox):
         options = Options()
         options.set_headless(headless=True)
         binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
-        geckodriverpath = '/usr/local/bin/geckodriver'
+        geckodriverpath = '/home/wo/install/geckodriver'
         super().__init__(executable_path=geckodriverpath,
                          firefox_binary=binary,
                          firefox_options=options,
                          log_path='/tmp/selenium.log')
 
-    def goto(self, url, timeout=10):
+    def goto(self, url, timeout=30):
         """
         sends browser to <url>, sets self.status to (guessed) HTTP status
    
