@@ -49,7 +49,7 @@ def stop_browser():
 def kill_all_browsers():
     logger.info('killing all firefox processes!')
     try: 
-        os.system('killall -9 firefox-bin')
+        os.system('killall -9 firefox')
         os.system('killall -9 geckodriver')
     except Exception as e:
         logger.debug(e)
@@ -60,7 +60,7 @@ class ActualBrowser(Firefox):
         logger.debug('initializing browser')
         options = Options()
         options.headless = True
-        binarypath = '/home/wo/install/firefox/firefox-bin'
+        binarypath = '/home/wo/install/firefox/firefox'
         options.binary_location = binarypath
         #binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
         geckodriverpath = '/home/wo/install/geckodriver'
@@ -89,11 +89,12 @@ class ActualBrowser(Firefox):
                 # happens e.g. when selenium has no internet access
                 self.status = 905
                 raise PageLoadException(e.msg)
-            if 'Tried to run command without establishing a connection' in e.msg:
-                # no working browser instance; unfortunately we can't
-                # simply restart the browser because this would
-                # destroy self. But we kill all running browsers which
-                # should make sure a restart happens.
+            if 'run command without establishing a connection' in e.msg:
+                # no working browser instance; unfortunately we can't simply
+                # restart the browser because this would destroy self. But we
+                # can kill all running browsers, which should make sure a restart
+                # happens.
+                logger.debug('browser looks dead; killing processes')
                 try:
                     stop_browser()
                     kill_all_browsers()
@@ -101,10 +102,11 @@ class ActualBrowser(Firefox):
                     pass
                 self.status = 906
                 raise PageLoadException(e.msg)
+            logger.debug("uncaught webdriver exception: {}".format(e.msg))
             print("xxx uncaught webdriver exception: {}".format(e.msg))
             self.status = get_http_status(url)
             if self.status == 200:
-                self.status = 900
+                self.status = 901
             raise PageLoadException(e.msg)
         self.status = 200
         # selenium doesn't raise exceptions for 404/500/etc. errors,
