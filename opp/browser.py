@@ -60,7 +60,7 @@ class ActualBrowser(Firefox):
         logger.debug('initializing browser')
         options = Options()
         options.headless = True
-        binarypath = '/usr/bin/firefox/firefox-bin'
+        binarypath = '/home/wo/install/firefox/firefox-bin'
         options.binary_location = binarypath
         #binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
         geckodriverpath = '/home/wo/install/geckodriver'
