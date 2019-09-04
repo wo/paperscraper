@@ -113,7 +113,7 @@ class SourcesFinder:
                 row_found_date < datetime.now() - timedelta(days=365)):
                 # url has been hibernated, now allow it to be found again.
                 debug('giving url another change')
-                query = "DELETE FROM sources WHERE source_id = %s"
+                query = "DELETE FROM sources WHERE source_id = %s LIMIT 1"
                 cur.execute(query, (rows[0]['source_id'],))
                 db.commit()
             elif (rows[0]['status'] == 1 and
