@@ -14,7 +14,7 @@ class Source(Webpage):
         'source_id': None,
         'url': '',
         'sourcetype': 'personal', # (alt: repo, journal, blog)
-        'status': 0, # 0 = unprocessed, 1 = OK, >1 = error
+        'status': 0, # 0 = unprocessed, 1 = OK, >1 = error, <0 = not real source
         'is_source': None, # sourcesfinder guess, 0-100
         'confirmed': False,
         'num_doclinks': 0, # number of current links to Doc objects
