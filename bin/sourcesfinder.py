@@ -107,7 +107,7 @@ class SourcesFinder:
         rows = cur.fetchall()
         if rows:
             debug(1, "url already known")
-            row_found_date = datetime.strptime(str(rows[0]['found_date']), "%Y-%m-%dT%H:%M:%S")
+            row_found_date = datetime.strptime(str(rows[0]['found_date']), "%Y-%m-%d %H:%M:%S")
             print(row_found_date)
             if (rows[0]['status'] == -2 and
                 row_found_date < datetime.now() - timedelta(days=365)):
