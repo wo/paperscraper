@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import hashlib
 from random import randint
+from datetime import datetime, timedelta
 import findmodules
 from opp import db, util, googlesearch
 from opp.models import Source
@@ -106,11 +107,21 @@ class SourcesFinder:
         rows = cur.fetchall()
         if rows:
             debug(1, "url already known")
-            if (rows[0]['status'] == 1 and
+            row_found_date = datetime.strptime(str(rows[0]['found_date']), "%Y-%m-%dT%H:%M:%S")
+            print(row_found_date)
+            if (rows[0]['status'] == -2 and
+                row_found_date < datetime.now() - timedelta(days=365)):
+                # url has been hibernated, now allow it to be found again.
+                debug('giving url another change')
+                query = "DELETE FROM sources WHERE source_id = %s"
+                cur.execute(query, (rows[0]['source_id'],))
+                db.commit()
+            elif (rows[0]['status'] == 1 and
                 rows[0]['default_author'] and
                 rows[0]['default_author'].split()[-1] == name.split()[-1]):
                 return 1
-            return 0
+            else:
+                return 0
         try:
             status, r = util.request_url(url)
             if status != 200:
@@ -129,11 +140,10 @@ class SourcesFinder:
             debug(1, "doesn't look like a papers page")
             return 0
         for dupe in source.get_duplicates():
-            # Now what? Sometimes the present URL is the
-            # correct new URL to use (e.g., everything is
-            # moving to 'https'). Other times the variants are
-            # equally valid. In neither case does it probably
-            # hurt to overwrite the old URL.
+            # Now what? Sometimes the present URL is the correct new URL to use
+            # (e.g., everything is moving to 'https'). Other times the variants
+            # are equally valid. In neither case does it probably hurt to
+            # overwrite the old URL.
             debug(1, "duplicate of already known %s", dupe.url)
             debug(1, "changing url of source %s to %s", dupe.source_id, url)
             dupe.update_db(url=url)
