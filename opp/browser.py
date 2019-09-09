@@ -89,12 +89,12 @@ class ActualBrowser(Firefox):
                 # happens e.g. when selenium has no internet access
                 self.status = 905
                 raise PageLoadException(e.msg)
-            if 'run command without establishing a connection' in e.msg:
+            if 'a connection' in e.msg:
                 # no working browser instance; unfortunately we can't simply
                 # restart the browser because this would destroy self. But we
                 # can kill all running browsers, which should make sure a restart
                 # happens.
-                logger.debug('browser looks dead; killing processes')
+                logger.warn('browser looks dead; killing processes')
                 try:
                     stop_browser()
                     kill_all_browsers()
