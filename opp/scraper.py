@@ -15,7 +15,7 @@ from opp import error
 from opp import util
 from opp.models import Source, Link, Doc, categories
 from opp.debug import debug
-from opp.browser import Browser
+from opp.browser import Browser, stop_browser, kill_all_browsers
 from opp.webpage import Webpage
 from opp.pdftools.pdftools import pdfinfo
 from opp.pdftools.pdf2xml import pdf2xml
@@ -130,7 +130,13 @@ def scrape(source, keep_tempfiles=False):
     except Exception as e:
         debug(1, 'connection to source %s failed: %s', source.url, str(e))
         #source.mark_as_dead(browser.status or error.code['unknown browser error'])
-        source.mark_as_dead(browser.status or 901)
+        if browser.status == 900 and 'connection' in str(e):
+            debug(1, 'killing browser')
+            stop_browser()
+            kill_all_browsers()
+            time.sleep(10)
+        else:
+            source.mark_as_dead(browser.status or 901)
         return 0
 
     if browser.current_url != source.url:
