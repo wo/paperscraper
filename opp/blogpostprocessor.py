@@ -83,4 +83,5 @@ def remove_from_db(doc):
         # delete fails if blogpost url is a document that has also
         # been found by the scraper, because then there'll be a Link
         # to the doc.
+        debug(1, "delete failed")
         pass
