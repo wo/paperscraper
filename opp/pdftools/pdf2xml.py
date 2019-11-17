@@ -35,6 +35,7 @@ def pdf2xml(pdffile, xmlfile, keep_tempfiles=False, ocr_ranges=None):
         debug(2, "no text in xml produced by pdftohtml")
     except Exception as e:
         debug(2, "pdftohtml failed: %s -- %s", pdffile, str(e))
+        return 'pdftohtml' # xxxxxxxxxxxxxxxxxxxxxxx ocr deactivated!
     # then try ocr2xml (not catching exceptions here)
     if ocr_ranges:
         shortened_pdf = pdffile.rsplit('.')[0] + '-short.pdf'
