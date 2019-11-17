@@ -441,7 +441,7 @@ def process_link(li, force_reprocess=False, redir_url=None, keep_tempfiles=False
             return 0
         
         # ignore old published papers:
-        if paper_is_old(doc):
+        if True or paper_is_old(doc): # xxxxxxxxxxxx
             li.update_db(status=1, doc_id=None)
             debug(1, "setting found_date of published paper to 1970")
             doc.found_date = datetime(1970, 1, 1)
