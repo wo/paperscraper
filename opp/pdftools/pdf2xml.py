@@ -33,6 +33,7 @@ def pdf2xml(pdffile, xmlfile, keep_tempfiles=False, ocr_ranges=None):
         return 'pdftohtml'
     except NoTextInPDFException:
         debug(2, "no text in xml produced by pdftohtml")
+        return 'pdftohtml' # xxxxxxxxxxxxxxxxxxxxxxx ocr deactivated!
     except Exception as e:
         debug(2, "pdftohtml failed: %s -- %s", pdffile, str(e))
         return 'pdftohtml' # xxxxxxxxxxxxxxxxxxxxxxx ocr deactivated!
