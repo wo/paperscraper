@@ -535,6 +535,8 @@ def process_file(doc, keep_tempfiles=False):
             doc.numwords = len(doc.content.split()) * doc.numpages/10
         else:
             doc.numwords = len(doc.content.split())
+    if doc.numwords == 0:
+        raise Exception('pdf conversion failed')
 
     # guess doc type (paper, book, review, etc.):
     from .doctyper import doctyper
