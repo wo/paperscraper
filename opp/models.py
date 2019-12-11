@@ -824,16 +824,18 @@ class Doc():
             query = "UPDATE docs SET {},urlhash=MD5(url) WHERE doc_id = %s".format(
                 ",".join(k+"=%s" for k in fields))
             cur.execute(query, values + [self.doc_id])
+            debug(4, cur._last_executed)
+            db.commit()
         else:
             query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             try:
                 cur.execute(query, values)
                 self.doc_id = cur.lastrowid
+                debug(4, cur._last_executed)
+                db.commit()
             except Exception as e:
                 print('Error in {}: {}'.format(query, e))
-        debug(4, cur._last_executed)
-        db.commit()
         
     def assign_category(self, cat_id, strength):
         """inserts or updates a docs2cats entry in the db"""
