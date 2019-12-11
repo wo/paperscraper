@@ -827,8 +827,11 @@ class Doc():
         else:
             query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
-            cur.execute(query, values)
-            self.doc_id = cur.lastrowid
+            try:
+                cur.execute(query, values)
+                self.doc_id = cur.lastrowid
+            except Exception as e:
+                print('Error in {}: {}'.format(query, e))
         debug(4, cur._last_executed)
         db.commit()
         
