@@ -68,7 +68,7 @@ class ActualBrowser(Firefox):
                          #firefox_binary=binary,
                          options=options,
                          log_path='/tmp/selenium.log')
-    
+
     def goto(self, url, timeout=30):
         """
         sends browser to <url>, sets self.status to (guessed) HTTP status

@@ -786,6 +786,7 @@ class Doc():
         debug(4, cur._last_executed)
         docs = cur.fetchall()
         if docs:
+            self.doc_id = docs[0][0]
             return docs[0][0]
         else:
             return None
@@ -825,7 +826,7 @@ class Doc():
                 ",".join(k+"=%s" for k in fields))
             cur.execute(query, values + [self.doc_id])
         else:
-            query = "INSERT IGNORE INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
+            query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             cur.execute(query, values)
             self.doc_id = cur.lastrowid
