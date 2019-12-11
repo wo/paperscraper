@@ -786,6 +786,7 @@ class Doc():
         debug(4, cur._last_executed)
         docs = cur.fetchall()
         if docs:
+            self.doc_id = docs[0][0]
             return docs[0][0]
         else:
             return None
@@ -831,7 +832,7 @@ class Doc():
                 cur.execute(query, values)
                 self.doc_id = cur.lastrowid
             except Exception as e:
-                print('Error in {}: {}'.format(query, e))
+                print('Error in {} {}: {}'.format(query, values, e))
         debug(4, cur._last_executed)
         db.commit()
         
