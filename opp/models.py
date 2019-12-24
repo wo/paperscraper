@@ -141,6 +141,7 @@ class Source(Webpage):
         """
         try:
             assert url.startswith('http')
+            assert '//' in url
             assert len(url) < 512
             assert url.split('#')[0] != self.url.split('#')[0]
             (http, domain, path, params, query, fragment) = urlparse(url)
