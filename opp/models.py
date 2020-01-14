@@ -65,6 +65,8 @@ class Source(Webpage):
             return
         if self.status == statuscode and statuscode < 900:
             debug(1, 'source repeatedly found with status {}; removing from db'.format(statuscode))
+            # don't actually delete, to avoid desasters:
+            self.update_db(status=9);
             #cur = db.cursor()
             # query = "DELETE FROM sources WHERE source_id = %s"
             #cur.execute(query, (self.source_id,))
