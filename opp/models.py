@@ -691,7 +691,7 @@ class Link():
                 cur.execute(query, values)
             except:
                 debug(1, "oops, %s: %s", query, ','.join(map(str, values)))
-                raise
+                # raise
             self.link_id = cur.lastrowid
         debug(4, cur._last_executed)
         db.commit()
