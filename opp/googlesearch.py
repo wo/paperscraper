@@ -20,6 +20,8 @@ except SystemError:
 
 from googleapiclient.discovery import build
 
+from .config import config
+
 GOOGLE_API_KEY = config['google_api_key']
 GOOGLE_CSE_ID = config['google_cse_id']
 

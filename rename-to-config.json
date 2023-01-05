@@ -5,6 +5,8 @@
         "user": "opp",
         "pass": "opp"
     },
+    "google_api_key": "",
+    "google_cse_id": "",
     "loglevel": 3,
     "logfile": "/home/wo/opp-tools/log/scraper.log"
     "email": {
