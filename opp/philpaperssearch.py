@@ -1,11 +1,12 @@
 import re
+import sys
 try:
     from .debug import debug, debuglevel
     from .util import request_url
-except SystemError:
-    # command line usage
+except ImportError:
+    ## command line usage
+    ## SFM: all this stuff seems to be fixing problems with relative imports.
     import os.path
-    import sys
     curpath = os.path.abspath(os.path.dirname(__file__))
     libpath = os.path.join(curpath, os.path.pardir)
     sys.path.insert(0, libpath)

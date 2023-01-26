@@ -9,7 +9,8 @@ import shutil
 import tempfile
 import hashlib
 from selenium.common.exceptions import *
-from _mysql_exceptions import IntegrityError
+from MySQLdb._exceptions import IntegrityError # SFM
+# from _mysql_exceptions import IntegrityError # SFM
 from opp import db
 from opp import error
 from opp import util
