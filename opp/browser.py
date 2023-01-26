@@ -2,9 +2,12 @@
 import os
 import time
 import logging
+
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.firefox.service import Service
+from webdriver_manager.firefox import GeckoDriverManager
+
 from selenium.common.exceptions import *
 if __name__ == '__main__':
     import sys
