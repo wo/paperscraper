@@ -60,14 +60,19 @@ class ActualBrowser(Firefox):
         logger.debug('initializing browser')
         options = Options()
         options.headless = True
-        binarypath = '/home/wo/install/firefox/firefox'
-        options.binary_location = binarypath
-        #binary = FirefoxBinary('/home/wo/install/firefox/firefox-bin') 
-        geckodriverpath = '/home/wo/install/geckodriver'
-        super().__init__(executable_path=geckodriverpath,
-                         #firefox_binary=binary,
-                         options=options,
-                         log_path='/tmp/selenium.log')
+        
+        #binarypath = '/snap/bin/firefox'
+        #options.binary_location = binarypath
+        #geckodriverpath = '/snap/bin/firefox.geckodriver'
+        
+        #driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()))
+        
+        super().__init__(
+                        #executable_path=geckodriverpath,
+                        # service=Service(GeckoDriverManager().install()),
+                        options=options#,
+                        #log_path='/tmp/selenium.log'
+                        )
 
     def goto(self, url, timeout=30):
         """
