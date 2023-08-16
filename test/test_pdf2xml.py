@@ -30,10 +30,11 @@ def test_simple():
         assert '<text top="247" left="314" width="288" height="23" font="0">Lorem ipsum dolor sit amet</text>' in xml
 
 def test_ocr(caplog):
+    caplog.set_level(logging.DEBUG, logger='opp')
     pdffile = os.path.join(testdir, 'needsocr.pdf')
     xmlfile = os.path.join(testdir, 'needsocr.xml')
     engine = pdf2xml.pdf2xml(pdffile, xmlfile)
-    assert 'no text in' in caplog.text()
+    assert 'no text in' in caplog.text
     assert engine == 'ocr2xml'
     with open(xmlfile, 'r') as f:
         xml = f.read()
@@ -43,7 +44,7 @@ def test_mongin_ocr(caplog):
     pdffile = os.path.join(testdir, 'MonginRE03.pdf')
     xmlfile = os.path.join(testdir, 'MonginRE03.xml')
     engine = pdf2xml.pdf2xml(pdffile, xmlfile, ocr_ranges=[(1,3)])
-    assert 'no text in' in caplog.text()
+    assert 'no text in' in caplog.text
     assert engine == 'ocr2xml'
     with open(xmlfile, 'r') as f:
         xml = f.read()

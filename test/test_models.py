@@ -25,7 +25,7 @@ testdir = os.path.join(curpath, 'testdocs')
 def testdb():
     """set up test database"""
     db.close()
-    db.connection(db='test_opp')
+    db.connect(db='test_opp')
     cur = db.cursor()
     for t in ('sources', 'links', 'docs'):
         cur.execute('DELETE FROM {}'.format(t))

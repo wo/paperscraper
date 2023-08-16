@@ -3,7 +3,7 @@ import pytest
 from opp import db
 
 def test_connect():
-    conn = db.connection()
+    conn = db.connect()
     assert conn is not None
 
 def test_cursor():

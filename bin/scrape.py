@@ -33,7 +33,7 @@ if args.link:
     b.goto(source.url)
     source.set_html(b.page_source)
     try:
-        el = b.find_element_by_xpath("//a[contains(@href, '{}')]".format(args.link))
+        el = b.find_element("xpath", "//a[contains(@href, '{}')]".format(args.link))
     except Exception as e:
         sys.exit('no link containing '+args.link+' on '+source.url)
     url = source.make_absolute(el.get_attribute('href'))

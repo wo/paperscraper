@@ -13,8 +13,8 @@ testdir = os.path.join(curpath, 'sourcepages')
 
 def test_startstop(caplog):
     num_browsers1 = count_processes('firefox-bin')
-    caplog.setLevel(logging.CRITICAL, logger='selenium')
-    caplog.setLevel(logging.DEBUG, logger='opp')
+    caplog.set_level(logging.CRITICAL, logger='selenium')
+    caplog.set_level(logging.DEBUG, logger='opp')
     b = Browser()
     time.sleep(1)
     stop_browser()
@@ -25,8 +25,8 @@ def test_startstop(caplog):
     assert num_browsers1 == num_browsers2
 
 def test_status(caplog):
-    caplog.setLevel(logging.CRITICAL, logger='selenium')
-    caplog.setLevel(logging.DEBUG, logger='opp')
+    caplog.set_level(logging.CRITICAL, logger='selenium')
+    caplog.set_level(logging.DEBUG, logger='opp')
     b = Browser()
     src = 'file://'+testdir+'/umsu.html'
     b.goto(src)
@@ -39,8 +39,8 @@ def test_status(caplog):
     stop_browser()
 
 def test_reuse(caplog):
-    caplog.setLevel(logging.CRITICAL, logger='selenium')
-    caplog.setLevel(logging.DEBUG, logger='opp')
+    caplog.set_level(logging.CRITICAL, logger='selenium')
+    caplog.set_level(logging.DEBUG, logger='opp')
     b1 = Browser()
     src = 'file://'+testdir+'/umsu.html'
     b1.goto(src)

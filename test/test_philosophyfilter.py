@@ -17,7 +17,7 @@ def setups():
     if philosophyfilter.is_ready():
         return
     db.close()
-    db.connection(db='test_opp')
+    db.connect(db='test_opp')
     ham = Doc(url='http://umsu.de/papers/magnetism2.pdf')
     ham.load_from_db()
     ham.content = readfile(os.path.join(testdir, 'attitudes.txt'))
