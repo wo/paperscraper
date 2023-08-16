@@ -1,0 +1,11 @@
+[Unit]
+Description=Unoconv listener for document conversions
+Documentation=https://github.com/dagwieers/unoconv
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/unoconv --listener
+
+[Install]
+WantedBy=multi-user.target
