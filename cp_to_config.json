@@ -5,10 +5,14 @@
         "user": "opp",
         "pass": "opp"
     },
+    "binaries": {
+        "firefox": "/usr/bin/firefox",
+        "geckodriver": "/usr/local/bin/geckodriver"
+    },
     "google_api_key": "",
     "google_cse_id": "",
     "loglevel": 3,
-    "logfile": "/home/wo/opp-tools/log/scraper.log",
+    "logfile": "/tmp/scraper.log",
     "email": {
         "smtp": "localhost",
         "port": "465",

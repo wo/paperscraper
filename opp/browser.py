@@ -2,12 +2,9 @@
 import os
 import time
 import logging
-
-from selenium.webdriver import Firefox
-from selenium.webdriver.firefox.options import Options
+from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
-from webdriver_manager.firefox import GeckoDriverManager
-
+from selenium.webdriver.firefox.options import Options
 from selenium.common.exceptions import *
 if __name__ == '__main__':
     import sys
@@ -16,6 +13,7 @@ if __name__ == '__main__':
     sys.path.insert(0, libpath)
 from opp.util import get_http_status
 from opp.exceptions import PageLoadException
+from opp.config import config
 
 logger = logging.getLogger('opp')
 
@@ -57,26 +55,20 @@ def kill_all_browsers():
     except Exception as e:
         logger.debug(e)
  
-class ActualBrowser(Firefox):
+class ActualBrowser(webdriver.Firefox):
     
     def __init__(self):
+        """
+        starts a new browser instance
+        """
         logger.debug('initializing browser')
         options = Options()
-        options.headless = True
+        options.add_argument('--headless')
+        options.binary_location = config['binaries']['firefox']
+        service = Service(config['binaries']['geckodriver'],
+                            log_output=open("/tmp/geckodriver.log", "w"))
+        super().__init__(service=service, options=options)
         
-        #binarypath = '/snap/bin/firefox'
-        #options.binary_location = binarypath
-        #geckodriverpath = '/snap/bin/firefox.geckodriver'
-        
-        #driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()))
-        
-        super().__init__(
-                        #executable_path=geckodriverpath,
-                        # service=Service(GeckoDriverManager().install()),
-                        options=options#,
-                        #log_path='/tmp/selenium.log'
-                        )
-
     def goto(self, url, timeout=30):
         """
         sends browser to <url>, sets self.status to (guessed) HTTP status

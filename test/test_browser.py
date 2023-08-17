@@ -7,9 +7,27 @@ import sys
 import subprocess
 from opp.browser import Browser, stop_browser
 from opp.exceptions import PageLoadException
+from opp.config import config
 
 curpath = os.path.abspath(os.path.dirname(__file__))
 testdir = os.path.join(curpath, 'sourcepages')
+
+
+def test_installation(caplog):
+    from selenium import webdriver
+    from selenium.webdriver.firefox.service import Service
+    from selenium.webdriver.firefox.options import Options
+    options = Options()
+    options.add_argument('--headless')
+    options.binary_location = config['binaries']['firefox']
+    service = Service(config['binaries']['geckodriver'],
+                      log_output=open("/tmp/geckodriver.log", "w"))
+    driver = webdriver.Firefox(service=service, options=options)
+    driver.get('https://www.umsu.de')
+    assert 'philosopher' in driver.page_source
+    driver.quit()
+    with open("/tmp/geckodriver.log", "r") as f:
+        assert 'running in headless mode' in f.read()
 
 def test_startstop(caplog):
     num_browsers1 = count_processes('firefox-bin')
