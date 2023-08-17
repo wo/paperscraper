@@ -7,11 +7,12 @@ import tempfile
 import subprocess
 from functools import lru_cache
 from opp.debug import debug
+from opp.config import config
 
-PDFINFO = '/usr/bin/pdfinfo'
-PDFSEPARATE = '/usr/bin/pdfseparate'
-GS = '/usr/bin/gs'
-PERL = '/usr/bin/perl'
+PDFINFO = config['binaries']['pdfinfo']
+PDFSEPARATE = config['binaries']['pdfseparate']
+GS = config['binaries']['gs']
+PERL = config['binaries']['perl']
 
 logger = logging.getLogger('opp')
 

@@ -9,9 +9,10 @@ from .ocr2xml import ocr2xml
 from .doctidy import doctidy
 from .pdftools import pdfcut
 from opp.exceptions import *
+from opp.config import config
 
-PDFTOHTML = '/usr/bin/pdftohtml'
-PERL = '/usr/bin/perl'
+PDFTOHTML = config['binaries']['pdftohtml']
+PERL = config['binaries']['perl']
 
 PATH = abspath(dirname(__file__))
 

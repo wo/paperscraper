@@ -19,10 +19,11 @@ from opp.debug import debug, debuglevel
 from .pdftools import pdfinfo
 from .doctidy import doctidy
 from opp.exceptions import *
+from opp.config import config
 
-PDFSEPARATE = '/usr/bin/pdfseparate'
-PDFTOPPM = '/usr/bin/pdftoppm'
-TESSERACT = '/usr/local/bin/tesseract'
+PDFSEPARATE = config['binaries']['pdfseparate']
+PDFTOPPM = config['binaries']['pdftoppm']
+TESSERACT = config['binaries']['tesseract']
 
 OCR_DPI = 300
 

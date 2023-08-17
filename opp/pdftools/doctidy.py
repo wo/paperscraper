@@ -2,8 +2,9 @@
 from os.path import abspath, dirname, join
 import subprocess
 from debug import debug, debuglevel
+from config import config
 
-PERL = '/usr/bin/perl'
+PERL = config['binaries']['perl']
 PATH = abspath(dirname(__file__))
 
 def doctidy(xmlfile):

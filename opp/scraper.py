@@ -12,6 +12,7 @@ from selenium.common.exceptions import *
 from opp import db
 from opp import error
 from opp import util
+from opp.config import config
 from opp.models import Source, Link, Doc, categories
 from opp.debug import debug
 from opp.browser import Browser, stop_browser, kill_all_browsers
@@ -628,7 +629,7 @@ def save_local(r):
 def convert_to_pdf(tempfile):
     outfile = tempfile.rsplit('.',1)[0]+'.pdf'
     try:
-        cmd = ['/usr/bin/python3', '/usr/bin/unoconv', 
+        cmd = ['/usr/bin/python3', config['binaries']['unoconv'], 
                '-f', 'pdf', '-o', outfile, tempfile]
         debug(2, ' '.join(cmd))
         subprocess.check_call(cmd, timeout=20)

@@ -7,7 +7,15 @@
     },
     "binaries": {
         "firefox": "/usr/bin/firefox",
-        "geckodriver": "/usr/local/bin/geckodriver"
+        "geckodriver": "/usr/local/bin/geckodriver",
+        "perl": "/usr/bin/perl",
+        "unoconv": "/usr/bin/unoconv",
+        "pdftohtml": "/usr/bin/pdftohtml",
+        "pdfinfo": "/usr/bin/pdfinfo",
+        "pdfseparate": "/usr/bin/pdfseparate",
+        "gs": "/usr/bin/gs",
+        "pdftoppm": "/usr/bin/pdftoppm",
+        "tesseract": "/usr/bin/tesseract"
     },
     "google_api_key": "",
     "google_cse_id": "",

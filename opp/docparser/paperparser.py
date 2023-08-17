@@ -9,8 +9,9 @@ from opp.pdftools.pdftools import pdfcut
 from opp.pdftools.pdf2xml import pdf2xml
 from opp.pdftools.ocr2xml import ocr2xml
 from opp.debug import debug, debuglevel
+from opp.config import config
 
-PERL = '/usr/bin/perl'
+PERL = config['binaries']['perl']
 
 logger = logging.getLogger('opp')
 path = abspath(dirname(__file__))
