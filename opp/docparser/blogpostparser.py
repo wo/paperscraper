@@ -4,30 +4,8 @@ import lxml.html
 from lxml import etree
 from lxml.html.clean import Cleaner
 from nltk.tokenize import sent_tokenize
+import trafilatura
 from opp.debug import debug
-
-#
-# Note (2015-09-11):
-#
-# There are several modules for extracting the main article content
-# from websites. I've tried Goose, Readability, and Dragnet. None of
-# them was really satisfactory. For example, on n-category cafe,
-# Readability misses the intro part of posts, Goose removes all tags
-# (including emphases), and all of them get the mathml formulas
-# wrong. Moreover, none of the modules is able to extract the author
-# name from posts on group blogs, and many fail to extract any content
-# for blog posts without long blocks of text, such as
-# https://philosophymodsquad.wordpress.com/2015/09/21/
-#
-# Rather than reinventing the wheel completely, what I do here is rely
-# on Goose to identify the main post content (fall-back: rss feed
-# content), locate that in the html source, and perform my own
-# clean-up on the html; I also look for 'by [names]' strings in the
-# vicinity of the start of the blog post to identify authors.
-#
-# Update 2016-06-13: Goose requires Python 2, so I'm reinventing the
-# wheel.
-#
 
 def parse(doc):
     """
@@ -35,92 +13,19 @@ def parse(doc):
     authors, abstract, numwords
     """
     debug(3, "fetching blog post %s", doc.url)
-    bytehtml = requests.get(doc.url).content.decode('utf-8', 'ignore')
-    doc.content = extract_content(bytehtml, doc) or strip_tags(doc.content)
+
+    html = trafilatura.fetch_url(doc.url)
+    doc.content = extract_content(html)
     doc.numwords = len(doc.content.split())
     doc.abstract = get_abstract(doc.content)
     if doc.title.isupper():
         doc.title = doc.title.capitalize()
+    trafilatura.reset_caches()
     debug(2, "\npost abstract: %s\n", doc.abstract)
     #if not doc.authors:
     #    doc.authors = get_authors(html, post_html, doc.content)
     #    debug(3, "\npost authors: %s\n", doc.authors)
 
-def extract_content(bytehtml, doc):
-    """
-    extracts blog post content from html
-    """
-    lxmldoc = lxml.html.document_fromstring(bytehtml)
-    cleaner = Cleaner()
-    cleaner.scripts = True
-    cleaner.comments = True
-    cleaner.style = True
-    #cleaner.page_structure = True
-    cleaner.kill_tags = ['head', 'noscript']
-    cleaner.remove_tags = ['p', 'i', 'b', 'strong', 'em', 'blockquote']
-    cleaner(lxmldoc)
-    content_el = find_content_element(lxmldoc)
-    if content_el:
-        debug(3, 'content quality {}'.format(content_el._quality))
-        text = tidy_content(content_el.text_content())
-        return text
-    else:
-        debug(2, 'no content found!')
-        raise Exception('no content')
-    
-def find_content_element(el, best_el=None):
-    """
-    returns the descendent of el with the best combination of
-    text-to-html ratio and text length
-    """ 
-    for child in el:
-        MIN_LENGTH = 200
-        child._textlen = len(child.text_content())
-        if child._textlen < MIN_LENGTH:
-            continue
-        child._quality = quality(child)
-        if child._quality > 0 and (best_el is None or child._quality > best_el._quality):
-            best_el = child
-        best_child = find_content_element(child, best_el=best_el)
-        if best_child != best_el:
-            best_el = best_child
-    return best_el
-    
-def quality(el):
-    """
-    gives a numerical score to <el> measuring its plausibility as blog
-    post content, weighing text-to-html ratio and text length
-    """
-    textlen = el._textlen
-    htmllen = len(etree.tostring(el))
-    ratio = textlen/htmllen
-    # A blog post often contains lengthy paragraphs without any tags
-    # and thus perfect textlen/htmllen ratio; we still want to prefer
-    # larger elements with decent ratio. Roughly, if we can add 500
-    # characters (~1 paragraph) of text with 100 characters of tags,
-    # we should do that. The following equation approximates what we
-    # might want: quality = ratio^3 * textlen
-    quality = (ratio**3)*textlen
-    #print(etree.tostring(el)[:100])
-    #print("textlen {}, htmllen {}, ratio {}, quality {}".format(textlen, htmllen, ratio, quality))
-    if quality < 300:
-        return  0
-    return quality
-
-#bytehtml = b'<html><body><div>asdf hahaha</div><p>dddd</p></body></html>'
-#doc = lxml.html.document_fromstring(bytehtml)
-#print(find_content_element(doc))
-
-def tidy_content(text):
-    """
-    strips redundant whitespace, removes "share" links etc. from
-    beginning and end. TODO: improve
-    """
-    text = text.strip()
-    if text.startswith('Tweet'):
-        return text[len('Tweet'):]
-    text = re.sub(r'\n\s+', '\n', text)
-    return text
 
 def get_abstract(text):
     sentences = sent_tokenize(text[:1000])
@@ -131,25 +36,61 @@ def get_abstract(text):
             break
     return abstract+'&hellip;'
 
-def strip_tags(text, keep_italics=False):
-    """
-    strip tags from <text> but possibly keep emphasis tags
-    """
-    if keep_italics:
-        text = re.sub(r'<(/?)(?:i|b|em|strong)>', r'{\1emph}', text, flags=re.IGNORECASE)
-        # also keep sub/supscript tags, e.g. for 'x_1'
-        text = re.sub(r'<(/?su[bp])>', r'{\1}', text, flags=re.IGNORECASE)
-    text = re.sub(r'<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub(r'<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub(r'<.+?>', ' ', text, flags=re.DOTALL)
-    text = re.sub(r'<', '&lt;', text)
-    text = re.sub(r'  +', ' ', text)
-    text = re.sub(r'(?<=\w) (?=[\.,;:\-\)])', '', text)
-    if keep_italics:
-        text = re.sub(r'{(/?)emph}', r'<\1i>', text)
-        text = re.sub(r'{(/?su[bp])}', r'<\1>', text)
-    return text
+def extract_content(html):
+    content = trafilatura.extract(html, include_comments=False)
+    if not content:
+        debug(2, "no content found in blogpost")
+        return ''
+    content = strip_headers(content, html)
+    content = strip_footers(content, html)
+    return content
 
+def strip_headers(content, html):
+    """
+    remove title, dates, "written by...", etc. from <content> (string)
+    """
+    stripped = content
+    while '\n' in stripped:
+        line, rem  = stripped.split('\n', 1)
+        # check if line is short and occurs in its own element in the html:
+        if len(line) < 30 and re.search(r'<[^>]*>'+re.escape(line)+r'</[^>]*>', html):
+            stripped = rem
+            continue
+        # check if line is a heading:
+        if re.search(r'<h\d[^>]*>'+re.escape(line)+r'</h\d>', html):
+            stripped = rem
+            continue
+        # check if <title> element contains line:
+        m = re.search(r'<title>([^<]+)</title>', html, re.IGNORECASE)
+        if m and line in m.group(1):
+            stripped = rem
+            continue
+        if re.match(r'^(?:written|posted) by(?: \S+){1,4}$', line, re.IGNORECASE):
+            stripped = rem
+            continue
+        return stripped
+    return stripped
+
+def strip_footers(content, html):
+    """
+    remove "Leave a reply" etc. from <content> (string)
+    """
+    stripped = content
+    while '\n' in stripped:
+        line = content.split('\n')[-1]
+        if re.match(r'^\s*(?:leave ?a? reply|leave ?a? comment|reply)', line, re.IGNORECASE):
+            stripped = '\n'.join(content.split('\n')[:-1])
+            continue
+        if re.match(r'^(?:written|posted) by(?: \S+){1,4}$', line, re.IGNORECASE):
+            stripped = '\n'.join(content.split('\n')[:-1])
+            continue
+        # check if line is short and occurs in its own element in the html:
+        if len(line) < 30 and re.search(r'<[^>]*>'+re.escape(line)+r'</[^>]*>', html):
+            stripped = '\n'.join(content.split('\n')[:-1])
+            continue
+        return stripped
+    return stripped
+    
 def get_authors(full_html, post_html, post_text):
     # look for 'by (Foo Bar)' near the start of the post
     post_start = full_html.find(post_html)
