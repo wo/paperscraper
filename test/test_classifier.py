@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
+#
+#  +-------------------------------------------------------------------------+
+#  |                                                                         |
+#  | MUST RUN WITH python -m pytest, NOT WITH pytest                         |
+#  |                                                                         |
+#  +-------------------------------------------------------------------------+
+#
 import pytest
 import os.path
-from opp.doctyper.classifier import DocClassifier
+from opp.doctyper.classifier import DocClassifier, get_classifier
 from opp.models import Doc
 from opp.debug import debuglevel
 
@@ -44,6 +51,16 @@ def test_classify():
     ham.content += 'foo bar'
     prob = mc.classify(ham)
     assert prob > 0.5
+    
+def test_philosophy():
+    clf = get_classifier('philosophy')
+    clf.load()
+    if not clf.ready:
+        print("skipping test_philosophy: no philosophy classifier")
+        return
+    doc = Doc(url='http://umsu.de/papers/variations.pdf')
+    doc.content = readfile(os.path.join(testdir, 'attitudes.txt'))
+    assert clf.classify(doc) > 0.6
     
 def readfile(path):
     with open(path, 'r', encoding='utf-8') as f:
