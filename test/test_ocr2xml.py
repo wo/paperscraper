@@ -19,7 +19,7 @@ def tidy_hocr_line_string2string(linehtml):
     hocr = lxml.html.document_fromstring(html)
     line = hocr.xpath('//text')[0]
     nline = ocr2xml.tidy_hocr_line(line)
-    if not nline:
+    if nline is None:
         return None
     nlinehtml = lxml.etree.tostring(nline, encoding=str)
     return nlinehtml[6:-7]
