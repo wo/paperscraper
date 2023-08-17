@@ -6,7 +6,7 @@ import logging
 import findmodules
 import datetime
 import math
-import MySQLdb
+import pymysql
 from opp import db, util
 from opp.sendmail import sendmail
 
@@ -76,7 +76,7 @@ class AuthorsFinder:
                 try:
                     cur.execute(query, (name,))
                     db.commit()
-                except MySQLdb.IntegrityError as e:
+                except pymysql.err.IntegrityError as e:
                     logger.info("{} already in db".format(name))
                     findings = [f for f in findings if f[0] != name]
                 else:

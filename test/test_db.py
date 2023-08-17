@@ -18,4 +18,5 @@ def test_query(caplog):
     query = "SELECT * FROM sources"
     cur.execute(query)
     sources = cur.fetchall()
+    assert 'SELECT' in cur._executed
     assert True

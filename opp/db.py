@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import MySQLdb
-import MySQLdb.cursors
-from .config import config
+import pymysql
+import pymysql.cursors
+from opp.config import config
 import logging
 
 _conn = None
@@ -12,15 +12,15 @@ def connect(host=config['mysql']['host'],
             passwd=config['mysql']['pass']):
     global _conn
     if not _conn or not _conn.open:
-        _conn = MySQLdb.connect(host=host, db=db, user=user, passwd=passwd,
-                                use_unicode=True, charset='UTF8')
+        _conn = pymysql.connect(host=host, db=db, user=user, passwd=passwd,
+                                use_unicode=True, charset='utf8')
     return _conn
 
 def cursor(use_dict=False, retry=False):
     # not cached so we can reconnect if db connection is gone
     try:
         if use_dict:
-            cur = connect().cursor(MySQLdb.cursors.DictCursor)
+            cur = connect().cursor(pymysql.cursors.DictCursor)
         else:
             cur = connect().cursor()
             cur.execute("SET NAMES utf8mb4")

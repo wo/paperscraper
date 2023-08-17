@@ -1,4 +1,4 @@
-import MySQLdb as mdb
+import pymysql as mdb
 import sys
 import re
 from os.path import abspath, dirname, join

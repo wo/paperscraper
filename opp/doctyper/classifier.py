@@ -47,6 +47,7 @@ class DocClassifier:
             self.ready = True
             debug(4, "loaded classifier model from disk")
         else:
+            print("no pickle file found, resetting classifier")
             self.reset()
     
     def reset(self):
@@ -71,7 +72,7 @@ class DocClassifier:
         # Tokenize the texts:
         tfidfs = self.vectorizer.fit_transform(texts)
         debug(4, 'Dimensions of tfidfs are %s', tfidfs.shape)
-        debug(5, self.vectorizer.get_feature_names())
+        # debug(5, self.vectorizer.get_feature_names())
         hamspam = array(hamspam).ravel()
         self.classifier.fit(tfidfs, hamspam)
         debug(5, 'classes: %s', self.classifier.classes_)
@@ -149,15 +150,16 @@ def update_classifier(category):
     cur = db.dict_cursor()
     query = "SELECT cat_id FROM cats WHERE label=%s LIMIT 1"
     cur.execute(query, (category,))
-    cat_id = cur.fetchall()[0]['cat_id']
+    try:
+        cat_id = cur.fetchall()[0]['cat_id']
+    except IndexError:
+        raise Exception(f"no training documents for category {category}")
     query = ("SELECT D.*, M.strength"
              " FROM docs D, docs2cats M"
              " WHERE M.doc_id = D.doc_id AND M.cat_id = %s AND M.is_training = 1")
     cur.execute(query, (cat_id,))
-    debug(5, cur.statement)
+    debug(5, cur._executed)
     rows = cur.fetchall()
-    if not rows:
-        raise Exception('no training documents for classifier')
     docs = [Doc(**row) for row in rows]
     classes = [int(row['strength']/100) for row in rows]
     clf.train(docs, classes)
