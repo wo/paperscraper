@@ -70,7 +70,7 @@ class Webpage():
             # add url parameters common to many links:
             hrefs = self.xpath('//a/@href')
             count_params = defaultdict(int)
-            for m in re.finditer('([\w_-]+)=', ' '.join(hrefs)):
+            for m in re.finditer(r'([\w_-]+)=', ' '.join(hrefs)):
                 count_params[m.group(1)] += 1
             self._session_vars |= set(p for p,i in count_params.items() if i>2)
         return self._session_vars
@@ -79,5 +79,5 @@ class Webpage():
     def strip_session_variables(self, url):
         if not hasattr(self, '_svarpat'):
             svars = self.session_variables()
-            self._svarpat = re.compile('(?:'+('|'.join(svars))+')=[\w-]+')
+            self._svarpat = re.compile(r'(?:'+(r'|'.join(svars))+r')=[\w-]+')
         return self._svarpat.sub('', url)

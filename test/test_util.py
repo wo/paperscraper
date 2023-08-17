@@ -12,10 +12,10 @@ def test_text_content():
     assert 'systems' in content
 
 def test_request_url():
-    (status, r) = util.request_url('http://umsu.de/')
+    (status, r) = util.request_url('https://www.umsu.de/')
     assert status == 200
     assert r.content
-    assert 'Hi' in r.text
+    assert 'philosopher' in r.text
 
 def test_request_url_404():
     (status, r) = util.request_url('http://umsu.de/notfound/')

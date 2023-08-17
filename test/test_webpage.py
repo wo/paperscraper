@@ -33,5 +33,5 @@ def test_broken_html():
     pagename = 'healey.html'
     url = 'https://blah.org'
     page = Webpage(url, html=source(pagename))
-    targets = set(u for u in page.xpath('//a/@href') if re.search('.pdf$', u, re.I))
+    targets = set(u for u in page.xpath('//a/@href') if re.search(r'.pdf$', u, re.I))
     assert targets

@@ -5,6 +5,7 @@ import logging
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By 
 from selenium.common.exceptions import *
 if __name__ == '__main__':
     import sys
@@ -112,7 +113,7 @@ class ActualBrowser(webdriver.Firefox):
         # selenium doesn't raise exceptions for 404/500/etc. errors,
         # so we need to catch these manually:
         try:
-            ff_error = self.find_element_by_id('errorTitleText')
+            ff_error = self.find_element(By.ID, 'errorTitleText')
         except Exception:
             ff_error = None
         if ff_error or "not found" in self.title.lower():

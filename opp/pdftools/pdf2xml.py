@@ -77,10 +77,10 @@ def pdftohtml(pdffile, xmlfile):
 def xml_ok(xml):
     if not xml:
         return False
-    text_pattern = re.compile('<text.+?>.*[a-z]{5}.*<')
+    text_pattern = re.compile(r'<text.+?>.*[a-z]{5}.*<')
     if not text_pattern.search(xml):
         return False
-    m = re.search('<page number="2".+?</page', xml, re.DOTALL)
+    m = re.search(r'<page number="2".+?</page', xml, re.DOTALL)
     if not m:
         # one-page document with text: OK
         return True
@@ -90,7 +90,7 @@ def xml_ok(xml):
     if text_pattern.search(m.group(0)):
         return True
     # no text on page 2, must be text on page 3:
-    m = re.search('<page number="3".+?</page', xml, re.DOTALL)
+    m = re.search(r'<page number="3".+?</page', xml, re.DOTALL)
     if not m:
         # two-page document with no text on page 2: not OK
         return False
@@ -100,7 +100,7 @@ def xml_ok(xml):
 
 def fix_pdftohtml(xml):
     # strip anchor tags inserted by pdftohtml for footnotes:
-    xml = re.sub('<a[^>]+>(.+?)</a>', r'\1', xml)
+    xml = re.sub(r'<a[^>]+>(.+?)</a>', r'\1', xml)
     return xml;
 
 def readfile(path):

@@ -558,7 +558,7 @@ def check_steppingstone(page):
     debug(3, "checking: intermediate page leading to article?")
 
     # catch dropbox pdf reader:
-    if re.search('dropbox.+dl=0', page.url):
+    if re.search(r'dropbox.+dl=0', page.url):
         target = page.url.replace('dl=0', 'dl=1')
         debug(3, "yes: dropbox page for %s", target)
         return target
@@ -566,22 +566,22 @@ def check_steppingstone(page):
     # steppingstone pages from known repositories:
     redir_patterns = [
         # arxiv.org, springer.com, researchgate, etc.:
-        (re.compile('<meta name="citation_pdf_url" content="(.+?)"'),
+        (re.compile(r'<meta name="citation_pdf_url" content="(.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # philpapers.org:
-        (re.compile('<h1.+ href="https://philpapers.org/go.pl[^"]+u=(http.+?)"'),
+        (re.compile(r'<h1.+ href="https://philpapers.org/go.pl[^"]+u=(http.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # philsci-archive.pitt.edu:
-        (re.compile('<meta name="eprints.document_url" content="(.+?)"'),
+        (re.compile(r'<meta name="eprints.document_url" content="(.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # sciencedirect.com:
-        (re.compile('pdfurl="(.+?)"'),
+        (re.compile(r'pdfurl="(.+?)"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # PLOSOne:
-        (re.compile('(https?://www.plosone.org/article/.+?representation=PDF)" id="downloadPdf"'),
+        (re.compile(r'(https?://www.plosone.org/article/.+?representation=PDF)" id="downloadPdf"'),
         (lambda m: page.make_absolute(requests.utils.unquote(m.group(1))))),
         # Google Drive:
-        (re.compile('content="https://drive.google.com/file/d/(.+?)/'),
+        (re.compile(r'content="https://drive.google.com/file/d/(.+?)/'),
         (lambda m: 'https://drive.google.com/uc?export=download&id={}'.format(requests.utils.unquote(m.group(1)))))
     ]
     for (pattern, retr_target) in redir_patterns:
@@ -597,7 +597,7 @@ def check_steppingstone(page):
     # and not be an SEP entry:
     if 'stanford.edu/entries' in page.url:
         return None
-    targets = set(u for u in page.xpath('//a/@href') if re.search('.pdf$', u, re.I))
+    targets = set(u for u in page.xpath('//a/@href') if re.search(r'.pdf$', u, re.I))
     if len(targets) != 1:
         debug(3, "no: %s links to pdf files", len(targets))
         debug(4, "targets: %s", targets)
@@ -610,9 +610,9 @@ def check_steppingstone(page):
 def save_local(r):
     '''saves file from resource, returns (local_path, md5)'''
     # use recognizable tempfile name:
-    m = re.search('/([^/]+?)(?:\.\w+)?(?:[\?\#].+)*$', r.url)
+    m = re.search(r'/([^/]+?)(?:\.\w+)?(?:[\?\#].+)*$', r.url)
     fname = m.group(1) if m else r.url
-    fname = re.sub('\W', '_', fname) + '.' + r.filetype
+    fname = re.sub(r'\W', '_', fname) + '.' + r.filetype
     temppath = os.path.join(tempdir(), fname)
     debug(2, "saving %s to %s", r.url, temppath)
     md5 = hashlib.md5()
@@ -661,11 +661,11 @@ def get_duplicate(doc):
     debug(5, "checking for duplicates")
     where = ['doc_id != %s']
     values = [doc.doc_id]
-    m = re.search('\w\w\w\w+', doc.title) # first title word
+    m = re.search(r'\w\w\w\w+', doc.title) # first title word
     if m:
         where.append('title LIKE %s') 
         values.append('%'+m.group()+'%')
-    m = re.search('(\w\w+)(?:,|$)', doc.authors) # first author surname
+    m = re.search(r'(\w\w+)(?:,|$)', doc.authors) # first author surname
     if m:
         where.append('authors LIKE %s')
         values.append('%'+m.group(1)+'%')
@@ -701,7 +701,7 @@ def context_suggests_published(context):
     # uncomment to test paper processing:
     # return False
 
-    if re.search('forthcoming|unpublished', context, re.I):
+    if re.search(r'forthcoming|unpublished', context, re.I):
         debug(4, 'forthcoming/unpublished in context suggests not yet published')
         return False
     for m in re.finditer(r'\b\d{4}\b', context):
@@ -737,7 +737,7 @@ def paper_is_old(doc):
     available as drafts yet
     """
     debug(4, "checking if paper is old")
-    title = re.sub('<[\S]+?>', '', doc.title) # strip tags
+    title = re.sub(r'<[\S]+?>', '', doc.title) # strip tags
     cur = db.cursor()
     query = "SELECT author FROM publications WHERE title = %s"
     cur.execute(query, (title,))

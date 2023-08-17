@@ -77,18 +77,18 @@ def request_filetype(r):
         return ft
     # trust the following content-type headers:
     content_type = r.headers.get('content-type')
-    m = re.search('pdf|rtf|msword|html?', content_type, re.I) 
+    m = re.search(r'pdf|rtf|msword|html?', content_type, re.I) 
     if m:
         return normalize(m.group(0))
     # for others, first check if content has pdf signature:
     if r.content.startswith(b'%PDF-'):
         return 'pdf'
     # otherwise use file-ending, if it is a 2-4 character string:
-    m = re.search('/.+/.+\.([A-Za-z]{2,4})$', r.url)
+    m = re.search(r'/.+/.+\.([A-Za-z]{2,4})$', r.url)
     if m:
         return normalize(m.group(1))
     # otherwise just accept whatever the header says:
-    m = re.search('.+/(.+)', content_type)
+    m = re.search(r'.+/(.+)', content_type)
     if m: 
         return normalize(m.group(1))
     else:
@@ -142,12 +142,12 @@ def strip_tags(text, keep_italics=False):
         text = re.sub(r'<(/?)(?:i|b|em)>', r'{\1emph}', text, flags=re.IGNORECASE)
         # also keep sub/supscript tags, e.g. for 'x_1'
         text = re.sub(r'<(/?su[bp])>', r'{\1}', text, flags=re.IGNORECASE)
-    text = re.sub('<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub('<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub('<.+?>', ' ', text, flags=re.DOTALL)
-    text = re.sub('<', '&lt;', text)
-    text = re.sub('  +', ' ', text)
-    text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
+    text = re.sub(r'<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub(r'<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub(r'<.+?>', ' ', text, flags=re.DOTALL)
+    text = re.sub(r'<', '&lt;', text)
+    text = re.sub(r'  +', ' ', text)
+    text = re.sub(r'(?<=\w) (?=[\.,;:\-\)])', '', text)
     if keep_italics:
         text = re.sub(r'{(/?)emph}', r'<\1i>', text)
         text = re.sub(r'{(/?su[bp])}', r'<\1>', text)
@@ -161,11 +161,11 @@ def text_content(xmlfile):
     with open(xmlfile, 'r', encoding='utf-8') as f:
         xml = f.read()
         text = ''
-        textre = re.compile('<text.+?>(.+?)</text>', re.DOTALL)
+        textre = re.compile(r'<text.+?>(.+?)</text>', re.DOTALL)
         for m in textre.finditer(xml):
             text += m.group(1) + '\n'
         # strip <sub>, <b>, etc.:
-        text = re.sub('</?\w.*?>', '', text)
+        text = re.sub(r'</?\w.*?>', '', text)
         # join hyphenated words:
-        text = re.sub('[-—]\n(\w\S+)\s', r'\1\n', text)
+        text = re.sub(r'[-—]\n(\w\S+)\s', r'\1\n', text)
         return text

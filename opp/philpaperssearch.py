@@ -54,7 +54,7 @@ def get_publications(author_name, strict=False):
 
     results = []
     for recordhtml in r.text.split("class='entry'>")[1:]:
-        m = re.search("class='articleTitle[^>]+>([^<]+)</span>", recordhtml)
+        m = re.search(r"class='articleTitle[^>]+>([^<]+)</span>", recordhtml)
         if not m:
             continue
         title = m.group(1)
@@ -66,7 +66,7 @@ def get_publications(author_name, strict=False):
             title = title[:-1]
         ms = re.findall("class='name'>([^<]+)</span>", recordhtml)
         authors = [m for m in ms]
-        m = re.search('class="pubYear">([^<]+)</span>', recordhtml)
+        m = re.search(r'class="pubYear">([^<]+)</span>', recordhtml)
         year = m.group(1) if m and m.group(1).isdigit() else None
         debug(4, '{}: {} ({})'.format(authors, title, year))
         if any(name_match(name) for name in authors):

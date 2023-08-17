@@ -204,7 +204,7 @@ class Source(Webpage):
         return None
 
         # We could also look for session variants in the whole db:
-        # pattern = re.sub('(?<='+v+')[\w-]+', '[\\w-]+', url)
+        # pattern = re.sub(r'(?<='+v+')[\w-]+', '[\\w-]+', url)
         # query = "SELECT url FROM links WHERE url REGEX %s LIMIT 1"
         # cur.execute(query, pattern)
         # variants = cur.fetchall()
@@ -325,7 +325,7 @@ class Source(Webpage):
 
     issource_classifier.likelihood(
         "blog post url",
-        lambda s: re.search("20\d\d/\d\d?/", s.url),
+        lambda s: re.search(r"20\d\d/\d\d?/", s.url),
         p_ifyes=0.01, p_ifno=0.1)
 
     issource_classifier.likelihood(
@@ -519,7 +519,7 @@ class Link():
         # First climb up DOM until we reach an element (par) that's
         # too large:
         el = self.element
-        par = el.find_element_by_xpath('..')
+        par = el.find_element('xpath', '..')
         debug(4, 'starting with %s', el.get_attribute('outerHTML'))
         el._text = el.get_attribute('textContent')
         while (True):
@@ -545,7 +545,7 @@ class Link():
                 debug(4, 'stopping: enough text already (%s)', el._text)
                 break
             try:
-                gpar = par.find_element_by_xpath('..')
+                gpar = par.find_element('xpath', '..')
                 el,par = par,gpar
             except Exception:
                 break
@@ -690,8 +690,8 @@ class Link():
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             try:
                 cur.execute(query, values)
-            except:
-                debug(1, "oops, %s: %s", query, ','.join(map(str, values)))
+            except Exception as e:
+                debug(1, "oops, %s\n%s: %s", e, query, ','.join(map(str, values)))
                 # raise
             self.link_id = cur.lastrowid
         debug(4, cur._executed)
@@ -824,6 +824,8 @@ class Doc():
         cur = db.cursor()
         fields = [f for f in self.db_fields.keys()
                   if f != 'doc_id' and getattr(self, f) is not None]
+        for f in fields:
+            print(f, getattr(self, f))
         values = [getattr(self, f) for f in fields]
         if self.doc_id:
             query = "UPDATE docs SET {},urlhash=MD5(url) WHERE doc_id = %s".format(
@@ -832,6 +834,7 @@ class Doc():
         else:
             query = "INSERT INTO docs ({},urlhash) VALUES ({},MD5(url))".format(
                 ",".join(fields), ",".join(("%s",)*len(fields)))
+            print(query)
             cur.execute(query, values)
             self.doc_id = cur.lastrowid
         debug(4, cur._executed)
@@ -898,7 +901,7 @@ class Doc():
         try:
             if self.source.sourcetype != 'repo':
                 return self.source.default_author
-            re_split = re.compile(',| & | and|\(')
+            re_split = re.compile(r',| & | and|\(')
             au, rest = re_split.split(self.link.context.strip(), 1)
             if len(au.split()) == 1:
                 au2, rest2 = re_split.split(rest, 1)

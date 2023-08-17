@@ -161,5 +161,5 @@ def enrich_doc(doc, extractor_res, preserve_fields=None):
 
 def strip_markup(string):
     '''strip <b>, <i>, <sub>, <sup> tags from extracted titles or abstractes'''
-    return re.sub('</?.+?>', '', string)
+    return re.sub(r'</?.+?>', '', string)
 

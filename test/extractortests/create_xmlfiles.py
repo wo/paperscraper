@@ -7,7 +7,7 @@ import re
 sys.path.append('..')
 from pdf2xml import pdf2xml
 
-pdfs = [f for f in listdir('.') if re.search('.pdf$', f)]
+pdfs = [f for f in listdir('.') if re.search(r'.pdf$', f)]
 
 for pdf in pdfs:
     print(pdf)

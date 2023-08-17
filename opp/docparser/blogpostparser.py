@@ -139,12 +139,12 @@ def strip_tags(text, keep_italics=False):
         text = re.sub(r'<(/?)(?:i|b|em|strong)>', r'{\1emph}', text, flags=re.IGNORECASE)
         # also keep sub/supscript tags, e.g. for 'x_1'
         text = re.sub(r'<(/?su[bp])>', r'{\1}', text, flags=re.IGNORECASE)
-    text = re.sub('<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub('<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
-    text = re.sub('<.+?>', ' ', text, flags=re.DOTALL)
-    text = re.sub('<', '&lt;', text)
-    text = re.sub('  +', ' ', text)
-    text = re.sub('(?<=\w) (?=[\.,;:\-\)])', '', text)
+    text = re.sub(r'<script.+?</script>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub(r'<style.+?</style>', '', text, flags=re.DOTALL|re.IGNORECASE)
+    text = re.sub(r'<.+?>', ' ', text, flags=re.DOTALL)
+    text = re.sub(r'<', '&lt;', text)
+    text = re.sub(r'  +', ' ', text)
+    text = re.sub(r'(?<=\w) (?=[\.,;:\-\)])', '', text)
     if keep_italics:
         text = re.sub(r'{(/?)emph}', r'<\1i>', text)
         text = re.sub(r'{(/?su[bp])}', r'<\1>', text)

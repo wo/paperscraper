@@ -31,38 +31,43 @@ def testdb():
         cur.execute('DELETE FROM {}'.format(t))
     db.commit()
     Source(
-        url='http://umsu.de/papers/',
+        url='https://www.umsu.de/writing/',
         sourcetype='personal',
         status=0,
         last_checked=datetime.now()).save_to_db()
     Source(
-        url='http://consc.net/papers.html',
+        url='https://consc.net/papers.html',
         sourcetype='personal',
         status=1).save_to_db()
 
-def test_Source(testdb):
-    src = Source(url='http://umsu.de/papers/')
+def test_Source(testdb, caplog):
+    caplog.set_level(logging.DEBUG, logger='opp')
+    src = Source(url='https://www.umsu.de/writing/')
     src.load_from_db()
     assert type(src.last_checked) is datetime
     assert type(src.found_date) is datetime
     src.update_db(name="wo's weblog")
-    src2 = Source(url='http://umsu.de/papers/')
+    src2 = Source(url='https://www.umsu.de/writing/')
     src2.load_from_db()
     assert src2.name == "wo's weblog"
 
-def test_Link(testdb):
-    li = Link(source_id=1, url='http://umsu.de/papers/magnetism2.pdf')
+def test_Link(testdb, caplog):
+    caplog.set_level(logging.DEBUG, logger='opp')
+    src = Source(url='https://www.umsu.de/writing/')
+    src.load_from_db()
+    li = Link(source_id=src.source_id, url='https://www.umsu.de/writing/magnetism2.pdf')
     li.update_db(filesize=1234)
     assert li.link_id > 0
-    li2 = Link(source_id=1, url='http://umsu.de/papers/magnetism2.pdf')
+    li2 = Link(source_id=src.source_id, url='https://www.umsu.de/writing/magnetism2.pdf')
     li2.load_from_db()
     assert li2.filesize == 1234
 
-def test_Doc(testdb):
-    doc = Doc(url='http://umsu.de/papers/magnetism.pdf')
+def test_Doc(testdb, caplog):
+    caplog.set_level(logging.DEBUG, logger='opp')
+    doc = Doc(url='https://www.umsu.de/writing/magnetism.pdf')
     doc.update_db(authors='wo')
     assert doc.doc_id > 0
-    doc2 = Doc(url='http://umsu.de/papers/magnetism.pdf')
+    doc2 = Doc(url='https://www.umsu.de/writing/magnetism.pdf')
     doc2.load_from_db()
     assert doc2.authors == 'wo'
 

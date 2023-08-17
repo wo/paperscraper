@@ -121,7 +121,7 @@ def xml_add_page(xml, page_hocr):
     debug(2, 'converting hocr to pdtohtml-style xml')
     
     xml_add_page.page_count += 1
-    re_bbox = re.compile('bbox (\d+) (\d+) (\d+) (\d+)')
+    re_bbox = re.compile(r'bbox (\d+) (\d+) (\d+) (\d+)')
     
     hocr = lxml.html.document_fromstring(page_hocr)
     try:
@@ -186,7 +186,7 @@ def tidy_hocr_line(line):
     # etree xml trees.
     linestr = lxml.etree.tostring(line, encoding=str)
     debug(5, "tidying hocr line %s", linestr)
-    m = re.match('(<text.*?>)(.+)(</text>)', linestr, flags=re.DOTALL)
+    m = re.match(r'(<text.*?>)(.+)(</text>)', linestr, flags=re.DOTALL)
     if not m:
         return None
     (start, content, end) = m.groups()
@@ -194,16 +194,16 @@ def tidy_hocr_line(line):
     content = content.replace('strong>', 'b>')
     content = content.replace('em>', 'i>')
     # merge consecutive (careful of </i><b><i>):
-    content = re.sub('</b>([^<]{0,4})<b>', r'\1', content)
-    content = re.sub('</i>([^<]{0,4})<i>', r'\1', content)
+    content = re.sub(r'</b>([^<]{0,4})<b>', r'\1', content)
+    content = re.sub(r'</i>([^<]{0,4})<i>', r'\1', content)
     # if most of a line is bold, make whole line bold (important for
     # title extraction):
     bpart = ''.join(re.findall('<b>.+?</b>', content))
     if len(bpart) > len(content)*2/3:
-        content = '<b>'+re.sub('</?b>', '', content)+'</b>'
+        content = '<b>'+re.sub(r'</?b>', '', content)+'</b>'
     elif bpart:
         # strip all bold tags, because tesseract finds too many
-        content = re.sub('</?b>', '', content)
+        content = re.sub(r'</?b>', '', content)
     if not content:
         return None
     linestr = start + content + end
@@ -213,10 +213,10 @@ def tidy_hocr_line(line):
 
 def fix_ocr(string):
     # fix some common OCR mistakes:
-    string = re.sub('(?<=[a-z])0(?=[a-z])', 'o', string) # 0 => o
-    string = re.sub('(?<=[A-Z])0(?=[A-Z])', 'o', string) # 0 => O
-    string = re.sub('(?<=[a-z])1(?=[a-z])', 'i', string) # 1 => i
-    string = re.sub('. .u \&\#174\;', '', string)        # the JSTOR logo
+    string = re.sub(r'(?<=[a-z])0(?=[a-z])', 'o', string) # 0 => o
+    string = re.sub(r'(?<=[A-Z])0(?=[A-Z])', 'o', string) # 0 => O
+    string = re.sub(r'(?<=[a-z])1(?=[a-z])', 'i', string) # 1 => i
+    string = re.sub(r'. .u \&\#174\;', '', string)        # the JSTOR logo
     return string
 
 def scale(x):
@@ -238,7 +238,7 @@ def line_attribs(line):
     around fontsize, which reflects how well the font size could be
     estimated)
     """
-    re_bbox = re.compile('bbox (\d+) (\d+) (\d+) (\d+)')
+    re_bbox = re.compile(r'bbox (\d+) (\d+) (\d+) (\d+)')
     m = re_bbox.search(line.xpath('@title')[0])
     if not m:
         return defaultdict(int)
@@ -247,7 +247,7 @@ def line_attribs(line):
     # 1427 2673; baseline -0.001 -6"; the second baseline number seems
     # to indicate the amount by which the font descends below its
     # baseline (here: 6).
-    #re_descent = re.compile('baseline [-\d\.]+ ([\d\-]+)')
+    #re_descent = re.compile(r'baseline [-\d\.]+ ([\d\-]+)')
     #m = re_descent.search(line.xpath('@title')[0])
     #descent = int(m.group(1))*-1 if m else 0
     #debug(5, 'left: %s, top: %s, width: %s, height: %s, descent: %s',
@@ -274,7 +274,7 @@ def line_attribs(line):
         # computes a height including such letters. So if a word
         # doesn't have sufficiently descending letters, we have to add
         # a bit to (wbottom-wtop)
-        has_desc = re.search('[qypgj;,]', wtext)
+        has_desc = re.search(r'[qypgj;,]', wtext)
         if not has_desc:
             wheight = wheight * 1.3
             debug(5, '    height adjusted to %s', str(wheight))
@@ -282,15 +282,15 @@ def line_attribs(line):
         #height = scale(bottom-top) if baseline < -1 else int(height_to_base * 1.3)
         height = max(height, wheight)
         # Now estimate font size:
-        has_caps = re.search('[A-Z]', wtext)
-        has_asc = re.search('[tidfhjklb]', wtext)
+        has_caps = re.search(r'[A-Z]', wtext)
+        has_asc = re.search(r'[tidfhjklb]', wtext)
         if has_caps:
             guess, quality = wheight, 'good'
         elif has_asc:
             guess, quality = wheight, 'good'
         else:
             guess, quality = wheight * 1.3, 'bad'
-        if not re.match('[A-Za-z\-\.\,\;]+$', wtext):
+        if not re.match(r'[A-Za-z\-\.\,\;]+$', wtext):
             # special characters like ( or ' interfere with font size estimation
             quality = 'terrible'
         debug(5, '    fontsize estimate %s credibility %s', guess, quality)
