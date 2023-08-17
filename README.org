@@ -1,0 +1,67 @@
+
+* What?
+
+This is a collection of tools to track philosophy papers and blog posts that
+recently appeared somewhere on the open internet.
+
+* Installation
+
+I'm running this on Ubuntu 22.
+
+** OS packages
+
+#+begin_src 
+add-apt-repository ppa:libreoffice/ppa
+sudo apt install aspell-en libaspell-dev libmysqlclient-dev libreoffice unoconv pkg-config tesseract-ocr imagemagick poppler-utils pdftk ghostscript cuneiform wkhtmltopdf
+#+end_src
+
+** Python packages (pip in virtualenv):
+
+#+begin_src 
+pip install lxml nltk selenium numpy scikit-learn google-api-python-client lxml pymysql beautifulsoup4 webdriver_manager pytest trafilatura
+#+end_src
+
+Also:
+
+#+begin_src
+$ python
+>>> import nltk
+>>> nltk.download('punkt')
+$ sudo mv ~/nltk_data /usr/share/
+#+end_src
+
+** Perl packages (only works with sudo):
+
+#+begin_src
+sudo cpan -i DBI DBD::mysql LWP Text::Aspell Text::Capitalize Text::Unidecode Text::Names String::Approx Lingua::Stem::Snowball JSON Config::JSON Statistics::Lite
+#+end_src
+
+** Firefox/geckodriver
+
+Getting firefox and geckodriver to run is a bit of a pain. I installed both manually and entered their location in config.json. I also had to install libgtk-3-dev and libdbus-glib-1-2.
+
+Test your installation:
+#+begin_src
+pytest test/test_browser.py -k "test_install"
+#+end_src
+
+** Google
+
+Create a google API key: https://developers.google.com/custom-search/v1/introduction
+Then create a custom search engine: https://programmablesearchengine.google.com/controlpanel/all
+
+** config.json
+
+Copy cp_to_config.json to config.json and fill in the relevant fields.
+
+* The small print
+
+The development of an earlier stage of this software was supported by the
+University of London and the UK Joint Information Systems Committee as part of
+the PhilPapers 2.0 project (Information Environment programme).
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version. See http://www.gnu.org/licenses/gpl.html.
+
