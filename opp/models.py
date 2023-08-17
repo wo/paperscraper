@@ -6,6 +6,7 @@ from opp import db, error, util, philpaperssearch
 from opp.debug import debug, debuglevel
 from opp.webpage import Webpage
 from opp.subjectivebayes import SubjectiveNaiveBayes 
+from selenium.webdriver.common.by import By
 
 class Source(Webpage):
     """ represents a source page with links to papers """
@@ -40,7 +41,7 @@ class Source(Webpage):
         cur = db.dict_cursor()
         query = "SELECT * FROM sources WHERE urlhash = MD5(%s) LIMIT 1"
         cur.execute(query, (url,))
-        debug(5, cur._last_executed)
+        debug(5, cur.statement)
         sources = cur.fetchall()
         if sources:
             for k,v in sources[0].items():
@@ -56,7 +57,7 @@ class Source(Webpage):
             query = "UPDATE sources SET {},urlhash=MD5(url) WHERE source_id = %s".format(
                 ",".join(k+"=%s" for k in kwargs.keys()))
             cur.execute(query, tuple(kwargs.values()) + (self.source_id,))
-            debug(3, cur._last_executed)
+            debug(3, cur.statement)
             db.commit()
     
     def mark_as_dead(self, statuscode):
@@ -70,7 +71,7 @@ class Source(Webpage):
             #cur = db.cursor()
             # query = "DELETE FROM sources WHERE source_id = %s"
             #cur.execute(query, (self.source_id,))
-            #debug(3, cur._last_executed)
+            #debug(3, cur.statement)
             #db.commit()
         else:
             self.update_db(status=statuscode)
@@ -84,7 +85,7 @@ class Source(Webpage):
         query = "INSERT INTO sources ({}, urlhash) VALUES ({}, MD5(url))".format(
             ",".join(fields), ",".join(("%s",)*len(fields)))
         cur.execute(query, values)
-        debug(3, cur._last_executed)
+        debug(3, cur.statement)
         db.commit()
         self.source_id = cur.lastrowid
     
@@ -106,7 +107,7 @@ class Source(Webpage):
         
         # lots of try/except because selenium easily crashes:
         try:
-            els = browser.find_elements_by_tag_name("a")
+            els = browser.find_elements(By.TAG_NAME, "a")
         except:
             debug(1, "cannot retrieve links from page %s", self.url)
             return [],[]
@@ -175,7 +176,7 @@ class Source(Webpage):
             cur = db.dict_cursor()
             query = "SELECT * FROM links WHERE source_id = %s"
             cur.execute(query, (self.source_id,))
-            debug(5, cur._last_executed)
+            debug(5, cur.statement)
             self._links = [ Link(source=self, **li) for li in cur.fetchall() ]
             #debug(2, 'xxx old links:\n%s', '\n'.join([li.url for li in self._links]))
 
@@ -213,7 +214,7 @@ class Source(Webpage):
         cur = db.cursor()
         query = "SELECT authors FROM docs WHERE source_id = %s"
         cur.execute(query, (self.source_id,))
-        debug(4, cur._last_executed)
+        debug(4, cur.statement)
         return [row[0] for row in cur.fetchall()]
         
     def looks_dead(self):
@@ -413,7 +414,7 @@ class Source(Webpage):
         for pub in pubs:
             query = "INSERT INTO publications (author, title, year) VALUES (%s,%s,%s)"
             cur.execute(query, (name, pub[0], pub[1]))
-            debug(4, cur._last_executed)
+            debug(4, cur.statement)
         db.commit()
         return [pub[0] for pub in pubs]
 
@@ -524,8 +525,8 @@ class Link():
         while (True):
             debug(4, 'climbing up par: %s', par.get_attribute('outerHTML'))
             # check if parent has many links or other significant children
-            par._links = par.find_elements_by_xpath('.//a')
-            par._children = par.find_elements_by_xpath('./*')
+            par._links = par.find_elements('xpath', './/a')
+            par._children = par.find_elements('xpath', './*')
             if len(par._links) > 3:
                 debug(4, 'stopping: too many links (%s)', len(par._links))
                 break
@@ -660,7 +661,7 @@ class Link():
         cur = db.dict_cursor()
         query = "SELECT * FROM links WHERE urlhash = MD5(%s) AND source_id = %s LIMIT 1"
         cur.execute(query, (url, source_id))
-        debug(5, cur._last_executed)
+        debug(5, cur.statement)
         links = cur.fetchall()
         if links:
             for k,v in links[0].items():
@@ -693,7 +694,7 @@ class Link():
                 debug(1, "oops, %s: %s", query, ','.join(map(str, values)))
                 # raise
             self.link_id = cur.lastrowid
-        debug(4, cur._last_executed)
+        debug(4, cur.statement)
         db.commit()
 
     def fetch(self, url=None, only_if_modified=True):
@@ -786,7 +787,7 @@ class Doc():
             cur.execute(query, (self.url,))
         else:
             raise TypeError("need url or filehash to check doc in db")
-        debug(4, cur._last_executed)
+        debug(4, cur.statement)
         docs = cur.fetchall()
         if docs:
             self.doc_id = docs[0][0]
@@ -806,7 +807,7 @@ class Doc():
             cur.execute(query, (url,))
         else:
             raise TypeError("need doc_id or url to load doc from db")
-        debug(5, cur._last_executed)
+        debug(5, cur.statement)
         docs = cur.fetchall()
         if docs:
             for k,v in docs[0].items():
@@ -833,7 +834,7 @@ class Doc():
                 ",".join(fields), ",".join(("%s",)*len(fields)))
             cur.execute(query, values)
             self.doc_id = cur.lastrowid
-        debug(4, cur._last_executed)
+        debug(4, cur.statement)
         db.commit()
         
     def assign_category(self, cat_id, strength):
@@ -844,7 +845,7 @@ class Doc():
         query = ("INSERT INTO docs2cats (cat_id, doc_id, strength) VALUES (%s,%s,%s)"
                  " ON DUPLICATE KEY UPDATE strength=%s")
         cur.execute(query, (cat_id, self.doc_id, strength, strength))
-        debug(4, cur._last_executed)
+        debug(4, cur.statement)
         db.commit()
 
     @property

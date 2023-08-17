@@ -154,7 +154,7 @@ def update_classifier(category):
              " FROM docs D, docs2cats M"
              " WHERE M.doc_id = D.doc_id AND M.cat_id = %s AND M.is_training = 1")
     cur.execute(query, (cat_id,))
-    debug(5, cur._last_executed)
+    debug(5, cur.statement)
     rows = cur.fetchall()
     if not rows:
         raise Exception('no training documents for classifier')

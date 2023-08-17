@@ -37,7 +37,7 @@ def next_source():
              " AND sourcetype != 'blog'"
              " LIMIT 1")
     cur.execute(query)
-    debug(4, cur._last_executed)
+    debug(4, cur.statement)
     sources = cur.fetchall()
     if sources:
         debug(1, "processing new source")
@@ -56,7 +56,7 @@ def next_source():
              " AND last_checked < %s"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
-    debug(4, cur._last_executed)
+    debug(4, cur.statement)
     sources = cur.fetchall()
     if sources:
         return Source(**sources[0])
@@ -71,7 +71,7 @@ def next_source():
              " AND last_checked < %s"
              " ORDER BY last_checked LIMIT 1")
     cur.execute(query, (min_age,))
-    debug(4, cur._last_executed)
+    debug(4, cur.statement)
     sources = cur.fetchall()
     if sources:
         debug(1, "re-checking broken source")
@@ -677,7 +677,7 @@ def get_duplicate(doc):
     query = "SELECT * FROM docs WHERE status=1 AND " + (' AND '.join(where))
     query += " LIMIT 100"
     cur.execute(query, values)
-    debug(5, cur._last_executed)
+    debug(5, cur.statement)
     dupes = cur.fetchall()
     for dupe in dupes:
         debug(5, "candidate: %s, '%s'", dupe['authors'], dupe['title'])

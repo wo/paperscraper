@@ -16,7 +16,7 @@ def run():
     cur = db.cursor()
     query = "SELECT doc_id FROM docs WHERE doctype = 'blogpost' AND status = 0"
     cur.execute(query)
-    debug(4, cur._last_executed)
+    debug(4, cur.statement)
     posts = cur.fetchall()
     if not posts:
         return debug(3, "no new blog posts")
@@ -77,7 +77,7 @@ def remove_from_db(doc):
     query = "DELETE FROM docs WHERE doc_id = %s"
     try:
         cur.execute(query, (doc.doc_id,))
-        debug(4, cur._last_executed)
+        debug(4, cur.statement)
         db.commit()
     except:
         # delete fails if blogpost url is a document that has also

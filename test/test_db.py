@@ -16,7 +16,6 @@ def test_cursor():
 def test_query(caplog):
     cur = db.dict_cursor()
     query = "SELECT * FROM sources"
-    #cur.execute(query, (url,))
     cur.execute(query)
     sources = cur.fetchall()
     assert True
