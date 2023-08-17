@@ -14,6 +14,7 @@ def debuglevel(level=None):
         return _debuglevel
 
 def debug(level, msg, *args):
+    # print(str(msg), *args)
     if _debuglevel >= level:
         logger.debug(str(msg), *args)
 
